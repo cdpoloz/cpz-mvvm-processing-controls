@@ -1,16 +1,22 @@
 package com.cpz.processing.controls.hit;
 
+import com.cpz.processing.controls.hit.interfaces.HitTest;
+
 public final class CircleHitTest implements HitTest {
 
     private float cx, cy, r;
+
+    public CircleHitTest() {
+    }
 
     public CircleHitTest(float cx, float cy, float r) {
         set(cx, cy, r);
     }
 
     @Override
-    public void onLayout(float x, float y, float size) {
-        set(x, y, size * 0.5f);
+    public void onLayout(float x, float y, float width, float height) {
+        float diameter = Math.min(width, height);
+        set(x, y, diameter * 0.5f);
     }
 
     public void set(float cx, float cy, float r) {

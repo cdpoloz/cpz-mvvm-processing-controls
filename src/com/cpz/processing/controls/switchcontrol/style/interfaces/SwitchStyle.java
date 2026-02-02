@@ -1,4 +1,4 @@
-package com.cpz.processing.controls.switchcontrol.style;
+package com.cpz.processing.controls.switchcontrol.style.interfaces;
 
 import com.cpz.processing.controls.switchcontrol.view.SwitchViewState;
 import processing.core.PApplet;

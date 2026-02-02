@@ -6,7 +6,8 @@ package com.cpz.processing.controls.switchcontrol.view;
 
 public record SwitchViewState(float x,
                               float y,
-                              float size,
+                              float width,
+                              float height,
                               int stateIndex,
                               int totalStates,
                               boolean hovering,
