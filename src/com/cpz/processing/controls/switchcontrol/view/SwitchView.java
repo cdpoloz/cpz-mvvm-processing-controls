@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.switchcontrol.view;
 
+import com.cpz.processing.controls.common.ControlView;
 import com.cpz.processing.controls.hit.CircleHitTest;
 import com.cpz.processing.controls.hit.interfaces.HitTest;
 import com.cpz.processing.controls.switchcontrol.style.SwitchDefaultStyles;
@@ -12,7 +13,7 @@ import processing.core.PApplet;
 /**
  * @author CPZ
  */
-public final class SwitchView {
+public final class SwitchView implements ControlView {
 
     // <editor-fold defaultstate="collapsed" desc="*** variables ***">
     private final PApplet sketch;

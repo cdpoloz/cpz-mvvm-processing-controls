@@ -1,4 +1,4 @@
-package dev.java.com.cpz.processing.controls.dev;
+package com.cpz.processing.controls.dev;
 
 import com.cpz.processing.controls.hit.CircleHitTest;
 import com.cpz.processing.controls.switchcontrol.SwitchInputAdapter;
@@ -20,10 +20,6 @@ public class SwitchDevSketch extends PApplet {
     private SwitchViewModel swViewModel1, swViewModel2;
     private SwitchView swView1, swView2;
     private SwitchInputAdapter swInput1, swInput2;
-
-    public static void main(String[] args) {
-        PApplet.main(SwitchDevSketch.class);
-    }
 
     @Override
     public void settings() {
