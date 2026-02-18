@@ -1,13 +1,10 @@
 package com.cpz.processing.controls.switchcontrol;
 
-import lombok.Getter;
-
 /**
  * @author CPZ
  */
 public final class SwitchModel {
 
-    @Getter
     private int state, prevState;
 
     public void nextState(int totalStates) {
@@ -34,6 +31,14 @@ public final class SwitchModel {
 
     public boolean isFirstState() {
         return state == 0;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public int getPrevState() {
+        return prevState;
     }
 
 }

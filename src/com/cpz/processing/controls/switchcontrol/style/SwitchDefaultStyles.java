@@ -3,8 +3,6 @@ package com.cpz.processing.controls.switchcontrol.style;
 import com.cpz.processing.controls.switchcontrol.style.interfaces.SwitchStyle;
 import com.cpz.processing.controls.switchcontrol.style.render.CircleShapeRenderer;
 import com.cpz.processing.controls.util.Colors;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * @author CPZ
@@ -13,8 +11,7 @@ public final class SwitchDefaultStyles {
 
     private SwitchDefaultStyles() {}
 
-    @Contract(" -> new")
-    public static @NotNull SwitchStyle circular() {
+    public static SwitchStyle circular() {
         SwitchStyleConfig cfg = new SwitchStyleConfig();
         cfg.shape = new CircleShapeRenderer();
         cfg.colorEstados = new int[] {

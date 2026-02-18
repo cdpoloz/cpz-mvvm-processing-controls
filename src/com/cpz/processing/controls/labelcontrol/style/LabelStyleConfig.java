@@ -1,6 +1,6 @@
 package com.cpz.processing.controls.labelcontrol.style;
 
-import processing.core.PApplet;
+import processing.core.PConstants;
 import processing.core.PFont;
 
 /**
@@ -12,7 +12,7 @@ public class LabelStyleConfig {
     public float textSize = 12f;
     public int textColor = 0;
     public float lineSpacingMultiplier = 1.0f;
-    public int alignX = PApplet.LEFT;
-    public int alignY = PApplet.BASELINE;
+    public int alignX = PConstants.LEFT;
+    public int alignY = PConstants.BASELINE;
     public int disabledAlpha = 100;
 }

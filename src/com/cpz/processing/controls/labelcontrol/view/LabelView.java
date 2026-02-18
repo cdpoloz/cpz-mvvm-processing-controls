@@ -3,8 +3,6 @@ package com.cpz.processing.controls.labelcontrol.view;
 import com.cpz.processing.controls.common.ControlView;
 import com.cpz.processing.controls.labelcontrol.style.LabelDefaultStyles;
 import com.cpz.processing.controls.labelcontrol.style.interfaces.LabelStyle;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import processing.core.PApplet;
 import java.util.Objects;
 
@@ -23,7 +21,7 @@ public final class LabelView implements ControlView {
     private boolean metricsDirty = true;
     private String lastMeasuredText = "";
 
-    public LabelView(@NotNull PApplet sketch, @NotNull LabelViewModel viewModel, float x, float y) {
+    public LabelView(PApplet sketch, LabelViewModel viewModel, float x, float y) {
         this.sketch = sketch;
         this.viewModel = viewModel;
         this.x = x;
@@ -99,12 +97,11 @@ public final class LabelView implements ControlView {
         this.y = centerY - (cachedHeight * 0.5f);
     }
 
-    @Contract(" -> new")
-    private @NotNull LabelViewState buildViewState() {
+    private LabelViewState buildViewState() {
         return new LabelViewState(x, y, viewModel.getText(), viewModel.isEnabled());
     }
 
-    public void setStyle(@NotNull LabelStyle style) {
+    public void setStyle(LabelStyle style) {
         this.style = style;
         this.metricsDirty = true;
     }

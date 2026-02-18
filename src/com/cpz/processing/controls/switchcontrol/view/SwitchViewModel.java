@@ -1,8 +1,6 @@
 package com.cpz.processing.controls.switchcontrol.view;
 
 import com.cpz.processing.controls.switchcontrol.SwitchModel;
-import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * @author CPZ
@@ -11,15 +9,12 @@ public class SwitchViewModel {
 
     // <editor-fold defaultstate="collapsed" desc="*** variables ***">
     private final SwitchModel model;
-    @Getter
     private int totalStates = 2;
-    @Getter
     private boolean enabled = true;
-    @Getter
     private boolean display = true;
     // </editor-fold>
 
-    public SwitchViewModel(@NotNull SwitchModel model) {
+    public SwitchViewModel(SwitchModel model) {
         this.model = model;
     }
 
@@ -47,11 +42,23 @@ public class SwitchViewModel {
         model.clampState(this.totalStates);
     }
 
+    public int getTotalStates() {
+        return totalStates;
+    }
+
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
     public void setDisplay(boolean display) {
         this.display = display;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public boolean isDisplay() {
+        return display;
     }
 }

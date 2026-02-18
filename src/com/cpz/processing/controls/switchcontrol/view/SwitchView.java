@@ -5,9 +5,6 @@ import com.cpz.processing.controls.hit.CircleHitTest;
 import com.cpz.processing.controls.hit.interfaces.HitTest;
 import com.cpz.processing.controls.switchcontrol.style.SwitchDefaultStyles;
 import com.cpz.processing.controls.switchcontrol.style.interfaces.SwitchStyle;
-import lombok.Getter;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import processing.core.PApplet;
 
 /**
@@ -18,18 +15,17 @@ public final class SwitchView implements ControlView {
     // <editor-fold defaultstate="collapsed" desc="*** variables ***">
     private final PApplet sketch;
     private final SwitchViewModel viewModel;
-    @Getter
     private float x, y, width, height;
     private boolean hovering;
     private SwitchStyle style;
     private HitTest hitTest;
     // </editor-fold>
 
-    public SwitchView(@NotNull PApplet sketch, @NotNull SwitchViewModel viewModel, float x, float y, float size) {
+    public SwitchView(PApplet sketch, SwitchViewModel viewModel, float x, float y, float size) {
         this(sketch, viewModel, x, y, size, size);
     }
 
-    public SwitchView(@NotNull PApplet sketch, @NotNull SwitchViewModel viewModel, float x, float y, float width, float height) {
+    public SwitchView(PApplet sketch, SwitchViewModel viewModel, float x, float y, float width, float height) {
         this.sketch = sketch;
         this.viewModel = viewModel;
         this.x = x;
@@ -54,8 +50,7 @@ public final class SwitchView implements ControlView {
     /**
      * Construye el snapshot visual actual.
      */
-    @Contract(" -> new")
-    private @NotNull SwitchViewState buildViewState() {
+    private SwitchViewState buildViewState() {
         return new SwitchViewState(x, y, width, height, viewModel.getState(), viewModel.getTotalStates(), hovering, viewModel.isEnabled());
     }
 
@@ -71,7 +66,7 @@ public final class SwitchView implements ControlView {
         return hovering;
     }
 
-    public void setHitTest(@NotNull HitTest hitTest) {
+    public void setHitTest(HitTest hitTest) {
         this.hitTest = hitTest;
         this.hitTest.onLayout(x, y, width, height);
     }
@@ -98,7 +93,7 @@ public final class SwitchView implements ControlView {
         hitTest.onLayout(x, y, width, height);
     }
 
-    public void setStyle(@NotNull SwitchStyle style) {
+    public void setStyle(SwitchStyle style) {
         this.style = style;
     }
 

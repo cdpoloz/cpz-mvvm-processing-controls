@@ -2,7 +2,6 @@ package com.cpz.processing.controls.switchcontrol;
 
 import com.cpz.processing.controls.switchcontrol.view.SwitchView;
 import com.cpz.processing.controls.switchcontrol.view.SwitchViewModel;
-import org.jetbrains.annotations.NotNull;
 import processing.core.PApplet;
 
 /**
@@ -16,7 +15,7 @@ public final class SwitchInputAdapter {
     /**
      * Debe llamarse una vez por frame.
      */
-    public void update(PApplet p, SwitchView view, @NotNull SwitchViewModel vm) {
+    public void update(PApplet p, SwitchView view, SwitchViewModel vm) {
         // Si no se muestra, no hay interaccion
         if (!vm.isDisplay() || !vm.isEnabled()) {
             view.setHovering(false);

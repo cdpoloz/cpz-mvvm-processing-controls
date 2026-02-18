@@ -3,7 +3,6 @@ package com.cpz.processing.controls.labelcontrol.style.render;
 import com.cpz.processing.controls.labelcontrol.style.LabelStyleConfig;
 import com.cpz.processing.controls.labelcontrol.style.interfaces.LabelStyle;
 import com.cpz.processing.controls.labelcontrol.view.LabelViewState;
-import org.jetbrains.annotations.NotNull;
 import processing.core.PApplet;
 
 /**
@@ -13,7 +12,7 @@ public final class DefaultTextRenderer implements LabelStyle {
 
     private final LabelStyleConfig config;
 
-    public DefaultTextRenderer(@NotNull LabelStyleConfig config) {
+    public DefaultTextRenderer(LabelStyleConfig config) {
         this.config = config;
     }
 
@@ -36,7 +35,7 @@ public final class DefaultTextRenderer implements LabelStyle {
     }
 
     @Override
-    public void draw(@NotNull PApplet sketch, LabelViewState state) {
+    public void draw(PApplet sketch, LabelViewState state) {
         sketch.pushStyle();
         applyTextStyle(sketch);
         if (!state.enabled()) {
