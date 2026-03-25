@@ -1,56 +1,45 @@
 package com.cpz.processing.controls.buttoncontrol.viewmodel;
 
+import com.cpz.processing.controls.buttoncontrol.ButtonListener;
 import com.cpz.processing.controls.buttoncontrol.model.ButtonModel;
-import com.cpz.processing.controls.buttoncontrol.view.ButtonViewState;
+import com.cpz.processing.controls.common.viewmodel.AbstractInteractiveControlViewModel;
 
 /**
  * @author CPZ
  */
-public final class ButtonViewModel {
+public final class ButtonViewModel extends AbstractInteractiveControlViewModel<ButtonModel> {
 
-    private final ButtonModel model;
-    private boolean hovered;
-    private boolean pressed;
-    private Runnable onClick;
+    private ButtonListener clickListener;
 
     public ButtonViewModel(ButtonModel model) {
-        this.model = model;
+        super(model);
     }
 
-    public void onMouseMove(boolean inside) {
-        hovered = model.isEnabled() && inside;
+    public void setClickListener(ButtonListener listener) {
+        this.clickListener = listener;
     }
 
-    public void onMousePress(boolean inside) {
-        pressed = model.isEnabled() && inside;
+    public String getText() {
+        return model.getText();
     }
 
-    public void onMouseRelease(boolean inside) {
-        boolean shouldRun = pressed
-                && inside
-                && model.isEnabled()
-                && onClick != null;
-        pressed = false;
-        hovered = model.isEnabled() && inside;
-        if (shouldRun) {
-            onClick.run();
+    public void setText(String text) {
+        model.setText(text);
+    }
+
+    @Deprecated
+    public void setOnClick(Runnable action) {
+        if (action == null) {
+            this.clickListener = null;
+        } else {
+            this.clickListener = action::run;
         }
     }
 
-    public void setOnClick(Runnable action) {
-        this.onClick = action;
-    }
-
-    public ButtonViewState buildViewState(float x, float y, float width, float height) {
-        return new ButtonViewState(
-                x,
-                y,
-                width,
-                height,
-                model.getText(),
-                model.isEnabled(),
-                hovered,
-                pressed
-        );
+    @Override
+    protected void activate() {
+        if (clickListener != null) {
+            clickListener.onClick();
+        }
     }
 }

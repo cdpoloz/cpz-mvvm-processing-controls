@@ -35,7 +35,7 @@ public final class DefaultTextRenderer implements LabelStyle {
     }
 
     @Override
-    public void draw(PApplet sketch, LabelViewState state) {
+    public void render(PApplet sketch, LabelViewState state) {
         sketch.pushStyle();
         applyTextStyle(sketch);
         if (!state.enabled()) {

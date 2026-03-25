@@ -1,13 +1,15 @@
 package com.cpz.processing.controls.labelcontrol;
 
+import com.cpz.processing.controls.common.Enableable;
+
 /**
  * @author CPZ
  */
 
-public final class LabelModel {
+public final class LabelModel implements Enableable {
 
     private String text = "";
-    private boolean display = true;
+    private boolean enabled = true;
 
     public void setText(String text) {
         this.text = text != null ? text : "";
@@ -17,11 +19,13 @@ public final class LabelModel {
         return text;
     }
 
-    public void setDisplay(boolean display) {
-        this.display = display;
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public boolean isDisplay(){
-        return display;
+    @Override
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

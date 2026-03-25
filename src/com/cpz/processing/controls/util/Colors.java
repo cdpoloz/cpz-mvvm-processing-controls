@@ -7,7 +7,7 @@ public final class Colors {
 
     private Colors() {}
 
-    // <editor-fold defaultstate="collapsed" desc="*** componentes 0 a 255 ***">
+    // <editor-fold defaultstate="collapsed" desc="*** components 0 to 255 ***">
     public static int agray(int a, int value) {
         return argb(a, value, value, value);
     }
@@ -31,7 +31,7 @@ public final class Colors {
                 |  (b & 0xFF);
     }
     // </editor-fold>
-    // <editor-fold defaultstate="collapsed" desc="*** componentes 0 a 100% ***">
+    // <editor-fold defaultstate="collapsed" desc="*** components 0 to 100% ***">
     public static int rgbPct(int rPct, int gPct, int bPct) {
         return rgb(
                 pctToByte(rPct),
@@ -64,16 +64,16 @@ public final class Colors {
         return Math.max(0, Math.min(100, pct)) * 255 / 100;
     }
     // </editor-fold>
-    // <editor-fold defaultstate="collapsed" desc="*** métodos complementarios ***">
+    // <editor-fold defaultstate="collapsed" desc="*** helper methods ***">
     /**
-    * Le aplica un alpha a un color existente
+    * Applies an alpha channel to an existing color.
      */
     public static int alpha(int a, int color) {
         return (color & 0x00FFFFFF) | ((a & 0xFF) << 24);
     }
 
     /**
-     * Limita el valor de entrada para que su rango sea de 0 a 255
+     * Clamps the input value to the 0..255 range.
      */
     private static int clamp(int v) {
         return Math.max(0, Math.min(255, v));

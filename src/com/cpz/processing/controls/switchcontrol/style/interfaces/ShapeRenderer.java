@@ -8,5 +8,5 @@ import processing.core.PApplet;
  * @author CPZ
  */
 public interface ShapeRenderer {
-    void draw(PApplet p, SwitchViewState s, SwitchStyleConfig cfg);
+    void render(PApplet p, SwitchViewState s, SwitchStyleConfig cfg);
 }

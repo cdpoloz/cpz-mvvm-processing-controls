@@ -1,43 +1,30 @@
 package com.cpz.processing.controls.switchcontrol;
 
-import com.cpz.processing.controls.switchcontrol.view.SwitchView;
-import com.cpz.processing.controls.switchcontrol.view.SwitchViewModel;
-import processing.core.PApplet;
+import com.cpz.processing.controls.common.input.PointerInputAdapter;
+import com.cpz.processing.controls.common.input.PointerInteractable;
+import com.cpz.processing.controls.common.input.PointerInputTarget;
 
 /**
  * @author CPZ
  */
 public final class SwitchInputAdapter {
 
-    private boolean mousePressedPrev = false;
-    private boolean pressStartedInside = false;
+    private final PointerInputAdapter delegate;
 
-    /**
-     * Debe llamarse una vez por frame.
-     */
-    public void update(PApplet p, SwitchView view, SwitchViewModel vm) {
-        // Si no se muestra, no hay interaccion
-        if (!vm.isDisplay() || !vm.isEnabled()) {
-            view.setHovering(false);
-            pressStartedInside = false;
-            mousePressedPrev = p.mousePressed;
-            return;
-        }
-        boolean hovering = view.contains(p.mouseX, p.mouseY);
-        view.setHovering(hovering);
-        boolean pressedNow = p.mousePressed;
-        // press
-        if (pressedNow && !mousePressedPrev) {
-            pressStartedInside = hovering;
-        }
-        // release
-        if (!pressedNow && mousePressedPrev) {
-            if (pressStartedInside && hovering) {
-                vm.onActivate();
-            }
-            pressStartedInside = false;
-        }
-        mousePressedPrev = pressedNow;
+    public SwitchInputAdapter(PointerInteractable view, PointerInputTarget viewModel) {
+        this.delegate = new PointerInputAdapter(view, viewModel);
+    }
+
+    public void handleMouseMove(float mx, float my) {
+        delegate.handleMouseMove(mx, my);
+    }
+
+    public void handleMousePress(float mx, float my) {
+        delegate.handleMousePress(mx, my);
+    }
+
+    public void handleMouseRelease(float mx, float my) {
+        delegate.handleMouseRelease(mx, my);
     }
 
 }

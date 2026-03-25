@@ -14,13 +14,13 @@ public final class ParametricSwitchStyle implements SwitchStyle {
     public ParametricSwitchStyle(SwitchStyleConfig cfg) {
         if (cfg == null) throw new IllegalArgumentException("Config null");
         if (cfg.shape == null) throw new IllegalArgumentException("ShapeRenderer requerido");
-        if (cfg.colorEstados == null || cfg.colorEstados.length == 0)
-            throw new IllegalArgumentException("Debe definirse al menos un color");
+        if (cfg.stateColors == null || cfg.stateColors.length == 0)
+            throw new IllegalArgumentException("At least one color must be defined");
         this.cfg = cfg;
     }
 
     @Override
-    public void draw(PApplet p, SwitchViewState s) {
-        cfg.shape.draw(p, s, cfg);
+    public void render(PApplet p, SwitchViewState s) {
+        cfg.shape.render(p, s, cfg);
     }
 }

@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.switchcontrol.view;
 
 import com.cpz.processing.controls.common.ControlView;
+import com.cpz.processing.controls.common.input.PointerInteractable;
 import com.cpz.processing.controls.hit.CircleHitTest;
 import com.cpz.processing.controls.hit.interfaces.HitTest;
 import com.cpz.processing.controls.switchcontrol.style.SwitchDefaultStyles;
@@ -10,13 +11,12 @@ import processing.core.PApplet;
 /**
  * @author CPZ
  */
-public final class SwitchView implements ControlView {
+public final class SwitchView implements ControlView, PointerInteractable {
 
     // <editor-fold defaultstate="collapsed" desc="*** variables ***">
     private final PApplet sketch;
     private final SwitchViewModel viewModel;
     private float x, y, width, height;
-    private boolean hovering;
     private SwitchStyle style;
     private HitTest hitTest;
     // </editor-fold>
@@ -32,38 +32,40 @@ public final class SwitchView implements ControlView {
         this.y = y;
         this.width = width;
         this.height = height;
-        // estilo por defecto mínimo
+        // minimal default style
         this.style = SwitchDefaultStyles.circular();
-        // HitTest por defecto mínimo
+        // minimal default hit test
         float diameter = Math.min(width, height);
         this.hitTest = new CircleHitTest(x, y, diameter * 0.5f);
     }
 
     /**
-     * Dibuja el control delegando en el estilo activo.
+     * Draws the control using the active style.
      */
     public void draw() {
-        if (!viewModel.isDisplay()) return;
-        style.draw(sketch, buildViewState());
+        if (!viewModel.isVisible()) return;
+        style.render(sketch, buildViewState());
     }
 
     /**
-     * Construye el snapshot visual actual.
+     * Builds the current visual snapshot.
      */
     private SwitchViewState buildViewState() {
-        return new SwitchViewState(x, y, width, height, viewModel.getState(), viewModel.getTotalStates(), hovering, viewModel.isEnabled());
+        return new SwitchViewState(
+                x,
+                y,
+                width,
+                height,
+                viewModel.getState(),
+                viewModel.getTotalStates(),
+                viewModel.isHovered(),
+                viewModel.isEnabled()
+        );
     }
 
-    public void setHovering(boolean hovering) {
-        this.hovering = hovering;
-    }
-
+    @Override
     public boolean contains(float px, float py) {
         return hitTest.contains(px, py);
-    }
-
-    public boolean isHovering() {
-        return hovering;
     }
 
     public void setHitTest(HitTest hitTest) {

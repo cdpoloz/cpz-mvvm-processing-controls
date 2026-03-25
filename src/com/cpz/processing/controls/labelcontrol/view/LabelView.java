@@ -32,13 +32,13 @@ public final class LabelView implements ControlView {
     }
 
     /**
-     * Dibuja el control delegando en el estilo activo.
+     * Draws the control using the active style.
      */
     public void draw() {
-        if (!viewModel.isDisplay()) {
+        if (!viewModel.isVisible()) {
             return;
         }
-        style.draw(sketch, buildViewState());
+        style.render(sketch, buildViewState());
     }
 
     private void updateTextMetrics() {

@@ -8,7 +8,7 @@ import processing.core.PApplet;
  */
 public interface LabelStyle {
 
-    void draw(PApplet sketch, LabelViewState state);
+    void render(PApplet sketch, LabelViewState state);
 
     void applyTextStyle(PApplet sketch);
 

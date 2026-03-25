@@ -11,10 +11,11 @@ import java.util.Locale;
 public class Launcher {
 
     public static void main(String[] args) {
-
         Locale.setDefault(Locale.forLanguageTag("en-US"));
         //PApplet.main(SwitchDevSketch.class);
-        PApplet.main(LabelDevSketch.class);
+        //PApplet.main(LabelDevSketch.class);
+        //PApplet.main(ButtonDevSketch.class);
+        PApplet.main(CheckboxDevSketch.class);
     }
 
 }

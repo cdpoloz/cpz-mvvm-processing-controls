@@ -1,43 +1,29 @@
 package com.cpz.processing.controls.buttoncontrol.input;
 
-import com.cpz.processing.controls.buttoncontrol.view.ButtonView;
-import com.cpz.processing.controls.buttoncontrol.viewmodel.ButtonViewModel;
-import com.cpz.processing.controls.hit.RectHitTest;
+import com.cpz.processing.controls.common.input.PointerInputAdapter;
+import com.cpz.processing.controls.common.input.PointerInteractable;
+import com.cpz.processing.controls.common.input.PointerInputTarget;
 
 /**
  * @author CPZ
  */
 public final class ButtonInputAdapter {
 
-    private final ButtonView view;
-    private final ButtonViewModel viewModel;
-    private final RectHitTest hitTest;
+    private final PointerInputAdapter delegate;
 
-    public ButtonInputAdapter(ButtonView view, ButtonViewModel viewModel) {
-        this.view = view;
-        this.viewModel = viewModel;
-        this.hitTest = new RectHitTest();
+    public ButtonInputAdapter(PointerInteractable view, PointerInputTarget viewModel) {
+        this.delegate = new PointerInputAdapter(view, viewModel);
     }
 
     public void handleMouseMove(float mx, float my) {
-        updateLayout();
-        boolean inside = hitTest.contains(mx, my);
-        viewModel.onMouseMove(inside);
+        delegate.handleMouseMove(mx, my);
     }
 
     public void handleMousePress(float mx, float my) {
-        updateLayout();
-        boolean inside = hitTest.contains(mx, my);
-        viewModel.onMousePress(inside);
+        delegate.handleMousePress(mx, my);
     }
 
     public void handleMouseRelease(float mx, float my) {
-        updateLayout();
-        boolean inside = hitTest.contains(mx, my);
-        viewModel.onMouseRelease(inside);
-    }
-
-    private void updateLayout() {
-        hitTest.onLayout(view.getX(), view.getY(), view.getWidth(), view.getHeight());
+        delegate.handleMouseRelease(mx, my);
     }
 }

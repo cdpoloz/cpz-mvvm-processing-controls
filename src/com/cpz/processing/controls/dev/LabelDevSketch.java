@@ -26,31 +26,31 @@ public class LabelDevSketch extends PApplet {
     @Override
     public void setup() {
 
-        // A) Label con estilo por defecto.
+        // A) Label with default style.
         LabelViewModel vmDefault = new LabelViewModel(new LabelModel());
         vmDefault.setText("Default Label");
         labelDefault = new LabelView(this, vmDefault, 50, 80);
 
-        // B) Multilínea con estilo por defecto.
+        // B) Multiline label with default style.
         LabelViewModel vmMultiline = new LabelViewModel(new LabelModel());
-        vmMultiline.setText("Línea 1\nLínea 2\nLínea 3");
+        vmMultiline.setText("Line 1\nLine 2\nLine 3");
         labelMultiline = new LabelView(this, vmMultiline, 50, 150);
 
-        // C) Bloque centrado usando centerBlockAround(...).
+        // C) Centered block using centerBlockAround(...).
         LabelViewModel vmCentered = new LabelViewModel(new LabelModel());
-        vmCentered.setText("Bloque\nCentrado");
+        vmCentered.setText("Centered\nBlock");
         labelCentered = new LabelView(this, vmCentered, 0, 0);
         labelCentered.centerBlockAround(width / 2f, 250);
 
-        // D) Label deshabilitado para probar disabledAlpha.
+        // D) Disabled label to test disabledAlpha.
         LabelViewModel vmDisabled = new LabelViewModel(new LabelModel());
-        vmDisabled.setText("Label Deshabilitado");
+        vmDisabled.setText("Disabled Label");
         vmDisabled.setEnabled(false);
         labelDisabled = new LabelView(this, vmDisabled, 50, 350);
 
-        // E) Estilo personalizado: fuente, tamaño, color, alineación y espaciado.
+        // E) Custom style: font, size, color, alignment, and spacing.
         LabelViewModel vmCustom = new LabelViewModel(new LabelModel());
-        vmCustom.setText("Estilo\nPersonalizado");
+        vmCustom.setText("Custom\nStyle");
         LabelStyleConfig customConfig = new LabelStyleConfig();
         customConfig.textSize = 24f;
         customConfig.textColor = color(0, 120, 220);

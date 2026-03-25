@@ -8,6 +8,6 @@ import processing.core.PApplet;
  */
 public interface SwitchStyle {
 
-    void draw(PApplet p, SwitchViewState state);
+    void render(PApplet p, SwitchViewState state);
 
 }

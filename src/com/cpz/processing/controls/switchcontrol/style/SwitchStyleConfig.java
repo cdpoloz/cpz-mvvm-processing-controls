@@ -8,11 +8,11 @@ import com.cpz.processing.controls.switchcontrol.style.interfaces.ShapeRenderer;
 public final class SwitchStyleConfig {
 
     public ShapeRenderer shape;
-    public int[] colorEstados;
-    public int colorStroke;
+    public int[] stateColors;
+    public int strokeColor;
     public float strokeWidth;
     public float strokeWidthHover;
-    public int alfaDeshabilitado; // 0–255
-    // ===== Rectángulos =====
-    public float esquinaRadio;
+    public int disabledAlpha; // 0-255
+    // rectangle rendering
+    public float cornerRadius;
 }

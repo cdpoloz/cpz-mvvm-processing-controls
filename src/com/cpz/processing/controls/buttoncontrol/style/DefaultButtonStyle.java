@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.buttoncontrol.style;
 
 import com.cpz.processing.controls.buttoncontrol.view.ButtonViewState;
+import com.cpz.processing.controls.common.style.InteractiveStyleHelper;
 import processing.core.PApplet;
 import processing.core.PConstants;
 
@@ -9,51 +10,35 @@ import processing.core.PConstants;
  */
 public final class DefaultButtonStyle implements ButtonStyle {
 
-    private final int baseColor;
-    private final int textColor;
-    private final float cornerRadius;
-    private final int disabledAlpha;
+    private final ButtonStyleConfig config;
 
-    public DefaultButtonStyle() {
-        this.baseColor = 0xFF4A90E2;
-        this.textColor = 0xFFFFFFFF;
-        this.cornerRadius = 10f;
-        this.disabledAlpha = 110;
+    public DefaultButtonStyle(ButtonStyleConfig config) {
+        this.config = config;
     }
 
     @Override
     public void render(PApplet p, ButtonViewState state) {
         p.pushStyle();
 
-        int lighter = p.lerpColor(baseColor, p.color(255), 0.18f);
-        int darker = p.lerpColor(baseColor, p.color(0), 0.20f);
-        int background = baseColor;
-        if (state.pressed()) {
-            background = darker;
-        } else if (state.hovered()) {
-            background = lighter;
-        }
+        int background = InteractiveStyleHelper.resolveFillColor(
+                p,
+                config.baseColor,
+                config.hoverBlendWithWhite,
+                config.pressedBlendWithBlack,
+                state.hovered(),
+                state.pressed()
+        );
 
         p.noStroke();
-        if (!state.enabled()) {
-            p.fill(background, disabledAlpha);
-        } else {
-            p.fill(background);
-        }
+        p.fill(InteractiveStyleHelper.applyDisabledAlpha(background, state.enabled(), config.disabledAlpha));
 
         float left = state.x() - (state.width() * 0.5f);
         float top = state.y() - (state.height() * 0.5f);
-        p.rect(left, top, state.width(), state.height(), cornerRadius);
+        p.rect(left, top, state.width(), state.height(), config.cornerRadius);
 
-        p.fill(textColor);
-        if (!state.enabled()) {
-            p.fill(textColor, disabledAlpha);
-        }
+        p.fill(InteractiveStyleHelper.applyDisabledAlpha(config.textColor, state.enabled(), config.disabledAlpha));
         p.textAlign(PConstants.CENTER, PConstants.CENTER);
         String text = state.text();
-        if (text == null) {
-            text = "";
-        }
         p.text(text, state.x(), state.y());
 
         p.popStyle();

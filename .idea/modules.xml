@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/cpz-processing-controls.iml" filepath="$PROJECT_DIR$/cpz-processing-controls.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cpz-mvvm-processing-controls.iml" filepath="$PROJECT_DIR$/cpz-mvvm-processing-controls.iml" />
     </modules>
   </component>
 </project>
