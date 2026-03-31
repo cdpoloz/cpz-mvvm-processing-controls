@@ -1,6 +1,5 @@
 package com.cpz.processing.controls.labelcontrol.style;
 
-import processing.core.PConstants;
 import processing.core.PFont;
 
 /**
@@ -12,7 +11,19 @@ public class LabelStyleConfig {
     public float textSize = 12f;
     public int textColor = 0;
     public float lineSpacingMultiplier = 1.0f;
-    public int alignX = PConstants.LEFT;
-    public int alignY = PConstants.BASELINE;
+    public HorizontalAlign alignX = HorizontalAlign.START;
+    public VerticalAlign alignY = VerticalAlign.BASELINE;
     public int disabledAlpha = 100;
+
+    public void setAlign(HorizontalAlign alignX, VerticalAlign alignY) {
+        this.alignX = alignX == null ? HorizontalAlign.START : alignX;
+        this.alignY = alignY == null ? VerticalAlign.BASELINE : alignY;
+    }
+
+    public void setAlign(int alignX, int alignY) {
+        setAlign(
+                com.cpz.processing.controls.labelcontrol.style.render.LabelAlignMapper.fromProcessingHorizontal(alignX),
+                com.cpz.processing.controls.labelcontrol.style.render.LabelAlignMapper.fromProcessingVertical(alignY)
+        );
+    }
 }

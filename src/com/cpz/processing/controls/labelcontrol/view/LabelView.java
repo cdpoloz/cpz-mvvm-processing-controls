@@ -3,6 +3,7 @@ package com.cpz.processing.controls.labelcontrol.view;
 import com.cpz.processing.controls.common.ControlView;
 import com.cpz.processing.controls.labelcontrol.style.LabelDefaultStyles;
 import com.cpz.processing.controls.labelcontrol.style.LabelTypography;
+import com.cpz.processing.controls.labelcontrol.style.render.LabelAlignMapper;
 import com.cpz.processing.controls.labelcontrol.style.interfaces.LabelStyle;
 import processing.core.PApplet;
 import java.util.Objects;
@@ -62,7 +63,10 @@ public final class LabelView implements ControlView {
             sketch.textFont(typography.font());
         }
         sketch.textSize(typography.textSize());
-        sketch.textAlign(typography.textAlignHorizontal(), typography.textAlignVertical());
+        sketch.textAlign(
+                LabelAlignMapper.mapHorizontal(typography.textAlignHorizontal()),
+                LabelAlignMapper.mapVertical(typography.textAlignVertical())
+        );
 
         String[] lines = text.split("\n", -1);
         float maxWidth = 0;

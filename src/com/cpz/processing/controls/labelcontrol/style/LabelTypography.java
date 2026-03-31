@@ -5,6 +5,6 @@ import processing.core.PFont;
 public record LabelTypography(PFont font,
                               float textSize,
                               float lineSpacingMultiplier,
-                              int textAlignHorizontal,
-                              int textAlignVertical) {
+                              HorizontalAlign textAlignHorizontal,
+                              VerticalAlign textAlignVertical) {
 }

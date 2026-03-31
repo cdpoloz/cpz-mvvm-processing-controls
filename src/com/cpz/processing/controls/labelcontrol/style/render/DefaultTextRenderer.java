@@ -16,7 +16,10 @@ public final class DefaultTextRenderer implements LabelRenderer {
             sketch.textFont(style.typography().font());
         }
         sketch.textSize(style.typography().textSize());
-        sketch.textAlign(style.typography().textAlignHorizontal(), style.typography().textAlignVertical());
+        sketch.textAlign(
+                LabelAlignMapper.mapHorizontal(style.typography().textAlignHorizontal()),
+                LabelAlignMapper.mapVertical(style.typography().textAlignVertical())
+        );
         sketch.fill(style.textColor());
 
         String text = style.text();

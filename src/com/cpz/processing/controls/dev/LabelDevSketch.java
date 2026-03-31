@@ -2,7 +2,9 @@ package com.cpz.processing.controls.dev;
 
 import com.cpz.processing.controls.labelcontrol.LabelModel;
 import com.cpz.processing.controls.labelcontrol.style.DefaultLabelStyle;
+import com.cpz.processing.controls.labelcontrol.style.HorizontalAlign;
 import com.cpz.processing.controls.labelcontrol.style.LabelStyleConfig;
+import com.cpz.processing.controls.labelcontrol.style.VerticalAlign;
 import com.cpz.processing.controls.labelcontrol.view.LabelView;
 import com.cpz.processing.controls.labelcontrol.view.LabelViewModel;
 import processing.core.PApplet;
@@ -54,8 +56,8 @@ public class LabelDevSketch extends PApplet {
         LabelStyleConfig customConfig = new LabelStyleConfig();
         customConfig.textSize = 24f;
         customConfig.textColor = color(0, 120, 220);
-        customConfig.alignX = PApplet.CENTER;
-        customConfig.alignY = PApplet.TOP;
+        customConfig.alignX = HorizontalAlign.CENTER;
+        customConfig.alignY = VerticalAlign.TOP;
         customConfig.lineSpacingMultiplier = 1.5f;
         customConfig.disabledAlpha = 60;
         labelCustom = new LabelView(this, vmCustom, 0, 0);
