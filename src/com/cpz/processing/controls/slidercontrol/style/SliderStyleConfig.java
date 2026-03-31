@@ -4,6 +4,18 @@ import processing.core.PShape;
 
 public final class SliderStyleConfig {
 
+    public Integer trackOverride;
+    public Integer trackHoverOverride;
+    public Integer trackPressedOverride;
+    public Integer progressOverride;
+    public Integer progressHoverOverride;
+    public Integer progressPressedOverride;
+    public Integer thumbOverride;
+    public Integer thumbHoverOverride;
+    public Integer thumbPressedOverride;
+    public Integer trackStrokeOverride;
+    public Integer thumbStrokeOverride;
+    public Integer textOverride;
     public int trackColor;
     public int trackHoverColor;
     public int trackPressedColor;

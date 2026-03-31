@@ -10,6 +10,7 @@ import com.cpz.processing.controls.common.viewmodel.AbstractInteractiveControlVi
 public final class ButtonViewModel extends AbstractInteractiveControlViewModel<ButtonModel> {
 
     private ButtonListener clickListener;
+    private boolean showText = true;
 
     public ButtonViewModel(ButtonModel model) {
         super(model);
@@ -25,6 +26,14 @@ public final class ButtonViewModel extends AbstractInteractiveControlViewModel<B
 
     public void setText(String text) {
         model.setText(text);
+    }
+
+    public boolean isShowText() {
+        return showText;
+    }
+
+    public void setShowText(boolean showText) {
+        this.showText = showText;
     }
 
     @Deprecated

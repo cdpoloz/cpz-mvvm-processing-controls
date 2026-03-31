@@ -16,7 +16,7 @@ public final class SliderRenderer {
         drawBaseTrack(p, geometry, style);
         drawActiveTrack(p, geometry, state, style);
         drawThumb(p, geometry, state, style);
-        drawValueText(p, geometry, style);
+        drawValueText(p, geometry, state, style);
         p.popStyle();
     }
 
@@ -87,8 +87,8 @@ public final class SliderRenderer {
         p.ellipse(geometry.thumbX(state.normalizedValue()), geometry.thumbY(state.normalizedValue()), style.thumbSize(), style.thumbSize());
     }
 
-    private void drawValueText(PApplet p, SliderGeometry geometry, SliderRenderStyle style) {
-        if (!style.showValueText() || style.displayText() == null || style.displayText().isEmpty()) {
+    private void drawValueText(PApplet p, SliderGeometry geometry, SliderViewState state, SliderRenderStyle style) {
+        if (!style.showValueText() || !state.showText() || state.displayText() == null || state.displayText().isEmpty()) {
             return;
         }
 
@@ -96,11 +96,11 @@ public final class SliderRenderer {
         p.noStroke();
         if (geometry.orientation() == SliderOrientation.HORIZONTAL) {
             p.textAlign(PConstants.CENTER, PConstants.CENTER);
-            p.text(style.displayText(), geometry.x(), geometry.y() + (geometry.height() * 0.8f));
+            p.text(state.displayText(), geometry.x(), geometry.y() + (geometry.height() * 0.8f));
             return;
         }
 
         p.textAlign(PConstants.LEFT, PConstants.CENTER);
-        p.text(style.displayText(), geometry.x() + (geometry.width() * 0.8f), geometry.y());
+        p.text(state.displayText(), geometry.x() + (geometry.width() * 0.8f), geometry.y());
     }
 }

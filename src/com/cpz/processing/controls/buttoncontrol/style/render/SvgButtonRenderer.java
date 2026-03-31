@@ -32,9 +32,11 @@ public final class SvgButtonRenderer implements ButtonRenderer {
             app.strokeWeight(style.strokeWeight());
             app.shape(shape, x, y, width, height);
         }
-        app.fill(style.textColor());
-        app.textAlign(PConstants.CENTER, PConstants.CENTER);
-        app.text(text, x, y);
+        if (style.showText()) {
+            app.fill(style.textColor());
+            app.textAlign(PConstants.CENTER, PConstants.CENTER);
+            app.text(text, x, y);
+        }
         app.popStyle();
     }
 

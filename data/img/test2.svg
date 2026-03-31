@@ -10,13 +10,52 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
-     id="defs1" />
-  <g
-     id="layer1"
-     transform="translate(-46.153024,-110.97865)">
-    <path
-       style="fill:#ff00ff;fill-rule:evenodd;stroke-width:0.264583"
-       d="m 50.380783,148.5 h 63.768677 v -37.52135 h -11.27402 v 23.25266 H 46.153024 Z"
-       id="path1" />
-  </g>
+     id="defs1">
+    <rect
+       x="-6.7654156"
+       y="-4.0948568"
+       width="103.79572"
+       height="66.05182"
+       id="rect1" />
+    <rect
+       x="-6.7654156"
+       y="-4.0948568"
+       width="103.79572"
+       height="66.05182"
+       id="rect2" />
+    <rect
+       x="-6.7654156"
+       y="-4.0948568"
+       width="103.79572"
+       height="66.05182"
+       id="rect3" />
+  </defs>
+  <text
+     xml:space="preserve"
+     id="text1"
+     style="font-size:16px;text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect1);display:inline;fill:#ff00ff;fill-rule:evenodd"
+     transform="translate(-32.716823,-1.7262998)"><tspan
+       x="31.836823"
+       y="10.4623"
+       id="tspan1">cen</tspan></text>
+  <text
+     xml:space="preserve"
+     id="text2"
+     style="font-size:16px;text-align:end;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect2);display:inline;fill:#ff00ff;fill-rule:evenodd"
+     transform="translate(-29.034813,10.559594)"
+     x="12.175992"
+     y="0"><tspan
+       x="71.559265"
+       y="10.4623"
+       id="tspan2">der</tspan></text>
+  <text
+     xml:space="preserve"
+     id="text3"
+     style="font-size:16px;text-align:start;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect3);display:inline;fill:#ff00ff;fill-rule:evenodd"
+     transform="translate(14.716883,22.511594)"
+     x="-12.175991"
+     y="0"><tspan
+       x="-6.765625"
+       y="10.4623"
+       id="tspan3">izq</tspan></text>
 </svg>

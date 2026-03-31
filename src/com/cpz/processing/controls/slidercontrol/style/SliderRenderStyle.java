@@ -14,6 +14,5 @@ public record SliderRenderStyle(int trackColor,
                                 int textColor,
                                 SvgColorMode svgColorMode,
                                 PShape thumbShape,
-                                boolean showValueText,
-                                String displayText) {
+                                boolean showValueText) {
 }

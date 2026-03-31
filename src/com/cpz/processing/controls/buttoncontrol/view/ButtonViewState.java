@@ -8,6 +8,7 @@ public record ButtonViewState(float x,
                               float width,
                               float height,
                               String text,
+                              boolean showText,
                               boolean enabled,
                               boolean hovered,
                               boolean pressed) {

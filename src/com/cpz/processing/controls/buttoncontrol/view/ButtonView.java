@@ -96,6 +96,7 @@ public final class ButtonView implements ControlView, PointerInteractable {
                 width,
                 height,
                 viewModel.getText(),
+                viewModel.isShowText(),
                 viewModel.isEnabled(),
                 viewModel.isHovered(),
                 viewModel.isPressed()

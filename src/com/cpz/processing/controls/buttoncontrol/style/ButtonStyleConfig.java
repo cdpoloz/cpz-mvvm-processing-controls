@@ -7,6 +7,9 @@ import com.cpz.processing.controls.buttoncontrol.style.interfaces.ButtonRenderer
  */
 public final class ButtonStyleConfig {
 
+    public Integer fillOverride;
+    public Integer textOverride;
+    public Integer strokeOverride;
     public int baseColor;
     public int textColor;
     public int strokeColor;

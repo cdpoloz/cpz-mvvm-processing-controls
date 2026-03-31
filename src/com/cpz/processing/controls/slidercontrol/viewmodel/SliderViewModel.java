@@ -14,6 +14,7 @@ public final class SliderViewModel extends AbstractControlViewModel<SliderModel>
     private boolean hovered;
     private boolean pressed;
     private boolean dragging;
+    private boolean showText = true;
 
     private Function<BigDecimal, String> formatter;
     private Consumer<BigDecimal> onValueChanged;
@@ -85,6 +86,14 @@ public final class SliderViewModel extends AbstractControlViewModel<SliderModel>
 
     public boolean isDragging() {
         return dragging;
+    }
+
+    public boolean isShowText() {
+        return showText;
+    }
+
+    public void setShowText(boolean showText) {
+        this.showText = showText;
     }
 
     public BigDecimal getValue() {

@@ -5,5 +5,6 @@ public record ButtonRenderStyle(int fillColor,
                                 float strokeWeight,
                                 int textColor,
                                 float cornerRadius,
+                                boolean showText,
                                 String text) {
 }

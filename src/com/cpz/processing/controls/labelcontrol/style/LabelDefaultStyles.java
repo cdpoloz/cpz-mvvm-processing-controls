@@ -1,7 +1,7 @@
 package com.cpz.processing.controls.labelcontrol.style;
 
-import com.cpz.processing.controls.common.theme.Theme;
 import com.cpz.processing.controls.common.theme.ThemeManager;
+import com.cpz.processing.controls.common.theme.ThemeTokens;
 import com.cpz.processing.controls.labelcontrol.style.interfaces.LabelStyle;
 import processing.core.PConstants;
 
@@ -14,15 +14,15 @@ public final class LabelDefaultStyles {
     }
 
     public static LabelStyle defaultText() {
-        Theme theme = ThemeManager.getTheme();
+        ThemeTokens tokens = ThemeManager.getTheme().tokens();
         LabelStyleConfig config = new LabelStyleConfig();
         config.font = null;
         config.textSize = 12f;
-        config.textColor = theme.textColor;
+        config.textColor = tokens.onSurface;
         config.lineSpacingMultiplier = 1.0f;
         config.alignX = PConstants.LEFT;
         config.alignY = PConstants.BASELINE;
-        config.disabledAlpha = theme.disabledAlpha;
+        config.disabledAlpha = tokens.disabledAlpha;
         return new DefaultLabelStyle(config);
     }
 }

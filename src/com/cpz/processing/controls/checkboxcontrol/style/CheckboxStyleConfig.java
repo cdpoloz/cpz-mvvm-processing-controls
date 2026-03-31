@@ -7,6 +7,12 @@ import com.cpz.processing.controls.checkboxcontrol.style.interfaces.CheckboxRend
  */
 public final class CheckboxStyleConfig {
 
+    public Integer checkedFillOverride;
+    public Integer uncheckedFillOverride;
+    public Integer hoverFillOverride;
+    public Integer pressedFillOverride;
+    public Integer checkOverride;
+    public Integer strokeOverride;
     public int boxColor;
     public int boxHoverColor;
     public int boxPressedColor;

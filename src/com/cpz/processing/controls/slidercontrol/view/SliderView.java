@@ -43,7 +43,7 @@ public final class SliderView implements ControlView, PointerInteractable {
             return;
         }
         SliderGeometry geometry = buildGeometry();
-        style.render(sketch, buildViewState(), geometry, viewModel.getFormattedValue());
+        style.render(sketch, buildViewState(), geometry);
     }
 
     @Override
@@ -93,6 +93,8 @@ public final class SliderView implements ControlView, PointerInteractable {
                 viewModel.isHovered(),
                 viewModel.isPressed(),
                 viewModel.isDragging(),
+                viewModel.isShowText(),
+                viewModel.getFormattedValue(),
                 viewModel.isEnabled()
         );
     }

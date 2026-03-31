@@ -22,9 +22,11 @@ public final class DefaultButtonRenderer implements ButtonRenderer {
         p.strokeWeight(style.strokeWeight());
         p.rect(left, top, width, height, style.cornerRadius());
 
-        p.fill(style.textColor());
-        p.textAlign(PConstants.CENTER, PConstants.CENTER);
-        p.text(text, x, y);
+        if (style.showText()) {
+            p.fill(style.textColor());
+            p.textAlign(PConstants.CENTER, PConstants.CENTER);
+            p.text(text, x, y);
+        }
         p.popStyle();
     }
 }

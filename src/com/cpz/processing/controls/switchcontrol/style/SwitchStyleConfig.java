@@ -8,6 +8,11 @@ import com.cpz.processing.controls.switchcontrol.style.interfaces.ShapeRenderer;
 public final class SwitchStyleConfig {
 
     public ShapeRenderer shape;
+    public Integer offFillOverride;
+    public Integer onFillOverride;
+    public Integer hoverFillOverride;
+    public Integer pressedFillOverride;
+    public Integer strokeOverride;
     public int[] stateColors;
     public int strokeColor;
     public float strokeWidth;

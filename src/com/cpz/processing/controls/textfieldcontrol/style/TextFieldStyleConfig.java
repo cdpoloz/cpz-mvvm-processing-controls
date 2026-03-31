@@ -4,6 +4,12 @@ import processing.core.PFont;
 
 public final class TextFieldStyleConfig {
 
+    public Integer backgroundOverride;
+    public Integer borderOverride;
+    public Integer textOverride;
+    public Integer cursorOverride;
+    public Integer selectionOverride;
+    public Integer selectionTextOverride;
     public int backgroundColor;
     public int borderColor;
     public int textColor;
