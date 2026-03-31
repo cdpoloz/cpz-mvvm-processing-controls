@@ -1,9 +1,7 @@
 package com.cpz.processing.controls.switchcontrol.style.render;
 
-import com.cpz.processing.controls.switchcontrol.style.SwitchStyleConfig;
+import com.cpz.processing.controls.switchcontrol.style.SwitchRenderStyle;
 import com.cpz.processing.controls.switchcontrol.style.interfaces.ShapeRenderer;
-import com.cpz.processing.controls.switchcontrol.view.SwitchViewState;
-import com.cpz.processing.controls.common.style.InteractiveStyleHelper;
 import processing.core.PApplet;
 
 /**
@@ -12,15 +10,13 @@ import processing.core.PApplet;
 public final class CircleShapeRenderer implements ShapeRenderer {
 
     @Override
-    public void render(PApplet p, SwitchViewState s, SwitchStyleConfig cfg) {
-        int idx = Math.min(s.stateIndex(), cfg.stateColors.length - 1);
-        int fill = InteractiveStyleHelper.applyDisabledAlpha(cfg.stateColors[idx], s.enabled(), cfg.disabledAlpha);
+    public void render(PApplet p, float x, float y, float width, float height, SwitchRenderStyle style) {
         p.pushStyle();
-        p.stroke(InteractiveStyleHelper.resolveStrokeColor(cfg.strokeColor, s.enabled(), cfg.disabledAlpha));
-        p.strokeWeight(InteractiveStyleHelper.resolveStrokeWeight(cfg.strokeWidth, cfg.strokeWidthHover, s.hovered()));
-        p.fill(fill);
-        float diameter = Math.min(s.width(), s.height());
-        p.circle(s.x(), s.y(), diameter);
+        p.stroke(style.strokeColor());
+        p.strokeWeight(style.strokeWeight());
+        p.fill(style.fillColor());
+        float diameter = Math.min(width, height);
+        p.circle(x, y, diameter);
         p.popStyle();
     }
 

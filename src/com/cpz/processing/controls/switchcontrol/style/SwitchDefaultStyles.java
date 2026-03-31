@@ -24,8 +24,9 @@ public final class SwitchDefaultStyles {
         cfg.strokeColor = Colors.gray(255);
         cfg.strokeWidth = 2f;
         cfg.strokeWidthHover = 3f;
+        cfg.hoverBlendWithWhite = theme.hoverModifier;
+        cfg.pressedBlendWithBlack = theme.pressedModifier;
         cfg.disabledAlpha = theme.disabledAlpha;
-        cfg.cornerRadius = 0;
         return new ParametricSwitchStyle(cfg);
     }
 }

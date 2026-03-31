@@ -17,6 +17,9 @@ public final class ButtonDefaultStyles {
         ButtonStyleConfig config = new ButtonStyleConfig();
         config.baseColor = theme.primaryColor;
         config.textColor = Colors.gray(255);
+        config.strokeColor = Colors.gray(255);
+        config.strokeWeight = 2f;
+        config.strokeWeightHover = 3f;
         config.cornerRadius = 10f;
         config.disabledAlpha = theme.disabledAlpha;
         config.hoverBlendWithWhite = theme.hoverModifier;

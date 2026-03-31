@@ -11,5 +11,6 @@ public record SwitchViewState(float x,
                               int stateIndex,
                               int totalStates,
                               boolean hovered,
+                              boolean pressed,
                               boolean enabled) {
 }

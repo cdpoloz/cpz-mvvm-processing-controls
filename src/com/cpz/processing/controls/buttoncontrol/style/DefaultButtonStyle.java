@@ -1,9 +1,10 @@
 package com.cpz.processing.controls.buttoncontrol.style;
 
+import com.cpz.processing.controls.buttoncontrol.style.interfaces.ButtonRenderer;
+import com.cpz.processing.controls.buttoncontrol.style.render.DefaultButtonRenderer;
 import com.cpz.processing.controls.buttoncontrol.view.ButtonViewState;
 import com.cpz.processing.controls.common.style.InteractiveStyleHelper;
 import processing.core.PApplet;
-import processing.core.PConstants;
 
 /**
  * @author CPZ
@@ -11,15 +12,19 @@ import processing.core.PConstants;
 public final class DefaultButtonStyle implements ButtonStyle {
 
     private final ButtonStyleConfig config;
+    private final ButtonRenderer renderer;
 
     public DefaultButtonStyle(ButtonStyleConfig config) {
+        this(config, config != null && config.renderer != null ? config.renderer : new DefaultButtonRenderer());
+    }
+
+    public DefaultButtonStyle(ButtonStyleConfig config, ButtonRenderer renderer) {
         this.config = config;
+        this.renderer = renderer;
     }
 
     @Override
     public void render(PApplet p, ButtonViewState state) {
-        p.pushStyle();
-
         int background = InteractiveStyleHelper.resolveFillColor(
                 p,
                 config.baseColor,
@@ -28,19 +33,14 @@ public final class DefaultButtonStyle implements ButtonStyle {
                 state.hovered(),
                 state.pressed()
         );
-
-        p.noStroke();
-        p.fill(InteractiveStyleHelper.applyDisabledAlpha(background, state.enabled(), config.disabledAlpha));
-
-        float left = state.x() - (state.width() * 0.5f);
-        float top = state.y() - (state.height() * 0.5f);
-        p.rect(left, top, state.width(), state.height(), config.cornerRadius);
-
-        p.fill(InteractiveStyleHelper.applyDisabledAlpha(config.textColor, state.enabled(), config.disabledAlpha));
-        p.textAlign(PConstants.CENTER, PConstants.CENTER);
-        String text = state.text();
-        p.text(text, state.x(), state.y());
-
-        p.popStyle();
+        ButtonRenderStyle style = new ButtonRenderStyle(
+                InteractiveStyleHelper.applyDisabledAlpha(background, state.enabled(), config.disabledAlpha),
+                InteractiveStyleHelper.resolveStrokeColor(config.strokeColor, state.enabled(), config.disabledAlpha),
+                InteractiveStyleHelper.resolveStrokeWeight(config.strokeWeight, config.strokeWeightHover, state.hovered()),
+                InteractiveStyleHelper.applyDisabledAlpha(config.textColor, state.enabled(), config.disabledAlpha),
+                config.cornerRadius,
+                state.text()
+        );
+        renderer.render(p, state.x(), state.y(), state.width(), state.height(), style);
     }
 }

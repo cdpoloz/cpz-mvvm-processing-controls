@@ -4,7 +4,6 @@ import com.cpz.processing.controls.common.theme.Theme;
 import com.cpz.processing.controls.common.theme.ThemeManager;
 import com.cpz.processing.controls.labelcontrol.style.interfaces.LabelStyle;
 import processing.core.PConstants;
-import com.cpz.processing.controls.labelcontrol.style.render.DefaultTextRenderer;
 
 /**
  * @author CPZ
@@ -24,6 +23,6 @@ public final class LabelDefaultStyles {
         config.alignX = PConstants.LEFT;
         config.alignY = PConstants.BASELINE;
         config.disabledAlpha = theme.disabledAlpha;
-        return new DefaultTextRenderer(config);
+        return new DefaultLabelStyle(config);
     }
 }

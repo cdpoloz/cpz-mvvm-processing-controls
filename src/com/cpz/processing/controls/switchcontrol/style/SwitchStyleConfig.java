@@ -12,7 +12,11 @@ public final class SwitchStyleConfig {
     public int strokeColor;
     public float strokeWidth;
     public float strokeWidthHover;
+    public float hoverBlendWithWhite;
+    public float pressedBlendWithBlack;
     public int disabledAlpha; // 0-255
-    // rectangle rendering
-    public float cornerRadius;
+
+    public void setShapeRenderer(ShapeRenderer shapeRenderer) {
+        this.shape = shapeRenderer;
+    }
 }

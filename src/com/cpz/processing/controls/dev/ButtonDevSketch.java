@@ -4,6 +4,7 @@ import com.cpz.processing.controls.buttoncontrol.input.ButtonInputAdapter;
 import com.cpz.processing.controls.buttoncontrol.model.ButtonModel;
 import com.cpz.processing.controls.buttoncontrol.style.ButtonStyleConfig;
 import com.cpz.processing.controls.buttoncontrol.style.DefaultButtonStyle;
+import com.cpz.processing.controls.buttoncontrol.style.render.SvgButtonRenderer;
 import com.cpz.processing.controls.buttoncontrol.view.ButtonView;
 import com.cpz.processing.controls.buttoncontrol.viewmodel.ButtonViewModel;
 import com.cpz.processing.controls.util.Colors;
@@ -15,23 +16,21 @@ import processing.core.PApplet;
 public class ButtonDevSketch extends PApplet {
 
     private ButtonView primaryButtonView;
-    private ButtonView disabledButtonView;
-    private ButtonView customButtonView;
+    private ButtonView svgButtonView;
 
     private ButtonViewModel primaryButtonViewModel;
-    private ButtonViewModel disabledButtonViewModel;
-    private ButtonViewModel customButtonViewModel;
+    private ButtonViewModel svgButtonViewModel;
 
     private ButtonInputAdapter primaryButtonInput;
-    private ButtonInputAdapter disabledButtonInput;
-    private ButtonInputAdapter customButtonInput;
+    private ButtonInputAdapter svgButtonInput;
 
     private int clickCount;
     private String lastAction = "No clicks";
+    private boolean svgEnabled = true;
 
     @Override
     public void settings() {
-        size(760, 420);
+        size(820, 440);
         smooth(4);
     }
 
@@ -40,22 +39,18 @@ public class ButtonDevSketch extends PApplet {
         primaryButtonViewModel = new ButtonViewModel(new ButtonModel("Primary"));
         primaryButtonViewModel.setClickListener(() -> {
             clickCount++;
+            svgEnabled = !svgEnabled;
+            svgButtonViewModel.setEnabled(svgEnabled);
             lastAction = "Primary click #" + clickCount;
         });
-        primaryButtonView = new ButtonView(this, primaryButtonViewModel, 180, 120, 180, 56);
+        primaryButtonView = new ButtonView(this, primaryButtonViewModel, 210, 150, 190, 60);
         primaryButtonInput = new ButtonInputAdapter(primaryButtonView, primaryButtonViewModel);
 
-        disabledButtonViewModel = new ButtonViewModel(new ButtonModel("Disabled"));
-        disabledButtonViewModel.setEnabled(false);
-        disabledButtonViewModel.setClickListener(() -> lastAction = "Should not fire");
-        disabledButtonView = new ButtonView(this, disabledButtonViewModel, 180, 220, 180, 56);
-        disabledButtonInput = new ButtonInputAdapter(disabledButtonView, disabledButtonViewModel);
-
-        customButtonViewModel = new ButtonViewModel(new ButtonModel("Custom"));
-        customButtonViewModel.setClickListener(() -> lastAction = "Custom click");
-        customButtonView = new ButtonView(this, customButtonViewModel, 470, 170, 220, 70);
-        customButtonView.setStyle(new DefaultButtonStyle(createCustomStyle()));
-        customButtonInput = new ButtonInputAdapter(customButtonView, customButtonViewModel);
+        svgButtonViewModel = new ButtonViewModel(new ButtonModel("SVG Action"));
+        svgButtonViewModel.setClickListener(() -> lastAction = "SVG click");
+        svgButtonView = new ButtonView(this, svgButtonViewModel, 590, 170, 250, 96);
+        svgButtonView.setStyle(new DefaultButtonStyle(createSvgStyle()));
+        svgButtonInput = new ButtonInputAdapter(svgButtonView, svgButtonViewModel);
     }
 
     @Override
@@ -63,8 +58,7 @@ public class ButtonDevSketch extends PApplet {
         background(28);
         drawTitles();
         primaryButtonView.draw();
-        disabledButtonView.draw();
-        customButtonView.draw();
+        svgButtonView.draw();
         drawDebug();
     }
 
@@ -81,29 +75,26 @@ public class ButtonDevSketch extends PApplet {
     @Override
     public void mousePressed() {
         primaryButtonInput.handleMousePress(mouseX, mouseY);
-        disabledButtonInput.handleMousePress(mouseX, mouseY);
-        customButtonInput.handleMousePress(mouseX, mouseY);
+        svgButtonInput.handleMousePress(mouseX, mouseY);
     }
 
     @Override
     public void mouseReleased() {
         primaryButtonInput.handleMouseRelease(mouseX, mouseY);
-        disabledButtonInput.handleMouseRelease(mouseX, mouseY);
-        customButtonInput.handleMouseRelease(mouseX, mouseY);
+        svgButtonInput.handleMouseRelease(mouseX, mouseY);
     }
 
     private void forwardMove(float mx, float my) {
         primaryButtonInput.handleMouseMove(mx, my);
-        disabledButtonInput.handleMouseMove(mx, my);
-        customButtonInput.handleMouseMove(mx, my);
+        svgButtonInput.handleMouseMove(mx, my);
     }
 
     private void drawTitles() {
         pushStyle();
         fill(230);
         textAlign(CENTER);
-        text("Button default", 180, 70);
-        text("Button custom", 470, 70);
+        text("Button baseline", 210, 84);
+        text("Button SVG", 590, 84);
         popStyle();
     }
 
@@ -111,26 +102,30 @@ public class ButtonDevSketch extends PApplet {
         pushStyle();
         fill(220);
         textAlign(LEFT);
-        text("Checks:", 24, 310);
-        text("- Hover changes color", 24, 332);
-        text("- Pressed darkens the background", 24, 352);
-        text("- Disabled does not trigger callback", 24, 372);
-        text("- Release outside cancels click", 24, 392);
-        text("Last action: " + lastAction, 330, 310);
-        text("Primary hovered: " + primaryButtonViewModel.isHovered(), 330, 332);
-        text("Primary pressed: " + primaryButtonViewModel.isPressed(), 330, 352);
-        text("Disabled enabled: " + disabledButtonViewModel.isEnabled(), 330, 372);
+        text("Checks:", 24, 320);
+        text("- Hover changes fill and strokeWeight", 24, 342);
+        text("- Pressed darkens only the fill", 24, 362);
+        text("- Primary click toggles SVG enabled state", 24, 382);
+        text("- Release outside cancels click", 24, 402);
+        text("Last action: " + lastAction, 430, 320);
+        text("Primary hovered: " + primaryButtonViewModel.isHovered(), 430, 342);
+        text("SVG pressed: " + svgButtonViewModel.isPressed(), 430, 362);
+        text("SVG enabled: " + svgButtonViewModel.isEnabled(), 430, 382);
         popStyle();
     }
 
-    private ButtonStyleConfig createCustomStyle() {
+    private ButtonStyleConfig createSvgStyle() {
         ButtonStyleConfig config = new ButtonStyleConfig();
-        config.baseColor = Colors.rgb(24, 160, 88);
+        config.baseColor = Colors.rgb(219, 98, 48);
         config.textColor = Colors.gray(255);
+        config.strokeColor = Colors.gray(255);
+        config.strokeWeight = 2f;
+        config.strokeWeightHover = 4f;
         config.cornerRadius = 18f;
         config.disabledAlpha = 90;
-        config.hoverBlendWithWhite = 0.10f;
-        config.pressedBlendWithBlack = 0.28f;
+        config.hoverBlendWithWhite = 0.12f;
+        config.pressedBlendWithBlack = 0.25f;
+        config.setRenderer(new SvgButtonRenderer(this, "data/img/test.svg"));
         return config;
     }
 }

@@ -2,6 +2,7 @@ package com.cpz.processing.controls.labelcontrol.view;
 
 import com.cpz.processing.controls.common.ControlView;
 import com.cpz.processing.controls.labelcontrol.style.LabelDefaultStyles;
+import com.cpz.processing.controls.labelcontrol.style.LabelTypography;
 import com.cpz.processing.controls.labelcontrol.style.interfaces.LabelStyle;
 import processing.core.PApplet;
 import java.util.Objects;
@@ -56,11 +57,16 @@ public final class LabelView implements ControlView {
         }
 
         sketch.pushStyle();
-        style.applyTextStyle(sketch);
+        LabelTypography typography = style.resolveTypography();
+        if (typography.font() != null) {
+            sketch.textFont(typography.font());
+        }
+        sketch.textSize(typography.textSize());
+        sketch.textAlign(typography.textAlignHorizontal(), typography.textAlignVertical());
 
         String[] lines = text.split("\n", -1);
         float maxWidth = 0;
-        float lineHeight = (sketch.textAscent() + sketch.textDescent()) * style.getLineSpacingMultiplier();
+        float lineHeight = (sketch.textAscent() + sketch.textDescent()) * typography.lineSpacingMultiplier();
         for (String line : lines) {
             float w = sketch.textWidth(line);
             if (w > maxWidth) {
@@ -102,8 +108,10 @@ public final class LabelView implements ControlView {
     }
 
     public void setStyle(LabelStyle style) {
-        this.style = style;
-        this.metricsDirty = true;
+        if (style != null) {
+            this.style = style;
+            this.metricsDirty = true;
+        }
     }
 
     public void setPosition(float x, float y) {

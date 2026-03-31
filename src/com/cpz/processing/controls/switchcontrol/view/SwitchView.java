@@ -59,6 +59,7 @@ public final class SwitchView implements ControlView, PointerInteractable {
                 viewModel.getState(),
                 viewModel.getTotalStates(),
                 viewModel.isHovered(),
+                viewModel.isPressed(),
                 viewModel.isEnabled()
         );
     }

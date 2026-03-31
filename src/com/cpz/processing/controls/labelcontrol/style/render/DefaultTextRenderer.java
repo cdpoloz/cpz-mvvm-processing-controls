@@ -1,57 +1,30 @@
 package com.cpz.processing.controls.labelcontrol.style.render;
 
-import com.cpz.processing.controls.labelcontrol.style.LabelStyleConfig;
-import com.cpz.processing.controls.labelcontrol.style.interfaces.LabelStyle;
-import com.cpz.processing.controls.labelcontrol.view.LabelViewState;
+import com.cpz.processing.controls.labelcontrol.style.LabelRenderStyle;
+import com.cpz.processing.controls.labelcontrol.style.interfaces.LabelRenderer;
 import processing.core.PApplet;
 
 /**
  * @author CPZ
  */
-public final class DefaultTextRenderer implements LabelStyle {
-
-    private final LabelStyleConfig config;
-
-    public DefaultTextRenderer(LabelStyleConfig config) {
-        this.config = config;
-    }
-
-    public LabelStyleConfig getConfig() {
-        return config;
-    }
+public final class DefaultTextRenderer implements LabelRenderer {
 
     @Override
-    public void applyTextStyle(PApplet sketch) {
-        if (config.font != null) {
-            sketch.textFont(config.font);
-        }
-        sketch.textSize(config.textSize);
-        sketch.textAlign(config.alignX, config.alignY);
-    }
-
-    @Override
-    public float getLineSpacingMultiplier() {
-        return config.lineSpacingMultiplier;
-    }
-
-    @Override
-    public void render(PApplet sketch, LabelViewState state) {
+    public void render(PApplet sketch, float x, float y, float width, float height, LabelRenderStyle style) {
         sketch.pushStyle();
-        applyTextStyle(sketch);
-        if (!state.enabled()) {
-            sketch.fill(config.textColor, config.disabledAlpha);
-        } else {
-            sketch.fill(config.textColor);
+        if (style.typography().font() != null) {
+            sketch.textFont(style.typography().font());
         }
+        sketch.textSize(style.typography().textSize());
+        sketch.textAlign(style.typography().textAlignHorizontal(), style.typography().textAlignVertical());
+        sketch.fill(style.textColor());
 
-        String text = state.text();
+        String text = style.text();
         if (text == null) {
             text = "";
         }
         String[] lines = text.split("\n", -1);
-        float lineHeight = (sketch.textAscent() + sketch.textDescent()) * config.lineSpacingMultiplier;
-        float x = state.x();
-        float y = state.y();
+        float lineHeight = (sketch.textAscent() + sketch.textDescent()) * style.typography().lineSpacingMultiplier();
         for (int i = 0; i < lines.length; i++) {
             sketch.text(lines[i], x, y + (i * lineHeight));
         }

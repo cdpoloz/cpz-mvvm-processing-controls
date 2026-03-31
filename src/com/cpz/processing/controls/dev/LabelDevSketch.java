@@ -1,8 +1,8 @@
 package com.cpz.processing.controls.dev;
 
 import com.cpz.processing.controls.labelcontrol.LabelModel;
+import com.cpz.processing.controls.labelcontrol.style.DefaultLabelStyle;
 import com.cpz.processing.controls.labelcontrol.style.LabelStyleConfig;
-import com.cpz.processing.controls.labelcontrol.style.render.DefaultTextRenderer;
 import com.cpz.processing.controls.labelcontrol.view.LabelView;
 import com.cpz.processing.controls.labelcontrol.view.LabelViewModel;
 import processing.core.PApplet;
@@ -59,7 +59,7 @@ public class LabelDevSketch extends PApplet {
         customConfig.lineSpacingMultiplier = 1.5f;
         customConfig.disabledAlpha = 60;
         labelCustom = new LabelView(this, vmCustom, 0, 0);
-        labelCustom.setStyle(new DefaultTextRenderer(customConfig));
+        labelCustom.setStyle(new DefaultLabelStyle(customConfig));
         labelCustom.centerBlockAround(width / 2f, 450);
     }
 

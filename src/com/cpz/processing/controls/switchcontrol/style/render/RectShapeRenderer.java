@@ -1,9 +1,7 @@
 package com.cpz.processing.controls.switchcontrol.style.render;
 
-import com.cpz.processing.controls.switchcontrol.style.SwitchStyleConfig;
+import com.cpz.processing.controls.switchcontrol.style.SwitchRenderStyle;
 import com.cpz.processing.controls.switchcontrol.style.interfaces.ShapeRenderer;
-import com.cpz.processing.controls.switchcontrol.view.SwitchViewState;
-import com.cpz.processing.controls.common.style.InteractiveStyleHelper;
 import processing.core.PApplet;
 
 /**
@@ -11,19 +9,27 @@ import processing.core.PApplet;
  */
 public final class RectShapeRenderer implements ShapeRenderer {
 
+    private final float cornerRadius;
+
+    public RectShapeRenderer() {
+        this(0f);
+    }
+
+    public RectShapeRenderer(float cornerRadius) {
+        this.cornerRadius = cornerRadius;
+    }
+
     @Override
-    public void render(PApplet p, SwitchViewState s, SwitchStyleConfig cfg) {
-        int idx = Math.min(s.stateIndex(), cfg.stateColors.length - 1);
-        int fill = InteractiveStyleHelper.applyDisabledAlpha(cfg.stateColors[idx], s.enabled(), cfg.disabledAlpha);
-        float halfW = s.width() * 0.5f;
-        float halfH = s.height() * 0.5f;
-        float x = s.x() - halfW;
-        float y = s.y() - halfH;
+    public void render(PApplet p, float centerX, float centerY, float width, float height, SwitchRenderStyle style) {
+        float halfW = width * 0.5f;
+        float halfH = height * 0.5f;
+        float x = centerX - halfW;
+        float y = centerY - halfH;
         p.pushStyle();
-        p.stroke(InteractiveStyleHelper.resolveStrokeColor(cfg.strokeColor, s.enabled(), cfg.disabledAlpha));
-        p.strokeWeight(InteractiveStyleHelper.resolveStrokeWeight(cfg.strokeWidth, cfg.strokeWidthHover, s.hovered()));
-        p.fill(fill);
-        p.rect(x, y, s.width(), s.height(), cfg.cornerRadius);
+        p.stroke(style.strokeColor());
+        p.strokeWeight(style.strokeWeight());
+        p.fill(style.fillColor());
+        p.rect(x, y, width, height, cornerRadius);
         p.popStyle();
     }
 }
