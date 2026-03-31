@@ -16,7 +16,8 @@ public class Launcher {
         //PApplet.main(LabelDevSketch.class);
         //PApplet.main(ButtonDevSketch.class);
         //PApplet.main(CheckboxDevSketch.class);
-        PApplet.main(SliderDevSketch.class);
+        //PApplet.main(SliderDevSketch.class);
+        PApplet.main(TextFieldDevSketch.class);
     }
 
 }
