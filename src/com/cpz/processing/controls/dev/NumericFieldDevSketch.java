@@ -2,7 +2,7 @@ package com.cpz.processing.controls.dev;
 
 import com.cpz.processing.controls.controls.numericfield.model.NumericFieldModel;
 import com.cpz.processing.controls.controls.numericfield.style.NumericFieldDefaultStyles;
-import com.cpz.processing.controls.controls.numericfield.view.NumericFieldInputAdapter;
+import com.cpz.processing.controls.controls.numericfield.input.NumericFieldInputAdapter;
 import com.cpz.processing.controls.controls.numericfield.view.NumericFieldView;
 import com.cpz.processing.controls.controls.numericfield.viewmodel.NumericFieldViewModel;
 import com.cpz.processing.controls.core.focus.FocusManager;

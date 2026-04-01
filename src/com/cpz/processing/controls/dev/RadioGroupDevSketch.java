@@ -2,7 +2,7 @@ package com.cpz.processing.controls.dev;
 
 import com.cpz.processing.controls.controls.radiogroup.model.RadioGroupModel;
 import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupDefaultStyles;
-import com.cpz.processing.controls.controls.radiogroup.view.RadioGroupInputAdapter;
+import com.cpz.processing.controls.controls.radiogroup.input.RadioGroupInputAdapter;
 import com.cpz.processing.controls.controls.radiogroup.view.RadioGroupView;
 import com.cpz.processing.controls.controls.radiogroup.viewmodel.RadioGroupViewModel;
 import com.cpz.processing.controls.core.focus.FocusManager;

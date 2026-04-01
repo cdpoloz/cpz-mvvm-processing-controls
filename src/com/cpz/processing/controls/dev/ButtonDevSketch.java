@@ -4,7 +4,7 @@ import com.cpz.processing.controls.controls.button.config.ButtonStyleConfig;
 import com.cpz.processing.controls.controls.button.model.ButtonModel;
 import com.cpz.processing.controls.controls.button.style.DefaultButtonStyle;
 import com.cpz.processing.controls.controls.button.style.render.SvgButtonRenderer;
-import com.cpz.processing.controls.controls.button.view.ButtonInputAdapter;
+import com.cpz.processing.controls.controls.button.input.ButtonInputAdapter;
 import com.cpz.processing.controls.controls.button.view.ButtonView;
 import com.cpz.processing.controls.controls.button.viewmodel.ButtonViewModel;
 import com.cpz.processing.controls.core.input.DefaultInputLayer;

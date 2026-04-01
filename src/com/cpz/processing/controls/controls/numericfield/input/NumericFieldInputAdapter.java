@@ -1,5 +1,6 @@
-package com.cpz.processing.controls.controls.numericfield.view;
+package com.cpz.processing.controls.controls.numericfield.input;
 
+import com.cpz.processing.controls.controls.numericfield.view.NumericFieldView;
 import com.cpz.processing.controls.controls.numericfield.viewmodel.NumericFieldViewModel;
 import com.cpz.processing.controls.core.focus.FocusManager;
 

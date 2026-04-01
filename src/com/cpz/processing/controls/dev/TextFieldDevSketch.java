@@ -3,7 +3,7 @@ package com.cpz.processing.controls.dev;
 import com.cpz.processing.controls.controls.textfield.config.TextFieldStyleConfig;
 import com.cpz.processing.controls.controls.textfield.model.TextFieldModel;
 import com.cpz.processing.controls.controls.textfield.style.DefaultTextFieldStyle;
-import com.cpz.processing.controls.controls.textfield.view.TextFieldInputAdapter;
+import com.cpz.processing.controls.controls.textfield.input.TextFieldInputAdapter;
 import com.cpz.processing.controls.controls.textfield.view.TextFieldView;
 import com.cpz.processing.controls.controls.textfield.viewmodel.TextFieldViewModel;
 import com.cpz.processing.controls.core.focus.FocusManager;
