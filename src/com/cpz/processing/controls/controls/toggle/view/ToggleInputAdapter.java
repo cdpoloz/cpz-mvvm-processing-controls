@@ -1,13 +1,13 @@
-package com.cpz.processing.controls.controls.switchcontrol.view;
+package com.cpz.processing.controls.controls.toggle.view;
 
 import com.cpz.processing.controls.core.input.PointerInputAdapter;
 import com.cpz.processing.controls.core.input.PointerInputTarget;
 import com.cpz.processing.controls.core.input.PointerInteractable;
 
-public final class SwitchInputAdapter {
+public final class ToggleInputAdapter {
    private final PointerInputAdapter delegate;
 
-   public SwitchInputAdapter(PointerInteractable var1, PointerInputTarget var2) {
+   public ToggleInputAdapter(PointerInteractable var1, PointerInputTarget var2) {
       this.delegate = new PointerInputAdapter(var1, var2);
    }
 

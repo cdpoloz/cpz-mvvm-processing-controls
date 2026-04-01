@@ -1,10 +1,10 @@
-package com.cpz.processing.controls.controls.switchcontrol.style.render;
+package com.cpz.processing.controls.controls.toggle.style.render;
 
-import com.cpz.processing.controls.controls.switchcontrol.style.SwitchRenderStyle;
+import com.cpz.processing.controls.controls.toggle.style.ToggleRenderStyle;
 import processing.core.PApplet;
 import processing.core.PShape;
 
-public final class SvgShapeRenderer implements ShapeRenderer {
+public final class SvgShapeRenderer implements ToggleShapeRenderer {
    private final PShape shape;
 
    public SvgShapeRenderer(PApplet var1, String var2) {
@@ -15,7 +15,7 @@ public final class SvgShapeRenderer implements ShapeRenderer {
 
    }
 
-   public void render(PApplet var1, float var2, float var3, float var4, float var5, SwitchRenderStyle var6) {
+   public void render(PApplet var1, float var2, float var3, float var4, float var5, ToggleRenderStyle var6) {
       if (this.shape != null) {
          var1.pushStyle();
          var1.shapeMode(3);

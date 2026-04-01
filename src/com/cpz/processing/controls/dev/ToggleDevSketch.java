@@ -1,13 +1,13 @@
 package com.cpz.processing.controls.dev;
 
-import com.cpz.processing.controls.controls.switchcontrol.config.SwitchStyleConfig;
-import com.cpz.processing.controls.controls.switchcontrol.model.SwitchModel;
-import com.cpz.processing.controls.controls.switchcontrol.style.ParametricSwitchStyle;
-import com.cpz.processing.controls.controls.switchcontrol.style.render.CircleShapeRenderer;
-import com.cpz.processing.controls.controls.switchcontrol.style.render.SvgShapeRenderer;
-import com.cpz.processing.controls.controls.switchcontrol.view.SwitchInputAdapter;
-import com.cpz.processing.controls.controls.switchcontrol.view.SwitchView;
-import com.cpz.processing.controls.controls.switchcontrol.viewmodel.SwitchViewModel;
+import com.cpz.processing.controls.controls.toggle.config.ToggleStyleConfig;
+import com.cpz.processing.controls.controls.toggle.model.ToggleModel;
+import com.cpz.processing.controls.controls.toggle.style.ParametricToggleStyle;
+import com.cpz.processing.controls.controls.toggle.style.render.CircleShapeRenderer;
+import com.cpz.processing.controls.controls.toggle.style.render.SvgShapeRenderer;
+import com.cpz.processing.controls.controls.toggle.view.ToggleInputAdapter;
+import com.cpz.processing.controls.controls.toggle.view.ToggleView;
+import com.cpz.processing.controls.controls.toggle.viewmodel.ToggleViewModel;
 import com.cpz.processing.controls.core.input.DefaultInputLayer;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
@@ -18,14 +18,14 @@ import com.cpz.processing.controls.core.util.Colors;
 import java.util.Objects;
 import processing.core.PApplet;
 
-public class SwitchDevSketch extends PApplet {
+public class ToggleDevSketch extends PApplet {
    private final InputManager inputManager = new InputManager();
-   private SwitchViewModel swViewModel1;
-   private SwitchViewModel swViewModel2;
-   private SwitchView swView1;
-   private SwitchView swView2;
-   private SwitchInputAdapter swInput1;
-   private SwitchInputAdapter swInput2;
+   private ToggleViewModel swViewModel1;
+   private ToggleViewModel swViewModel2;
+   private ToggleView swView1;
+   private ToggleView swView2;
+   private ToggleInputAdapter swInput1;
+   private ToggleInputAdapter swInput2;
 
    public void settings() {
       this.size(760, 440);
@@ -34,19 +34,19 @@ public class SwitchDevSketch extends PApplet {
 
    public void setup() {
       this.noStroke();
-      this.swViewModel1 = new SwitchViewModel(new SwitchModel());
+      this.swViewModel1 = new ToggleViewModel(new ToggleModel());
       this.swViewModel1.setTotalStates(2);
-      this.swView1 = new SwitchView(this, this.swViewModel1, 220.0F, 220.0F, 76.0F);
+      this.swView1 = new ToggleView(this, this.swViewModel1, 220.0F, 220.0F, 76.0F);
       this.swView1.setHitTest(new CircleHitTest());
-      this.swView1.setStyle(new ParametricSwitchStyle(this.createCircularConfig()));
-      this.swInput1 = new SwitchInputAdapter(this.swView1, this.swViewModel1);
-      this.swViewModel2 = new SwitchViewModel(new SwitchModel());
+      this.swView1.setStyle(new ParametricToggleStyle(this.createCircularConfig()));
+      this.swInput1 = new ToggleInputAdapter(this.swView1, this.swViewModel1);
+      this.swViewModel2 = new ToggleViewModel(new ToggleModel());
       this.swViewModel2.setTotalStates(3);
-      this.swView2 = new SwitchView(this, this.swViewModel2, 540.0F, 220.0F, 120.0F, 100.0F);
-      this.swView2.setStyle(new ParametricSwitchStyle(this.createSvgConfig()));
+      this.swView2 = new ToggleView(this, this.swViewModel2, 540.0F, 220.0F, 120.0F, 100.0F);
+      this.swView2.setStyle(new ParametricToggleStyle(this.createSvgConfig()));
       this.swView2.setHitTest(new RectHitTest());
-      this.swInput2 = new SwitchInputAdapter(this.swView2, this.swViewModel2);
-      this.inputManager.registerLayer(new SwitchRootInputLayer());
+      this.swInput2 = new ToggleInputAdapter(this.swView2, this.swViewModel2);
+      this.inputManager.registerLayer(new ToggleRootInputLayer());
    }
 
    public void draw() {
@@ -107,7 +107,7 @@ public class SwitchDevSketch extends PApplet {
       this.text("SVG Renderer", 540.0F, 110.0F);
       this.text("State: " + this.swViewModel2.getState(), 540.0F, 132.0F);
       this.textAlign(37);
-      String var1 = "Checks:\n- Click changes state on release\n- Dragging outside cancels\n- Hover/pressed modify final fill\n- SVG switch is disabled while circle is OFF\n- SVG scales using SwitchView width/height";
+      String var1 = "Checks:\n- Click changes state on release\n- Dragging outside cancels\n- Hover/pressed modify final fill\n- SVG toggle is disabled while circle is OFF\n- SVG scales using ToggleView width/height";
       this.text(var1, 24.0F, (float)(this.height - 108));
       this.text("SVG enabled: " + this.swViewModel2.isEnabled(), 420.0F, 344.0F);
       this.text("Circle hovered: " + this.swViewModel1.isHovered(), 420.0F, 366.0F);
@@ -115,8 +115,8 @@ public class SwitchDevSketch extends PApplet {
       this.popStyle();
    }
 
-   private SwitchStyleConfig createCircularConfig() {
-      SwitchStyleConfig var1 = new SwitchStyleConfig();
+   private ToggleStyleConfig createCircularConfig() {
+      ToggleStyleConfig var1 = new ToggleStyleConfig();
       var1.setShapeRenderer(new CircleShapeRenderer());
       var1.stateColors = new Integer[]{Colors.gray(60), Colors.rgb(48, 186, 96)};
       var1.strokeColor = Colors.gray(255);
@@ -128,8 +128,8 @@ public class SwitchDevSketch extends PApplet {
       return var1;
    }
 
-   private SwitchStyleConfig createSvgConfig() {
-      SwitchStyleConfig var1 = new SwitchStyleConfig();
+   private ToggleStyleConfig createSvgConfig() {
+      ToggleStyleConfig var1 = new ToggleStyleConfig();
       var1.setShapeRenderer(new SvgShapeRenderer(this, "data/img/test.svg"));
       var1.stateColors = new Integer[]{Colors.rgb(80, 100, 220), Colors.rgb(235, 160, 40), Colors.rgb(32, 188, 176)};
       var1.strokeColor = Colors.gray(255);
@@ -141,9 +141,9 @@ public class SwitchDevSketch extends PApplet {
       return var1;
    }
 
-   private final class SwitchRootInputLayer extends DefaultInputLayer {
-      private SwitchRootInputLayer() {
-         Objects.requireNonNull(SwitchDevSketch.this);
+   private final class ToggleRootInputLayer extends DefaultInputLayer {
+      private ToggleRootInputLayer() {
+         Objects.requireNonNull(ToggleDevSketch.this);
          super(0);
       }
 
@@ -151,16 +151,16 @@ public class SwitchDevSketch extends PApplet {
          switch (var1.getType()) {
             case MOVE:
             case DRAG:
-               SwitchDevSketch.this.swInput1.handleMouseMove(var1.getX(), var1.getY());
-               SwitchDevSketch.this.swInput2.handleMouseMove(var1.getX(), var1.getY());
+               ToggleDevSketch.this.swInput1.handleMouseMove(var1.getX(), var1.getY());
+               ToggleDevSketch.this.swInput2.handleMouseMove(var1.getX(), var1.getY());
                return true;
             case PRESS:
-               SwitchDevSketch.this.swInput1.handleMousePress(var1.getX(), var1.getY());
-               SwitchDevSketch.this.swInput2.handleMousePress(var1.getX(), var1.getY());
+               ToggleDevSketch.this.swInput1.handleMousePress(var1.getX(), var1.getY());
+               ToggleDevSketch.this.swInput2.handleMousePress(var1.getX(), var1.getY());
                return true;
             case RELEASE:
-               SwitchDevSketch.this.swInput1.handleMouseRelease(var1.getX(), var1.getY());
-               SwitchDevSketch.this.swInput2.handleMouseRelease(var1.getX(), var1.getY());
+               ToggleDevSketch.this.swInput1.handleMouseRelease(var1.getX(), var1.getY());
+               ToggleDevSketch.this.swInput2.handleMouseRelease(var1.getX(), var1.getY());
                return true;
             default:
                return false;
