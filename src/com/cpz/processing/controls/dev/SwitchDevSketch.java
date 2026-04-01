@@ -9,6 +9,10 @@ import com.cpz.processing.controls.switchcontrol.style.render.CircleShapeRendere
 import com.cpz.processing.controls.switchcontrol.style.render.SvgShapeRenderer;
 import com.cpz.processing.controls.switchcontrol.view.SwitchView;
 import com.cpz.processing.controls.switchcontrol.view.SwitchViewModel;
+import com.cpz.processing.controls.input.DefaultInputLayer;
+import com.cpz.processing.controls.input.InputManager;
+import com.cpz.processing.controls.input.KeyboardEvent;
+import com.cpz.processing.controls.input.PointerEvent;
 import com.cpz.processing.controls.util.Colors;
 import com.cpz.processing.controls.hit.RectHitTest;
 import processing.core.PApplet;
@@ -17,6 +21,8 @@ import processing.core.PApplet;
  * @author CPZ
  */
 public class SwitchDevSketch extends PApplet {
+
+    private final InputManager inputManager = new InputManager();
 
     private SwitchViewModel swViewModel1, swViewModel2;
     private SwitchView swView1, swView2;
@@ -54,6 +60,8 @@ public class SwitchDevSketch extends PApplet {
         swView2.setStyle(new ParametricSwitchStyle(createSvgConfig()));
         swView2.setHitTest(new RectHitTest());
         swInput2 = new SwitchInputAdapter(swView2, swViewModel2);
+
+        inputManager.registerLayer(new SwitchRootInputLayer());
     }
 
     @Override
@@ -65,29 +73,34 @@ public class SwitchDevSketch extends PApplet {
     @Override
     public void keyReleased() {
         if (key == ESC) key = 0;
+        inputManager.dispatchKeyboard(new KeyboardEvent(
+                KeyboardEvent.Type.RELEASE,
+                key,
+                keyCode,
+                keyEvent != null && keyEvent.isShiftDown(),
+                keyEvent != null && keyEvent.isControlDown(),
+                keyEvent != null && keyEvent.isAltDown()
+        ));
     }
 
     @Override
     public void mouseMoved() {
-        swInput1.handleMouseMove(mouseX, mouseY);
-        swInput2.handleMouseMove(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mouseDragged() {
-        mouseMoved();
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mousePressed() {
-        swInput1.handleMousePress(mouseX, mouseY);
-        swInput2.handleMousePress(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mouseReleased() {
-        swInput1.handleMouseRelease(mouseX, mouseY);
-        swInput2.handleMouseRelease(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, mouseX, mouseY, mouseButton));
     }
 
     private void update() {
@@ -155,5 +168,41 @@ public class SwitchDevSketch extends PApplet {
         config.pressedBlendWithBlack = 0.24f;
         config.disabledAlpha = 70;
         return config;
+    }
+
+    private final class SwitchRootInputLayer extends DefaultInputLayer {
+
+        private SwitchRootInputLayer() {
+            super(0);
+        }
+
+        @Override
+        public boolean handlePointerEvent(PointerEvent event) {
+            switch (event.getType()) {
+                case MOVE:
+                case DRAG:
+                    swInput1.handleMouseMove(event.getX(), event.getY());
+                    swInput2.handleMouseMove(event.getX(), event.getY());
+                    return true;
+
+                case PRESS:
+                    swInput1.handleMousePress(event.getX(), event.getY());
+                    swInput2.handleMousePress(event.getX(), event.getY());
+                    return true;
+
+                case RELEASE:
+                    swInput1.handleMouseRelease(event.getX(), event.getY());
+                    swInput2.handleMouseRelease(event.getX(), event.getY());
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public boolean handleKeyboardEvent(KeyboardEvent event) {
+            return false;
+        }
     }
 }

@@ -31,4 +31,13 @@ public interface KeyboardInputTarget extends Focusable {
     void cutSelection();
 
     void pasteFromClipboard();
+
+    default void commit() {
+    }
+
+    default void increment(boolean shiftDown, boolean ctrlDown) {
+    }
+
+    default void decrement(boolean shiftDown, boolean ctrlDown) {
+    }
 }

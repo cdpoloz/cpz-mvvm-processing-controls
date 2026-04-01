@@ -2,6 +2,10 @@ package com.cpz.processing.controls.dev;
 
 import com.cpz.processing.controls.common.focus.FocusManager;
 import com.cpz.processing.controls.common.input.KeyboardInputAdapter;
+import com.cpz.processing.controls.input.DefaultInputLayer;
+import com.cpz.processing.controls.input.InputManager;
+import com.cpz.processing.controls.input.KeyboardEvent;
+import com.cpz.processing.controls.input.PointerEvent;
 import com.cpz.processing.controls.textfieldcontrol.input.TextFieldInputAdapter;
 import com.cpz.processing.controls.textfieldcontrol.model.TextFieldModel;
 import com.cpz.processing.controls.textfieldcontrol.style.DefaultTextFieldStyle;
@@ -15,6 +19,7 @@ import processing.core.PFont;
 public class TextFieldDevSketch extends PApplet {
 
     private final FocusManager focusManager = new FocusManager();
+    private final InputManager inputManager = new InputManager();
 
     private TextFieldView customFontView;
     private TextFieldView defaultFontView;
@@ -44,6 +49,8 @@ public class TextFieldDevSketch extends PApplet {
         defaultFontView = new TextFieldView(this, defaultFontViewModel, width * 0.5f, 250f, 420f, 46f);
         defaultFontView.setStyle(new DefaultTextFieldStyle(createDefaultFontStyle()));
         defaultFontInput = new TextFieldInputAdapter(defaultFontView, defaultFontViewModel, focusManager);
+
+        inputManager.registerLayer(new TextFieldRootInputLayer());
     }
 
     @Override
@@ -55,41 +62,60 @@ public class TextFieldDevSketch extends PApplet {
     }
 
     @Override
-    public void keyReleased() {
-        if (key == ESC) key = 0;
-    }
-
-    @Override
     public void mousePressed() {
-        boolean handled = customFontInput.handleMousePress(mouseX, mouseY);
-        if (!handled) {
-            handled = defaultFontInput.handleMousePress(mouseX, mouseY);
-        }
-        if (!handled) {
-            focusManager.clearFocus();
-        }
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mouseDragged() {
-        customFontInput.handleMouseDrag(mouseX, mouseY);
-        defaultFontInput.handleMouseDrag(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mouseReleased() {
-        customFontInput.handleMouseRelease();
-        defaultFontInput.handleMouseRelease();
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void keyPressed() {
-        keyboardAdapter.onKeyPressed(key, keyCode, keyEvent);
+        if (key == ESC) {
+            key = 0;
+        }
+        inputManager.dispatchKeyboard(new KeyboardEvent(
+                KeyboardEvent.Type.PRESS,
+                key,
+                keyCode,
+                keyEvent != null && keyEvent.isShiftDown(),
+                keyEvent != null && keyEvent.isControlDown(),
+                keyEvent != null && keyEvent.isAltDown()
+        ));
+    }
+
+    @Override
+    public void keyReleased() {
+        if (key == ESC) {
+            key = 0;
+        }
+        inputManager.dispatchKeyboard(new KeyboardEvent(
+                KeyboardEvent.Type.RELEASE,
+                key,
+                keyCode,
+                keyEvent != null && keyEvent.isShiftDown(),
+                keyEvent != null && keyEvent.isControlDown(),
+                keyEvent != null && keyEvent.isAltDown()
+        ));
     }
 
     @Override
     public void keyTyped() {
-        keyboardAdapter.onKeyTyped(key);
+        inputManager.dispatchKeyboard(new KeyboardEvent(
+                KeyboardEvent.Type.TYPE,
+                key,
+                keyCode,
+                keyEvent != null && keyEvent.isShiftDown(),
+                keyEvent != null && keyEvent.isControlDown(),
+                keyEvent != null && keyEvent.isAltDown()
+        ));
     }
 
     private void drawTitles() {
@@ -128,5 +154,56 @@ public class TextFieldDevSketch extends PApplet {
         config.textSize = 16f;
         config.font = null;
         return config;
+    }
+
+    private final class TextFieldRootInputLayer extends DefaultInputLayer {
+
+        private TextFieldRootInputLayer() {
+            super(0);
+        }
+
+        @Override
+        public boolean handlePointerEvent(PointerEvent event) {
+            switch (event.getType()) {
+                case PRESS:
+                    boolean handled = customFontInput.handleMousePress(event.getX(), event.getY());
+                    if (!handled) {
+                        handled = defaultFontInput.handleMousePress(event.getX(), event.getY());
+                    }
+                    if (!handled) {
+                        focusManager.clearFocus();
+                    }
+                    return true;
+
+                case DRAG:
+                    customFontInput.handleMouseDrag(event.getX(), event.getY());
+                    defaultFontInput.handleMouseDrag(event.getX(), event.getY());
+                    return true;
+
+                case RELEASE:
+                    customFontInput.handleMouseRelease();
+                    defaultFontInput.handleMouseRelease();
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public boolean handleKeyboardEvent(KeyboardEvent event) {
+            switch (event.getType()) {
+                case PRESS:
+                    keyboardAdapter.handleKeyboardEvent(event);
+                    return true;
+
+                case TYPE:
+                    keyboardAdapter.handleKeyboardEvent(event);
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
     }
 }

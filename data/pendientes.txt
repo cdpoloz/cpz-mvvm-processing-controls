@@ -1,27 +1,7 @@
+NumericField
 
-Fase 2
+RadioGroup
 
-👉 DropDown (ComboBox)
+Uniformizar paquetes
 
-Porque:
-
-introduce overlay + foco complejo
-sube el nivel del framework
-
-Fase 3
-
-👉 NumericField
-
-Porque:
-
-reutiliza mucho del TextField
-añade valor funcional fuerte
-
-Fase 4
-
-👉 RadioGroup
-
-Porque:
-
-introduce control compuesto
-puedes hacerlo después con más claridad
+Guías de uso

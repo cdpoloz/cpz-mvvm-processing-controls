@@ -10,12 +10,18 @@ import com.cpz.processing.controls.checkboxcontrol.viewmodel.CheckboxViewModel;
 import com.cpz.processing.controls.labelcontrol.LabelModel;
 import com.cpz.processing.controls.labelcontrol.view.LabelView;
 import com.cpz.processing.controls.labelcontrol.view.LabelViewModel;
+import com.cpz.processing.controls.input.DefaultInputLayer;
+import com.cpz.processing.controls.input.InputManager;
+import com.cpz.processing.controls.input.KeyboardEvent;
+import com.cpz.processing.controls.input.PointerEvent;
 import processing.core.PApplet;
 
 /**
  * @author CPZ
  */
 public class CheckboxDevSketch extends PApplet {
+
+    private final InputManager inputManager = new InputManager();
 
     private CheckboxView checkboxAView;
     private CheckboxView checkboxBView;
@@ -85,6 +91,8 @@ public class CheckboxDevSketch extends PApplet {
         helperLabelViewModel = new LabelViewModel(new LabelModel());
         helperLabel = createLabel(helperLabelViewModel, "Click Option A to toggle SVG checkbox enabled. Press V to toggle Option B visibility.", 40, 360);
         updateStatusLabels();
+
+        inputManager.registerLayer(new CheckboxRootInputLayer());
     }
 
     @Override
@@ -107,46 +115,46 @@ public class CheckboxDevSketch extends PApplet {
     @Override
     public void keyReleased() {
         if (key == ESC) key = 0;
+        inputManager.dispatchKeyboard(new KeyboardEvent(
+                KeyboardEvent.Type.RELEASE,
+                key,
+                keyCode,
+                keyEvent != null && keyEvent.isShiftDown(),
+                keyEvent != null && keyEvent.isControlDown(),
+                keyEvent != null && keyEvent.isAltDown()
+        ));
     }
 
     @Override
     public void mouseMoved() {
-        forwardMove(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mouseDragged() {
-        forwardMove(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mousePressed() {
-        checkboxAInput.handleMousePress(mouseX, mouseY);
-        checkboxBInput.handleMousePress(mouseX, mouseY);
-        checkboxSvgInput.handleMousePress(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mouseReleased() {
-        checkboxAInput.handleMouseRelease(mouseX, mouseY);
-        checkboxBInput.handleMouseRelease(mouseX, mouseY);
-        checkboxSvgInput.handleMouseRelease(mouseX, mouseY);
-        checkboxSvgViewModel.setEnabled(checkboxAViewModel.isChecked());
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void keyPressed() {
-        if (key == 'v' || key == 'V') {
-            checkboxBViewModel.setVisible(!checkboxBViewModel.isVisible());
-            labelBTitle.setPosition(120, 184);
-            labelBStatus.setPosition(320, 184);
-        }
-    }
-
-    private void forwardMove(float mx, float my) {
-        checkboxAInput.handleMouseMove(mx, my);
-        checkboxBInput.handleMouseMove(mx, my);
-        checkboxSvgInput.handleMouseMove(mx, my);
+        inputManager.dispatchKeyboard(new KeyboardEvent(
+                KeyboardEvent.Type.PRESS,
+                key,
+                keyCode,
+                keyEvent != null && keyEvent.isShiftDown(),
+                keyEvent != null && keyEvent.isControlDown(),
+                keyEvent != null && keyEvent.isAltDown()
+        ));
     }
 
     private void updateStatusLabels() {
@@ -196,5 +204,51 @@ public class CheckboxDevSketch extends PApplet {
         config.checkInset = 0.22f;
         config.setRenderer(new SvgCheckboxRenderer(this, "data/img/test.svg"));
         return config;
+    }
+
+    private final class CheckboxRootInputLayer extends DefaultInputLayer {
+
+        private CheckboxRootInputLayer() {
+            super(0);
+        }
+
+        @Override
+        public boolean handlePointerEvent(PointerEvent event) {
+            switch (event.getType()) {
+                case MOVE:
+                case DRAG:
+                    checkboxAInput.handleMouseMove(event.getX(), event.getY());
+                    checkboxBInput.handleMouseMove(event.getX(), event.getY());
+                    checkboxSvgInput.handleMouseMove(event.getX(), event.getY());
+                    return true;
+
+                case PRESS:
+                    checkboxAInput.handleMousePress(event.getX(), event.getY());
+                    checkboxBInput.handleMousePress(event.getX(), event.getY());
+                    checkboxSvgInput.handleMousePress(event.getX(), event.getY());
+                    return true;
+
+                case RELEASE:
+                    checkboxAInput.handleMouseRelease(event.getX(), event.getY());
+                    checkboxBInput.handleMouseRelease(event.getX(), event.getY());
+                    checkboxSvgInput.handleMouseRelease(event.getX(), event.getY());
+                    checkboxSvgViewModel.setEnabled(checkboxAViewModel.isChecked());
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public boolean handleKeyboardEvent(KeyboardEvent event) {
+            if (event.getType() == KeyboardEvent.Type.PRESS && (event.getKey() == 'v' || event.getKey() == 'V')) {
+                checkboxBViewModel.setVisible(!checkboxBViewModel.isVisible());
+                labelBTitle.setPosition(120, 184);
+                labelBStatus.setPosition(320, 184);
+                return true;
+            }
+            return false;
+        }
     }
 }

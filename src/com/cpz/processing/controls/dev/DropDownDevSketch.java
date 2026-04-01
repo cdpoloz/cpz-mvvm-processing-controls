@@ -20,6 +20,7 @@ import com.cpz.processing.controls.layout.Anchor;
 import com.cpz.processing.controls.layout.LayoutConfig;
 import com.cpz.processing.controls.overlay.OverlayEntry;
 import com.cpz.processing.controls.overlay.OverlayManager;
+import com.cpz.processing.controls.tooltipoverlay.TooltipOverlayController;
 import com.cpz.processing.controls.util.Colors;
 import processing.core.PApplet;
 
@@ -32,7 +33,7 @@ public class DropDownDevSketch extends PApplet {
 
     private final FocusManager focusManager = new FocusManager();
     private final InputManager inputManager = new InputManager();
-    private final OverlayManager overlayManager = new OverlayManager();
+    private final OverlayManager overlayManager = new OverlayManager(focusManager);
 
     private DropDownView firstDropDownView;
     private DropDownViewModel firstDropDownViewModel;
@@ -40,6 +41,9 @@ public class DropDownDevSketch extends PApplet {
     private DropDownViewModel secondDropDownViewModel;
     private DropDownOverlayController firstOverlayController;
     private DropDownOverlayController secondOverlayController;
+    private TooltipOverlayController firstTooltipController;
+    private TooltipOverlayController secondTooltipController;
+    private TooltipOverlayController buttonTooltipController;
     private ButtonView buttonView;
     private ButtonInputAdapter buttonInputAdapter;
     private String statusText = "Sin interaccion";
@@ -105,6 +109,58 @@ public class DropDownDevSketch extends PApplet {
         buttonView.setLayoutConfig(createLayout(0.50f, 0.45f, Anchor.TOP_CENTER));
         buttonInputAdapter = new ButtonInputAdapter(buttonView, buttonViewModel);
 
+        firstTooltipController = new TooltipOverlayController(
+                this,
+                overlayManager,
+                firstDropDownViewModel::isHovered,
+                () -> "Choose the first option set",
+                new TooltipOverlayController.AnchorBoundsProvider() {
+                    @Override
+                    public float getCenterX() {
+                        return firstDropDownView.getX();
+                    }
+
+                    @Override
+                    public float getTopY() {
+                        return firstDropDownView.getY() - (firstDropDownView.getHeight() * 0.5f);
+                    }
+                }
+        );
+        secondTooltipController = new TooltipOverlayController(
+                this,
+                overlayManager,
+                secondDropDownViewModel::isHovered,
+                () -> "Choose the color set",
+                new TooltipOverlayController.AnchorBoundsProvider() {
+                    @Override
+                    public float getCenterX() {
+                        return secondDropDownView.getX();
+                    }
+
+                    @Override
+                    public float getTopY() {
+                        return secondDropDownView.getY() - (secondDropDownView.getHeight() * 0.5f);
+                    }
+                }
+        );
+        buttonTooltipController = new TooltipOverlayController(
+                this,
+                overlayManager,
+                () -> buttonViewModel.isHovered(),
+                () -> "Tooltip overlays do not block the button",
+                new TooltipOverlayController.AnchorBoundsProvider() {
+                    @Override
+                    public float getCenterX() {
+                        return buttonView.getX();
+                    }
+
+                    @Override
+                    public float getTopY() {
+                        return buttonView.getY() - (buttonView.getHeight() * 0.5f);
+                    }
+                }
+        );
+
         inputManager.registerLayer(new RootInputLayer());
         syncOverlayControllers();
     }
@@ -112,6 +168,7 @@ public class DropDownDevSketch extends PApplet {
     @Override
     public void draw() {
         syncOverlayControllers();
+        syncTooltipControllers();
         background(246);
         drawFrame();
         buttonView.draw();
@@ -145,11 +202,6 @@ public class DropDownDevSketch extends PApplet {
     }
 
     @Override
-    public void keyReleased() {
-        if (key == ESC) key = 0;
-    }
-
-    @Override
     public void keyPressed() {
         if (key == ESC) {
             key = 0;
@@ -170,9 +222,27 @@ public class DropDownDevSketch extends PApplet {
     }
 
     @Override
+    public void keyReleased() {
+        if (key == ESC) {
+            key = 0;
+        }
+        inputManager.dispatchKeyboard(new KeyboardEvent(
+                KeyboardEvent.Type.RELEASE,
+                key,
+                keyCode,
+                keyEvent != null && keyEvent.isShiftDown(),
+                keyEvent != null && keyEvent.isControlDown(),
+                keyEvent != null && keyEvent.isAltDown()
+        ));
+    }
+
+    @Override
     public void exit() {
         firstOverlayController.dispose();
         secondOverlayController.dispose();
+        firstTooltipController.dispose();
+        secondTooltipController.dispose();
+        buttonTooltipController.dispose();
         overlayManager.clearAll();
         super.exit();
     }
@@ -211,6 +281,12 @@ public class DropDownDevSketch extends PApplet {
     private void syncOverlayControllers() {
         firstOverlayController.syncRegistration();
         secondOverlayController.syncRegistration();
+    }
+
+    private void syncTooltipControllers() {
+        firstTooltipController.sync();
+        secondTooltipController.sync();
+        buttonTooltipController.sync();
     }
 
     private boolean handleOverlayTransfer(DropDownOverlayController source, PointerEvent event) {
@@ -289,6 +365,7 @@ public class DropDownDevSketch extends PApplet {
         text("First hovered item index: " + firstDropDownView.getHoveredIndex(), 92, 446);
         text("Second hovered item index: " + secondDropDownView.getHoveredIndex(), 92, 472);
         text("Active overlays: " + overlayManager.getActiveOverlays().size(), 92, 498);
+        text("Focused target: " + (focusManager.getFocused() == null ? "none" : focusManager.getFocused().getClass().getSimpleName()), 92, 524);
         popStyle();
     }
 
@@ -322,6 +399,7 @@ public class DropDownDevSketch extends PApplet {
         public boolean handlePointerEvent(PointerEvent event) {
             switch (event.getType()) {
                 case MOVE:
+                case DRAG:
                     handleRootMove(event);
                     return true;
 

@@ -40,7 +40,7 @@ public final class DropDownOverlayController {
         this.inputManager = inputManager;
         this.zIndex = zIndex;
         this.inputLayer = new OverlayInputLayer(zIndex);
-        this.overlayEntry = new OverlayEntry(zIndex, view::draw, inputLayer, this::closeOverlay);
+        this.overlayEntry = new OverlayEntry(zIndex, view::draw, inputLayer, this::closeOverlay, viewModel);
     }
 
     public void setTransferHandler(TransferHandler transferHandler) {

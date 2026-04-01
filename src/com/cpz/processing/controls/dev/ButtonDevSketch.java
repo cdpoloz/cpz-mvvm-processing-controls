@@ -7,6 +7,10 @@ import com.cpz.processing.controls.buttoncontrol.style.DefaultButtonStyle;
 import com.cpz.processing.controls.buttoncontrol.style.render.SvgButtonRenderer;
 import com.cpz.processing.controls.buttoncontrol.view.ButtonView;
 import com.cpz.processing.controls.buttoncontrol.viewmodel.ButtonViewModel;
+import com.cpz.processing.controls.input.DefaultInputLayer;
+import com.cpz.processing.controls.input.InputManager;
+import com.cpz.processing.controls.input.KeyboardEvent;
+import com.cpz.processing.controls.input.PointerEvent;
 import com.cpz.processing.controls.util.Colors;
 import processing.core.PApplet;
 
@@ -14,6 +18,8 @@ import processing.core.PApplet;
  * @author CPZ
  */
 public class ButtonDevSketch extends PApplet {
+
+    private final InputManager inputManager = new InputManager();
 
     private ButtonView primaryButtonView;
     private ButtonView svgButtonView;
@@ -51,6 +57,8 @@ public class ButtonDevSketch extends PApplet {
         svgButtonView = new ButtonView(this, svgButtonViewModel, 590, 170, 250, 96);
         svgButtonView.setStyle(new DefaultButtonStyle(createSvgStyle()));
         svgButtonInput = new ButtonInputAdapter(svgButtonView, svgButtonViewModel);
+
+        inputManager.registerLayer(new ButtonRootInputLayer());
     }
 
     @Override
@@ -65,33 +73,34 @@ public class ButtonDevSketch extends PApplet {
     @Override
     public void keyReleased() {
         if (key == ESC) key = 0;
+        inputManager.dispatchKeyboard(new KeyboardEvent(
+                KeyboardEvent.Type.RELEASE,
+                key,
+                keyCode,
+                keyEvent != null && keyEvent.isShiftDown(),
+                keyEvent != null && keyEvent.isControlDown(),
+                keyEvent != null && keyEvent.isAltDown()
+        ));
     }
 
     @Override
     public void mouseMoved() {
-        forwardMove(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mouseDragged() {
-        forwardMove(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mousePressed() {
-        primaryButtonInput.handleMousePress(mouseX, mouseY);
-        svgButtonInput.handleMousePress(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mouseReleased() {
-        primaryButtonInput.handleMouseRelease(mouseX, mouseY);
-        svgButtonInput.handleMouseRelease(mouseX, mouseY);
-    }
-
-    private void forwardMove(float mx, float my) {
-        primaryButtonInput.handleMouseMove(mx, my);
-        svgButtonInput.handleMouseMove(mx, my);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, mouseX, mouseY, mouseButton));
     }
 
     private void drawTitles() {
@@ -132,5 +141,41 @@ public class ButtonDevSketch extends PApplet {
         config.pressedBlendWithBlack = 0.25f;
         config.setRenderer(new SvgButtonRenderer(this, "data/img/test.svg"));
         return config;
+    }
+
+    private final class ButtonRootInputLayer extends DefaultInputLayer {
+
+        private ButtonRootInputLayer() {
+            super(0);
+        }
+
+        @Override
+        public boolean handlePointerEvent(PointerEvent event) {
+            switch (event.getType()) {
+                case MOVE:
+                case DRAG:
+                    primaryButtonInput.handleMouseMove(event.getX(), event.getY());
+                    svgButtonInput.handleMouseMove(event.getX(), event.getY());
+                    return true;
+
+                case PRESS:
+                    primaryButtonInput.handleMousePress(event.getX(), event.getY());
+                    svgButtonInput.handleMousePress(event.getX(), event.getY());
+                    return true;
+
+                case RELEASE:
+                    primaryButtonInput.handleMouseRelease(event.getX(), event.getY());
+                    svgButtonInput.handleMouseRelease(event.getX(), event.getY());
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public boolean handleKeyboardEvent(KeyboardEvent event) {
+            return false;
+        }
     }
 }

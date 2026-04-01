@@ -9,6 +9,10 @@ import com.cpz.processing.controls.slidercontrol.style.SliderStyleConfig;
 import com.cpz.processing.controls.slidercontrol.style.SvgColorMode;
 import com.cpz.processing.controls.slidercontrol.view.SliderView;
 import com.cpz.processing.controls.slidercontrol.viewmodel.SliderViewModel;
+import com.cpz.processing.controls.input.DefaultInputLayer;
+import com.cpz.processing.controls.input.InputManager;
+import com.cpz.processing.controls.input.KeyboardEvent;
+import com.cpz.processing.controls.input.PointerEvent;
 import com.cpz.processing.controls.util.Colors;
 import processing.core.PApplet;
 import processing.core.PShape;
@@ -18,6 +22,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class SliderDevSketch extends PApplet {
+
+    private final InputManager inputManager = new InputManager();
 
     private SliderView horizontalSliderView;
     private SliderView verticalSliderView;
@@ -90,6 +96,8 @@ public class SliderDevSketch extends PApplet {
         releaseSnapSliderView = new SliderView(this, releaseSnapSliderViewModel, width * 0.5f, height * 0.88f, 420f, 60f, SliderOrientation.HORIZONTAL);
         releaseSnapSliderView.setStyle(new SliderStyle(createHorizontalStyle(svgThumb1)));
         releaseSnapInputAdapter = new SliderInputAdapter(releaseSnapSliderView, releaseSnapSliderViewModel);
+
+        inputManager.registerLayer(new SliderRootInputLayer());
     }
 
     @Override
@@ -106,57 +114,47 @@ public class SliderDevSketch extends PApplet {
     @Override
     public void keyReleased() {
         if (key == ESC) key = 0;
+        inputManager.dispatchKeyboard(new KeyboardEvent(
+                KeyboardEvent.Type.RELEASE,
+                key,
+                keyCode,
+                keyEvent != null && keyEvent.isShiftDown(),
+                keyEvent != null && keyEvent.isControlDown(),
+                keyEvent != null && keyEvent.isAltDown()
+        ));
     }
 
     @Override
     public void mouseMoved() {
-        forwardMove(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mouseDragged() {
-        forwardDrag(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mousePressed() {
-        horizontalInputAdapter.handleMousePress(mouseX, mouseY);
-        verticalInputAdapter.handleMousePress(mouseX, mouseY);
-        fallbackInputAdapter.handleMousePress(mouseX, mouseY);
-        releaseSnapInputAdapter.handleMousePress(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mouseReleased() {
-        horizontalInputAdapter.handleMouseRelease(mouseX, mouseY);
-        verticalInputAdapter.handleMouseRelease(mouseX, mouseY);
-        fallbackInputAdapter.handleMouseRelease(mouseX, mouseY);
-        releaseSnapInputAdapter.handleMouseRelease(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mouseWheel(MouseEvent event) {
-        float delta = event.getCount();
-        boolean shiftDown = event.isShiftDown();
-        boolean ctrlDown = event.isControlDown();
-        horizontalInputAdapter.handleMouseWheel(delta, shiftDown, ctrlDown);
-        verticalInputAdapter.handleMouseWheel(delta, shiftDown, ctrlDown);
-        fallbackInputAdapter.handleMouseWheel(delta, shiftDown, ctrlDown);
-        releaseSnapInputAdapter.handleMouseWheel(delta, shiftDown, ctrlDown);
-    }
-
-    private void forwardMove(float mx, float my) {
-        horizontalInputAdapter.handleMouseMove(mx, my);
-        verticalInputAdapter.handleMouseMove(mx, my);
-        fallbackInputAdapter.handleMouseMove(mx, my);
-        releaseSnapInputAdapter.handleMouseMove(mx, my);
-    }
-
-    private void forwardDrag(float mx, float my) {
-        horizontalInputAdapter.handleMouseDrag(mx, my);
-        verticalInputAdapter.handleMouseDrag(mx, my);
-        fallbackInputAdapter.handleMouseDrag(mx, my);
-        releaseSnapInputAdapter.handleMouseDrag(mx, my);
+        inputManager.dispatchPointer(new PointerEvent(
+                PointerEvent.Type.WHEEL,
+                mouseX,
+                mouseY,
+                mouseButton,
+                event.getCount(),
+                event.isShiftDown(),
+                event.isControlDown()
+        ));
     }
 
     private void drawTitles() {
@@ -289,5 +287,60 @@ public class SliderDevSketch extends PApplet {
             shape = loadShape(path.substring("data/".length()));
         }
         return shape;
+    }
+
+    private final class SliderRootInputLayer extends DefaultInputLayer {
+
+        private SliderRootInputLayer() {
+            super(0);
+        }
+
+        @Override
+        public boolean handlePointerEvent(PointerEvent event) {
+            switch (event.getType()) {
+                case MOVE:
+                    horizontalInputAdapter.handleMouseMove(event.getX(), event.getY());
+                    verticalInputAdapter.handleMouseMove(event.getX(), event.getY());
+                    fallbackInputAdapter.handleMouseMove(event.getX(), event.getY());
+                    releaseSnapInputAdapter.handleMouseMove(event.getX(), event.getY());
+                    return true;
+
+                case DRAG:
+                    horizontalInputAdapter.handleMouseDrag(event.getX(), event.getY());
+                    verticalInputAdapter.handleMouseDrag(event.getX(), event.getY());
+                    fallbackInputAdapter.handleMouseDrag(event.getX(), event.getY());
+                    releaseSnapInputAdapter.handleMouseDrag(event.getX(), event.getY());
+                    return true;
+
+                case PRESS:
+                    horizontalInputAdapter.handleMousePress(event.getX(), event.getY());
+                    verticalInputAdapter.handleMousePress(event.getX(), event.getY());
+                    fallbackInputAdapter.handleMousePress(event.getX(), event.getY());
+                    releaseSnapInputAdapter.handleMousePress(event.getX(), event.getY());
+                    return true;
+
+                case RELEASE:
+                    horizontalInputAdapter.handleMouseRelease(event.getX(), event.getY());
+                    verticalInputAdapter.handleMouseRelease(event.getX(), event.getY());
+                    fallbackInputAdapter.handleMouseRelease(event.getX(), event.getY());
+                    releaseSnapInputAdapter.handleMouseRelease(event.getX(), event.getY());
+                    return true;
+
+                case WHEEL:
+                    horizontalInputAdapter.handleMouseWheel(event.getWheelDelta(), event.isShiftDown(), event.isControlDown());
+                    verticalInputAdapter.handleMouseWheel(event.getWheelDelta(), event.isShiftDown(), event.isControlDown());
+                    fallbackInputAdapter.handleMouseWheel(event.getWheelDelta(), event.isShiftDown(), event.isControlDown());
+                    releaseSnapInputAdapter.handleMouseWheel(event.getWheelDelta(), event.isShiftDown(), event.isControlDown());
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public boolean handleKeyboardEvent(KeyboardEvent event) {
+            return false;
+        }
     }
 }

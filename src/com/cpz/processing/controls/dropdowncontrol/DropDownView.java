@@ -139,6 +139,24 @@ public final class DropDownView implements ControlView, PointerInteractable {
         return viewModel.isExpanded();
     }
 
+    public float getX() {
+        applyLayoutIfNeeded();
+        return x;
+    }
+
+    public float getY() {
+        applyLayoutIfNeeded();
+        return y;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
     public int getHoveredIndex() {
         return hoveredIndex;
     }

@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.common.input;
 
 import com.cpz.processing.controls.common.focus.FocusManager;
+import com.cpz.processing.controls.input.KeyboardEvent;
 import processing.core.PConstants;
 import processing.event.KeyEvent;
 
@@ -28,7 +29,29 @@ public final class KeyboardInputAdapter {
     public void onKeyPressed(char key, int keyCode, KeyEvent event) {
         boolean shift = event != null && event.isShiftDown();
         boolean ctrl = event != null && event.isControlDown();
+        int ctrlKeyCode = event != null ? event.getKeyCode() : keyCode;
+        handlePressed(keyCode, shift, ctrl, ctrlKeyCode);
+    }
 
+    public void handleKeyboardEvent(KeyboardEvent event) {
+        if (event == null) {
+            return;
+        }
+        switch (event.getType()) {
+            case PRESS:
+                handlePressed(event.getKeyCode(), event.isShiftDown(), event.isControlDown(), event.getKeyCode());
+                return;
+
+            case TYPE:
+                onKeyTyped(event.getKey());
+                return;
+
+            default:
+                return;
+        }
+    }
+
+    private void handlePressed(int keyCode, boolean shift, boolean ctrl, int ctrlKeyCode) {
         if (keyCode == PConstants.TAB) {
             suppressTypedOnce = true;
             if (shift) {
@@ -44,7 +67,7 @@ public final class KeyboardInputAdapter {
             return;
         }
         if (ctrl) {
-            int code = event.getKeyCode();
+            int code = ctrlKeyCode;
             switch (code) {
                 case java.awt.event.KeyEvent.VK_A:
                     suppressTypedOnce = true;
@@ -80,12 +103,29 @@ public final class KeyboardInputAdapter {
             } else {
                 target.moveCursorLeft();
             }
-        } else if (keyCode == PConstants.RIGHT) {
+            return;
+        }
+        if (keyCode == PConstants.RIGHT) {
             if (shift) {
                 target.moveCursorRightWithSelection();
             } else {
                 target.moveCursorRight();
             }
+            return;
+        }
+        if (keyCode == PConstants.UP) {
+            suppressTypedOnce = true;
+            target.increment(shift, ctrl);
+            return;
+        }
+        if (keyCode == PConstants.DOWN) {
+            suppressTypedOnce = true;
+            target.decrement(shift, ctrl);
+            return;
+        }
+        if (keyCode == PConstants.ENTER || keyCode == PConstants.RETURN) {
+            suppressTypedOnce = true;
+            target.commit();
         }
     }
 }

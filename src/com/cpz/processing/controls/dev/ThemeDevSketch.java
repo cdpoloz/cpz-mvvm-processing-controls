@@ -31,6 +31,10 @@ import com.cpz.processing.controls.textfieldcontrol.input.TextFieldInputAdapter;
 import com.cpz.processing.controls.textfieldcontrol.model.TextFieldModel;
 import com.cpz.processing.controls.textfieldcontrol.view.TextFieldView;
 import com.cpz.processing.controls.textfieldcontrol.viewmodel.TextFieldViewModel;
+import com.cpz.processing.controls.input.DefaultInputLayer;
+import com.cpz.processing.controls.input.InputManager;
+import com.cpz.processing.controls.input.KeyboardEvent;
+import com.cpz.processing.controls.input.PointerEvent;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
 
@@ -39,6 +43,7 @@ import java.math.BigDecimal;
 public final class ThemeDevSketch extends PApplet {
 
     private final FocusManager focusManager = new FocusManager();
+    private final InputManager inputManager = new InputManager();
 
     private ButtonView buttonView;
     private ButtonViewModel buttonViewModel;
@@ -116,6 +121,8 @@ public final class ThemeDevSketch extends PApplet {
 
         sliderValueLabelViewModel = new LabelViewModel(new LabelModel());
         sliderValueLabel = new LabelView(this, sliderValueLabelViewModel, width * 0.5f - 42f, 324f);
+
+        inputManager.registerLayer(new ThemeRootInputLayer());
     }
 
     @Override
@@ -137,70 +144,71 @@ public final class ThemeDevSketch extends PApplet {
     @Override
     public void keyReleased() {
         if (key == ESC) key = 0;
+        inputManager.dispatchKeyboard(new KeyboardEvent(
+                KeyboardEvent.Type.RELEASE,
+                key,
+                keyCode,
+                keyEvent != null && keyEvent.isShiftDown(),
+                keyEvent != null && keyEvent.isControlDown(),
+                keyEvent != null && keyEvent.isAltDown()
+        ));
     }
 
     @Override
     public void mouseMoved() {
-        buttonInput.handleMouseMove(mouseX, mouseY);
-        iconButtonInput.handleMouseMove(mouseX, mouseY);
-        switchInput.handleMouseMove(mouseX, mouseY);
-        checkboxInput.handleMouseMove(mouseX, mouseY);
-        sliderInput.handleMouseMove(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mouseDragged() {
-        buttonInput.handleMouseMove(mouseX, mouseY);
-        iconButtonInput.handleMouseMove(mouseX, mouseY);
-        switchInput.handleMouseMove(mouseX, mouseY);
-        checkboxInput.handleMouseMove(mouseX, mouseY);
-        textFieldInput.handleMouseDrag(mouseX, mouseY);
-        sliderInput.handleMouseDrag(mouseX, mouseY);
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mousePressed() {
-        buttonInput.handleMousePress(mouseX, mouseY);
-        iconButtonInput.handleMousePress(mouseX, mouseY);
-        switchInput.handleMousePress(mouseX, mouseY);
-        checkboxInput.handleMousePress(mouseX, mouseY);
-        sliderInput.handleMousePress(mouseX, mouseY);
-        boolean handled = textFieldInput.handleMousePress(mouseX, mouseY);
-        if (!handled && !textFieldView.contains(mouseX, mouseY)) {
-            focusManager.clearFocus();
-        }
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mouseReleased() {
-        buttonInput.handleMouseRelease(mouseX, mouseY);
-        iconButtonInput.handleMouseRelease(mouseX, mouseY);
-        switchInput.handleMouseRelease(mouseX, mouseY);
-        checkboxInput.handleMouseRelease(mouseX, mouseY);
-        sliderInput.handleMouseRelease(mouseX, mouseY);
-        textFieldInput.handleMouseRelease();
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, mouseX, mouseY, mouseButton));
     }
 
     @Override
     public void mouseWheel(MouseEvent event) {
-        sliderInput.handleMouseWheel(event.getCount(), event.isShiftDown(), event.isControlDown());
+        inputManager.dispatchPointer(new PointerEvent(
+                PointerEvent.Type.WHEEL,
+                mouseX,
+                mouseY,
+                mouseButton,
+                event.getCount(),
+                event.isShiftDown(),
+                event.isControlDown()
+        ));
     }
 
     @Override
     public void keyPressed() {
-        if (key == 't' || key == 'T') {
-            toggleTheme();
-            return;
-        }
-        keyboardAdapter.onKeyPressed(key, keyCode, keyEvent);
+        inputManager.dispatchKeyboard(new KeyboardEvent(
+                KeyboardEvent.Type.PRESS,
+                key,
+                keyCode,
+                keyEvent != null && keyEvent.isShiftDown(),
+                keyEvent != null && keyEvent.isControlDown(),
+                keyEvent != null && keyEvent.isAltDown()
+        ));
     }
 
     @Override
     public void keyTyped() {
-        if (key == 't' || key == 'T') {
-            return;
-        }
-        keyboardAdapter.onKeyTyped(key);
+        inputManager.dispatchKeyboard(new KeyboardEvent(
+                KeyboardEvent.Type.TYPE,
+                key,
+                keyCode,
+                keyEvent != null && keyEvent.isShiftDown(),
+                keyEvent != null && keyEvent.isControlDown(),
+                keyEvent != null && keyEvent.isAltDown()
+        ));
     }
 
     private void drawHeader(ThemeTokens tokens) {
@@ -242,5 +250,75 @@ public final class ThemeDevSketch extends PApplet {
 
     private String currentThemeName() {
         return ThemeManager.getTheme() instanceof LightTheme ? "Light" : "Dark";
+    }
+
+    private final class ThemeRootInputLayer extends DefaultInputLayer {
+
+        private ThemeRootInputLayer() {
+            super(0);
+        }
+
+        @Override
+        public boolean handlePointerEvent(PointerEvent event) {
+            switch (event.getType()) {
+                case MOVE:
+                    buttonInput.handleMouseMove(event.getX(), event.getY());
+                    iconButtonInput.handleMouseMove(event.getX(), event.getY());
+                    switchInput.handleMouseMove(event.getX(), event.getY());
+                    checkboxInput.handleMouseMove(event.getX(), event.getY());
+                    sliderInput.handleMouseMove(event.getX(), event.getY());
+                    return true;
+
+                case DRAG:
+                    buttonInput.handleMouseMove(event.getX(), event.getY());
+                    iconButtonInput.handleMouseMove(event.getX(), event.getY());
+                    switchInput.handleMouseMove(event.getX(), event.getY());
+                    checkboxInput.handleMouseMove(event.getX(), event.getY());
+                    textFieldInput.handleMouseDrag(event.getX(), event.getY());
+                    sliderInput.handleMouseDrag(event.getX(), event.getY());
+                    return true;
+
+                case PRESS:
+                    buttonInput.handleMousePress(event.getX(), event.getY());
+                    iconButtonInput.handleMousePress(event.getX(), event.getY());
+                    switchInput.handleMousePress(event.getX(), event.getY());
+                    checkboxInput.handleMousePress(event.getX(), event.getY());
+                    sliderInput.handleMousePress(event.getX(), event.getY());
+                    boolean handled = textFieldInput.handleMousePress(event.getX(), event.getY());
+                    if (!handled && !textFieldView.contains(event.getX(), event.getY())) {
+                        focusManager.clearFocus();
+                    }
+                    return true;
+
+                case RELEASE:
+                    buttonInput.handleMouseRelease(event.getX(), event.getY());
+                    iconButtonInput.handleMouseRelease(event.getX(), event.getY());
+                    switchInput.handleMouseRelease(event.getX(), event.getY());
+                    checkboxInput.handleMouseRelease(event.getX(), event.getY());
+                    sliderInput.handleMouseRelease(event.getX(), event.getY());
+                    textFieldInput.handleMouseRelease();
+                    return true;
+
+                case WHEEL:
+                    sliderInput.handleMouseWheel(event.getWheelDelta(), event.isShiftDown(), event.isControlDown());
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public boolean handleKeyboardEvent(KeyboardEvent event) {
+            if (event.getType() == KeyboardEvent.Type.PRESS && (event.getKey() == 't' || event.getKey() == 'T')) {
+                toggleTheme();
+                return true;
+            }
+            if (event.getType() == KeyboardEvent.Type.TYPE && (event.getKey() == 't' || event.getKey() == 'T')) {
+                return true;
+            }
+            keyboardAdapter.handleKeyboardEvent(event);
+            return true;
+        }
     }
 }
