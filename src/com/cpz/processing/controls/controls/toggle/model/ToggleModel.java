@@ -1,8 +1,8 @@
-package com.cpz.processing.controls.controls.switchcontrol.model;
+package com.cpz.processing.controls.controls.toggle.model;
 
 import com.cpz.processing.controls.core.model.Enableable;
 
-public final class SwitchModel implements Enableable {
+public final class ToggleModel implements Enableable {
    private int state;
    private int prevState;
    private int totalStates = 2;

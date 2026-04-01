@@ -1,9 +1,9 @@
-package com.cpz.processing.controls.controls.switchcontrol.style.render;
+package com.cpz.processing.controls.controls.toggle.style.render;
 
-import com.cpz.processing.controls.controls.switchcontrol.style.SwitchRenderStyle;
+import com.cpz.processing.controls.controls.toggle.style.ToggleRenderStyle;
 import processing.core.PApplet;
 
-public final class RectShapeRenderer implements ShapeRenderer {
+public final class RectShapeRenderer implements ToggleShapeRenderer {
    private final float cornerRadius;
 
    public RectShapeRenderer() {
@@ -14,7 +14,7 @@ public final class RectShapeRenderer implements ShapeRenderer {
       this.cornerRadius = var1;
    }
 
-   public void render(PApplet var1, float var2, float var3, float var4, float var5, SwitchRenderStyle var6) {
+   public void render(PApplet var1, float var2, float var3, float var4, float var5, ToggleRenderStyle var6) {
       float var7 = var4 * 0.5F;
       float var8 = var5 * 0.5F;
       float var9 = var2 - var7;

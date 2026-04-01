@@ -1,33 +1,33 @@
-package com.cpz.processing.controls.controls.switchcontrol.style;
+package com.cpz.processing.controls.controls.toggle.style;
 
-import com.cpz.processing.controls.controls.switchcontrol.config.SwitchStyleConfig;
-import com.cpz.processing.controls.controls.switchcontrol.state.SwitchViewState;
+import com.cpz.processing.controls.controls.toggle.config.ToggleStyleConfig;
+import com.cpz.processing.controls.controls.toggle.state.ToggleViewState;
 import com.cpz.processing.controls.core.style.InteractiveStyleHelper;
 import com.cpz.processing.controls.core.theme.ThemeManager;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import processing.core.PApplet;
 
-public final class ParametricSwitchStyle implements SwitchStyle {
-   private final SwitchStyleConfig cfg;
+public final class ParametricToggleStyle implements ToggleStyle {
+   private final ToggleStyleConfig cfg;
 
-   public ParametricSwitchStyle(SwitchStyleConfig var1) {
+   public ParametricToggleStyle(ToggleStyleConfig var1) {
       if (var1 == null) {
          throw new IllegalArgumentException("Config null");
       } else if (var1.shape == null) {
-         throw new IllegalArgumentException("ShapeRenderer requerido");
+         throw new IllegalArgumentException("ToggleShapeRenderer requerido");
       } else {
          this.cfg = var1;
       }
    }
 
-   public void render(PApplet var1, SwitchViewState var2) {
+   public void render(PApplet var1, ToggleViewState var2) {
       ThemeTokens var3 = ThemeManager.getTheme().tokens();
       int var4 = Math.max(0, var2.stateIndex());
       int var5 = var4 == 0 ? this.resolveStateColor(var3.surfaceVariant, this.cfg.offFillOverride, 0) : this.resolveStateColor(var3.primary, this.cfg.onFillOverride, var4);
       int var6 = InteractiveStyleHelper.resolveFillColor(var5, this.resolveInteractiveColor(var5, var3.hoverOverlay, this.cfg.hoverFillOverride, this.cfg.hoverBlendWithWhite, var1, true), this.resolveInteractiveColor(var5, var3.pressedOverlay, this.cfg.pressedFillOverride, this.cfg.pressedBlendWithBlack, var1, false), var2.hovered(), var2.pressed());
       int var7 = this.cfg.disabledAlpha != null ? this.cfg.disabledAlpha : var3.disabledAlpha;
       int var8 = this.resolveColorOverride(var3.border, this.cfg.strokeOverride, this.cfg.strokeColor);
-      SwitchRenderStyle var9 = new SwitchRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(var6, var2.enabled(), var7), InteractiveStyleHelper.resolveStrokeColor(var8, var2.enabled(), var7), InteractiveStyleHelper.resolveStrokeWeight(this.cfg.strokeWidth, this.cfg.strokeWidthHover, var2.hovered()));
+      ToggleRenderStyle var9 = new ToggleRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(var6, var2.enabled(), var7), InteractiveStyleHelper.resolveStrokeColor(var8, var2.enabled(), var7), InteractiveStyleHelper.resolveStrokeWeight(this.cfg.strokeWidth, this.cfg.strokeWidthHover, var2.hovered()));
       this.cfg.shape.render(var1, var2.x(), var2.y(), var2.width(), var2.height(), var9);
    }
 

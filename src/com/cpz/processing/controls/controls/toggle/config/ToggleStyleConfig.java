@@ -1,9 +1,9 @@
-package com.cpz.processing.controls.controls.switchcontrol.config;
+package com.cpz.processing.controls.controls.toggle.config;
 
-import com.cpz.processing.controls.controls.switchcontrol.style.render.ShapeRenderer;
+import com.cpz.processing.controls.controls.toggle.style.render.ToggleShapeRenderer;
 
-public final class SwitchStyleConfig {
-   public ShapeRenderer shape;
+public final class ToggleStyleConfig {
+   public ToggleShapeRenderer shape;
    public Integer offFillOverride;
    public Integer onFillOverride;
    public Integer hoverFillOverride;
@@ -17,7 +17,7 @@ public final class SwitchStyleConfig {
    public Float pressedBlendWithBlack;
    public Integer disabledAlpha;
 
-   public void setShapeRenderer(ShapeRenderer var1) {
+   public void setShapeRenderer(ToggleShapeRenderer var1) {
       this.shape = var1;
    }
 }
