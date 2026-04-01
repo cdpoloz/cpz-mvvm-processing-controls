@@ -5,7 +5,7 @@ import com.cpz.processing.controls.controls.toggle.model.ToggleModel;
 import com.cpz.processing.controls.controls.toggle.style.ParametricToggleStyle;
 import com.cpz.processing.controls.controls.toggle.style.render.CircleShapeRenderer;
 import com.cpz.processing.controls.controls.toggle.style.render.SvgShapeRenderer;
-import com.cpz.processing.controls.controls.toggle.view.ToggleInputAdapter;
+import com.cpz.processing.controls.controls.toggle.input.ToggleInputAdapter;
 import com.cpz.processing.controls.controls.toggle.view.ToggleView;
 import com.cpz.processing.controls.controls.toggle.viewmodel.ToggleViewModel;
 import com.cpz.processing.controls.core.input.DefaultInputLayer;

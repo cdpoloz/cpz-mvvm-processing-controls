@@ -2,7 +2,7 @@ package com.cpz.processing.controls.dev;
 
 import com.cpz.processing.controls.controls.button.model.ButtonModel;
 import com.cpz.processing.controls.controls.button.style.ButtonDefaultStyles;
-import com.cpz.processing.controls.controls.button.view.ButtonInputAdapter;
+import com.cpz.processing.controls.controls.button.input.ButtonInputAdapter;
 import com.cpz.processing.controls.controls.button.view.ButtonView;
 import com.cpz.processing.controls.controls.button.viewmodel.ButtonViewModel;
 import com.cpz.processing.controls.controls.dropdown.config.DropDownStyleConfig;

@@ -6,7 +6,7 @@ import com.cpz.processing.controls.controls.slider.model.SliderOrientation;
 import com.cpz.processing.controls.controls.slider.model.SnapMode;
 import com.cpz.processing.controls.controls.slider.style.SliderStyle;
 import com.cpz.processing.controls.controls.slider.style.SvgColorMode;
-import com.cpz.processing.controls.controls.slider.view.SliderInputAdapter;
+import com.cpz.processing.controls.controls.slider.input.SliderInputAdapter;
 import com.cpz.processing.controls.controls.slider.view.SliderView;
 import com.cpz.processing.controls.controls.slider.viewmodel.SliderViewModel;
 import com.cpz.processing.controls.core.input.DefaultInputLayer;

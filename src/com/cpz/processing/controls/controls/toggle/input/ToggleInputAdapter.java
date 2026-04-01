@@ -1,13 +1,13 @@
-package com.cpz.processing.controls.controls.checkbox.view;
+package com.cpz.processing.controls.controls.toggle.input;
 
 import com.cpz.processing.controls.core.input.PointerInputAdapter;
 import com.cpz.processing.controls.core.input.PointerInputTarget;
 import com.cpz.processing.controls.core.input.PointerInteractable;
 
-public final class CheckboxInputAdapter {
+public final class ToggleInputAdapter {
    private final PointerInputAdapter delegate;
 
-   public CheckboxInputAdapter(PointerInteractable var1, PointerInputTarget var2) {
+   public ToggleInputAdapter(PointerInteractable var1, PointerInputTarget var2) {
       this.delegate = new PointerInputAdapter(var1, var2);
    }
 

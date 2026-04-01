@@ -4,7 +4,7 @@ import com.cpz.processing.controls.controls.checkbox.config.CheckboxStyleConfig;
 import com.cpz.processing.controls.controls.checkbox.model.CheckboxModel;
 import com.cpz.processing.controls.controls.checkbox.style.DefaultCheckboxStyle;
 import com.cpz.processing.controls.controls.checkbox.style.render.SvgCheckboxRenderer;
-import com.cpz.processing.controls.controls.checkbox.view.CheckboxInputAdapter;
+import com.cpz.processing.controls.controls.checkbox.input.CheckboxInputAdapter;
 import com.cpz.processing.controls.controls.checkbox.view.CheckboxView;
 import com.cpz.processing.controls.controls.checkbox.viewmodel.CheckboxViewModel;
 import com.cpz.processing.controls.controls.label.model.LabelModel;

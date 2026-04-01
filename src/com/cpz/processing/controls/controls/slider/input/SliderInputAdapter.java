@@ -1,5 +1,6 @@
-package com.cpz.processing.controls.controls.slider.view;
+package com.cpz.processing.controls.controls.slider.input;
 
+import com.cpz.processing.controls.controls.slider.view.SliderView;
 import com.cpz.processing.controls.controls.slider.viewmodel.SliderViewModel;
 import com.cpz.processing.controls.core.input.PointerInteractable;
 

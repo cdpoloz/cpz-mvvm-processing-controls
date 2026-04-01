@@ -1,5 +1,6 @@
-package com.cpz.processing.controls.controls.radiogroup.view;
+package com.cpz.processing.controls.controls.radiogroup.input;
 
+import com.cpz.processing.controls.controls.radiogroup.view.RadioGroupView;
 import com.cpz.processing.controls.controls.radiogroup.viewmodel.RadioGroupViewModel;
 import com.cpz.processing.controls.core.focus.FocusManager;
 import com.cpz.processing.controls.core.input.PointerInputAdapter;

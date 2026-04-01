@@ -1,5 +1,6 @@
-package com.cpz.processing.controls.controls.textfield.view;
+package com.cpz.processing.controls.controls.textfield.input;
 
+import com.cpz.processing.controls.controls.textfield.view.TextFieldView;
 import com.cpz.processing.controls.controls.textfield.viewmodel.TextFieldViewModel;
 import com.cpz.processing.controls.core.focus.FocusManager;
 

@@ -1,4 +1,4 @@
-package com.cpz.processing.controls.controls.button.view;
+package com.cpz.processing.controls.controls.button.input;
 
 import com.cpz.processing.controls.core.input.PointerInputAdapter;
 import com.cpz.processing.controls.core.input.PointerInputTarget;
