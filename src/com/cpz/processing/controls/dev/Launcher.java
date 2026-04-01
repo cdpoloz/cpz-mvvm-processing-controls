@@ -4,7 +4,7 @@ import java.util.Locale;
 import processing.core.PApplet;
 
 public class Launcher {
-   public static void main(String[] var0) {
+   public static void main(String[] args) {
       Locale.setDefault(Locale.forLanguageTag("en-US"));
       //PApplet.main(ButtonDevSketch.class);
       //PApplet.main(CheckboxDevSketch.class);
