@@ -63,6 +63,11 @@ public class SwitchDevSketch extends PApplet {
     }
 
     @Override
+    public void keyReleased() {
+        if (key == ESC) key = 0;
+    }
+
+    @Override
     public void mouseMoved() {
         swInput1.handleMouseMove(mouseX, mouseY);
         swInput2.handleMouseMove(mouseX, mouseY);

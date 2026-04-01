@@ -63,6 +63,11 @@ public class ButtonDevSketch extends PApplet {
     }
 
     @Override
+    public void keyReleased() {
+        if (key == ESC) key = 0;
+    }
+
+    @Override
     public void mouseMoved() {
         forwardMove(mouseX, mouseY);
     }

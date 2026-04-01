@@ -135,6 +135,11 @@ public final class ThemeDevSketch extends PApplet {
     }
 
     @Override
+    public void keyReleased() {
+        if (key == ESC) key = 0;
+    }
+
+    @Override
     public void mouseMoved() {
         buttonInput.handleMouseMove(mouseX, mouseY);
         iconButtonInput.handleMouseMove(mouseX, mouseY);

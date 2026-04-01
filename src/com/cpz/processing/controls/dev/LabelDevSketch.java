@@ -74,4 +74,9 @@ public class LabelDevSketch extends PApplet {
         labelDisabled.draw();
         labelCustom.draw();
     }
+
+    @Override
+    public void keyReleased() {
+        if (key == ESC) key = 0;
+    }
 }

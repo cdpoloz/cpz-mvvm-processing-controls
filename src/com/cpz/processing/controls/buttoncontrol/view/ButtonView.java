@@ -7,6 +7,8 @@ import com.cpz.processing.controls.common.ControlView;
 import com.cpz.processing.controls.common.input.PointerInteractable;
 import com.cpz.processing.controls.hit.RectHitTest;
 import com.cpz.processing.controls.hit.interfaces.HitTest;
+import com.cpz.processing.controls.layout.LayoutConfig;
+import com.cpz.processing.controls.layout.LayoutResolver;
 import processing.core.PApplet;
 
 /**
@@ -22,6 +24,7 @@ public final class ButtonView implements ControlView, PointerInteractable {
     private float height;
     private ButtonStyle style;
     private HitTest hitTest;
+    private LayoutConfig layoutConfig;
 
     public ButtonView(PApplet sketch, ButtonViewModel vm, float x, float y, float width, float height) {
         this.sketch = sketch;
@@ -40,6 +43,7 @@ public final class ButtonView implements ControlView, PointerInteractable {
         if (!viewModel.isVisible()) {
             return;
         }
+        applyLayoutIfNeeded();
         style.render(sketch, buildViewState());
     }
 
@@ -48,6 +52,12 @@ public final class ButtonView implements ControlView, PointerInteractable {
         this.x = x;
         this.y = y;
         notifyLayoutChanged();
+    }
+
+    @Override
+    public void setLayoutConfig(LayoutConfig layoutConfig) {
+        this.layoutConfig = layoutConfig;
+        applyLayoutIfNeeded();
     }
 
     public void setSize(float width, float height) {
@@ -70,6 +80,7 @@ public final class ButtonView implements ControlView, PointerInteractable {
 
     @Override
     public boolean contains(float px, float py) {
+        applyLayoutIfNeeded();
         return hitTest.contains(px, py);
     }
 
@@ -105,5 +116,16 @@ public final class ButtonView implements ControlView, PointerInteractable {
 
     private void notifyLayoutChanged() {
         hitTest.onLayout(x, y, width, height);
+    }
+
+    private void applyLayoutIfNeeded() {
+        if (layoutConfig == null) {
+            return;
+        }
+        float resolvedLeft = LayoutResolver.resolveX(layoutConfig, width, sketch.width);
+        float resolvedTop = LayoutResolver.resolveY(layoutConfig, height, sketch.height);
+        x = resolvedLeft + (width * 0.5f);
+        y = resolvedTop + (height * 0.5f);
+        notifyLayoutChanged();
     }
 }
