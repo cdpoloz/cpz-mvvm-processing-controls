@@ -1,40 +1,39 @@
 package com.cpz.processing.controls.dev;
 
-import com.cpz.processing.controls.buttoncontrol.input.ButtonInputAdapter;
-import com.cpz.processing.controls.buttoncontrol.model.ButtonModel;
-import com.cpz.processing.controls.buttoncontrol.style.ButtonDefaultStyles;
-import com.cpz.processing.controls.buttoncontrol.view.ButtonView;
-import com.cpz.processing.controls.buttoncontrol.viewmodel.ButtonViewModel;
-import com.cpz.processing.controls.common.focus.FocusManager;
-import com.cpz.processing.controls.dropdowncontrol.DefaultDropDownStyle;
-import com.cpz.processing.controls.dropdowncontrol.DropDownModel;
-import com.cpz.processing.controls.dropdowncontrol.DropDownOverlayController;
-import com.cpz.processing.controls.dropdowncontrol.DropDownStyleConfig;
-import com.cpz.processing.controls.dropdowncontrol.DropDownView;
-import com.cpz.processing.controls.dropdowncontrol.DropDownViewModel;
-import com.cpz.processing.controls.input.DefaultInputLayer;
-import com.cpz.processing.controls.input.InputManager;
-import com.cpz.processing.controls.input.KeyboardEvent;
-import com.cpz.processing.controls.input.PointerEvent;
-import com.cpz.processing.controls.layout.Anchor;
-import com.cpz.processing.controls.layout.LayoutConfig;
-import com.cpz.processing.controls.overlay.OverlayEntry;
-import com.cpz.processing.controls.overlay.OverlayManager;
-import com.cpz.processing.controls.tooltipoverlay.TooltipOverlayController;
-import com.cpz.processing.controls.util.Colors;
-import processing.core.PApplet;
+import com.cpz.processing.controls.controls.button.model.ButtonModel;
+import com.cpz.processing.controls.controls.button.style.ButtonDefaultStyles;
+import com.cpz.processing.controls.controls.button.view.ButtonInputAdapter;
+import com.cpz.processing.controls.controls.button.view.ButtonView;
+import com.cpz.processing.controls.controls.button.viewmodel.ButtonViewModel;
+import com.cpz.processing.controls.controls.dropdown.config.DropDownStyleConfig;
+import com.cpz.processing.controls.controls.dropdown.model.DropDownModel;
+import com.cpz.processing.controls.controls.dropdown.style.DefaultDropDownStyle;
+import com.cpz.processing.controls.controls.dropdown.util.DropDownOverlayController;
+import com.cpz.processing.controls.controls.dropdown.view.DropDownView;
+import com.cpz.processing.controls.controls.dropdown.viewmodel.DropDownViewModel;
+import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.input.DefaultInputLayer;
+import com.cpz.processing.controls.core.input.InputManager;
+import com.cpz.processing.controls.core.input.KeyboardEvent;
+import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.core.layout.Anchor;
+import com.cpz.processing.controls.core.layout.LayoutConfig;
+import com.cpz.processing.controls.core.overlay.OverlayEntry;
+import com.cpz.processing.controls.core.overlay.OverlayManager;
+import com.cpz.processing.controls.core.overlay.tooltip.util.TooltipOverlayController;
+import com.cpz.processing.controls.core.util.Colors;
 
 import java.util.List;
+import java.util.Objects;
+
+import processing.core.PApplet;
 
 public class DropDownDevSketch extends PApplet {
-
     private static final int ROOT_LAYER_PRIORITY = 0;
     private static final int DROPDOWN_OVERLAY_PRIORITY = 100;
-
     private final FocusManager focusManager = new FocusManager();
     private final InputManager inputManager = new InputManager();
-    private final OverlayManager overlayManager = new OverlayManager(focusManager);
-
+    private final OverlayManager overlayManager;
     private DropDownView firstDropDownView;
     private DropDownViewModel firstDropDownViewModel;
     private DropDownView secondDropDownView;
@@ -46,418 +45,354 @@ public class DropDownDevSketch extends PApplet {
     private TooltipOverlayController buttonTooltipController;
     private ButtonView buttonView;
     private ButtonInputAdapter buttonInputAdapter;
-    private String statusText = "Sin interaccion";
+    private String statusText;
 
-    @Override
+    public DropDownDevSketch() {
+        this.overlayManager = new OverlayManager(this.focusManager);
+        this.statusText = "Sin interaccion";
+    }
+
     public void settings() {
-        size(960, 560);
-        smooth(4);
+        this.size(960, 560);
+        this.smooth(4);
     }
 
-    @Override
     public void setup() {
-        firstDropDownViewModel = new DropDownViewModel(new DropDownModel(List.of(
-                "Option Alpha",
-                "Option Beta",
-                "Option Gamma",
-                "Option Delta",
-                "Option Epsilon",
-                "Option Zeta",
-                "Option Eta"
-        ), 1));
-        firstDropDownView = new DropDownView(this, firstDropDownViewModel, width * 0.32f, 150f, 280f, 42f);
-        firstDropDownView.setStyle(new DefaultDropDownStyle(createDropDownStyle()));
-        firstDropDownView.setLayoutConfig(createLayout(0.20f, 0.20f, Anchor.TOP_LEFT));
-        focusManager.register(firstDropDownViewModel);
+        this.firstDropDownViewModel = new DropDownViewModel(new DropDownModel(List.of("Option Alpha", "Option Beta", "Option Gamma", "Option Delta", "Option Epsilon", "Option Zeta", "Option Eta"), 1));
+        this.firstDropDownView = new DropDownView(this, this.firstDropDownViewModel, (float) this.width * 0.32F, 150.0F, 280.0F, 42.0F);
+        this.firstDropDownView.setStyle(new DefaultDropDownStyle(this.createDropDownStyle()));
+        this.firstDropDownView.setLayoutConfig(this.createLayout(0.2F, 0.2F, Anchor.TOP_LEFT));
+        this.focusManager.register(this.firstDropDownViewModel);
+        this.secondDropDownViewModel = new DropDownViewModel(new DropDownModel(List.of("Red", "Green", "Blue", "Cyan", "Magenta", "Yellow"), 2));
+        this.secondDropDownView = new DropDownView(this, this.secondDropDownViewModel, (float) this.width * 0.68F, 150.0F, 280.0F, 42.0F);
+        this.secondDropDownView.setStyle(new DefaultDropDownStyle(this.createDropDownStyle()));
+        this.secondDropDownView.setLayoutConfig(this.createLayout(0.8F, 0.2F, Anchor.TOP_RIGHT));
+        this.focusManager.register(this.secondDropDownViewModel);
+        this.firstOverlayController = new DropDownOverlayController(this.firstDropDownView, this.firstDropDownViewModel, this.focusManager, this.overlayManager, this.inputManager, 100);
+        this.secondOverlayController = new DropDownOverlayController(this.secondDropDownView, this.secondDropDownViewModel, this.focusManager, this.overlayManager, this.inputManager, 100);
+        this.firstOverlayController.setTransferHandler(this::handleOverlayTransfer);
+        this.secondOverlayController.setTransferHandler(this::handleOverlayTransfer);
+        ButtonViewModel var1 = new ButtonViewModel(new ButtonModel("Underlying Button"));
+        var1.setClickListener(() -> this.statusText = "Button clicked");
+        this.buttonView = new ButtonView(this, var1, (float) this.width * 0.5F, 250.0F, 240.0F, 52.0F);
+        this.buttonView.setStyle(ButtonDefaultStyles.primary());
+        this.buttonView.setLayoutConfig(this.createLayout(0.5F, 0.45F, Anchor.TOP_CENTER));
+        this.buttonInputAdapter = new ButtonInputAdapter(this.buttonView, var1);
+        OverlayManager var10004 = this.overlayManager;
+        DropDownViewModel var10005 = this.firstDropDownViewModel;
+        Objects.requireNonNull(var10005);
+        this.firstTooltipController = new TooltipOverlayController(this, var10004, var10005::isHovered, () -> "Choose the first option set", new TooltipOverlayController.AnchorBoundsProvider() {
+            {
+                Objects.requireNonNull(DropDownDevSketch.this);
+            }
 
-        secondDropDownViewModel = new DropDownViewModel(new DropDownModel(List.of(
-                "Red",
-                "Green",
-                "Blue",
-                "Cyan",
-                "Magenta",
-                "Yellow"
-        ), 2));
-        secondDropDownView = new DropDownView(this, secondDropDownViewModel, width * 0.68f, 150f, 280f, 42f);
-        secondDropDownView.setStyle(new DefaultDropDownStyle(createDropDownStyle()));
-        secondDropDownView.setLayoutConfig(createLayout(0.80f, 0.20f, Anchor.TOP_RIGHT));
-        focusManager.register(secondDropDownViewModel);
+            public float getCenterX() {
+                return DropDownDevSketch.this.firstDropDownView.getX();
+            }
 
-        firstOverlayController = new DropDownOverlayController(
-                firstDropDownView,
-                firstDropDownViewModel,
-                focusManager,
-                overlayManager,
-                inputManager,
-                DROPDOWN_OVERLAY_PRIORITY
-        );
-        secondOverlayController = new DropDownOverlayController(
-                secondDropDownView,
-                secondDropDownViewModel,
-                focusManager,
-                overlayManager,
-                inputManager,
-                DROPDOWN_OVERLAY_PRIORITY
-        );
-        firstOverlayController.setTransferHandler(this::handleOverlayTransfer);
-        secondOverlayController.setTransferHandler(this::handleOverlayTransfer);
+            public float getTopY() {
+                return DropDownDevSketch.this.firstDropDownView.getY() - DropDownDevSketch.this.firstDropDownView.getHeight() * 0.5F;
+            }
+        });
+        var10004 = this.overlayManager;
+        var10005 = this.secondDropDownViewModel;
+        Objects.requireNonNull(var10005);
+        this.secondTooltipController = new TooltipOverlayController(this, var10004, var10005::isHovered, () -> "Choose the color set", new TooltipOverlayController.AnchorBoundsProvider() {
+            {
+                Objects.requireNonNull(DropDownDevSketch.this);
+            }
 
-        ButtonViewModel buttonViewModel = new ButtonViewModel(new ButtonModel("Underlying Button"));
-        buttonViewModel.setClickListener(() -> statusText = "Button clicked");
-        buttonView = new ButtonView(this, buttonViewModel, width * 0.5f, 250f, 240f, 52f);
-        buttonView.setStyle(ButtonDefaultStyles.primary());
-        buttonView.setLayoutConfig(createLayout(0.50f, 0.45f, Anchor.TOP_CENTER));
-        buttonInputAdapter = new ButtonInputAdapter(buttonView, buttonViewModel);
+            public float getCenterX() {
+                return DropDownDevSketch.this.secondDropDownView.getX();
+            }
 
-        firstTooltipController = new TooltipOverlayController(
-                this,
-                overlayManager,
-                firstDropDownViewModel::isHovered,
-                () -> "Choose the first option set",
-                new TooltipOverlayController.AnchorBoundsProvider() {
-                    @Override
-                    public float getCenterX() {
-                        return firstDropDownView.getX();
-                    }
+            public float getTopY() {
+                return DropDownDevSketch.this.secondDropDownView.getY() - DropDownDevSketch.this.secondDropDownView.getHeight() * 0.5F;
+            }
+        });
+        this.buttonTooltipController = new TooltipOverlayController(this, this.overlayManager, () -> var1.isHovered(), () -> "Tooltip overlays do not block the button", new TooltipOverlayController.AnchorBoundsProvider() {
+            {
+                Objects.requireNonNull(DropDownDevSketch.this);
+            }
 
-                    @Override
-                    public float getTopY() {
-                        return firstDropDownView.getY() - (firstDropDownView.getHeight() * 0.5f);
-                    }
-                }
-        );
-        secondTooltipController = new TooltipOverlayController(
-                this,
-                overlayManager,
-                secondDropDownViewModel::isHovered,
-                () -> "Choose the color set",
-                new TooltipOverlayController.AnchorBoundsProvider() {
-                    @Override
-                    public float getCenterX() {
-                        return secondDropDownView.getX();
-                    }
+            public float getCenterX() {
+                return DropDownDevSketch.this.buttonView.getX();
+            }
 
-                    @Override
-                    public float getTopY() {
-                        return secondDropDownView.getY() - (secondDropDownView.getHeight() * 0.5f);
-                    }
-                }
-        );
-        buttonTooltipController = new TooltipOverlayController(
-                this,
-                overlayManager,
-                () -> buttonViewModel.isHovered(),
-                () -> "Tooltip overlays do not block the button",
-                new TooltipOverlayController.AnchorBoundsProvider() {
-                    @Override
-                    public float getCenterX() {
-                        return buttonView.getX();
-                    }
-
-                    @Override
-                    public float getTopY() {
-                        return buttonView.getY() - (buttonView.getHeight() * 0.5f);
-                    }
-                }
-        );
-
-        inputManager.registerLayer(new RootInputLayer());
-        syncOverlayControllers();
+            public float getTopY() {
+                return DropDownDevSketch.this.buttonView.getY() - DropDownDevSketch.this.buttonView.getHeight() * 0.5F;
+            }
+        });
+        this.inputManager.registerLayer(new RootInputLayer());
+        this.syncOverlayControllers();
     }
 
-    @Override
     public void draw() {
-        syncOverlayControllers();
-        syncTooltipControllers();
-        background(246);
-        drawFrame();
-        buttonView.draw();
-        drawCollapsedDropDowns();
-        drawNotes();
-        drawRegisteredOverlays();
+        this.syncOverlayControllers();
+        this.syncTooltipControllers();
+        this.background(246);
+        this.drawFrame();
+        this.buttonView.draw();
+        this.drawCollapsedDropDowns();
+        this.drawNotes();
+        this.drawRegisteredOverlays();
     }
 
-    @Override
     public void mouseMoved() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, mouseX, mouseY, mouseButton));
-        syncOverlayControllers();
-        DropDownView expandedDropDown = getExpandedDropDown();
-        if (expandedDropDown != null) {
-            resetHoverForInactiveDropDowns(expandedDropDown);
-            buttonInputAdapter.handleMouseMove(-1f, -1f);
+        this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
+        this.syncOverlayControllers();
+        DropDownView var1 = this.getExpandedDropDown();
+        if (var1 != null) {
+            this.resetHoverForInactiveDropDowns(var1);
+            this.buttonInputAdapter.handleMouseMove(-1.0F, -1.0F);
         }
+
     }
 
-    @Override
     public void mousePressed() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, mouseX, mouseY, mouseButton));
-        syncOverlayControllers();
-        updateStatusAfterInput();
+        this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
+        this.syncOverlayControllers();
+        this.updateStatusAfterInput();
     }
 
-    @Override
     public void mouseReleased() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, mouseX, mouseY, mouseButton));
-        syncOverlayControllers();
+        this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
+        this.syncOverlayControllers();
     }
 
-    @Override
     public void keyPressed() {
-        if (key == ESC) {
-            key = 0;
-            overlayManager.getTopOverlay().ifPresent(this::closeTopOverlay);
-            syncOverlayControllers();
-            updateStatusAfterInput();
-            return;
+        if (this.key == ESC) {
+            this.key = 0;
+            this.overlayManager.getTopOverlay().ifPresent(this::closeTopOverlay);
+            this.syncOverlayControllers();
+            this.updateStatusAfterInput();
+        } else {
+            this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.PRESS, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
         }
-
-        inputManager.dispatchKeyboard(new KeyboardEvent(
-                KeyboardEvent.Type.PRESS,
-                key,
-                keyCode,
-                keyEvent != null && keyEvent.isShiftDown(),
-                keyEvent != null && keyEvent.isControlDown(),
-                keyEvent != null && keyEvent.isAltDown()
-        ));
     }
 
-    @Override
     public void keyReleased() {
-        if (key == ESC) {
-            key = 0;
-        }
-        inputManager.dispatchKeyboard(new KeyboardEvent(
-                KeyboardEvent.Type.RELEASE,
-                key,
-                keyCode,
-                keyEvent != null && keyEvent.isShiftDown(),
-                keyEvent != null && keyEvent.isControlDown(),
-                keyEvent != null && keyEvent.isAltDown()
-        ));
+        if (this.key == ESC) this.key = 0;
+        this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
     }
 
-    @Override
+    public void keyTyped() {
+        if (key == ESC) key = 0;
+    }
+
     public void exit() {
-        firstOverlayController.dispose();
-        secondOverlayController.dispose();
-        firstTooltipController.dispose();
-        secondTooltipController.dispose();
-        buttonTooltipController.dispose();
-        overlayManager.clearAll();
+        this.firstOverlayController.dispose();
+        this.secondOverlayController.dispose();
+        this.firstTooltipController.dispose();
+        this.secondTooltipController.dispose();
+        this.buttonTooltipController.dispose();
+        this.overlayManager.clearAll();
         super.exit();
     }
 
     private void drawCollapsedDropDowns() {
-        if (!firstDropDownViewModel.isExpanded()) {
-            firstDropDownView.draw();
+        if (!this.firstDropDownViewModel.isExpanded()) {
+            this.firstDropDownView.draw();
         }
-        if (!secondDropDownViewModel.isExpanded()) {
-            secondDropDownView.draw();
+
+        if (!this.secondDropDownViewModel.isExpanded()) {
+            this.secondDropDownView.draw();
         }
+
     }
 
     private void drawRegisteredOverlays() {
-        for (OverlayEntry entry : overlayManager.getActiveOverlays()) {
-            entry.getRender().run();
+        for (OverlayEntry var2 : this.overlayManager.getActiveOverlays()) {
+            var2.getRender().run();
         }
+
     }
 
-    private void closeTopOverlay(OverlayEntry overlay) {
-        if (overlay.getOnClose() != null) {
-            overlay.getOnClose().run();
+    private void closeTopOverlay(OverlayEntry var1) {
+        if (var1.getOnClose() != null) {
+            var1.getOnClose().run();
         }
+
     }
 
     private DropDownView getExpandedDropDown() {
-        if (firstDropDownViewModel.isExpanded()) {
-            return firstDropDownView;
+        if (this.firstDropDownViewModel.isExpanded()) {
+            return this.firstDropDownView;
+        } else {
+            return this.secondDropDownViewModel.isExpanded() ? this.secondDropDownView : null;
         }
-        if (secondDropDownViewModel.isExpanded()) {
-            return secondDropDownView;
-        }
-        return null;
     }
 
     private void syncOverlayControllers() {
-        firstOverlayController.syncRegistration();
-        secondOverlayController.syncRegistration();
+        this.firstOverlayController.syncRegistration();
+        this.secondOverlayController.syncRegistration();
     }
 
     private void syncTooltipControllers() {
-        firstTooltipController.sync();
-        secondTooltipController.sync();
-        buttonTooltipController.sync();
+        this.firstTooltipController.sync();
+        this.secondTooltipController.sync();
+        this.buttonTooltipController.sync();
     }
 
-    private boolean handleOverlayTransfer(DropDownOverlayController source, PointerEvent event) {
-        if (event.getType() != PointerEvent.Type.PRESS) {
+    private boolean handleOverlayTransfer(DropDownOverlayController var1, PointerEvent var2) {
+        if (var2.getType() != PointerEvent.Type.PRESS) {
             return false;
-        }
-        DropDownView targetView = findClickedDropDown(event.getX(), event.getY());
-        if (targetView == null || targetView == source.getView()) {
-            return false;
-        }
-        closeOtherDropDowns(targetView);
-        targetView.handleMousePress(event.getX(), event.getY(), focusManager);
-        return true;
-    }
-
-    private DropDownView findClickedDropDown(float mx, float my) {
-        if (firstDropDownView.contains(mx, my)) {
-            return firstDropDownView;
-        }
-        if (secondDropDownView.contains(mx, my)) {
-            return secondDropDownView;
-        }
-        return null;
-    }
-
-    private void closeOtherDropDowns(DropDownView activeDropDown) {
-        if (activeDropDown != firstDropDownView) {
-            firstDropDownViewModel.close();
-            firstDropDownView.handleMouseMove(-1f, -1f);
-        }
-        if (activeDropDown != secondDropDownView) {
-            secondDropDownViewModel.close();
-            secondDropDownView.handleMouseMove(-1f, -1f);
+        } else {
+            DropDownView var3 = this.findClickedDropDown(var2.getX(), var2.getY());
+            if (var3 != null && var3 != var1.getView()) {
+                this.closeOtherDropDowns(var3);
+                var3.handleMousePress(var2.getX(), var2.getY(), this.focusManager);
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
-    private void resetHoverForInactiveDropDowns(DropDownView activeDropDown) {
-        if (firstDropDownView != activeDropDown) {
-            firstDropDownView.handleMouseMove(-1f, -1f);
+    private DropDownView findClickedDropDown(float var1, float var2) {
+        if (this.firstDropDownView.contains(var1, var2)) {
+            return this.firstDropDownView;
+        } else {
+            return this.secondDropDownView.contains(var1, var2) ? this.secondDropDownView : null;
         }
-        if (secondDropDownView != activeDropDown) {
-            secondDropDownView.handleMouseMove(-1f, -1f);
+    }
+
+    private void closeOtherDropDowns(DropDownView var1) {
+        if (var1 != this.firstDropDownView) {
+            this.firstDropDownViewModel.close();
+            this.firstDropDownView.handleMouseMove(-1.0F, -1.0F);
         }
+
+        if (var1 != this.secondDropDownView) {
+            this.secondDropDownViewModel.close();
+            this.secondDropDownView.handleMouseMove(-1.0F, -1.0F);
+        }
+
+    }
+
+    private void resetHoverForInactiveDropDowns(DropDownView var1) {
+        if (this.firstDropDownView != var1) {
+            this.firstDropDownView.handleMouseMove(-1.0F, -1.0F);
+        }
+
+        if (this.secondDropDownView != var1) {
+            this.secondDropDownView.handleMouseMove(-1.0F, -1.0F);
+        }
+
     }
 
     private void updateStatusAfterInput() {
-        if (firstDropDownViewModel.isExpanded()) {
-            statusText = "First DropDown expanded";
-            return;
+        if (this.firstDropDownViewModel.isExpanded()) {
+            this.statusText = "First DropDown expanded";
+        } else if (this.secondDropDownViewModel.isExpanded()) {
+            this.statusText = "Second DropDown expanded";
+        } else {
+            String var10001 = this.firstDropDownViewModel.getSelectedText();
+            this.statusText = "Selected: first=" + var10001 + " | second=" + this.secondDropDownViewModel.getSelectedText();
         }
-        if (secondDropDownViewModel.isExpanded()) {
-            statusText = "Second DropDown expanded";
-            return;
-        }
-        statusText = "Selected: first=" + firstDropDownViewModel.getSelectedText()
-                + " | second=" + secondDropDownViewModel.getSelectedText();
     }
 
     private void drawFrame() {
-        pushStyle();
-        fill(255);
-        stroke(Colors.rgb(210, 218, 229));
-        rect(54, 54, width - 108, height - 108, 18f);
-        popStyle();
+        this.pushStyle();
+        this.fill(255);
+        this.stroke(Colors.rgb(210, 218, 229));
+        this.rect(54.0F, 54.0F, (float) (this.width - 108), (float) (this.height - 108), 18.0F);
+        this.popStyle();
     }
 
     private void drawNotes() {
-        pushStyle();
-        fill(Colors.rgb(28, 36, 46));
-        textAlign(LEFT, TOP);
-        textSize(24);
-        text("DropDown Overlay Dev Sketch", 92, 86);
-        textSize(14);
-        text("Input flows through InputManager. Expanded dropdowns register as overlays and capture pointer events by priority.", 92, 116, 720, 40);
-        text("Current status: " + statusText, 92, 420);
-        text("First hovered item index: " + firstDropDownView.getHoveredIndex(), 92, 446);
-        text("Second hovered item index: " + secondDropDownView.getHoveredIndex(), 92, 472);
-        text("Active overlays: " + overlayManager.getActiveOverlays().size(), 92, 498);
-        text("Focused target: " + (focusManager.getFocused() == null ? "none" : focusManager.getFocused().getClass().getSimpleName()), 92, 524);
-        popStyle();
+        this.pushStyle();
+        this.fill(Colors.rgb(28, 36, 46));
+        this.textAlign(37, 101);
+        this.textSize(24.0F);
+        this.text("DropDown Overlay Dev Sketch", 92.0F, 86.0F);
+        this.textSize(14.0F);
+        this.text("Input flows through InputManager. Expanded dropdowns register as overlays and capture pointer events by priority.", 92.0F, 116.0F, 720.0F, 40.0F);
+        this.text("Current status: " + this.statusText, 92.0F, 420.0F);
+        this.text("First hovered item index: " + this.firstDropDownView.getHoveredIndex(), 92.0F, 446.0F);
+        this.text("Second hovered item index: " + this.secondDropDownView.getHoveredIndex(), 92.0F, 472.0F);
+        this.text("Active overlays: " + this.overlayManager.getActiveOverlays().size(), 92.0F, 498.0F);
+        this.text("Focused target: " + (this.focusManager.getFocused() == null ? "none" : this.focusManager.getFocused().getClass().getSimpleName()), 92.0F, 524.0F);
+        this.popStyle();
     }
 
     private DropDownStyleConfig createDropDownStyle() {
-        DropDownStyleConfig config = new DropDownStyleConfig();
-        config.cornerRadius = 10f;
-        config.listCornerRadius = 10f;
-        config.strokeWeight = 1.5f;
-        config.focusedStrokeWeight = 2.5f;
-        config.textSize = 16f;
-        config.itemHeight = 36f;
-        config.textPadding = 12f;
-        config.arrowPadding = 18f;
-        config.maxVisibleItems = 6;
-        return config;
+        DropDownStyleConfig var1 = new DropDownStyleConfig();
+        var1.cornerRadius = 10.0F;
+        var1.listCornerRadius = 10.0F;
+        var1.strokeWeight = 1.5F;
+        var1.focusedStrokeWeight = 2.5F;
+        var1.textSize = 16.0F;
+        var1.itemHeight = 36.0F;
+        var1.textPadding = 12.0F;
+        var1.arrowPadding = 18.0F;
+        var1.maxVisibleItems = 6;
+        return var1;
     }
 
-    private LayoutConfig createLayout(float normalizedX, float normalizedY, Anchor anchor) {
-        LayoutConfig config = new LayoutConfig(normalizedX, normalizedY);
-        config.setAnchor(anchor);
-        return config;
+    private LayoutConfig createLayout(float var1, float var2, Anchor var3) {
+        LayoutConfig var4 = new LayoutConfig(var1, var2);
+        var4.setAnchor(var3);
+        return var4;
     }
 
     private final class RootInputLayer extends DefaultInputLayer {
-
         private RootInputLayer() {
-            super(ROOT_LAYER_PRIORITY);
+            Objects.requireNonNull(DropDownDevSketch.this);
+            super(0);
         }
 
-        @Override
-        public boolean handlePointerEvent(PointerEvent event) {
-            switch (event.getType()) {
+        public boolean handlePointerEvent(PointerEvent var1) {
+            switch (var1.getType()) {
                 case MOVE:
                 case DRAG:
-                    handleRootMove(event);
+                    this.handleRootMove(var1);
                     return true;
-
                 case PRESS:
-                    handleRootPress(event);
+                    this.handleRootPress(var1);
                     return true;
-
                 case RELEASE:
-                    handleRootRelease(event);
+                    this.handleRootRelease(var1);
                     return true;
-
                 default:
                     return false;
             }
         }
 
-        @Override
-        public boolean handleKeyboardEvent(KeyboardEvent event) {
+        public boolean handleKeyboardEvent(KeyboardEvent var1) {
             return false;
         }
 
-        private void handleRootMove(PointerEvent event) {
-            firstDropDownView.handleMouseMove(event.getX(), event.getY());
-            secondDropDownView.handleMouseMove(event.getX(), event.getY());
-            buttonInputAdapter.handleMouseMove(event.getX(), event.getY());
+        private void handleRootMove(PointerEvent var1) {
+            DropDownDevSketch.this.firstDropDownView.handleMouseMove(var1.getX(), var1.getY());
+            DropDownDevSketch.this.secondDropDownView.handleMouseMove(var1.getX(), var1.getY());
+            DropDownDevSketch.this.buttonInputAdapter.handleMouseMove(var1.getX(), var1.getY());
         }
 
-        private void handleRootPress(PointerEvent event) {
-            DropDownView clickedDropDown = findClickedDropDown(event.getX(), event.getY());
-            if (clickedDropDown != null) {
-                closeOtherDropDowns(clickedDropDown);
-                clickedDropDown.handleMousePress(event.getX(), event.getY(), focusManager);
-                return;
+        private void handleRootPress(PointerEvent var1) {
+            DropDownView var2 = DropDownDevSketch.this.findClickedDropDown(var1.getX(), var1.getY());
+            if (var2 != null) {
+                DropDownDevSketch.this.closeOtherDropDowns(var2);
+                var2.handleMousePress(var1.getX(), var1.getY(), DropDownDevSketch.this.focusManager);
+            } else if (DropDownDevSketch.this.buttonView.contains(var1.getX(), var1.getY())) {
+                DropDownDevSketch.this.buttonInputAdapter.handleMousePress(var1.getX(), var1.getY());
+                DropDownDevSketch.this.focusManager.clearFocus();
+            } else {
+                DropDownDevSketch.this.focusManager.clearFocus();
             }
-
-            if (buttonView.contains(event.getX(), event.getY())) {
-                buttonInputAdapter.handleMousePress(event.getX(), event.getY());
-                focusManager.clearFocus();
-                return;
-            }
-
-            focusManager.clearFocus();
         }
 
-        private void handleRootRelease(PointerEvent event) {
-            DropDownView expandedDropDown = firstDropDownViewModel.isExpanded()
-                    ? firstDropDownView
-                    : secondDropDownViewModel.isExpanded() ? secondDropDownView : null;
-            if (expandedDropDown != null) {
-                expandedDropDown.handleMouseRelease(event.getX(), event.getY());
-                resetHoverForInactiveDropDowns(expandedDropDown);
-                buttonInputAdapter.handleMouseRelease(-1f, -1f);
-                return;
+        private void handleRootRelease(PointerEvent var1) {
+            DropDownView var2 = DropDownDevSketch.this.firstDropDownViewModel.isExpanded() ? DropDownDevSketch.this.firstDropDownView : (DropDownDevSketch.this.secondDropDownViewModel.isExpanded() ? DropDownDevSketch.this.secondDropDownView : null);
+            if (var2 != null) {
+                var2.handleMouseRelease(var1.getX(), var1.getY());
+                DropDownDevSketch.this.resetHoverForInactiveDropDowns(var2);
+                DropDownDevSketch.this.buttonInputAdapter.handleMouseRelease(-1.0F, -1.0F);
+            } else {
+                DropDownDevSketch.this.firstDropDownView.handleMouseRelease(var1.getX(), var1.getY());
+                DropDownDevSketch.this.secondDropDownView.handleMouseRelease(var1.getX(), var1.getY());
+                DropDownDevSketch.this.buttonInputAdapter.handleMouseRelease(var1.getX(), var1.getY());
             }
-
-            firstDropDownView.handleMouseRelease(event.getX(), event.getY());
-            secondDropDownView.handleMouseRelease(event.getX(), event.getY());
-            buttonInputAdapter.handleMouseRelease(event.getX(), event.getY());
         }
     }
 }

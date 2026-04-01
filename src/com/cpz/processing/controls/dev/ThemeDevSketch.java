@@ -1,251 +1,201 @@
 package com.cpz.processing.controls.dev;
 
-import com.cpz.processing.controls.buttoncontrol.input.ButtonInputAdapter;
-import com.cpz.processing.controls.buttoncontrol.model.ButtonModel;
-import com.cpz.processing.controls.buttoncontrol.view.ButtonView;
-import com.cpz.processing.controls.buttoncontrol.viewmodel.ButtonViewModel;
-import com.cpz.processing.controls.checkboxcontrol.input.CheckboxInputAdapter;
-import com.cpz.processing.controls.checkboxcontrol.model.CheckboxModel;
-import com.cpz.processing.controls.checkboxcontrol.view.CheckboxView;
-import com.cpz.processing.controls.checkboxcontrol.viewmodel.CheckboxViewModel;
-import com.cpz.processing.controls.common.focus.FocusManager;
-import com.cpz.processing.controls.common.input.KeyboardInputAdapter;
-import com.cpz.processing.controls.common.theme.DarkTheme;
-import com.cpz.processing.controls.common.theme.LightTheme;
-import com.cpz.processing.controls.common.theme.Theme;
-import com.cpz.processing.controls.common.theme.ThemeManager;
-import com.cpz.processing.controls.common.theme.ThemeTokens;
-import com.cpz.processing.controls.labelcontrol.LabelModel;
-import com.cpz.processing.controls.labelcontrol.view.LabelView;
-import com.cpz.processing.controls.labelcontrol.view.LabelViewModel;
-import com.cpz.processing.controls.slidercontrol.SliderOrientation;
-import com.cpz.processing.controls.slidercontrol.input.SliderInputAdapter;
-import com.cpz.processing.controls.slidercontrol.model.SliderModel;
-import com.cpz.processing.controls.slidercontrol.view.SliderView;
-import com.cpz.processing.controls.slidercontrol.viewmodel.SliderViewModel;
-import com.cpz.processing.controls.switchcontrol.SwitchInputAdapter;
-import com.cpz.processing.controls.switchcontrol.SwitchModel;
-import com.cpz.processing.controls.switchcontrol.view.SwitchView;
-import com.cpz.processing.controls.switchcontrol.view.SwitchViewModel;
-import com.cpz.processing.controls.textfieldcontrol.input.TextFieldInputAdapter;
-import com.cpz.processing.controls.textfieldcontrol.model.TextFieldModel;
-import com.cpz.processing.controls.textfieldcontrol.view.TextFieldView;
-import com.cpz.processing.controls.textfieldcontrol.viewmodel.TextFieldViewModel;
-import com.cpz.processing.controls.input.DefaultInputLayer;
-import com.cpz.processing.controls.input.InputManager;
-import com.cpz.processing.controls.input.KeyboardEvent;
-import com.cpz.processing.controls.input.PointerEvent;
+import com.cpz.processing.controls.controls.button.model.ButtonModel;
+import com.cpz.processing.controls.controls.button.view.ButtonInputAdapter;
+import com.cpz.processing.controls.controls.button.view.ButtonView;
+import com.cpz.processing.controls.controls.button.viewmodel.ButtonViewModel;
+import com.cpz.processing.controls.controls.checkbox.model.CheckboxModel;
+import com.cpz.processing.controls.controls.checkbox.view.CheckboxInputAdapter;
+import com.cpz.processing.controls.controls.checkbox.view.CheckboxView;
+import com.cpz.processing.controls.controls.checkbox.viewmodel.CheckboxViewModel;
+import com.cpz.processing.controls.controls.label.model.LabelModel;
+import com.cpz.processing.controls.controls.label.view.LabelView;
+import com.cpz.processing.controls.controls.label.viewmodel.LabelViewModel;
+import com.cpz.processing.controls.controls.slider.model.SliderModel;
+import com.cpz.processing.controls.controls.slider.model.SliderOrientation;
+import com.cpz.processing.controls.controls.slider.view.SliderInputAdapter;
+import com.cpz.processing.controls.controls.slider.view.SliderView;
+import com.cpz.processing.controls.controls.slider.viewmodel.SliderViewModel;
+import com.cpz.processing.controls.controls.switchcontrol.model.SwitchModel;
+import com.cpz.processing.controls.controls.switchcontrol.view.SwitchInputAdapter;
+import com.cpz.processing.controls.controls.switchcontrol.view.SwitchView;
+import com.cpz.processing.controls.controls.switchcontrol.viewmodel.SwitchViewModel;
+import com.cpz.processing.controls.controls.textfield.model.TextFieldModel;
+import com.cpz.processing.controls.controls.textfield.view.TextFieldInputAdapter;
+import com.cpz.processing.controls.controls.textfield.view.TextFieldView;
+import com.cpz.processing.controls.controls.textfield.viewmodel.TextFieldViewModel;
+import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.input.DefaultInputLayer;
+import com.cpz.processing.controls.core.input.InputManager;
+import com.cpz.processing.controls.core.input.KeyboardEvent;
+import com.cpz.processing.controls.core.input.KeyboardInputAdapter;
+import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.core.theme.DarkTheme;
+import com.cpz.processing.controls.core.theme.LightTheme;
+import com.cpz.processing.controls.core.theme.Theme;
+import com.cpz.processing.controls.core.theme.ThemeManager;
+import com.cpz.processing.controls.core.theme.ThemeTokens;
+
+import java.math.BigDecimal;
+import java.util.Objects;
+
 import processing.core.PApplet;
 import processing.event.MouseEvent;
 
-import java.math.BigDecimal;
-
 public final class ThemeDevSketch extends PApplet {
-
     private final FocusManager focusManager = new FocusManager();
     private final InputManager inputManager = new InputManager();
-
     private ButtonView buttonView;
     private ButtonViewModel buttonViewModel;
     private ButtonInputAdapter buttonInput;
     private ButtonView iconButtonView;
     private ButtonViewModel iconButtonViewModel;
     private ButtonInputAdapter iconButtonInput;
-
     private TextFieldView textFieldView;
     private TextFieldViewModel textFieldViewModel;
     private TextFieldInputAdapter textFieldInput;
     private KeyboardInputAdapter keyboardAdapter;
-
     private SwitchView switchView;
     private SwitchViewModel switchViewModel;
     private SwitchInputAdapter switchInput;
-
     private CheckboxView checkboxView;
     private CheckboxViewModel checkboxViewModel;
     private CheckboxInputAdapter checkboxInput;
-
     private SliderView sliderView;
     private SliderViewModel sliderViewModel;
     private SliderInputAdapter sliderInput;
     private LabelView sliderValueLabel;
     private LabelViewModel sliderValueLabelViewModel;
 
-    @Override
     public void settings() {
-        size(920, 420);
-        smooth(4);
+        this.size(920, 420);
+        this.smooth(4);
     }
 
-    @Override
     public void setup() {
         ThemeManager.setTheme(new LightTheme());
-
-        keyboardAdapter = new KeyboardInputAdapter(focusManager);
-
-        buttonViewModel = new ButtonViewModel(new ButtonModel("Toggle Ready"));
-        buttonViewModel.setClickListener(() -> checkboxViewModel.setChecked(!checkboxViewModel.isChecked()));
-        buttonView = new ButtonView(this, buttonViewModel, 180f, 150f, 220f, 60f);
-        buttonInput = new ButtonInputAdapter(buttonView, buttonViewModel);
-
-        iconButtonViewModel = new ButtonViewModel(new ButtonModel("Hidden"));
-        iconButtonViewModel.setShowText(false);
-        iconButtonViewModel.setClickListener(() -> textFieldViewModel.setText("Hidden-text button clicked"));
-        iconButtonView = new ButtonView(this, iconButtonViewModel, 180f, 245f, 76f, 50f);
-        iconButtonInput = new ButtonInputAdapter(iconButtonView, iconButtonViewModel);
-
-        textFieldViewModel = new TextFieldViewModel(new TextFieldModel());
-        textFieldViewModel.setText("Press 't' to toggle theme");
-        textFieldView = new TextFieldView(this, textFieldViewModel, width * 0.5f, 260f, 420f, 48f);
-        textFieldInput = new TextFieldInputAdapter(textFieldView, textFieldViewModel, focusManager);
-
-        switchViewModel = new SwitchViewModel(new SwitchModel());
-        switchViewModel.setTotalStates(2);
-        switchView = new SwitchView(this, switchViewModel, 430f, 150f, 64f);
-        switchInput = new SwitchInputAdapter(switchView, switchViewModel);
-
-        checkboxViewModel = new CheckboxViewModel(new CheckboxModel(true));
-        checkboxView = new CheckboxView(this, checkboxViewModel, 610f, 150f, 34f);
-        checkboxInput = new CheckboxInputAdapter(checkboxView, checkboxViewModel);
-
-        SliderModel sliderModel = new SliderModel();
-        sliderModel.setMin(BigDecimal.ZERO);
-        sliderModel.setMax(BigDecimal.ONE);
-        sliderModel.setStep(new BigDecimal("0.05"));
-        sliderModel.setValue(new BigDecimal("0.45"));
-        sliderViewModel = new SliderViewModel(sliderModel);
-        sliderViewModel.setFormatter(value -> "Slider " + value.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
-        sliderViewModel.setShowText(false);
-        sliderView = new SliderView(this, sliderViewModel, width * 0.5f, 360f, 360f, 70f, SliderOrientation.HORIZONTAL);
-        sliderInput = new SliderInputAdapter(sliderView, sliderViewModel);
-
-        sliderValueLabelViewModel = new LabelViewModel(new LabelModel());
-        sliderValueLabel = new LabelView(this, sliderValueLabelViewModel, width * 0.5f - 42f, 324f);
-
-        inputManager.registerLayer(new ThemeRootInputLayer());
+        this.keyboardAdapter = new KeyboardInputAdapter(this.focusManager);
+        this.buttonViewModel = new ButtonViewModel(new ButtonModel("Toggle Ready"));
+        this.buttonViewModel.setClickListener(() -> this.checkboxViewModel.setChecked(!this.checkboxViewModel.isChecked()));
+        this.buttonView = new ButtonView(this, this.buttonViewModel, 180.0F, 150.0F, 220.0F, 60.0F);
+        this.buttonInput = new ButtonInputAdapter(this.buttonView, this.buttonViewModel);
+        this.iconButtonViewModel = new ButtonViewModel(new ButtonModel("Hidden"));
+        this.iconButtonViewModel.setShowText(false);
+        this.iconButtonViewModel.setClickListener(() -> this.textFieldViewModel.setText("Hidden-text button clicked"));
+        this.iconButtonView = new ButtonView(this, this.iconButtonViewModel, 180.0F, 245.0F, 76.0F, 50.0F);
+        this.iconButtonInput = new ButtonInputAdapter(this.iconButtonView, this.iconButtonViewModel);
+        this.textFieldViewModel = new TextFieldViewModel(new TextFieldModel());
+        this.textFieldViewModel.setText("Press 't' to toggle theme");
+        this.textFieldView = new TextFieldView(this, this.textFieldViewModel, (float) this.width * 0.5F, 260.0F, 420.0F, 48.0F);
+        this.textFieldInput = new TextFieldInputAdapter(this.textFieldView, this.textFieldViewModel, this.focusManager);
+        this.switchViewModel = new SwitchViewModel(new SwitchModel());
+        this.switchViewModel.setTotalStates(2);
+        this.switchView = new SwitchView(this, this.switchViewModel, 430.0F, 150.0F, 64.0F);
+        this.switchInput = new SwitchInputAdapter(this.switchView, this.switchViewModel);
+        this.checkboxViewModel = new CheckboxViewModel(new CheckboxModel(true));
+        this.checkboxView = new CheckboxView(this, this.checkboxViewModel, 610.0F, 150.0F, 34.0F);
+        this.checkboxInput = new CheckboxInputAdapter(this.checkboxView, this.checkboxViewModel);
+        SliderModel var1 = new SliderModel();
+        var1.setMin(BigDecimal.ZERO);
+        var1.setMax(BigDecimal.ONE);
+        var1.setStep(new BigDecimal("0.05"));
+        var1.setValue(new BigDecimal("0.45"));
+        this.sliderViewModel = new SliderViewModel(var1);
+        this.sliderViewModel.setFormatter((var0) -> "Slider " + var0.setScale(2, 4).toPlainString());
+        this.sliderViewModel.setShowText(false);
+        this.sliderView = new SliderView(this, this.sliderViewModel, (float) this.width * 0.5F, 360.0F, 360.0F, 70.0F, SliderOrientation.HORIZONTAL);
+        this.sliderInput = new SliderInputAdapter(this.sliderView, this.sliderViewModel);
+        this.sliderValueLabelViewModel = new LabelViewModel(new LabelModel());
+        this.sliderValueLabel = new LabelView(this, this.sliderValueLabelViewModel, (float) this.width * 0.5F - 42.0F, 324.0F);
+        this.inputManager.registerLayer(new ThemeRootInputLayer());
     }
 
-    @Override
     public void draw() {
-        ThemeTokens tokens = ThemeManager.getTheme().tokens();
-        background(tokens.surfaceVariant);
-        sliderValueLabelViewModel.setText(sliderViewModel.getFormattedValue());
-        drawHeader(tokens);
-        buttonView.draw();
-        iconButtonView.draw();
-        switchView.draw();
-        checkboxView.draw();
-        textFieldView.draw();
-        sliderView.draw();
-        sliderValueLabel.draw();
-        drawFooter(tokens);
+        ThemeTokens var1 = ThemeManager.getTheme().tokens();
+        this.background(var1.surfaceVariant);
+        this.sliderValueLabelViewModel.setText(this.sliderViewModel.getFormattedValue());
+        this.drawHeader(var1);
+        this.buttonView.draw();
+        this.iconButtonView.draw();
+        this.switchView.draw();
+        this.checkboxView.draw();
+        this.textFieldView.draw();
+        this.sliderView.draw();
+        this.sliderValueLabel.draw();
+        this.drawFooter(var1);
     }
 
-    @Override
     public void keyReleased() {
         if (key == ESC) key = 0;
-        inputManager.dispatchKeyboard(new KeyboardEvent(
-                KeyboardEvent.Type.RELEASE,
-                key,
-                keyCode,
-                keyEvent != null && keyEvent.isShiftDown(),
-                keyEvent != null && keyEvent.isControlDown(),
-                keyEvent != null && keyEvent.isAltDown()
-        ));
+        this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
     }
 
-    @Override
     public void mouseMoved() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, mouseX, mouseY, mouseButton));
+        this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
-    @Override
     public void mouseDragged() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, mouseX, mouseY, mouseButton));
+        this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
-    @Override
     public void mousePressed() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, mouseX, mouseY, mouseButton));
+        this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
-    @Override
     public void mouseReleased() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, mouseX, mouseY, mouseButton));
+        this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
-    @Override
-    public void mouseWheel(MouseEvent event) {
-        inputManager.dispatchPointer(new PointerEvent(
-                PointerEvent.Type.WHEEL,
-                mouseX,
-                mouseY,
-                mouseButton,
-                event.getCount(),
-                event.isShiftDown(),
-                event.isControlDown()
-        ));
+    public void mouseWheel(MouseEvent var1) {
+        this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.WHEEL, (float) this.mouseX, (float) this.mouseY, this.mouseButton, (float) var1.getCount(), var1.isShiftDown(), var1.isControlDown()));
     }
 
-    @Override
     public void keyPressed() {
-        inputManager.dispatchKeyboard(new KeyboardEvent(
-                KeyboardEvent.Type.PRESS,
-                key,
-                keyCode,
-                keyEvent != null && keyEvent.isShiftDown(),
-                keyEvent != null && keyEvent.isControlDown(),
-                keyEvent != null && keyEvent.isAltDown()
-        ));
+        if (key == ESC) key = 0;
+        this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.PRESS, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
     }
 
-    @Override
     public void keyTyped() {
-        inputManager.dispatchKeyboard(new KeyboardEvent(
-                KeyboardEvent.Type.TYPE,
-                key,
-                keyCode,
-                keyEvent != null && keyEvent.isShiftDown(),
-                keyEvent != null && keyEvent.isControlDown(),
-                keyEvent != null && keyEvent.isAltDown()
-        ));
+        if (key == ESC) key = 0;
+        this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.TYPE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
     }
 
-    private void drawHeader(ThemeTokens tokens) {
-        pushStyle();
-        fill(tokens.onSurface);
-        textAlign(CENTER, CENTER);
-        textSize(24f);
-        text("Theme Dev Sketch", width * 0.5f, 56f);
-        fill(tokens.onSurfaceVariant);
-        textSize(14f);
-        text("Press 't' to switch between LightTheme and DarkTheme across all controls", width * 0.5f, 88f);
-        popStyle();
+    private void drawHeader(ThemeTokens var1) {
+        this.pushStyle();
+        this.fill(var1.onSurface);
+        this.textAlign(3, 3);
+        this.textSize(24.0F);
+        this.text("Theme Dev Sketch", (float) this.width * 0.5F, 56.0F);
+        this.fill(var1.onSurfaceVariant);
+        this.textSize(14.0F);
+        this.text("Press 't' to switch between LightTheme and DarkTheme across all controls", (float) this.width * 0.5F, 88.0F);
+        this.popStyle();
     }
 
-    private void drawFooter(ThemeTokens tokens) {
-        pushStyle();
-        fill(tokens.onSurfaceVariant);
-        textAlign(LEFT, CENTER);
-        textSize(14f);
-        text("Button showText=true", 112f, 106f);
-        text("Button showText=false", 96f, 286f);
-        text("Switch", 430f, 106f);
-        text("Checkbox", 610f, 106f);
-        text("TextField", width * 0.5f - 210f, 216f);
-        text("External label mirrors slider value", width * 0.5f - 210f, 304f);
-        text("Current theme: " + currentThemeName(), width * 0.5f - 180f, 404f);
-        text("Validate background, borders, hover/pressed, cursor, selection and slider progress after toggling", width * 0.5f - 180f, 430f);
-        popStyle();
+    private void drawFooter(ThemeTokens var1) {
+        this.pushStyle();
+        this.fill(var1.onSurfaceVariant);
+        this.textAlign(37, 3);
+        this.textSize(14.0F);
+        this.text("Button showText=true", 112.0F, 106.0F);
+        this.text("Button showText=false", 96.0F, 286.0F);
+        this.text("Switch", 430.0F, 106.0F);
+        this.text("Checkbox", 610.0F, 106.0F);
+        this.text("TextField", (float) this.width * 0.5F - 210.0F, 216.0F);
+        this.text("External label mirrors slider value", (float) this.width * 0.5F - 210.0F, 304.0F);
+        this.text("Current theme: " + this.currentThemeName(), (float) this.width * 0.5F - 180.0F, 404.0F);
+        this.text("Validate background, borders, hover/pressed, cursor, selection and slider progress after toggling", (float) this.width * 0.5F - 180.0F, 430.0F);
+        this.popStyle();
     }
 
     private void toggleTheme() {
-        Theme current = ThemeManager.getTheme();
-        if (current instanceof LightTheme) {
+        Theme var1 = ThemeManager.getTheme();
+        if (var1 instanceof LightTheme) {
             ThemeManager.setTheme(new DarkTheme());
         } else {
             ThemeManager.setTheme(new LightTheme());
         }
+
     }
 
     private String currentThemeName() {
@@ -253,72 +203,68 @@ public final class ThemeDevSketch extends PApplet {
     }
 
     private final class ThemeRootInputLayer extends DefaultInputLayer {
-
         private ThemeRootInputLayer() {
+            Objects.requireNonNull(ThemeDevSketch.this);
             super(0);
         }
 
-        @Override
-        public boolean handlePointerEvent(PointerEvent event) {
-            switch (event.getType()) {
+        public boolean handlePointerEvent(PointerEvent var1) {
+            switch (var1.getType()) {
                 case MOVE:
-                    buttonInput.handleMouseMove(event.getX(), event.getY());
-                    iconButtonInput.handleMouseMove(event.getX(), event.getY());
-                    switchInput.handleMouseMove(event.getX(), event.getY());
-                    checkboxInput.handleMouseMove(event.getX(), event.getY());
-                    sliderInput.handleMouseMove(event.getX(), event.getY());
+                    ThemeDevSketch.this.buttonInput.handleMouseMove(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.iconButtonInput.handleMouseMove(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.switchInput.handleMouseMove(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.checkboxInput.handleMouseMove(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.sliderInput.handleMouseMove(var1.getX(), var1.getY());
                     return true;
-
                 case DRAG:
-                    buttonInput.handleMouseMove(event.getX(), event.getY());
-                    iconButtonInput.handleMouseMove(event.getX(), event.getY());
-                    switchInput.handleMouseMove(event.getX(), event.getY());
-                    checkboxInput.handleMouseMove(event.getX(), event.getY());
-                    textFieldInput.handleMouseDrag(event.getX(), event.getY());
-                    sliderInput.handleMouseDrag(event.getX(), event.getY());
+                    ThemeDevSketch.this.buttonInput.handleMouseMove(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.iconButtonInput.handleMouseMove(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.switchInput.handleMouseMove(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.checkboxInput.handleMouseMove(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.textFieldInput.handleMouseDrag(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.sliderInput.handleMouseDrag(var1.getX(), var1.getY());
                     return true;
-
                 case PRESS:
-                    buttonInput.handleMousePress(event.getX(), event.getY());
-                    iconButtonInput.handleMousePress(event.getX(), event.getY());
-                    switchInput.handleMousePress(event.getX(), event.getY());
-                    checkboxInput.handleMousePress(event.getX(), event.getY());
-                    sliderInput.handleMousePress(event.getX(), event.getY());
-                    boolean handled = textFieldInput.handleMousePress(event.getX(), event.getY());
-                    if (!handled && !textFieldView.contains(event.getX(), event.getY())) {
-                        focusManager.clearFocus();
+                    ThemeDevSketch.this.buttonInput.handleMousePress(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.iconButtonInput.handleMousePress(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.switchInput.handleMousePress(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.checkboxInput.handleMousePress(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.sliderInput.handleMousePress(var1.getX(), var1.getY());
+                    boolean var2 = ThemeDevSketch.this.textFieldInput.handleMousePress(var1.getX(), var1.getY());
+                    if (!var2 && !ThemeDevSketch.this.textFieldView.contains(var1.getX(), var1.getY())) {
+                        ThemeDevSketch.this.focusManager.clearFocus();
                     }
-                    return true;
 
+                    return true;
                 case RELEASE:
-                    buttonInput.handleMouseRelease(event.getX(), event.getY());
-                    iconButtonInput.handleMouseRelease(event.getX(), event.getY());
-                    switchInput.handleMouseRelease(event.getX(), event.getY());
-                    checkboxInput.handleMouseRelease(event.getX(), event.getY());
-                    sliderInput.handleMouseRelease(event.getX(), event.getY());
-                    textFieldInput.handleMouseRelease();
+                    ThemeDevSketch.this.buttonInput.handleMouseRelease(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.iconButtonInput.handleMouseRelease(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.switchInput.handleMouseRelease(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.checkboxInput.handleMouseRelease(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.sliderInput.handleMouseRelease(var1.getX(), var1.getY());
+                    ThemeDevSketch.this.textFieldInput.handleMouseRelease();
                     return true;
-
                 case WHEEL:
-                    sliderInput.handleMouseWheel(event.getWheelDelta(), event.isShiftDown(), event.isControlDown());
+                    ThemeDevSketch.this.sliderInput.handleMouseWheel(var1.getWheelDelta(), var1.isShiftDown(), var1.isControlDown());
                     return true;
-
                 default:
                     return false;
             }
         }
 
-        @Override
-        public boolean handleKeyboardEvent(KeyboardEvent event) {
-            if (event.getType() == KeyboardEvent.Type.PRESS && (event.getKey() == 't' || event.getKey() == 'T')) {
-                toggleTheme();
+        public boolean handleKeyboardEvent(KeyboardEvent var1) {
+            if (var1.getType() != KeyboardEvent.Type.PRESS || var1.getKey() != 't' && var1.getKey() != 'T') {
+                if (var1.getType() != KeyboardEvent.Type.TYPE || var1.getKey() != 't' && var1.getKey() != 'T') {
+                    ThemeDevSketch.this.keyboardAdapter.handleKeyboardEvent(var1);
+                    return true;
+                } else {
+                    return true;
+                }
+            } else {
+                ThemeDevSketch.this.toggleTheme();
                 return true;
             }
-            if (event.getType() == KeyboardEvent.Type.TYPE && (event.getKey() == 't' || event.getKey() == 'T')) {
-                return true;
-            }
-            keyboardAdapter.handleKeyboardEvent(event);
-            return true;
         }
     }
 }
