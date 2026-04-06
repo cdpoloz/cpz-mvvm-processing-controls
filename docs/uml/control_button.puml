@@ -1,0 +1,58 @@
+@startuml
+title Button Control Structure
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "Core" {
+  interface Enableable
+  interface Visible
+  interface ControlView
+  interface PointerInputTarget
+  interface PointerInteractable
+  abstract class AbstractControlViewModel
+  abstract class AbstractInteractiveControlViewModel
+  class PointerInputAdapter
+  interface ThemeProvider
+}
+
+package "Button" {
+  class ButtonModel
+  class ButtonViewModel
+  class ButtonView
+  class ButtonInputAdapter
+  class ButtonViewState
+  interface ButtonStyle
+  class DefaultButtonStyle
+  class ButtonRenderStyle
+  interface ButtonRenderer
+  class DefaultButtonRenderer
+  class SvgButtonRenderer
+  interface ButtonListener
+}
+
+AbstractControlViewModel ..|> Visible
+AbstractControlViewModel ..|> Enableable
+AbstractInteractiveControlViewModel --|> AbstractControlViewModel
+AbstractInteractiveControlViewModel ..|> PointerInputTarget
+ButtonModel ..|> Enableable
+ButtonViewModel --|> AbstractInteractiveControlViewModel
+ButtonView ..|> ControlView
+ButtonView ..|> PointerInteractable
+AbstractControlViewModel *-- Enableable : model
+ButtonView --> ButtonViewModel
+ButtonView --> ButtonViewState : builds
+ButtonView --> ButtonStyle : uses
+ButtonStyle --> ButtonViewState
+DefaultButtonStyle ..|> ButtonStyle
+DefaultButtonStyle --> ButtonRenderStyle : creates
+DefaultButtonStyle --> ButtonRenderer : delegates
+DefaultButtonStyle --> ThemeProvider
+ButtonRenderer --> ButtonRenderStyle
+DefaultButtonRenderer ..|> ButtonRenderer
+SvgButtonRenderer ..|> ButtonRenderer
+PointerInputAdapter --> PointerInteractable
+PointerInputAdapter --> PointerInputTarget
+ButtonInputAdapter *-- PointerInputAdapter : delegate
+ButtonViewModel --> ButtonModel
+ButtonViewModel --> ButtonListener
+@enduml

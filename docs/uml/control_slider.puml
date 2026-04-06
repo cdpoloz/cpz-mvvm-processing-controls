@@ -1,0 +1,51 @@
+@startuml
+title Slider Control Structure
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "Core" {
+  interface Enableable
+  interface Visible
+  interface ControlView
+  interface PointerInputTarget
+  interface PointerInteractable
+  abstract class AbstractControlViewModel
+  abstract class AbstractInteractiveControlViewModel
+  class PointerInputAdapter
+  interface ThemeProvider
+}
+
+package "Slider" {
+  class SliderModel
+  class SliderViewModel
+  class SliderView
+  class SliderInputAdapter
+  class SliderViewState
+  class SliderGeometry
+  class SliderStyle
+  class SliderRenderStyle
+  class SliderRenderer
+}
+
+AbstractControlViewModel ..|> Visible
+AbstractControlViewModel ..|> Enableable
+AbstractInteractiveControlViewModel --|> AbstractControlViewModel
+AbstractInteractiveControlViewModel ..|> PointerInputTarget
+SliderModel ..|> Enableable
+SliderViewModel --|> AbstractInteractiveControlViewModel
+SliderView ..|> ControlView
+SliderView ..|> PointerInteractable
+AbstractControlViewModel *-- Enableable : model
+SliderViewModel --> SliderModel
+SliderView --> SliderViewModel
+SliderView --> SliderViewState : builds
+SliderView --> SliderStyle : uses
+SliderStyle --> SliderViewState
+SliderStyle --> SliderGeometry
+SliderStyle --> SliderRenderStyle : creates
+SliderStyle --> SliderRenderer : delegates
+SliderStyle --> ThemeProvider
+PointerInputAdapter --> PointerInteractable
+PointerInputAdapter --> PointerInputTarget
+SliderInputAdapter *-- PointerInputAdapter : delegate
+@enduml

@@ -5,6 +5,7 @@ import com.cpz.processing.controls.core.overlay.tooltip.state.TooltipViewState;
 import com.cpz.processing.controls.core.overlay.tooltip.style.render.DefaultTooltipRenderer;
 import com.cpz.processing.controls.core.style.InteractiveStyleHelper;
 import com.cpz.processing.controls.core.theme.ThemeManager;
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import com.cpz.processing.controls.core.util.Colors;
 import processing.core.PApplet;
@@ -27,7 +28,7 @@ public final class DefaultTooltipStyle {
    }
 
    public TooltipRenderStyle resolveRenderStyle() {
-      ThemeTokens var1 = ThemeManager.getTheme().tokens();
+      ThemeTokens var1 = this.resolveThemeProvider().getTheme().tokens();
       int var2 = this.config.backgroundOverride != null ? this.config.backgroundOverride : InteractiveStyleHelper.applyOverlay(var1.surfaceVariant, Colors.argb(220, 0, 0, 0));
       int var3 = this.config.textOverride != null ? this.config.textOverride : var1.onSurface;
       int var4 = this.config.borderOverride != null ? this.config.borderOverride : var1.border;
@@ -36,5 +37,9 @@ public final class DefaultTooltipStyle {
 
    public float getTextPadding() {
       return this.config.textPadding;
+   }
+
+   private ThemeProvider resolveThemeProvider() {
+      return this.config.themeProvider != null ? this.config.themeProvider : ThemeManager::getDefaultTheme;
    }
 }

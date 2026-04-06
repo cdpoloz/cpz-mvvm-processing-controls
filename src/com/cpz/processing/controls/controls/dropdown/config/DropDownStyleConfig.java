@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.controls.dropdown.config;
 
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import processing.core.PFont;
 
 public final class DropDownStyleConfig {
@@ -21,4 +22,9 @@ public final class DropDownStyleConfig {
    public int maxVisibleItems = 6;
    public Integer disabledAlpha;
    public PFont font;
+   public ThemeProvider themeProvider;
+
+   public void setThemeProvider(ThemeProvider var1) {
+      this.themeProvider = var1;
+   }
 }

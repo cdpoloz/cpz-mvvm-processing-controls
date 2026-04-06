@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.button.style.render.ButtonRenderer;
 import com.cpz.processing.controls.controls.button.style.render.DefaultButtonRenderer;
 import com.cpz.processing.controls.core.style.InteractiveStyleHelper;
 import com.cpz.processing.controls.core.theme.ThemeManager;
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import processing.core.PApplet;
 
@@ -23,7 +24,7 @@ public final class DefaultButtonStyle implements ButtonStyle {
    }
 
    public void render(PApplet var1, ButtonViewState var2) {
-      ThemeTokens var3 = ThemeManager.getTheme().tokens();
+      ThemeTokens var3 = this.resolveThemeProvider().getTheme().tokens();
       int var4 = this.resolveColorOverride(var3.primary, this.config.fillOverride, this.config.baseColor);
       int var5 = this.resolveInteractiveOverride(var4, var3.hoverOverlay, this.config.hoverBlendWithWhite != null ? var1.lerpColor(var4, var1.color(255), this.config.hoverBlendWithWhite) : null);
       int var6 = this.resolveInteractiveOverride(var4, var3.pressedOverlay, this.config.pressedBlendWithBlack != null ? var1.lerpColor(var4, var1.color(0), this.config.pressedBlendWithBlack) : null);
@@ -45,5 +46,9 @@ public final class DefaultButtonStyle implements ButtonStyle {
 
    private int resolveInteractiveOverride(int var1, int var2, Integer var3) {
       return var3 != null ? var3 : InteractiveStyleHelper.applyOverlay(var1, var2);
+   }
+
+   private ThemeProvider resolveThemeProvider() {
+      return this.config != null && this.config.themeProvider != null ? this.config.themeProvider : ThemeManager::getDefaultTheme;
    }
 }

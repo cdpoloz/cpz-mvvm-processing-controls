@@ -1,80 +1,39 @@
 # Input System
 
-## 🧠 Concepto
+## Overview
 
-Sistema centralizado que desacopla Processing del framework y evita rutas paralelas de input hacia los controles.
+Input is centralized on purpose. Processing events enter the sketch once, then the framework redistributes them through `InputManager`.
 
----
+## Core pieces
 
-## ⚙️ Componentes MVVM
+- `InputManager`: dispatches pointer and keyboard events by priority
+- `InputLayer`: capture boundary with priority and activation rules
+- `PointerInputAdapter`: translates pointer events into control intentions
+- `KeyboardInputAdapter`: routes keyboard events through `FocusManager`
+- `FocusManager`: owns the focused keyboard target
+- `OverlayManager`: lets overlays temporarily sit above base layers
 
-- InputManager
-- InputLayer
-- PointerInputAdapter
-- KeyboardInputAdapter
-- FocusManager
-- OverlayManager
+## Flow
 
----
-
-## 🚀 Uso básico
-
-```java
-InputManager inputManager = new InputManager();
-
-inputManager.dispatchPointer(...);
-inputManager.dispatchKeyboard(...);
+```text
+Processing event
+-> InputManager
+-> InputLayer
+-> Control adapter
+-> ViewModel
+-> ViewState
+-> Style
+-> Renderer
 ```
 
-En los `DevSketch`, Processing solo genera eventos y los entrega a `InputManager`.
+## Notes
 
----
+- Input, focus, and overlay managers are instance-based and should be owned per sketch.
+- Theme resolution is separate from input and is handled through `ThemeProvider`.
+- `ThemeDevSketch` demonstrates per-sketch theme ownership without changing the input architecture.
 
-## 🎯 Interacción
+## Related
 
-Flujo típico:
-
-1. Processing emite un evento
-2. `InputManager` lo distribuye por prioridad
-3. Un `InputLayer` decide si lo consume
-4. Un adapter específico traduce el evento
-5. El `ViewModel` actualiza el estado del control
-
-Para teclado:
-
-- `FocusManager` decide qué control recibe el input
-- `KeyboardInputAdapter` reenvía el evento al target enfocado
-
-Para overlays:
-
-- `OverlayManager` registra overlays activos
-- el overlay superior puede capturar input antes que el resto
-
----
-
-## 🎨 Personalización
-
-El comportamiento se ajusta creando `InputLayer` específicos por sketch o por overlay. Los adapters compartidos permanecen en `core/input`, y los adapters de control viven dentro de cada control.
-
----
-
-## 🧪 Ejemplo completo
-
-Ver [`ThemeDevSketch.java`](../src/com/cpz/processing/controls/dev/ThemeDevSketch.java) y [`DropDownDevSketch.java`](../src/com/cpz/processing/controls/dev/DropDownDevSketch.java)
-
----
-
-## ⚠️ Consideraciones
-
-- No enviar input directo desde Processing al `ViewModel`
-- Los adapters traducen, no implementan negocio
-- El foco y los overlays afectan prioridad de input
-
----
-
-## 🔗 Relacionado
-
-- `InputManager`
-- `FocusManager`
-- `OverlayManager`
-- `KeyboardInputAdapter`
+- [Architecture](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/architecture.md)
+- [ThemeDevSketch.java](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/src/com/cpz/processing/controls/dev/ThemeDevSketch.java)
+- [DropDownDevSketch.java](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/src/com/cpz/processing/controls/dev/DropDownDevSketch.java)

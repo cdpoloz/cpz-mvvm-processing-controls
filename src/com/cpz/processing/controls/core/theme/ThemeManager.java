@@ -1,20 +1,30 @@
 package com.cpz.processing.controls.core.theme;
 
-public final class ThemeManager {
-   private static Theme currentTheme = new LightTheme();
+public final class ThemeManager implements ThemeProvider {
+   private static final ThemeManager DEFAULT = new ThemeManager();
+   private Theme currentTheme;
 
-   private ThemeManager() {
+   public ThemeManager() {
+      this(new LightTheme());
    }
 
-   public static Theme getTheme() {
-      return currentTheme;
+   public ThemeManager(Theme var1) {
+      this.setTheme(var1 == null ? new LightTheme() : var1);
    }
 
-   public static void setTheme(Theme var0) {
-      if (var0 == null) {
+   public Theme getTheme() {
+      return this.currentTheme.copy();
+   }
+
+   public void setTheme(Theme var1) {
+      if (var1 == null) {
          throw new IllegalArgumentException("Theme null");
       } else {
-         currentTheme = var0;
+         this.currentTheme = var1.copy();
       }
+   }
+
+   public static Theme getDefaultTheme() {
+      return DEFAULT.getTheme();
    }
 }

@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.radiogroup.state.RadioGroupViewState
 import com.cpz.processing.controls.controls.radiogroup.style.render.DefaultRadioGroupRenderer;
 import com.cpz.processing.controls.core.style.InteractiveStyleHelper;
 import com.cpz.processing.controls.core.theme.ThemeManager;
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import com.cpz.processing.controls.core.util.Colors;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public final class RadioGroupStyle {
    }
 
    public RadioGroupRenderStyle resolveRenderStyle(RadioGroupViewState var1) {
-      ThemeTokens var2 = ThemeManager.getTheme().tokens();
+      ThemeTokens var2 = this.resolveThemeProvider().getTheme().tokens();
       ArrayList var3 = new ArrayList(var1.items().size());
       int var4 = this.config.disabledAlpha != null ? this.config.disabledAlpha : var2.disabledAlpha;
 
@@ -80,5 +81,9 @@ public final class RadioGroupStyle {
 
    public float getTextOffsetX() {
       return this.config.textOffsetX;
+   }
+
+   private ThemeProvider resolveThemeProvider() {
+      return this.config.themeProvider != null ? this.config.themeProvider : ThemeManager::getDefaultTheme;
    }
 }

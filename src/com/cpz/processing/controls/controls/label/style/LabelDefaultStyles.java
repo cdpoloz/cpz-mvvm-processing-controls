@@ -1,20 +1,26 @@
 package com.cpz.processing.controls.controls.label.style;
 
 import com.cpz.processing.controls.controls.label.config.LabelStyleConfig;
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 
 public final class LabelDefaultStyles {
    private LabelDefaultStyles() {
    }
 
    public static LabelStyle defaultText() {
-      LabelStyleConfig var0 = new LabelStyleConfig();
-      var0.font = null;
-      var0.textSize = 12.0F;
-      var0.textColor = null;
-      var0.lineSpacingMultiplier = 1.0F;
-      var0.alignX = HorizontalAlign.START;
-      var0.alignY = VerticalAlign.BASELINE;
-      var0.disabledAlpha = null;
-      return new DefaultLabelStyle(var0);
+      return defaultText((ThemeProvider)null);
+   }
+
+   public static LabelStyle defaultText(ThemeProvider var0) {
+      LabelStyleConfig var1 = new LabelStyleConfig();
+      var1.font = null;
+      var1.textSize = 12.0F;
+      var1.textColor = null;
+      var1.lineSpacingMultiplier = 1.0F;
+      var1.alignX = HorizontalAlign.START;
+      var1.alignY = VerticalAlign.BASELINE;
+      var1.disabledAlpha = null;
+      var1.themeProvider = var0;
+      return new DefaultLabelStyle(var1);
    }
 }

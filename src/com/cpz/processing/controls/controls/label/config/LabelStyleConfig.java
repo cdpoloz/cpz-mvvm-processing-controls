@@ -3,6 +3,7 @@ package com.cpz.processing.controls.controls.label.config;
 import com.cpz.processing.controls.controls.label.style.HorizontalAlign;
 import com.cpz.processing.controls.controls.label.style.VerticalAlign;
 import com.cpz.processing.controls.controls.label.style.render.LabelAlignMapper;
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import processing.core.PFont;
 
 public class LabelStyleConfig {
@@ -13,6 +14,7 @@ public class LabelStyleConfig {
    public HorizontalAlign alignX;
    public VerticalAlign alignY;
    public Integer disabledAlpha;
+   public ThemeProvider themeProvider;
 
    public LabelStyleConfig() {
       this.alignX = HorizontalAlign.START;
@@ -26,5 +28,9 @@ public class LabelStyleConfig {
 
    public void setAlign(int var1, int var2) {
       this.setAlign(LabelAlignMapper.fromProcessingHorizontal(var1), LabelAlignMapper.fromProcessingVertical(var2));
+   }
+
+   public void setThemeProvider(ThemeProvider var1) {
+      this.themeProvider = var1;
    }
 }

@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.slider.config;
 
 import com.cpz.processing.controls.controls.slider.style.SvgColorMode;
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import processing.core.PShape;
 
 public final class SliderStyleConfig {
@@ -38,8 +39,13 @@ public final class SliderStyleConfig {
    public boolean showValueText = true;
    public SvgColorMode svgColorMode;
    public PShape thumbShape;
+   public ThemeProvider themeProvider;
 
    public SliderStyleConfig() {
       this.svgColorMode = SvgColorMode.USE_RENDER_STYLE;
+   }
+
+   public void setThemeProvider(ThemeProvider var1) {
+      this.themeProvider = var1;
    }
 }

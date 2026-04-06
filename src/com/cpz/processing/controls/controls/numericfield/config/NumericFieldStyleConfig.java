@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.controls.numericfield.config;
 
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import processing.core.PFont;
 
 public final class NumericFieldStyleConfig {
@@ -17,4 +18,9 @@ public final class NumericFieldStyleConfig {
    public Integer selectionTextColor;
    public float textSize = 16.0F;
    public PFont font;
+   public ThemeProvider themeProvider;
+
+   public void setThemeProvider(ThemeProvider var1) {
+      this.themeProvider = var1;
+   }
 }

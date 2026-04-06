@@ -1,0 +1,51 @@
+@startuml
+title Toggle Control Structure
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "Core" {
+  interface Enableable
+  interface Visible
+  interface ControlView
+  interface PointerInputTarget
+  interface PointerInteractable
+  abstract class AbstractControlViewModel
+  abstract class AbstractInteractiveControlViewModel
+  class PointerInputAdapter
+  interface ThemeProvider
+}
+
+package "Toggle" {
+  class ToggleModel
+  class ToggleViewModel
+  class ToggleView
+  class ToggleInputAdapter
+  class ToggleViewState
+  interface ToggleStyle
+  class ParametricToggleStyle
+  class ToggleRenderStyle
+  interface ToggleShapeRenderer
+}
+
+AbstractControlViewModel ..|> Visible
+AbstractControlViewModel ..|> Enableable
+AbstractInteractiveControlViewModel --|> AbstractControlViewModel
+AbstractInteractiveControlViewModel ..|> PointerInputTarget
+ToggleModel ..|> Enableable
+ToggleViewModel --|> AbstractInteractiveControlViewModel
+ToggleView ..|> ControlView
+ToggleView ..|> PointerInteractable
+AbstractControlViewModel *-- Enableable : model
+ToggleViewModel --> ToggleModel
+ToggleView --> ToggleViewModel
+ToggleView --> ToggleViewState : builds
+ToggleView --> ToggleStyle : uses
+ToggleStyle --> ToggleViewState
+ParametricToggleStyle ..|> ToggleStyle
+ParametricToggleStyle --> ToggleRenderStyle : creates
+ParametricToggleStyle --> ToggleShapeRenderer : delegates
+ParametricToggleStyle --> ThemeProvider
+PointerInputAdapter --> PointerInteractable
+PointerInputAdapter --> PointerInputTarget
+ToggleInputAdapter *-- PointerInputAdapter : delegate
+@enduml

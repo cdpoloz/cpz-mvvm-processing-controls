@@ -5,6 +5,7 @@ import com.cpz.processing.controls.controls.dropdown.state.DropDownViewState;
 import com.cpz.processing.controls.controls.dropdown.style.render.DefaultDropDownRenderer;
 import com.cpz.processing.controls.core.style.InteractiveStyleHelper;
 import com.cpz.processing.controls.core.theme.ThemeManager;
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import com.cpz.processing.controls.core.util.Colors;
 import processing.core.PApplet;
@@ -63,7 +64,7 @@ public final class DefaultDropDownStyle {
    }
 
    public DropDownRenderStyle resolveRenderStyle(DropDownViewState var1) {
-      ThemeTokens var2 = ThemeManager.getTheme().tokens();
+      ThemeTokens var2 = this.resolveThemeProvider().getTheme().tokens();
       int var3 = this.resolveColor(var2.surface, this.config.baseFillOverride);
       int var4 = this.resolveColor(var2.surfaceVariant, this.config.listFillOverride);
       int var5 = this.resolveColor(var2.onSurface, this.config.textOverride);
@@ -99,5 +100,9 @@ public final class DefaultDropDownStyle {
 
    private int blendChannel(int var1, int var2, float var3) {
       return Math.round((float)var1 + (float)(var2 - var1) * var3);
+   }
+
+   private ThemeProvider resolveThemeProvider() {
+      return this.config.themeProvider != null ? this.config.themeProvider : ThemeManager::getDefaultTheme;
    }
 }

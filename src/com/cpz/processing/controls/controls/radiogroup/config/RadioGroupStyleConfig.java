@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.controls.radiogroup.config;
 
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import processing.core.PFont;
 
 public final class RadioGroupStyleConfig {
@@ -21,4 +22,9 @@ public final class RadioGroupStyleConfig {
    public float cornerRadius = 6.0F;
    public Integer disabledAlpha;
    public PFont font;
+   public ThemeProvider themeProvider;
+
+   public void setThemeProvider(ThemeProvider var1) {
+      this.themeProvider = var1;
+   }
 }

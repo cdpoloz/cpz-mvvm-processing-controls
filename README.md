@@ -1,161 +1,147 @@
 # CPZ MVVM Processing Controls
 
-Framework UI en Java sobre Processing con arquitectura MVVM estricta, input centralizado y theming dinámico en runtime.
+Java UI framework for Processing with strict MVVM layering, centralized input, overlays, and per-sketch theme isolation.
 
-## Características principales
+## Main features
 
-- Arquitectura estricta: `Model -> ViewModel -> View -> Style -> RenderStyle -> Renderer`
-- Input centralizado con `InputManager` e `InputLayer`
-- Gestión de foco con `FocusManager`
-- Overlays con `OverlayManager`
-- Theming dinámico con `ThemeManager` y `ThemeTokens`
-- Layout proporcional y utilidades de anclaje
-- Controles reutilizables con `DevSketch` para validación rápida
+- Strict pipeline: `Model -> ViewModel -> View -> Style -> RenderStyle -> Renderer`
+- Centralized input via `InputManager` and `InputLayer`
+- Keyboard focus via `FocusManager`
+- Overlay stacking via `OverlayManager`
+- Runtime theming via `ThemeProvider`, `ThemeManager`, and `ThemeTokens`
+- Reusable controls with `DevSketch` examples
 
-## Modelo mental
+## Mental model
 
-La forma correcta de trabajar con el framework es siempre la misma:
+The intended usage pattern is stable across controls:
 
-1. Crear el `Model` con el estado base
-2. Crear el `ViewModel` con la lógica de interacción
-3. Crear la `View` para layout e hit testing
-4. Configurar `Style` o `StyleConfig` si hace falta
-5. Registrar el control en el flujo de input correspondiente
-6. Llamar a `draw()` en cada frame
+1. Create the `Model`.
+2. Create the `ViewModel`.
+3. Create the `View`.
+4. Optionally configure a `Style` or `StyleConfig`.
+5. Register the control in the sketch input flow.
+6. Call `draw()` every frame.
 
-Si un comportamiento parece visual, suele vivir en `View`, `Style` o `Renderer`.
-Si parece una regla de interacción, suele vivir en `ViewModel`.
+If the concern is visual, it usually belongs in `View`, `Style`, or `Renderer`.
+If the concern is interaction logic, it usually belongs in `ViewModel`.
 
-## Estructura del proyecto
+## Project structure
 
 ```text
 src/com/cpz/processing/controls
-├── core
-│   ├── focus
-│   ├── input
-│   ├── layout
-│   ├── model
-│   ├── overlay
-│   ├── style
-│   ├── theme
-│   ├── util
-│   ├── view
-│   └── viewmodel
-├── controls
-│   ├── button
-│   ├── checkbox
-│   ├── dropdown
-│   ├── label
-│   ├── numericfield
-│   ├── radiogroup
-│   ├── slider
-│   ├── textfield
-│   └── toggle
-└── dev
+|- core
+|  |- focus
+|  |- input
+|  |- layout
+|  |- model
+|  |- overlay
+|  |- style
+|  |- theme
+|  |- util
+|  |- view
+|  `- viewmodel
+|- controls
+|  |- button
+|  |- checkbox
+|  |- dropdown
+|  |- label
+|  |- numericfield
+|  |- radiogroup
+|  |- slider
+|  |- textfield
+|  `- toggle
+`- dev
 ```
 
 ## Quick start
 
-La forma más rápida de explorar el framework es ejecutar un `DevSketch` desde [`Launcher.java`](src/com/cpz/processing/controls/dev/Launcher.java) o lanzar directamente una clase `*DevSketch`.
+Run a `DevSketch` from [Launcher.java](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/src/com/cpz/processing/controls/dev/Launcher.java) or start a sketch class directly.
 
 ```java
-// En Launcher.java
+// In Launcher.java
 // PApplet.main(ButtonDevSketch.class);
 // PApplet.main(ToggleDevSketch.class);
 // PApplet.main(TextFieldDevSketch.class);
 PApplet.main(ThemeDevSketch.class);
 ```
 
-Un `DevSketch` muestra el patrón real de uso:
+## MVVM summary
 
-- instancia de `Model`
-- instancia de `ViewModel`
-- instancia de `View`
-- adapters específicos del control
-- registro en `InputManager`
-- dibujo por frame
+- `Model`: pure state, no Processing dependency
+- `ViewModel`: interaction rules, no coordinates or drawing
+- `View`: layout, hit testing, and `ViewState` creation
+- `Style`: resolves appearance from `ThemeTokens` and control state
+- `RenderStyle`: final frame snapshot
+- `Renderer`: drawing only
 
-## MVVM en breve
-
-- `Model`: estado puro, sin Processing
-- `ViewModel`: interacción y reglas de uso, sin coordenadas ni dibujo
-- `View`: layout, hit testing y construcción de `ViewState`
-- `Style`: resuelve apariencia usando `ThemeTokens`
-- `RenderStyle`: snapshot visual final del frame
-- `Renderer`: dibujo puro
-
-## 🔄 Ciclo de vida
-
-En cada frame, el flujo normal es:
-
-1. Processing genera eventos
-2. `InputManager` distribuye pointer y keyboard por prioridad
-3. Los adapters traducen eventos a intenciones del control
-4. El `ViewModel` actualiza estado
-5. La `View` construye `ViewState`
-6. El `Style` resuelve `RenderStyle`
-7. El `Renderer` dibuja
-
-## Pipeline de render
+## Render pipeline
 
 ```text
-ViewState → Style → RenderStyle → Renderer
+ViewState -> Style -> RenderStyle -> Renderer
 ```
 
-El `Renderer` no contiene lógica de negocio y el `ViewModel` no conoce píxeles.
+The `Renderer` does not contain business logic and `ViewModel` does not know pixels.
 
 ## Input system
 
-El input del framework es centralizado:
+Input is centralized:
 
-- `InputManager` es el punto único de entrada
-- `InputLayer` define prioridad y consumo de eventos
-- los adapters específicos de control traducen input a métodos del `ViewModel`
-- `FocusManager` coordina el target de teclado
-- `OverlayManager` permite que overlays como `DropDown` tengan prioridad cuando están activos
+- `InputManager` is the single dispatch point.
+- `InputLayer` defines priority and event capture.
+- Control adapters translate Processing input into `ViewModel` intentions.
+- `FocusManager` coordinates keyboard ownership.
+- `OverlayManager` gives overlays priority when active.
 
-La idea clave es evitar rutas paralelas de input desde Processing hacia los controles.
-
-## Controles
-
-- [Button](docs/button.md)
-- [Toggle](docs/toggle.md)
-- [Label](docs/label.md)
-- [Checkbox](docs/checkbox.md)
-- [Slider](docs/slider.md)
-- [TextField](docs/textfield.md)
-- [NumericField](docs/numericfield.md)
-- [DropDown](docs/dropdown.md)
-- [RadioGroup](docs/radiogroup.md)
+See [docs/input-system.md](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/input-system.md).
 
 ## Theming
 
-El framework resuelve el tema en runtime mediante `ThemeManager` y `ThemeTokens`. El estilo final se calcula en cada render, lo que permite alternar entre temas como `LightTheme` y `DarkTheme` sin recrear controles.
+The theme system is instance-based:
 
-Puntos clave:
+- `ThemeProvider` exposes the active `Theme`.
+- `ThemeManager` implements `ThemeProvider` and is designed to be owned per sketch.
+- Styles read `themeProvider.getTheme().tokens()` during render.
+- `StyleConfig` objects can optionally carry a `ThemeProvider`.
 
-- `ThemeManager.setTheme(...)` cambia el tema activo
-- `Style` usa `ThemeManager.getTheme().tokens()`
-- `RenderStyle` contiene solo valores finales para el frame actual
+Default behavior still works without extra wiring. If no provider is supplied, styles fall back to an internal default theme for backward compatibility.
 
-## 📚 Documentación
+### Per-sketch example
 
-- [Architecture](docs/architecture.md)
-- [Input System](docs/input-system.md)
-- [Button](docs/button.md)
-- [Toggle](docs/toggle.md)
-- [Label](docs/label.md)
-- [Checkbox](docs/checkbox.md)
-- [Slider](docs/slider.md)
-- [TextField](docs/textfield.md)
-- [NumericField](docs/numericfield.md)
-- [DropDown](docs/dropdown.md)
-- [RadioGroup](docs/radiogroup.md)
+```java
+ThemeManager themeManager = new ThemeManager(new LightTheme());
 
-## Roadmap
+ButtonView buttonView = new ButtonView(this, buttonViewModel, 180f, 150f, 220f, 60f);
+buttonView.setStyle(ButtonDefaultStyles.primary(themeManager));
 
-- Binding entre controles y modelos externos
-- UI declarativa
-- Layout más avanzado
-- Mejoras de documentación y ejemplos
-- Extensiones de renderer y assets vectoriales
+TextFieldStyleConfig config = new TextFieldStyleConfig();
+config.themeProvider = themeManager;
+textFieldView.setStyle(new DefaultTextFieldStyle(config));
+```
+
+This keeps theme changes isolated to the owning sketch.
+
+## Controls
+
+- [Button](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/button.md)
+- [Toggle](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/toggle.md)
+- [Label](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/label.md)
+- [Checkbox](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/checkbox.md)
+- [Slider](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/slider.md)
+- [TextField](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/textfield.md)
+- [NumericField](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/numericfield.md)
+- [DropDown](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/dropdown.md)
+- [RadioGroup](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/radiogroup.md)
+
+## Documentation
+
+- [Architecture](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/architecture.md)
+- [Input System](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/input-system.md)
+- [Button](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/button.md)
+- [Toggle](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/toggle.md)
+- [Label](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/label.md)
+- [Checkbox](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/checkbox.md)
+- [Slider](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/slider.md)
+- [TextField](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/textfield.md)
+- [NumericField](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/numericfield.md)
+- [DropDown](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/dropdown.md)
+- [RadioGroup](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/radiogroup.md)

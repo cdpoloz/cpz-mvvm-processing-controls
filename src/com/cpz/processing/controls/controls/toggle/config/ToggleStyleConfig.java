@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.toggle.config;
 
 import com.cpz.processing.controls.controls.toggle.style.render.ToggleShapeRenderer;
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 
 public final class ToggleStyleConfig {
    public ToggleShapeRenderer shape;
@@ -16,8 +17,13 @@ public final class ToggleStyleConfig {
    public Float hoverBlendWithWhite;
    public Float pressedBlendWithBlack;
    public Integer disabledAlpha;
+   public ThemeProvider themeProvider;
 
    public void setShapeRenderer(ToggleShapeRenderer var1) {
       this.shape = var1;
+   }
+
+   public void setThemeProvider(ThemeProvider var1) {
+      this.themeProvider = var1;
    }
 }

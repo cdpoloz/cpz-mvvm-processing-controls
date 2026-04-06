@@ -2,26 +2,32 @@ package com.cpz.processing.controls.dev;
 
 import com.cpz.processing.controls.controls.button.model.ButtonModel;
 import com.cpz.processing.controls.controls.button.input.ButtonInputAdapter;
+import com.cpz.processing.controls.controls.button.style.ButtonDefaultStyles;
 import com.cpz.processing.controls.controls.button.view.ButtonView;
 import com.cpz.processing.controls.controls.button.viewmodel.ButtonViewModel;
 import com.cpz.processing.controls.controls.checkbox.model.CheckboxModel;
 import com.cpz.processing.controls.controls.checkbox.input.CheckboxInputAdapter;
+import com.cpz.processing.controls.controls.checkbox.style.CheckboxDefaultStyles;
 import com.cpz.processing.controls.controls.checkbox.view.CheckboxView;
 import com.cpz.processing.controls.controls.checkbox.viewmodel.CheckboxViewModel;
 import com.cpz.processing.controls.controls.label.model.LabelModel;
+import com.cpz.processing.controls.controls.label.style.LabelDefaultStyles;
 import com.cpz.processing.controls.controls.label.view.LabelView;
 import com.cpz.processing.controls.controls.label.viewmodel.LabelViewModel;
 import com.cpz.processing.controls.controls.slider.model.SliderModel;
 import com.cpz.processing.controls.controls.slider.model.SliderOrientation;
 import com.cpz.processing.controls.controls.slider.input.SliderInputAdapter;
+import com.cpz.processing.controls.controls.slider.style.SliderDefaultStyles;
 import com.cpz.processing.controls.controls.slider.view.SliderView;
 import com.cpz.processing.controls.controls.slider.viewmodel.SliderViewModel;
 import com.cpz.processing.controls.controls.toggle.model.ToggleModel;
 import com.cpz.processing.controls.controls.toggle.input.ToggleInputAdapter;
+import com.cpz.processing.controls.controls.toggle.style.ToggleDefaultStyles;
 import com.cpz.processing.controls.controls.toggle.view.ToggleView;
 import com.cpz.processing.controls.controls.toggle.viewmodel.ToggleViewModel;
 import com.cpz.processing.controls.controls.textfield.model.TextFieldModel;
 import com.cpz.processing.controls.controls.textfield.input.TextFieldInputAdapter;
+import com.cpz.processing.controls.controls.textfield.style.TextFieldDefaultStyles;
 import com.cpz.processing.controls.controls.textfield.view.TextFieldView;
 import com.cpz.processing.controls.controls.textfield.viewmodel.TextFieldViewModel;
 import com.cpz.processing.controls.core.focus.FocusManager;
@@ -45,6 +51,7 @@ import processing.event.MouseEvent;
 public final class ThemeDevSketch extends PApplet {
     private final FocusManager focusManager = new FocusManager();
     private final InputManager inputManager = new InputManager();
+    private final ThemeManager themeManager = new ThemeManager(new LightTheme());
     private ButtonView buttonView;
     private ButtonViewModel buttonViewModel;
     private ButtonInputAdapter buttonInput;
@@ -73,27 +80,31 @@ public final class ThemeDevSketch extends PApplet {
     }
 
     public void setup() {
-        ThemeManager.setTheme(new LightTheme());
         this.keyboardAdapter = new KeyboardInputAdapter(this.focusManager);
         this.buttonViewModel = new ButtonViewModel(new ButtonModel("Toggle Ready"));
         this.buttonViewModel.setClickListener(() -> this.checkboxViewModel.setChecked(!this.checkboxViewModel.isChecked()));
         this.buttonView = new ButtonView(this, this.buttonViewModel, 180.0F, 150.0F, 220.0F, 60.0F);
+        this.buttonView.setStyle(ButtonDefaultStyles.primary(this.themeManager));
         this.buttonInput = new ButtonInputAdapter(this.buttonView, this.buttonViewModel);
         this.iconButtonViewModel = new ButtonViewModel(new ButtonModel("Hidden"));
         this.iconButtonViewModel.setShowText(false);
         this.iconButtonViewModel.setClickListener(() -> this.textFieldViewModel.setText("Hidden-text button clicked"));
         this.iconButtonView = new ButtonView(this, this.iconButtonViewModel, 180.0F, 245.0F, 76.0F, 50.0F);
+        this.iconButtonView.setStyle(ButtonDefaultStyles.primary(this.themeManager));
         this.iconButtonInput = new ButtonInputAdapter(this.iconButtonView, this.iconButtonViewModel);
         this.textFieldViewModel = new TextFieldViewModel(new TextFieldModel());
         this.textFieldViewModel.setText("Press 't' to toggle theme");
         this.textFieldView = new TextFieldView(this, this.textFieldViewModel, (float) this.width * 0.5F, 260.0F, 420.0F, 48.0F);
+        this.textFieldView.setStyle(TextFieldDefaultStyles.standard(this.themeManager));
         this.textFieldInput = new TextFieldInputAdapter(this.textFieldView, this.textFieldViewModel, this.focusManager);
         this.switchViewModel = new ToggleViewModel(new ToggleModel());
         this.switchViewModel.setTotalStates(2);
         this.switchView = new ToggleView(this, this.switchViewModel, 430.0F, 150.0F, 64.0F);
+        this.switchView.setStyle(ToggleDefaultStyles.circular(this.themeManager));
         this.switchInput = new ToggleInputAdapter(this.switchView, this.switchViewModel);
         this.checkboxViewModel = new CheckboxViewModel(new CheckboxModel(true));
         this.checkboxView = new CheckboxView(this, this.checkboxViewModel, 610.0F, 150.0F, 34.0F);
+        this.checkboxView.setStyle(CheckboxDefaultStyles.standard(this.themeManager));
         this.checkboxInput = new CheckboxInputAdapter(this.checkboxView, this.checkboxViewModel);
         SliderModel var1 = new SliderModel();
         var1.setMin(BigDecimal.ZERO);
@@ -104,14 +115,16 @@ public final class ThemeDevSketch extends PApplet {
         this.sliderViewModel.setFormatter((var0) -> "Slider " + var0.setScale(2, 4).toPlainString());
         this.sliderViewModel.setShowText(false);
         this.sliderView = new SliderView(this, this.sliderViewModel, (float) this.width * 0.5F, 360.0F, 360.0F, 70.0F, SliderOrientation.HORIZONTAL);
+        this.sliderView.setStyle(SliderDefaultStyles.standard(this.themeManager));
         this.sliderInput = new SliderInputAdapter(this.sliderView, this.sliderViewModel);
         this.sliderValueLabelViewModel = new LabelViewModel(new LabelModel());
         this.sliderValueLabel = new LabelView(this, this.sliderValueLabelViewModel, (float) this.width * 0.5F - 42.0F, 324.0F);
+        this.sliderValueLabel.setStyle(LabelDefaultStyles.defaultText(this.themeManager));
         this.inputManager.registerLayer(new ThemeRootInputLayer());
     }
 
     public void draw() {
-        ThemeTokens var1 = ThemeManager.getTheme().tokens();
+        ThemeTokens var1 = this.themeManager.getTheme().tokens();
         this.background(var1.surfaceVariant);
         this.sliderValueLabelViewModel.setText(this.sliderViewModel.getFormattedValue());
         this.drawHeader(var1);
@@ -189,17 +202,17 @@ public final class ThemeDevSketch extends PApplet {
     }
 
     private void toggleTheme() {
-        Theme var1 = ThemeManager.getTheme();
+        Theme var1 = this.themeManager.getTheme();
         if (var1 instanceof LightTheme) {
-            ThemeManager.setTheme(new DarkTheme());
+            this.themeManager.setTheme(new DarkTheme());
         } else {
-            ThemeManager.setTheme(new LightTheme());
+            this.themeManager.setTheme(new LightTheme());
         }
 
     }
 
     private String currentThemeName() {
-        return ThemeManager.getTheme() instanceof LightTheme ? "Light" : "Dark";
+        return this.themeManager.getTheme() instanceof LightTheme ? "Light" : "Dark";
     }
 
     private final class ThemeRootInputLayer extends DefaultInputLayer {

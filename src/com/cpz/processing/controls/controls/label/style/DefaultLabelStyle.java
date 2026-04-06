@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.label.style.render.DefaultTextRender
 import com.cpz.processing.controls.controls.label.style.render.LabelRenderer;
 import com.cpz.processing.controls.core.style.InteractiveStyleHelper;
 import com.cpz.processing.controls.core.theme.ThemeManager;
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import processing.core.PApplet;
 
@@ -23,7 +24,7 @@ public final class DefaultLabelStyle implements LabelStyle {
    }
 
    public void render(PApplet var1, LabelViewState var2) {
-      ThemeTokens var3 = ThemeManager.getTheme().tokens();
+      ThemeTokens var3 = this.resolveThemeProvider().getTheme().tokens();
       int var4 = this.config.textColor != null ? this.config.textColor : var3.onSurface;
       int var5 = this.config.disabledAlpha != null ? this.config.disabledAlpha : var3.disabledAlpha;
       LabelRenderStyle var6 = new LabelRenderStyle(var2.text(), InteractiveStyleHelper.applyDisabledAlpha(var4, var2.enabled(), var5), this.resolveTypography());
@@ -32,5 +33,9 @@ public final class DefaultLabelStyle implements LabelStyle {
 
    public LabelTypography resolveTypography() {
       return new LabelTypography(this.config.font, this.config.textSize, this.config.lineSpacingMultiplier, this.config.alignX, this.config.alignY);
+   }
+
+   private ThemeProvider resolveThemeProvider() {
+      return this.config != null && this.config.themeProvider != null ? this.config.themeProvider : ThemeManager::getDefaultTheme;
    }
 }

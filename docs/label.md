@@ -1,12 +1,10 @@
 # Label
 
-## 🧠 Concepto
+## Concept
 
-Control de texto pasivo para mostrar información o apoyar otros controles.
+Passive text control for status, captions, and supporting information.
 
----
-
-## ⚙️ Componentes MVVM
+## MVVM pieces
 
 - Model: `LabelModel`
 - ViewModel: `LabelViewModel`
@@ -14,9 +12,7 @@ Control de texto pasivo para mostrar información o apoyar otros controles.
 - Style: `LabelStyle` / `DefaultLabelStyle`
 - Renderer: `DefaultTextRenderer`
 
----
-
-## 🚀 Uso básico
+## Basic usage
 
 ```java
 LabelModel model = new LabelModel();
@@ -28,45 +24,15 @@ view.setPosition(160f, 120f);
 view.setStyle(LabelDefaultStyles.defaultText());
 ```
 
----
-
-## 🎯 Interacción
+## Per-sketch theme usage
 
 ```java
-viewModel.setText("Ready");
+ThemeManager themeManager = new ThemeManager(new LightTheme());
+view.setStyle(LabelDefaultStyles.defaultText(themeManager));
 ```
 
----
+## Related
 
-## 🎨 Personalización
-
-```java
-LabelStyleConfig config = new LabelStyleConfig();
-config.textSize = 18f;
-config.setAlign(HorizontalAlign.START, VerticalAlign.BASELINE);
-
-view.setStyle(new DefaultLabelStyle(config));
-```
-
----
-
-## 🧪 Ejemplo completo
-
-Ver [`LabelDevSketch.java`](../src/com/cpz/processing/controls/dev/LabelDevSketch.java)
-
----
-
-## ⚠️ Consideraciones
-
-- `Label` no depende de input
-- El color final se resuelve con `ThemeManager`
-- El renderer permanece puro
-- Es un control pasivo: no necesita adapters de input
-
----
-
-## 🔗 Relacionado
-
-- `ThemeManager`
+- `ThemeProvider`
 - `LabelStyleConfig`
 - `LabelTypography`

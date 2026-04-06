@@ -4,6 +4,7 @@ import com.cpz.processing.controls.controls.toggle.config.ToggleStyleConfig;
 import com.cpz.processing.controls.controls.toggle.state.ToggleViewState;
 import com.cpz.processing.controls.core.style.InteractiveStyleHelper;
 import com.cpz.processing.controls.core.theme.ThemeManager;
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import processing.core.PApplet;
 
@@ -21,7 +22,7 @@ public final class ParametricToggleStyle implements ToggleStyle {
    }
 
    public void render(PApplet var1, ToggleViewState var2) {
-      ThemeTokens var3 = ThemeManager.getTheme().tokens();
+      ThemeTokens var3 = this.resolveThemeProvider().getTheme().tokens();
       int var4 = Math.max(0, var2.stateIndex());
       int var5 = var4 == 0 ? this.resolveStateColor(var3.surfaceVariant, this.cfg.offFillOverride, 0) : this.resolveStateColor(var3.primary, this.cfg.onFillOverride, var4);
       int var6 = InteractiveStyleHelper.resolveFillColor(var5, this.resolveInteractiveColor(var5, var3.hoverOverlay, this.cfg.hoverFillOverride, this.cfg.hoverBlendWithWhite, var1, true), this.resolveInteractiveColor(var5, var3.pressedOverlay, this.cfg.pressedFillOverride, this.cfg.pressedBlendWithBlack, var1, false), var2.hovered(), var2.pressed());
@@ -53,5 +54,9 @@ public final class ParametricToggleStyle implements ToggleStyle {
       } else {
          return var3 != null ? var3 : var1;
       }
+   }
+
+   private ThemeProvider resolveThemeProvider() {
+      return this.cfg.themeProvider != null ? this.cfg.themeProvider : ThemeManager::getDefaultTheme;
    }
 }

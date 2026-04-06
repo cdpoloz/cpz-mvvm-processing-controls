@@ -1,22 +1,18 @@
 # Button
 
-## 🧠 Concepto
+## Concept
 
-Control de acción para disparar una operación puntual mediante click.
+Action control for triggering a single operation on click.
 
----
-
-## ⚙️ Componentes MVVM
+## MVVM pieces
 
 - Model: `ButtonModel`
 - ViewModel: `ButtonViewModel`
 - View: `ButtonView`
 - Style: `ButtonStyle` / `DefaultButtonStyle`
-- Renderer: `DefaultButtonRenderer` o `SvgButtonRenderer`
+- Renderer: `DefaultButtonRenderer` or `SvgButtonRenderer`
 
----
-
-## 🚀 Uso básico
+## Basic usage
 
 ```java
 ButtonModel model = new ButtonModel("Save");
@@ -28,21 +24,18 @@ view.setSize(200f, 52f);
 view.setStyle(ButtonDefaultStyles.primary());
 ```
 
----
-
-## 🎯 Interacción
+## Per-sketch theme usage
 
 ```java
-viewModel.setClickListener(() -> System.out.println("Button clicked"));
-viewModel.setText("Apply");
+ThemeManager themeManager = new ThemeManager(new LightTheme());
+view.setStyle(ButtonDefaultStyles.primary(themeManager));
 ```
 
----
-
-## 🎨 Personalización
+Or through config:
 
 ```java
 ButtonStyleConfig config = new ButtonStyleConfig();
+config.themeProvider = themeManager;
 config.cornerRadius = 12f;
 config.strokeWeight = 2f;
 config.strokeWeightHover = 3f;
@@ -50,26 +43,9 @@ config.strokeWeightHover = 3f;
 view.setStyle(new DefaultButtonStyle(config));
 ```
 
----
-
-## 🧪 Ejemplo completo
-
-Ver [`ButtonDevSketch.java`](../src/com/cpz/processing/controls/dev/ButtonDevSketch.java)
-
----
-
-## ⚠️ Consideraciones
-
-- El input entra por `InputManager`
-- `ButtonInputAdapter` traduce pointer a intenciones del control
-- La `View` resuelve hit testing
-- El `Renderer` solo dibuja
-
----
-
-## 🔗 Relacionado
+## Related
 
 - `InputManager`
 - `PointerInputAdapter`
-- `ThemeManager`
+- `ThemeProvider`
 - `ButtonInputAdapter`

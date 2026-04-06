@@ -1,22 +1,18 @@
 # Checkbox
 
-## 🧠 Concepto
+## Concept
 
-Control booleano para marcar o desmarcar una opción.
+Boolean control for marking or clearing an option.
 
----
-
-## ⚙️ Componentes MVVM
+## MVVM pieces
 
 - Model: `CheckboxModel`
 - ViewModel: `CheckboxViewModel`
 - View: `CheckboxView`
 - Style: `CheckboxStyle` / `DefaultCheckboxStyle`
-- Renderer: `DefaultCheckboxRenderer` o `SvgCheckboxRenderer`
+- Renderer: `DefaultCheckboxRenderer` or `SvgCheckboxRenderer`
 
----
-
-## 🚀 Uso básico
+## Basic usage
 
 ```java
 CheckboxModel model = new CheckboxModel(false);
@@ -28,47 +24,15 @@ view.setSize(32f);
 view.setStyle(CheckboxDefaultStyles.standard());
 ```
 
----
-
-## 🎯 Interacción
+## Per-sketch theme usage
 
 ```java
-viewModel.setChecked(true);
-boolean checked = viewModel.isChecked();
+ThemeManager themeManager = new ThemeManager(new DarkTheme());
+view.setStyle(CheckboxDefaultStyles.standard(themeManager));
 ```
 
----
-
-## 🎨 Personalización
-
-```java
-CheckboxStyleConfig config = new CheckboxStyleConfig();
-config.borderWidth = 2f;
-config.borderWidthHover = 3f;
-config.cornerRadius = 6f;
-
-view.setStyle(new DefaultCheckboxStyle(config));
-```
-
----
-
-## 🧪 Ejemplo completo
-
-Ver [`CheckboxDevSketch.java`](../src/com/cpz/processing/controls/dev/CheckboxDevSketch.java)
-
----
-
-## ⚠️ Consideraciones
-
-- La selección se gestiona en `ViewModel`
-- La `View` solo resuelve geometría e interacción espacial
-- El input pasa por `CheckboxInputAdapter`
-- El renderer no contiene reglas de cambio de estado
-
----
-
-## 🔗 Relacionado
+## Related
 
 - `InputManager`
 - `CheckboxInputAdapter`
-- `ThemeManager`
+- `ThemeProvider`

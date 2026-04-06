@@ -1,0 +1,58 @@
+@startuml
+title RadioGroup Control Structure
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "Core" {
+  interface Enableable
+  interface Visible
+  interface ControlView
+  interface PointerInputTarget
+  interface PointerInteractable
+  interface KeyboardInputTarget
+  abstract class AbstractControlViewModel
+  abstract class AbstractInteractiveControlViewModel
+  class PointerInputAdapter
+  class KeyboardInputAdapter
+  class FocusManager
+  interface ThemeProvider
+}
+
+package "RadioGroup" {
+  class RadioGroupModel
+  class RadioGroupViewModel
+  class RadioGroupView
+  class RadioGroupInputAdapter
+  class RadioGroupViewState
+  class RadioGroupStyle
+  class RadioGroupRenderStyle
+  class RadioGroupItemRenderStyle
+  class DefaultRadioGroupRenderer
+}
+
+AbstractControlViewModel ..|> Visible
+AbstractControlViewModel ..|> Enableable
+AbstractInteractiveControlViewModel --|> AbstractControlViewModel
+AbstractInteractiveControlViewModel ..|> PointerInputTarget
+KeyboardInputTarget ..|> Visible
+KeyboardInputTarget ..|> Enableable
+RadioGroupModel ..|> Enableable
+RadioGroupViewModel --|> AbstractControlViewModel
+RadioGroupViewModel ..|> KeyboardInputTarget
+RadioGroupView ..|> ControlView
+RadioGroupView ..|> PointerInteractable
+AbstractControlViewModel *-- Enableable : model
+RadioGroupViewModel --> RadioGroupModel
+RadioGroupView --> RadioGroupViewModel
+RadioGroupView --> RadioGroupViewState : builds
+RadioGroupView --> RadioGroupStyle : uses
+RadioGroupStyle --> RadioGroupViewState
+RadioGroupStyle --> RadioGroupRenderStyle : creates
+RadioGroupStyle --> RadioGroupItemRenderStyle : creates
+RadioGroupStyle --> DefaultRadioGroupRenderer : delegates
+RadioGroupStyle --> ThemeProvider
+PointerInputAdapter --> PointerInteractable
+PointerInputAdapter --> PointerInputTarget
+KeyboardInputAdapter --> FocusManager
+RadioGroupInputAdapter *-- PointerInputAdapter : delegate
+@enduml

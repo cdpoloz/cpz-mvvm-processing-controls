@@ -5,6 +5,7 @@ import com.cpz.processing.controls.controls.textfield.state.TextFieldViewState;
 import com.cpz.processing.controls.controls.textfield.style.render.DefaultTextFieldRenderer;
 import com.cpz.processing.controls.controls.textfield.style.render.TextFieldRenderer;
 import com.cpz.processing.controls.core.theme.ThemeManager;
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import processing.core.PApplet;
 
@@ -30,7 +31,7 @@ public final class DefaultTextFieldStyle implements TextFieldStyle {
    }
 
    public TextFieldRenderStyle resolveRenderStyle(TextFieldViewState var1) {
-      ThemeTokens var2 = ThemeManager.getTheme().tokens();
+      ThemeTokens var2 = this.resolveThemeProvider().getTheme().tokens();
       int var3 = this.resolveColorOverride(var2.surface, this.config.backgroundOverride, this.config.backgroundColor);
       int var4 = this.resolveColorOverride(var2.border, this.config.borderOverride, this.config.borderColor);
       int var5 = this.resolveColorOverride(var2.onSurface, this.config.textOverride, this.config.textColor);
@@ -67,5 +68,9 @@ public final class DefaultTextFieldStyle implements TextFieldStyle {
 
    private int blendChannel(int var1, int var2, float var3) {
       return Math.round((float)var1 + (float)(var2 - var1) * var3);
+   }
+
+   private ThemeProvider resolveThemeProvider() {
+      return this.config.themeProvider != null ? this.config.themeProvider : ThemeManager::getDefaultTheme;
    }
 }

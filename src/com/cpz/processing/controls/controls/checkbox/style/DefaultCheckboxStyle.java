@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.checkbox.style.render.CheckboxRender
 import com.cpz.processing.controls.controls.checkbox.style.render.DefaultCheckboxRenderer;
 import com.cpz.processing.controls.core.style.InteractiveStyleHelper;
 import com.cpz.processing.controls.core.theme.ThemeManager;
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import processing.core.PApplet;
 
@@ -23,7 +24,7 @@ public final class DefaultCheckboxStyle implements CheckboxStyle {
    }
 
    public void render(PApplet var1, CheckboxViewState var2) {
-      ThemeTokens var3 = ThemeManager.getTheme().tokens();
+      ThemeTokens var3 = this.resolveThemeProvider().getTheme().tokens();
       int var4 = var2.checked() ? this.resolveBaseFill(var3.primary, this.config.checkedFillOverride) : this.resolveBaseFill(var3.surface, this.config.uncheckedFillOverride);
       int var5 = InteractiveStyleHelper.resolveFillColor(var4, this.resolveInteractiveColor(var4, var3.hoverOverlay, this.config.hoverFillOverride, this.config.boxHoverColor), this.resolveInteractiveColor(var4, var3.pressedOverlay, this.config.pressedFillOverride, this.config.boxPressedColor), var2.hovered(), var2.pressed());
       int var6 = this.config.disabledAlpha != null ? this.config.disabledAlpha : var3.disabledAlpha;
@@ -55,5 +56,9 @@ public final class DefaultCheckboxStyle implements CheckboxStyle {
       } else {
          return var3 != null ? var3 : var1;
       }
+   }
+
+   private ThemeProvider resolveThemeProvider() {
+      return this.config != null && this.config.themeProvider != null ? this.config.themeProvider : ThemeManager::getDefaultTheme;
    }
 }

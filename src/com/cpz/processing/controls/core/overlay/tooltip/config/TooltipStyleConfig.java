@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.core.overlay.tooltip.config;
 
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import processing.core.PFont;
 
 public final class TooltipStyleConfig {
@@ -11,4 +12,9 @@ public final class TooltipStyleConfig {
    public float cornerRadius = 8.0F;
    public float minHeight = 32.0F;
    public PFont font;
+   public ThemeProvider themeProvider;
+
+   public void setThemeProvider(ThemeProvider var1) {
+      this.themeProvider = var1;
+   }
 }

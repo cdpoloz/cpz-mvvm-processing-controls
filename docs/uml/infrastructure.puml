@@ -1,0 +1,71 @@
+@startuml
+title Core Infrastructure
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "Input System" {
+  class InputManager
+  interface InputLayer
+  class DefaultInputLayer
+  class PointerInputAdapter
+  class KeyboardInputAdapter
+  interface PointerInteractable
+  interface PointerInputTarget
+  interface KeyboardInputTarget
+  class PointerEvent
+  class KeyboardEvent
+  interface HitTest
+  class RectHitTest
+  class CircleHitTest
+}
+
+package "Focus System" {
+  interface Focusable
+  class FocusManager
+}
+
+package "Overlay System" {
+  class OverlayManager
+  class OverlayEntry
+  class DropDownOverlayController
+  class TooltipOverlayController
+}
+
+package "Theme System" {
+  interface ThemeProvider
+  class Theme
+  class ThemeManager
+  class ThemeTokens
+}
+
+package "Shared Contracts" {
+  interface Visible
+  interface Enableable
+}
+
+Focusable ..|> Visible
+Focusable ..|> Enableable
+PointerInputTarget ..|> Visible
+PointerInputTarget ..|> Enableable
+KeyboardInputTarget ..|> Focusable
+DefaultInputLayer ..|> InputLayer
+RectHitTest ..|> HitTest
+CircleHitTest ..|> HitTest
+InputManager o-- InputLayer
+PointerInputAdapter --> PointerInteractable
+PointerInputAdapter --> PointerInputTarget
+KeyboardInputAdapter --> FocusManager
+FocusManager --> Focusable
+FocusManager --> KeyboardInputTarget : focused target
+OverlayManager o-- OverlayEntry
+OverlayManager --> FocusManager
+OverlayEntry --> InputLayer
+OverlayEntry --> Focusable : focus target
+DropDownOverlayController --> OverlayManager
+DropDownOverlayController --> InputManager
+DropDownOverlayController --> FocusManager
+TooltipOverlayController --> OverlayManager
+ThemeManager ..|> ThemeProvider
+Theme --* ThemeTokens
+ThemeProvider --> Theme
+@enduml

@@ -1,12 +1,10 @@
 # RadioGroup
 
-## 🧠 Concepto
+## Concept
 
-Grupo de opciones mutuamente excluyentes para seleccionar una sola alternativa.
+Mutually exclusive selection control for choosing one option from a list.
 
----
-
-## ⚙️ Componentes MVVM
+## MVVM pieces
 
 - Model: `RadioGroupModel`
 - ViewModel: `RadioGroupViewModel`
@@ -14,64 +12,20 @@ Grupo de opciones mutuamente excluyentes para seleccionar una sola alternativa.
 - Style: `RadioGroupStyle`
 - Renderer: `DefaultRadioGroupRenderer`
 
----
-
-## 🚀 Uso básico
-
-```java
-RadioGroupModel model = new RadioGroupModel(
-    java.util.List.of("Mercury", "Venus", "Earth"),
-    1
-);
-
-RadioGroupViewModel viewModel = new RadioGroupViewModel(model);
-RadioGroupView view = new RadioGroupView(this, viewModel, 220f, 140f, 240f);
-
-view.setPosition(260f, 180f);
-view.setStyle(RadioGroupDefaultStyles.standard());
-```
-
----
-
-## 🎯 Interacción
-
-```java
-viewModel.setOnOptionSelected(index -> System.out.println("Selected: " + index));
-int selectedIndex = viewModel.getSelectedIndex();
-```
-
----
-
-## 🎨 Personalización
+## Theme-aware customization
 
 ```java
 RadioGroupStyleConfig config = new RadioGroupStyleConfig();
+config.themeProvider = themeManager;
 config.itemHeight = 30f;
 config.itemSpacing = 8f;
-config.textSize = 16f;
 
 view.setStyle(new RadioGroupStyle(config));
 ```
 
----
-
-## 🧪 Ejemplo completo
-
-Ver [`RadioGroupDevSketch.java`](../src/com/cpz/processing/controls/dev/RadioGroupDevSketch.java)
-
----
-
-## ⚠️ Consideraciones
-
-- El índice desde coordenadas se calcula en la `View`
-- El `ViewModel` controla selección y navegación por teclado
-- El renderer solo consume `RenderStyle`
-- `RadioGroup` representa selección exclusiva, no múltiple
-
----
-
-## 🔗 Relacionado
+## Related
 
 - `InputManager`
 - `FocusManager`
 - `RadioGroupInputAdapter`
+- `ThemeProvider`

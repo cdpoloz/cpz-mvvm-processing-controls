@@ -1,0 +1,83 @@
+@startuml
+title High-Level Architecture
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "Model" {
+  interface Enableable
+  class "Concrete Models" as Models
+}
+
+package "ViewModel" {
+  abstract class AbstractControlViewModel
+  abstract class AbstractInteractiveControlViewModel
+  interface PointerInputTarget
+  interface Focusable
+  interface KeyboardInputTarget
+  class "Concrete ViewModels" as ViewModels
+}
+
+package "View" {
+  interface ControlView
+  interface Visible
+  interface PointerInteractable
+  class "Concrete Views" as Views
+  class "ViewState records" as ViewStates
+}
+
+package "Style" {
+  class "Style interfaces / classes" as Styles
+  class "RenderStyle records" as RenderStyles
+  interface ThemeProvider
+  class Theme
+  class ThemeManager
+  class ThemeTokens
+}
+
+package "Renderer" {
+  class "Renderer interfaces / classes" as Renderers
+}
+
+package "Input" {
+  class PointerInputAdapter
+  class KeyboardInputAdapter
+}
+
+package "Core Infrastructure" {
+  class InputManager
+  interface InputLayer
+  class OverlayManager
+  class OverlayEntry
+  class FocusManager
+}
+
+AbstractControlViewModel ..|> Visible
+AbstractControlViewModel ..|> Enableable
+AbstractInteractiveControlViewModel --|> AbstractControlViewModel
+AbstractInteractiveControlViewModel ..|> PointerInputTarget
+Focusable ..|> Visible
+Focusable ..|> Enableable
+KeyboardInputTarget ..|> Focusable
+ViewModels --|> AbstractControlViewModel
+Views ..|> ControlView
+Views ..|> PointerInteractable
+AbstractControlViewModel *-- Enableable : model
+Views --> ViewModels
+Views --> ViewStates
+Views --> Styles : render(...)
+Styles --> ViewStates
+Styles --> RenderStyles
+Styles --> Renderers
+Styles --> ThemeProvider
+ThemeManager ..|> ThemeProvider
+Theme --* ThemeTokens
+ThemeProvider --> Theme
+PointerInputAdapter --> PointerInteractable
+PointerInputAdapter --> PointerInputTarget
+KeyboardInputAdapter --> FocusManager
+InputManager o-- InputLayer
+OverlayManager o-- OverlayEntry
+OverlayManager --> FocusManager
+OverlayEntry --> InputLayer
+OverlayEntry --> Focusable
+@enduml

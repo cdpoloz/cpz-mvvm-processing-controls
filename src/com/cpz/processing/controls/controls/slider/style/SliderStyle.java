@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.slider.style.render.SliderRenderer;
 import com.cpz.processing.controls.controls.slider.view.SliderGeometry;
 import com.cpz.processing.controls.core.style.InteractiveStyleHelper;
 import com.cpz.processing.controls.core.theme.ThemeManager;
+import com.cpz.processing.controls.core.theme.ThemeProvider;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import processing.core.PApplet;
 
@@ -27,7 +28,7 @@ public final class SliderStyle {
    }
 
    public void render(PApplet var1, SliderViewState var2, SliderGeometry var3) {
-      ThemeTokens var4 = ThemeManager.getTheme().tokens();
+      ThemeTokens var4 = this.resolveThemeProvider().getTheme().tokens();
       boolean var5 = var2.pressed() || var2.dragging();
       int var6 = this.resolveColorOverride(var4.surfaceVariant, this.config.trackOverride, this.config.trackColor);
       int var7 = InteractiveStyleHelper.resolveFillColor(var6, this.resolveInteractiveColor(var6, var4.hoverOverlay, this.config.trackHoverOverride, this.config.trackHoverColor), this.resolveInteractiveColor(var6, var4.pressedOverlay, this.config.trackPressedOverride, this.config.trackPressedColor), var2.hovered(), var5);
@@ -57,5 +58,9 @@ public final class SliderStyle {
       } else {
          return var3 != null ? var3 : var1;
       }
+   }
+
+   private ThemeProvider resolveThemeProvider() {
+      return this.config.themeProvider != null ? this.config.themeProvider : ThemeManager::getDefaultTheme;
    }
 }
