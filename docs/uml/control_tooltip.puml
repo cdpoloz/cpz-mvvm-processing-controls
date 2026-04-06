@@ -3,46 +3,17 @@ title Tooltip Control Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-package "Core" {
-  interface Enableable
-  interface Visible
-  interface ControlView
-  abstract class AbstractControlViewModel
-  class OverlayManager
-  class OverlayEntry
-  interface InputLayer
-  interface ThemeProvider
-}
+class TooltipView
+class TooltipViewState
+class DefaultTooltipStyle
+class TooltipRenderStyle
+class DefaultTooltipRenderer
+class ThemeSnapshot
 
-package "Tooltip" {
-  class TooltipModel
-  class TooltipViewModel
-  class TooltipView
-  class TooltipViewState
-  class DefaultTooltipStyle
-  class TooltipRenderStyle
-  class DefaultTooltipRenderer
-  class TooltipOverlayController
-}
-
-AbstractControlViewModel ..|> Visible
-AbstractControlViewModel ..|> Enableable
-TooltipModel ..|> Enableable
-TooltipViewModel --|> AbstractControlViewModel
-TooltipView ..|> ControlView
-AbstractControlViewModel *-- Enableable : model
-TooltipViewModel --> TooltipModel
-TooltipView --> TooltipViewModel
-TooltipView --> TooltipViewState : builds
-TooltipView --> DefaultTooltipStyle : uses
+TooltipView --> TooltipViewState
+TooltipView --> ThemeSnapshot
 DefaultTooltipStyle --> TooltipViewState
-DefaultTooltipStyle --> TooltipRenderStyle : creates
-DefaultTooltipStyle --> DefaultTooltipRenderer : delegates
-DefaultTooltipStyle --> ThemeProvider
-OverlayManager o-- OverlayEntry
-OverlayEntry --> InputLayer
-TooltipOverlayController --> TooltipView
-TooltipOverlayController --> TooltipViewModel
-TooltipOverlayController --> OverlayManager
-TooltipOverlayController --> OverlayEntry
+DefaultTooltipStyle --> ThemeSnapshot
+DefaultTooltipStyle --> TooltipRenderStyle
+DefaultTooltipRenderer --> TooltipRenderStyle
 @enduml

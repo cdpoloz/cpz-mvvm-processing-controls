@@ -1,30 +1,7 @@
 # TextField
 
-## Concept
+`TextFieldView` keeps `TextFieldViewState` theme-free, reads a cached `ThemeSnapshot` once per draw or measurement pass, and passes that snapshot into `DefaultTextFieldStyle`. Text measurement helpers reuse the same snapshot.
 
-Editable text field with cursor, selection, and focus integration.
+## Performance note
 
-## MVVM pieces
-
-- Model: `TextFieldModel`
-- ViewModel: `TextFieldViewModel`
-- View: `TextFieldView`
-- Style: `TextFieldStyle` / `DefaultTextFieldStyle`
-- Renderer: `DefaultTextFieldRenderer`
-
-## Theme-aware customization
-
-```java
-TextFieldStyleConfig config = new TextFieldStyleConfig();
-config.themeProvider = themeManager;
-config.textSize = 18f;
-
-view.setStyle(new DefaultTextFieldStyle(config));
-```
-
-## Related
-
-- `FocusManager`
-- `KeyboardInputAdapter`
-- `TextFieldInputAdapter`
-- `ThemeProvider`
+Theme overhead has been removed from the text field render loop. Snapshot access is stable and allocation-free from the theming side.

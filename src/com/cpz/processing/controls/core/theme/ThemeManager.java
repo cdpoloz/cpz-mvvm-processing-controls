@@ -1,8 +1,8 @@
 package com.cpz.processing.controls.core.theme;
 
 public final class ThemeManager implements ThemeProvider {
-   private static final ThemeManager DEFAULT = new ThemeManager();
    private Theme currentTheme;
+   private ThemeSnapshot snapshot;
 
    public ThemeManager() {
       this(new LightTheme());
@@ -12,8 +12,8 @@ public final class ThemeManager implements ThemeProvider {
       this.setTheme(var1 == null ? new LightTheme() : var1);
    }
 
-   public Theme getTheme() {
-      return this.currentTheme.copy();
+   public ThemeSnapshot getSnapshot() {
+      return this.snapshot;
    }
 
    public void setTheme(Theme var1) {
@@ -21,10 +21,7 @@ public final class ThemeManager implements ThemeProvider {
          throw new IllegalArgumentException("Theme null");
       } else {
          this.currentTheme = var1.copy();
+         this.snapshot = new ThemeSnapshot(this.currentTheme);
       }
-   }
-
-   public static Theme getDefaultTheme() {
-      return DEFAULT.getTheme();
    }
 }

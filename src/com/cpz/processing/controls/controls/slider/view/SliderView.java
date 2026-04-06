@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.slider.style.SliderDefaultStyles;
 import com.cpz.processing.controls.controls.slider.style.SliderStyle;
 import com.cpz.processing.controls.controls.slider.viewmodel.SliderViewModel;
 import com.cpz.processing.controls.core.input.PointerInteractable;
+import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import processing.core.PApplet;
 
@@ -34,7 +35,8 @@ public final class SliderView implements ControlView, PointerInteractable {
    public void draw() {
       if (this.viewModel.isVisible()) {
          SliderGeometry var1 = this.buildGeometry();
-         this.style.render(this.sketch, this.buildViewState(), var1);
+         ThemeSnapshot var2 = this.style.getThemeSnapshot();
+         this.style.render(this.sketch, this.buildViewState(), var2, var1);
       }
    }
 

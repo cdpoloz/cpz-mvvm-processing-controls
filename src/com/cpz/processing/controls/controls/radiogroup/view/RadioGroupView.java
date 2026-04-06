@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupDefaultSt
 import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupStyle;
 import com.cpz.processing.controls.controls.radiogroup.viewmodel.RadioGroupViewModel;
 import com.cpz.processing.controls.core.input.PointerInteractable;
+import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import java.util.ArrayList;
 import processing.core.PApplet;
@@ -34,7 +35,8 @@ public final class RadioGroupView implements ControlView, PointerInteractable {
 
    public void draw() {
       if (this.viewModel.isVisible()) {
-         this.style.render(this.sketch, this.buildViewState());
+         ThemeSnapshot var1 = this.style.getThemeSnapshot();
+         this.style.render(this.sketch, this.buildViewState(), var1);
       }
    }
 
@@ -91,20 +93,19 @@ public final class RadioGroupView implements ControlView, PointerInteractable {
    }
 
    private RadioGroupViewState buildViewState() {
-      ArrayList var1 = new ArrayList();
-      float var2 = this.y - this.itemHeight * 0.5F;
-      float var3 = this.x;
+      ArrayList var2 = new ArrayList();
+      float var3 = this.y - this.itemHeight * 0.5F;
       float var4 = this.x - this.width * 0.5F;
       float var5 = this.style.getIndicatorOffsetX();
       float var6 = this.style.getTextOffsetX();
 
       for(int var7 = 0; var7 < this.viewModel.getOptions().size(); ++var7) {
-         float var8 = var2 + (float)var7 * (this.itemHeight + this.itemSpacing);
+         float var8 = var3 + (float)var7 * (this.itemHeight + this.itemSpacing);
          float var9 = var8 + this.itemHeight * 0.5F;
-         var1.add(new RadioGroupItemViewState(var7, (String)this.viewModel.getOptions().get(var7), this.viewModel.getSelectedIndex() == var7, this.viewModel.getHoveredIndex() == var7, this.viewModel.getPressedIndex() == var7, this.viewModel.isFocused() && this.viewModel.getActiveIndex() == var7, var3, var9, this.width, this.itemHeight, var4 + var5, var9, var4 + var6));
+         var2.add(new RadioGroupItemViewState(var7, (String)this.viewModel.getOptions().get(var7), this.viewModel.getSelectedIndex() == var7, this.viewModel.getHoveredIndex() == var7, this.viewModel.getPressedIndex() == var7, this.viewModel.isFocused() && this.viewModel.getActiveIndex() == var7, this.x, var9, this.width, this.itemHeight, var4 + var5, var9, var4 + var6));
       }
 
-      return new RadioGroupViewState(this.x, this.y, this.width, this.getHeight(), var1.size(), this.viewModel.isEnabled(), var1);
+      return new RadioGroupViewState(this.x, this.y, this.width, this.getHeight(), var2.size(), this.viewModel.isEnabled(), var2);
    }
 
    private void applyConfiguredLayoutDefaults() {

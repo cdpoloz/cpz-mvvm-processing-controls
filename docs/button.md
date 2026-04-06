@@ -1,51 +1,7 @@
 # Button
 
-## Concept
+`ButtonView` builds a plain `ButtonViewState`, reads the cached `ThemeSnapshot` once from its style, and passes that snapshot into `DefaultButtonStyle`. The style reads tokens from the snapshot instead of resolving theme objects during render.
 
-Action control for triggering a single operation on click.
+## Performance note
 
-## MVVM pieces
-
-- Model: `ButtonModel`
-- ViewModel: `ButtonViewModel`
-- View: `ButtonView`
-- Style: `ButtonStyle` / `DefaultButtonStyle`
-- Renderer: `DefaultButtonRenderer` or `SvgButtonRenderer`
-
-## Basic usage
-
-```java
-ButtonModel model = new ButtonModel("Save");
-ButtonViewModel viewModel = new ButtonViewModel(model);
-ButtonView view = new ButtonView(this, viewModel, 120f, 80f, 180f, 48f);
-
-view.setPosition(160f, 120f);
-view.setSize(200f, 52f);
-view.setStyle(ButtonDefaultStyles.primary());
-```
-
-## Per-sketch theme usage
-
-```java
-ThemeManager themeManager = new ThemeManager(new LightTheme());
-view.setStyle(ButtonDefaultStyles.primary(themeManager));
-```
-
-Or through config:
-
-```java
-ButtonStyleConfig config = new ButtonStyleConfig();
-config.themeProvider = themeManager;
-config.cornerRadius = 12f;
-config.strokeWeight = 2f;
-config.strokeWeightHover = 3f;
-
-view.setStyle(new DefaultButtonStyle(config));
-```
-
-## Related
-
-- `InputManager`
-- `PointerInputAdapter`
-- `ThemeProvider`
-- `ButtonInputAdapter`
+Themed button rendering no longer allocates from theme resolution in `draw()`. Theme snapshots are reused until the sketch changes theme.

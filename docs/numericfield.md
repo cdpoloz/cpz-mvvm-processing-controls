@@ -1,36 +1,7 @@
 # NumericField
 
-## Concept
+`NumericFieldView` reads a cached `ThemeSnapshot` once per draw or measurement pass and passes it into `NumericFieldStyle`. Measurement helpers reuse that same snapshot, so themed text layout stays allocation-free from the theme side.
 
-Text-based numeric input backed by `BigDecimal`, with separate numeric value and editable text buffer.
+## Performance note
 
-## MVVM pieces
-
-- Model: `NumericFieldModel`
-- ViewModel: `NumericFieldViewModel`
-- View: `NumericFieldView`
-- Style: `NumericFieldStyle`
-- Renderer: `DefaultNumericFieldRenderer`
-
-## Theme-aware customization
-
-```java
-NumericFieldStyleConfig config = new NumericFieldStyleConfig();
-config.themeProvider = themeManager;
-config.textSize = 18f;
-
-view.setStyle(new NumericFieldStyle(config));
-```
-
-## Notes
-
-- Parsing and commit rules stay in the `ViewModel`.
-- Wheel, arrows, and modifiers are handled by the existing input pipeline.
-- Theme resolution is style-local and per sketch when a provider is supplied.
-
-## Related
-
-- `FocusManager`
-- `KeyboardInputAdapter`
-- `NumericFieldInputAdapter`
-- `ThemeProvider`
+Theme-related allocations were removed from the numeric field render path. Snapshot access is constant-time and reused across frame work.

@@ -5,6 +5,7 @@ import com.cpz.processing.controls.core.overlay.tooltip.state.TooltipViewState;
 import com.cpz.processing.controls.core.overlay.tooltip.style.DefaultTooltipStyle;
 import com.cpz.processing.controls.core.overlay.tooltip.style.TooltipRenderStyle;
 import com.cpz.processing.controls.core.overlay.tooltip.viewmodel.TooltipViewModel;
+import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import processing.core.PApplet;
 
@@ -26,8 +27,10 @@ public final class TooltipView implements ControlView {
 
    public void draw() {
       if (this.viewModel.isVisible()) {
-         this.measureFromText();
-         this.style.render(this.sketch, new TooltipViewState(this.x, this.y, this.width, this.height, this.viewModel.getText(), this.viewModel.isEnabled(), this.style.getTextPadding(), this.style.resolveRenderStyle().cornerRadius()));
+         ThemeSnapshot var1 = this.style.getThemeSnapshot();
+         TooltipRenderStyle var2 = this.style.resolveRenderStyle(var1);
+         this.measureFromText(var2);
+         this.style.render(this.sketch, new TooltipViewState(this.x, this.y, this.width, this.height, this.viewModel.getText(), this.viewModel.isEnabled(), this.style.getTextPadding(), var2.cornerRadius()), var1);
       }
    }
 
@@ -37,7 +40,8 @@ public final class TooltipView implements ControlView {
    }
 
    public void setAnchorBounds(float var1, float var2) {
-      this.measureFromText();
+      ThemeSnapshot var3 = this.style.getThemeSnapshot();
+      this.measureFromText(this.style.resolveRenderStyle(var3));
       this.x = var1;
       this.y = var2 - this.height * 0.5F - 10.0F;
    }
@@ -49,8 +53,7 @@ public final class TooltipView implements ControlView {
 
    }
 
-   private void measureFromText() {
-      TooltipRenderStyle var1 = this.style.resolveRenderStyle();
+   private void measureFromText(TooltipRenderStyle var1) {
       this.sketch.pushStyle();
       if (var1.font() != null) {
          this.sketch.textFont(var1.font(), var1.textSize());

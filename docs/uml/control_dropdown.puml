@@ -3,60 +3,17 @@ title DropDown Control Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-package "Core" {
-  interface Enableable
-  interface Visible
-  interface ControlView
-  interface PointerInteractable
-  interface Focusable
-  abstract class AbstractControlViewModel
-  class FocusManager
-  class InputManager
-  class OverlayManager
-  class OverlayEntry
-  interface InputLayer
-  class DefaultInputLayer
-  interface ThemeProvider
-}
+class DropDownView
+class DropDownViewState
+class DefaultDropDownStyle
+class DropDownRenderStyle
+class DefaultDropDownRenderer
+class ThemeSnapshot
 
-package "DropDown" {
-  class DropDownModel
-  class DropDownViewModel
-  class DropDownView
-  class DropDownViewState
-  class DefaultDropDownStyle
-  class DropDownRenderStyle
-  class DefaultDropDownRenderer
-  class DropDownOverlayController
-}
-
-AbstractControlViewModel ..|> Visible
-AbstractControlViewModel ..|> Enableable
-Focusable ..|> Visible
-Focusable ..|> Enableable
-DropDownModel ..|> Enableable
-DropDownViewModel --|> AbstractControlViewModel
-DropDownViewModel ..|> Focusable
-DropDownView ..|> ControlView
-DropDownView ..|> PointerInteractable
-DefaultInputLayer ..|> InputLayer
-AbstractControlViewModel *-- Enableable : model
-DropDownView --> DropDownViewModel
-DropDownView --> DropDownViewState : builds
-DropDownView --> DefaultDropDownStyle : uses
+DropDownView --> DropDownViewState
+DropDownView --> ThemeSnapshot
 DefaultDropDownStyle --> DropDownViewState
-DefaultDropDownStyle --> DropDownRenderStyle : creates
-DefaultDropDownStyle --> DefaultDropDownRenderer : delegates
-DefaultDropDownStyle --> ThemeProvider
-DropDownViewModel --> DropDownModel
-OverlayManager o-- OverlayEntry
-OverlayEntry --> InputLayer
-OverlayEntry --> Focusable
-DropDownOverlayController --> DropDownView
-DropDownOverlayController --> DropDownViewModel
-DropDownOverlayController --> FocusManager
-DropDownOverlayController --> OverlayManager
-DropDownOverlayController --> InputManager
-DropDownOverlayController --> OverlayEntry
-DropDownOverlayController --> InputLayer
+DefaultDropDownStyle --> ThemeSnapshot
+DefaultDropDownStyle --> DropDownRenderStyle
+DefaultDropDownRenderer --> DropDownRenderStyle
 @enduml

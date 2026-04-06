@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.label.style.LabelStyle;
 import com.cpz.processing.controls.controls.label.style.LabelTypography;
 import com.cpz.processing.controls.controls.label.style.render.LabelAlignMapper;
 import com.cpz.processing.controls.controls.label.viewmodel.LabelViewModel;
+import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import java.util.Objects;
 import processing.core.PApplet;
@@ -33,7 +34,8 @@ public final class LabelView implements ControlView {
 
    public void draw() {
       if (this.viewModel.isVisible()) {
-         this.style.render(this.sketch, this.buildViewState());
+         ThemeSnapshot var1 = this.style.getThemeSnapshot();
+         this.style.render(this.sketch, this.buildViewState(), var1);
       }
    }
 

@@ -6,12 +6,14 @@ import com.cpz.processing.controls.controls.textfield.style.render.DefaultTextFi
 import com.cpz.processing.controls.controls.textfield.style.render.TextFieldRenderer;
 import com.cpz.processing.controls.core.theme.ThemeManager;
 import com.cpz.processing.controls.core.theme.ThemeProvider;
+import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import processing.core.PApplet;
 
 public final class DefaultTextFieldStyle implements TextFieldStyle {
    private final TextFieldStyleConfig config;
    private final TextFieldRenderer renderer;
+   private final ThemeProvider themeProvider;
 
    public DefaultTextFieldStyle(TextFieldStyleConfig var1) {
       this(var1, new DefaultTextFieldRenderer());
@@ -23,22 +25,23 @@ public final class DefaultTextFieldStyle implements TextFieldStyle {
       } else {
          this.config = var1;
          this.renderer = (TextFieldRenderer)(var2 == null ? new DefaultTextFieldRenderer() : var2);
+         this.themeProvider = var1.themeProvider != null ? var1.themeProvider : new ThemeManager();
       }
    }
 
-   public void render(PApplet var1, TextFieldViewState var2) {
-      this.renderer.render(var1, var2, this.resolveRenderStyle(var2));
+   public void render(PApplet var1, TextFieldViewState var2, ThemeSnapshot var3) {
+      this.renderer.render(var1, var2, this.resolveRenderStyle(var2, var3));
    }
 
-   public TextFieldRenderStyle resolveRenderStyle(TextFieldViewState var1) {
-      ThemeTokens var2 = this.resolveThemeProvider().getTheme().tokens();
-      int var3 = this.resolveColorOverride(var2.surface, this.config.backgroundOverride, this.config.backgroundColor);
-      int var4 = this.resolveColorOverride(var2.border, this.config.borderOverride, this.config.borderColor);
-      int var5 = this.resolveColorOverride(var2.onSurface, this.config.textOverride, this.config.textColor);
-      int var6 = this.resolveColorOverride(var2.cursor, this.config.cursorOverride, this.config.cursorColor);
-      int var7 = this.resolveColorOverride(var2.selection, this.config.selectionOverride, this.config.selectionColor);
-      int var8 = this.resolveSelectionTextColor(var2.onSurface);
-      return new TextFieldRenderStyle(var3, var1.focused() ? this.blend(var4, var6, 0.35F) : var4, var5, var1.focused() ? var6 : var4, var7, var8, this.config.textSize, this.config.font);
+   public TextFieldRenderStyle resolveRenderStyle(TextFieldViewState var1, ThemeSnapshot var2) {
+      ThemeTokens var3 = var2.tokens;
+      int var4 = this.resolveColorOverride(var3.surface, this.config.backgroundOverride, this.config.backgroundColor);
+      int var5 = this.resolveColorOverride(var3.border, this.config.borderOverride, this.config.borderColor);
+      int var6 = this.resolveColorOverride(var3.onSurface, this.config.textOverride, this.config.textColor);
+      int var7 = this.resolveColorOverride(var3.cursor, this.config.cursorOverride, this.config.cursorColor);
+      int var8 = this.resolveColorOverride(var3.selection, this.config.selectionOverride, this.config.selectionColor);
+      int var9 = this.resolveSelectionTextColor(var3.onSurface);
+      return new TextFieldRenderStyle(var4, var1.focused() ? this.blend(var5, var7, 0.35F) : var5, var6, var1.focused() ? var7 : var5, var8, var9, this.config.textSize, this.config.font);
    }
 
    private int resolveSelectionTextColor(int var1) {
@@ -70,7 +73,7 @@ public final class DefaultTextFieldStyle implements TextFieldStyle {
       return Math.round((float)var1 + (float)(var2 - var1) * var3);
    }
 
-   private ThemeProvider resolveThemeProvider() {
-      return this.config.themeProvider != null ? this.config.themeProvider : ThemeManager::getDefaultTheme;
+   public ThemeSnapshot getThemeSnapshot() {
+      return this.themeProvider.getSnapshot();
    }
 }

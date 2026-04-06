@@ -3,54 +3,17 @@ title Checkbox Control Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-package "Core" {
-  interface Enableable
-  interface Visible
-  interface ControlView
-  interface PointerInputTarget
-  interface PointerInteractable
-  abstract class AbstractControlViewModel
-  abstract class AbstractInteractiveControlViewModel
-  class PointerInputAdapter
-  interface ThemeProvider
-}
+class CheckboxView
+class CheckboxViewState
+class DefaultCheckboxStyle
+class CheckboxRenderStyle
+class DefaultCheckboxRenderer
+class ThemeSnapshot
 
-package "Checkbox" {
-  class CheckboxModel
-  class CheckboxViewModel
-  class CheckboxView
-  class CheckboxInputAdapter
-  class CheckboxViewState
-  interface CheckboxStyle
-  class DefaultCheckboxStyle
-  class CheckboxRenderStyle
-  interface CheckboxRenderer
-  class DefaultCheckboxRenderer
-  class SvgCheckboxRenderer
-}
-
-AbstractControlViewModel ..|> Visible
-AbstractControlViewModel ..|> Enableable
-AbstractInteractiveControlViewModel --|> AbstractControlViewModel
-AbstractInteractiveControlViewModel ..|> PointerInputTarget
-CheckboxModel ..|> Enableable
-CheckboxViewModel --|> AbstractInteractiveControlViewModel
-CheckboxView ..|> ControlView
-CheckboxView ..|> PointerInteractable
-AbstractControlViewModel *-- Enableable : model
-CheckboxView --> CheckboxViewModel
-CheckboxView --> CheckboxViewState : builds
-CheckboxView --> CheckboxStyle : uses
-CheckboxStyle --> CheckboxViewState
-DefaultCheckboxStyle ..|> CheckboxStyle
-DefaultCheckboxStyle --> CheckboxRenderStyle : creates
-DefaultCheckboxStyle --> CheckboxRenderer : delegates
-DefaultCheckboxStyle --> ThemeProvider
-CheckboxRenderer --> CheckboxRenderStyle
-DefaultCheckboxRenderer ..|> CheckboxRenderer
-SvgCheckboxRenderer ..|> CheckboxRenderer
-PointerInputAdapter --> PointerInteractable
-PointerInputAdapter --> PointerInputTarget
-CheckboxInputAdapter *-- PointerInputAdapter : delegate
-CheckboxViewModel --> CheckboxModel
+CheckboxView --> CheckboxViewState
+CheckboxView --> ThemeSnapshot
+DefaultCheckboxStyle --> CheckboxViewState
+DefaultCheckboxStyle --> ThemeSnapshot
+DefaultCheckboxStyle --> CheckboxRenderStyle
+DefaultCheckboxRenderer --> CheckboxRenderStyle
 @enduml

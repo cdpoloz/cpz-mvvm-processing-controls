@@ -9,6 +9,7 @@ import com.cpz.processing.controls.core.input.hit.RectHitTest;
 import com.cpz.processing.controls.core.input.hit.interfaces.HitTest;
 import com.cpz.processing.controls.core.layout.LayoutConfig;
 import com.cpz.processing.controls.core.layout.LayoutResolver;
+import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import processing.core.PApplet;
 
@@ -38,7 +39,8 @@ public final class ButtonView implements ControlView, PointerInteractable {
    public void draw() {
       if (this.viewModel.isVisible()) {
          this.applyLayoutIfNeeded();
-         this.style.render(this.sketch, this.buildViewState());
+         ThemeSnapshot var1 = this.style.getThemeSnapshot();
+         this.style.render(this.sketch, this.buildViewState(), var1);
       }
    }
 

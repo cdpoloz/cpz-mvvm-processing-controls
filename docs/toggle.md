@@ -1,33 +1,7 @@
 # Toggle
 
-## Concept
+`ToggleView` keeps `ToggleViewState` theme-free, reads a cached `ThemeSnapshot` once from its style, and `ParametricToggleStyle` reads snapshot tokens for per-state fill and stroke resolution.
 
-Cyclic state control that can behave as a binary toggle or as a multi-state selector.
+## Performance note
 
-## MVVM pieces
-
-- Model: `ToggleModel`
-- ViewModel: `ToggleViewModel`
-- View: `ToggleView`
-- Style: `ToggleStyle` / `ParametricToggleStyle`
-- Renderer: `ToggleShapeRenderer` and implementations
-
-## Basic usage
-
-```java
-ToggleModel model = new ToggleModel();
-ToggleViewModel viewModel = new ToggleViewModel(model);
-ToggleView view = new ToggleView(this, viewModel, 200f, 120f, 64f);
-
-viewModel.setTotalStates(2);
-view.setPosition(220f, 160f);
-view.setSize(72f);
-view.setStyle(ToggleDefaultStyles.circular(themeManager));
-```
-
-## Related
-
-- `InputManager`
-- `ToggleInputAdapter`
-- `ThemeProvider`
-- `CircleShapeRenderer`
+Toggle rendering no longer performs theme resolution inside the draw path. Snapshot reuse keeps the hot path constant-time.

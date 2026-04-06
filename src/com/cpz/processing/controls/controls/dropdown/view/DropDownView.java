@@ -8,6 +8,7 @@ import com.cpz.processing.controls.core.focus.FocusManager;
 import com.cpz.processing.controls.core.input.PointerInteractable;
 import com.cpz.processing.controls.core.layout.LayoutConfig;
 import com.cpz.processing.controls.core.layout.LayoutResolver;
+import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import java.util.List;
 import processing.core.PApplet;
@@ -36,7 +37,8 @@ public final class DropDownView implements ControlView, PointerInteractable {
    public void draw() {
       if (this.viewModel.isVisible()) {
          this.applyLayoutIfNeeded();
-         this.style.render(this.sketch, this.buildViewState());
+         ThemeSnapshot var1 = this.style.getThemeSnapshot();
+         this.style.render(this.sketch, this.buildViewState(), var1);
       }
    }
 

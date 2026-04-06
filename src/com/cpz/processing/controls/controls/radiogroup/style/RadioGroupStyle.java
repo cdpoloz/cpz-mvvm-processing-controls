@@ -7,6 +7,7 @@ import com.cpz.processing.controls.controls.radiogroup.style.render.DefaultRadio
 import com.cpz.processing.controls.core.style.InteractiveStyleHelper;
 import com.cpz.processing.controls.core.theme.ThemeManager;
 import com.cpz.processing.controls.core.theme.ThemeProvider;
+import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import com.cpz.processing.controls.core.util.Colors;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import processing.core.PApplet;
 public final class RadioGroupStyle {
    private final RadioGroupStyleConfig config;
    private final DefaultRadioGroupRenderer renderer;
+   private final ThemeProvider themeProvider;
 
    public RadioGroupStyle(RadioGroupStyleConfig var1) {
       this(var1, new DefaultRadioGroupRenderer());
@@ -23,26 +25,27 @@ public final class RadioGroupStyle {
    public RadioGroupStyle(RadioGroupStyleConfig var1, DefaultRadioGroupRenderer var2) {
       this.config = var1 == null ? new RadioGroupStyleConfig() : var1;
       this.renderer = var2 == null ? new DefaultRadioGroupRenderer() : var2;
+      this.themeProvider = this.config.themeProvider != null ? this.config.themeProvider : new ThemeManager();
    }
 
-   public void render(PApplet var1, RadioGroupViewState var2) {
-      this.renderer.render(var1, var2, this.resolveRenderStyle(var2));
+   public void render(PApplet var1, RadioGroupViewState var2, ThemeSnapshot var3) {
+      this.renderer.render(var1, var2, this.resolveRenderStyle(var2, var3));
    }
 
-   public RadioGroupRenderStyle resolveRenderStyle(RadioGroupViewState var1) {
-      ThemeTokens var2 = this.resolveThemeProvider().getTheme().tokens();
-      ArrayList var3 = new ArrayList(var1.items().size());
-      int var4 = this.config.disabledAlpha != null ? this.config.disabledAlpha : var2.disabledAlpha;
+   public RadioGroupRenderStyle resolveRenderStyle(RadioGroupViewState var1, ThemeSnapshot var2) {
+      ThemeTokens var3 = var2.tokens;
+      ArrayList var4 = new ArrayList(var1.items().size());
+      int var5 = this.config.disabledAlpha != null ? this.config.disabledAlpha : var3.disabledAlpha;
 
-      for(RadioGroupItemViewState var6 : var1.items()) {
-         int var7 = this.resolveColor(var2.onSurface, this.config.textOverride);
-         int var8 = this.resolveColor(var2.border, this.config.indicatorOverride);
-         int var9 = this.resolveBackground(var2, var6);
-         int var10 = var6.selected() ? this.resolveColor(var2.primary, this.config.selectedDotOverride) : Colors.argb(0, 0, 0, 0);
-         var3.add(new RadioGroupItemRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(var7, var1.enabled(), var4), InteractiveStyleHelper.applyDisabledAlpha(var8, var1.enabled(), var4), InteractiveStyleHelper.applyDisabledAlpha(var9, var1.enabled(), var4), InteractiveStyleHelper.applyDisabledAlpha(var10, var1.enabled(), var4), InteractiveStyleHelper.applyDisabledAlpha(var9, var1.enabled(), var4)));
+      for(RadioGroupItemViewState var7 : var1.items()) {
+         int var8 = this.resolveColor(var3.onSurface, this.config.textOverride);
+         int var9 = this.resolveColor(var3.border, this.config.indicatorOverride);
+         int var10 = this.resolveBackground(var3, var7);
+         int var11 = var7.selected() ? this.resolveColor(var3.primary, this.config.selectedDotOverride) : Colors.argb(0, 0, 0, 0);
+         var4.add(new RadioGroupItemRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(var8, var1.enabled(), var5), InteractiveStyleHelper.applyDisabledAlpha(var9, var1.enabled(), var5), InteractiveStyleHelper.applyDisabledAlpha(var10, var1.enabled(), var5), InteractiveStyleHelper.applyDisabledAlpha(var11, var1.enabled(), var5), InteractiveStyleHelper.applyDisabledAlpha(var10, var1.enabled(), var5)));
       }
 
-      return new RadioGroupRenderStyle(var3, this.config.indicatorOuterDiameter, this.config.indicatorInnerDiameter, this.config.strokeWeight, this.config.textSize, this.config.cornerRadius, this.config.font);
+      return new RadioGroupRenderStyle(var4, this.config.indicatorOuterDiameter, this.config.indicatorInnerDiameter, this.config.strokeWeight, this.config.textSize, this.config.cornerRadius, this.config.font);
    }
 
    private int resolveBackground(ThemeTokens var1, RadioGroupItemViewState var2) {
@@ -83,7 +86,7 @@ public final class RadioGroupStyle {
       return this.config.textOffsetX;
    }
 
-   private ThemeProvider resolveThemeProvider() {
-      return this.config.themeProvider != null ? this.config.themeProvider : ThemeManager::getDefaultTheme;
+   public ThemeSnapshot getThemeSnapshot() {
+      return this.themeProvider.getSnapshot();
    }
 }

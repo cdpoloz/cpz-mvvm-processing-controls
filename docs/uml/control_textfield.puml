@@ -3,59 +3,17 @@ title TextField Control Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-package "Core" {
-  interface Enableable
-  interface Visible
-  interface ControlView
-  interface PointerInputTarget
-  interface PointerInteractable
-  interface KeyboardInputTarget
-  abstract class AbstractControlViewModel
-  abstract class AbstractInteractiveControlViewModel
-  class PointerInputAdapter
-  class KeyboardInputAdapter
-  class FocusManager
-  interface ThemeProvider
-}
+class TextFieldView
+class TextFieldViewState
+class DefaultTextFieldStyle
+class TextFieldRenderStyle
+class DefaultTextFieldRenderer
+class ThemeSnapshot
 
-package "TextField" {
-  class TextFieldModel
-  class TextFieldViewModel
-  class TextFieldView
-  class TextFieldInputAdapter
-  class TextFieldViewState
-  interface TextFieldStyle
-  class DefaultTextFieldStyle
-  class TextFieldRenderStyle
-  interface TextFieldRenderer
-  class DefaultTextFieldRenderer
-}
-
-AbstractControlViewModel ..|> Visible
-AbstractControlViewModel ..|> Enableable
-AbstractInteractiveControlViewModel --|> AbstractControlViewModel
-AbstractInteractiveControlViewModel ..|> PointerInputTarget
-KeyboardInputTarget ..|> Visible
-KeyboardInputTarget ..|> Enableable
-TextFieldModel ..|> Enableable
-TextFieldViewModel --|> AbstractControlViewModel
-TextFieldViewModel ..|> KeyboardInputTarget
-TextFieldView ..|> ControlView
-TextFieldView ..|> PointerInteractable
-AbstractControlViewModel *-- Enableable : model
-TextFieldViewModel --> TextFieldModel
-TextFieldView --> TextFieldViewModel
-TextFieldView --> TextFieldViewState : builds
-TextFieldView --> TextFieldStyle : uses
-TextFieldStyle --> TextFieldViewState
-DefaultTextFieldStyle ..|> TextFieldStyle
-DefaultTextFieldStyle --> TextFieldRenderStyle : creates
-DefaultTextFieldStyle --> TextFieldRenderer : delegates
-DefaultTextFieldStyle --> ThemeProvider
-TextFieldRenderer --> TextFieldRenderStyle
-DefaultTextFieldRenderer ..|> TextFieldRenderer
-PointerInputAdapter --> PointerInteractable
-PointerInputAdapter --> PointerInputTarget
-KeyboardInputAdapter --> FocusManager
-TextFieldInputAdapter *-- PointerInputAdapter : delegate
+TextFieldView --> TextFieldViewState
+TextFieldView --> ThemeSnapshot
+DefaultTextFieldStyle --> TextFieldViewState
+DefaultTextFieldStyle --> ThemeSnapshot
+DefaultTextFieldStyle --> TextFieldRenderStyle
+DefaultTextFieldRenderer --> TextFieldRenderStyle
 @enduml
