@@ -4,7 +4,30 @@ import com.cpz.processing.controls.controls.textfield.state.TextFieldViewState;
 import com.cpz.processing.controls.controls.textfield.style.TextFieldRenderStyle;
 import processing.core.PApplet;
 
+/**
+ * Renderer for default text field renderer.
+ *
+ * Responsibilities:
+ * - Draw already resolved frame data.
+ * - Keep rendering concerns separate from state decisions.
+ *
+ * Behavior:
+ * - Uses already resolved state and does not decide behavior.
+ *
+ * Notes:
+ * - This type belongs to the visual styling pipeline.
+ */
 public final class DefaultTextFieldRenderer implements TextFieldRenderer {
+   /**
+    * Renders the current frame.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void render(PApplet var1, TextFieldViewState var2, TextFieldRenderStyle var3) {
       float var4 = var2.x() - var2.width() * 0.5F;
       float var5 = var2.y() - var2.height() * 0.5F;

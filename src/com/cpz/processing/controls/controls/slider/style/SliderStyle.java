@@ -11,15 +11,45 @@ import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import processing.core.PApplet;
 
+/**
+ * Style component for slider style.
+ *
+ * Responsibilities:
+ * - Resolve visual values from immutable state and theme data.
+ * - Keep interaction rules outside the rendering layer.
+ *
+ * Behavior:
+ * - Does not process raw input or mutate the backing model.
+ *
+ * Notes:
+ * - This type belongs to the visual styling pipeline.
+ */
 public final class SliderStyle {
    private final SliderStyleConfig config;
    private final SliderRenderer renderer;
    private final ThemeProvider themeProvider;
 
+   /**
+    * Creates a slider style.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public SliderStyle(SliderStyleConfig var1) {
       this(var1, new SliderRenderer());
    }
 
+   /**
+    * Creates a slider style.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public SliderStyle(SliderStyleConfig var1, SliderRenderer var2) {
       if (var1 == null) {
          throw new IllegalArgumentException("config must not be null");
@@ -30,6 +60,17 @@ public final class SliderStyle {
       }
    }
 
+   /**
+    * Renders the current frame.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    * @param var4 parameter used by this operation
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void render(PApplet var1, SliderViewState var2, ThemeSnapshot var3, SliderGeometry var4) {
       ThemeTokens var5 = var3.tokens;
       boolean var6 = var2.pressed() || var2.dragging();
@@ -63,6 +104,14 @@ public final class SliderStyle {
       }
    }
 
+   /**
+    * Returns theme snapshot.
+    *
+    * @return current theme snapshot
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public ThemeSnapshot getThemeSnapshot() {
       return this.themeProvider.getSnapshot();
    }

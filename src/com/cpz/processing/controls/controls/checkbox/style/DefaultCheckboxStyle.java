@@ -11,21 +11,61 @@ import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import processing.core.PApplet;
 
+/**
+ * Style component for default checkbox style.
+ *
+ * Responsibilities:
+ * - Resolve visual values from immutable state and theme data.
+ * - Keep interaction rules outside the rendering layer.
+ *
+ * Behavior:
+ * - Does not process raw input or mutate the backing model.
+ *
+ * Notes:
+ * - This type belongs to the visual styling pipeline.
+ */
 public final class DefaultCheckboxStyle implements CheckboxStyle {
    private final CheckboxStyleConfig config;
    private final CheckboxRenderer renderer;
    private final ThemeProvider themeProvider;
 
+   /**
+    * Creates a default checkbox style.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public DefaultCheckboxStyle(CheckboxStyleConfig var1) {
       this(var1, (CheckboxRenderer)(var1 != null && var1.renderer != null ? var1.renderer : new DefaultCheckboxRenderer()));
    }
 
+   /**
+    * Creates a default checkbox style.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public DefaultCheckboxStyle(CheckboxStyleConfig var1, CheckboxRenderer var2) {
       this.config = var1;
       this.renderer = var2;
       this.themeProvider = var1 != null && var1.themeProvider != null ? var1.themeProvider : new ThemeManager();
    }
 
+   /**
+    * Renders the current frame.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void render(PApplet var1, CheckboxViewState var2, ThemeSnapshot var3) {
       ThemeTokens var4 = var3.tokens;
       int var5 = var2.checked() ? this.resolveBaseFill(var4.primary, this.config.checkedFillOverride) : this.resolveBaseFill(var4.surface, this.config.uncheckedFillOverride);
@@ -61,6 +101,14 @@ public final class DefaultCheckboxStyle implements CheckboxStyle {
       }
    }
 
+   /**
+    * Returns theme snapshot.
+    *
+    * @return current theme snapshot
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public ThemeSnapshot getThemeSnapshot() {
       return this.themeProvider.getSnapshot();
    }

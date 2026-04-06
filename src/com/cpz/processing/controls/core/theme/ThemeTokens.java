@@ -1,5 +1,18 @@
 package com.cpz.processing.controls.core.theme;
 
+/**
+ * Theme component for theme tokens.
+ *
+ * Responsibilities:
+ * - Represent theme data or theme access for the rendering pipeline.
+ * - Keep theme concerns explicit and reusable.
+ *
+ * Behavior:
+ * - Keeps the public role isolated from unrelated concerns.
+ *
+ * Notes:
+ * - This type is part of the public project surface.
+ */
 public final class ThemeTokens {
    public int surface;
    public int surfaceVariant;
@@ -14,9 +27,23 @@ public final class ThemeTokens {
    public int cursor;
    public int selection;
 
+   /**
+    * Creates a theme tokens.
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public ThemeTokens() {
    }
 
+   /**
+    * Creates a theme tokens.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public ThemeTokens(ThemeTokens var1) {
       if (var1 == null) {
          throw new IllegalArgumentException("source must not be null");
@@ -36,6 +63,14 @@ public final class ThemeTokens {
       }
    }
 
+   /**
+    * Returns a copy of state.
+    *
+    * @return copied value
+    *
+    * Behavior:
+    * - Produces the public result required by the surrounding pipeline.
+    */
    public ThemeTokens copy() {
       return new ThemeTokens(this);
    }

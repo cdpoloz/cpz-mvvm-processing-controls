@@ -19,6 +19,19 @@ import java.util.Objects;
 
 import processing.core.PApplet;
 
+/**
+ * Development sketch for the checkbox dev flow.
+ *
+ * Responsibilities:
+ * - Exercise public controls in an interactive sketch.
+ * - Provide a development-time validation surface.
+ *
+ * Behavior:
+ * - Targets interactive validation rather than library reuse.
+ *
+ * Notes:
+ * - This type is intended for development and demonstration flows.
+ */
 public class CheckboxDevSketch extends PApplet {
     private final InputManager inputManager = new InputManager();
     private CheckboxView checkboxAView;
@@ -45,11 +58,23 @@ public class CheckboxDevSketch extends PApplet {
     private LabelViewModel labelSvgStatusViewModel;
     private LabelViewModel helperLabelViewModel;
 
+    /**
+     * Updates tings.
+     *
+     * Behavior:
+     * - Updates the public state or registration owned by this type.
+     */
     public void settings() {
         this.size(900, 420);
         this.smooth(4);
     }
 
+    /**
+     * Updates up.
+     *
+     * Behavior:
+     * - Updates the public state or registration owned by this type.
+     */
     public void setup() {
         this.checkboxAViewModel = new CheckboxViewModel(new CheckboxModel(true));
         this.checkboxAView = new CheckboxView(this, this.checkboxAViewModel, 90.0F, 110.0F, 30.0F);
@@ -80,6 +105,12 @@ public class CheckboxDevSketch extends PApplet {
         this.inputManager.registerLayer(new CheckboxRootInputLayer());
     }
 
+    /**
+     * Draws the current frame.
+     *
+     * Behavior:
+     * - Uses already available state and does not define business rules.
+     */
     public void draw() {
         this.background(242);
         this.updateStatusLabels();
@@ -96,31 +127,73 @@ public class CheckboxDevSketch extends PApplet {
         this.helperLabel.draw();
     }
 
+    /**
+     * Performs key released.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyReleased() {
         if (this.key == ESC) this.key = 0;
         this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
     }
 
+    /**
+     * Performs key typed.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyTyped() {
         if (key == ESC) key = 0;
     }
 
+    /**
+     * Performs mouse moved.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mouseMoved() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
+    /**
+     * Performs mouse dragged.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mouseDragged() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
+    /**
+     * Performs mouse pressed.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mousePressed() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
+    /**
+     * Performs mouse released.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mouseReleased() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
+    /**
+     * Performs key pressed.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyPressed() {
         if (key == ESC) key = 0;
         this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.PRESS, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
@@ -175,6 +248,15 @@ public class CheckboxDevSketch extends PApplet {
             super(0);
         }
 
+        /**
+         * Handles pointer event.
+         *
+         * @param var1 parameter used by this operation
+         * @return result of this operation
+         *
+         * Behavior:
+         * - Applies the public interaction flow exposed by this type.
+         */
         public boolean handlePointerEvent(PointerEvent var1) {
             switch (var1.getType()) {
                 case MOVE:
@@ -199,6 +281,15 @@ public class CheckboxDevSketch extends PApplet {
             }
         }
 
+        /**
+         * Handles keyboard event.
+         *
+         * @param var1 parameter used by this operation
+         * @return result of this operation
+         *
+         * Behavior:
+         * - Applies the public interaction flow exposed by this type.
+         */
         public boolean handleKeyboardEvent(KeyboardEvent var1) {
             if (var1.getType() == KeyboardEvent.Type.PRESS && (var1.getKey() == 'v' || var1.getKey() == 'V')) {
                 CheckboxDevSketch.this.checkboxBViewModel.setVisible(!CheckboxDevSketch.this.checkboxBViewModel.isVisible());

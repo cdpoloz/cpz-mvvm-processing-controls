@@ -6,7 +6,30 @@ import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupItemRende
 import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupRenderStyle;
 import processing.core.PApplet;
 
+/**
+ * Renderer for default radio group renderer.
+ *
+ * Responsibilities:
+ * - Draw already resolved frame data.
+ * - Keep rendering concerns separate from state decisions.
+ *
+ * Behavior:
+ * - Uses already resolved state and does not decide behavior.
+ *
+ * Notes:
+ * - This type belongs to the visual styling pipeline.
+ */
 public final class DefaultRadioGroupRenderer {
+   /**
+    * Renders the current frame.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void render(PApplet var1, RadioGroupViewState var2, RadioGroupRenderStyle var3) {
       var1.pushStyle();
       if (var3.font() != null) {

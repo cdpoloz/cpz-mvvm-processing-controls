@@ -1,5 +1,18 @@
 package com.cpz.processing.controls.core.layout;
 
+/**
+ * Enumeration of anchor values.
+ *
+ * Responsibilities:
+ * - Represent layout data or coordinate resolution.
+ * - Keep placement logic outside control behavior.
+ *
+ * Behavior:
+ * - Provides symbolic values only.
+ *
+ * Notes:
+ * - This type is part of the public project surface.
+ */
 public enum Anchor {
    TOP_LEFT,
    TOP_CENTER,

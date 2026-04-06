@@ -6,20 +6,35 @@ skinparam shadowing false
 package "Input" {
   class InputManager
   interface InputLayer
+  interface PointerInputTarget
+  interface KeyboardInputTarget
   class FocusManager
-  class OverlayManager
 }
 
 package "Theme" {
   interface ThemeProvider
   class ThemeManager
-  class Theme
   class ThemeSnapshot
   class ThemeTokens
 }
 
+package "Overlay" {
+  class OverlayManager
+}
+
+package "Binding" {
+  class Binding
+  interface ValueListener<T>
+}
+
 ThemeManager ..|> ThemeProvider
 ThemeProvider --> ThemeSnapshot
-ThemeManager --> ThemeSnapshot : caches
 ThemeSnapshot --> ThemeTokens
+
+InputManager --> InputLayer : dispatches
+InputLayer --> PointerInputTarget : pointer events
+InputLayer --> KeyboardInputTarget : keyboard events
+FocusManager --> KeyboardInputTarget : focuses
+
+Binding --> ValueListener : registers
 @enduml

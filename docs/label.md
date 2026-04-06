@@ -1,7 +1,19 @@
 # Label
 
-`LabelView` keeps `LabelViewState` theme-free, reads a cached `ThemeSnapshot` once from its style, and `DefaultLabelStyle` consumes snapshot tokens directly.
+## Responsibilities
 
-## Performance note
+- `LabelModel` stores the current text
+- `LabelViewModel` exposes label state to the view layer
+- `LabelView` measures text and builds `LabelViewState`
+- `DefaultLabelStyle` resolves typography and colors from the theme
+- `DefaultTextRenderer` performs drawing only
 
-Theme lookups are removed from the label render path. The render loop only reads already-cached theme data.
+## Notes
+
+- the label control does not own business logic
+- text measurement is cached in the view
+- theme data is consumed through `ThemeSnapshot`, not resolved ad hoc during drawing
+
+## Related
+
+- [Architecture](architecture.md)

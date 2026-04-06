@@ -5,7 +5,28 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 
+/**
+ * Input component for clipboard service.
+ *
+ * Responsibilities:
+ * - Translate public input flow into control operations.
+ * - Keep raw event handling outside business state.
+ *
+ * Behavior:
+ * - Keeps the public role isolated from unrelated concerns.
+ *
+ * Notes:
+ * - This type is part of the public project surface.
+ */
 public final class ClipboardService {
+   /**
+    * Performs copy.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Produces the public result required by the surrounding pipeline.
+    */
    public void copy(String var1) {
       try {
          String var2 = var1 == null ? "" : var1;
@@ -15,6 +36,14 @@ public final class ClipboardService {
 
    }
 
+   /**
+    * Performs paste.
+    *
+    * @return result of this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public String paste() {
       try {
          Object var1 = Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);

@@ -1,62 +1,175 @@
 # CPZ MVVM Processing Controls
+![Java](https://img.shields.io/badge/Java-25+-orange)
+![Processing](https://img.shields.io/badge/Processing-4.x-blue)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-Java UI framework for Processing with strict MVVM layering, centralized input, overlays, and per-sketch theme isolation.
+UI controls for Processing built around a strict MVVM pipeline, explicit  input routing, and theme-aware rendering.
 
-## Main features
+------------------------------------------------------------------------
 
-- Strict pipeline: `Model -> ViewModel -> View -> ViewState -> Style -> RenderStyle -> Renderer`
-- Centralized input via `InputManager` and `InputLayer`
-- Keyboard focus via `FocusManager`
-- Overlay stacking via `OverlayManager`
-- Runtime theming via `ThemeProvider`, `ThemeManager`, `ThemeSnapshot`, and `ThemeTokens`
-- Render loop designed to avoid theme-related allocations
+## Why this library?
 
-## Performance model
+Processing sketches often mix rendering, input handling, and state in a  single class.
 
-The render path is optimized for high-frequency `draw()` loops:
+This project provides a structured alternative based on a strict MVVM  pipeline, explicit input routing, and fully decoupled rendering.
 
-- `ThemeManager` caches a `ThemeSnapshot`
-- snapshots are rebuilt only when `setTheme(...)` is called
-- `View` pulls the cached snapshot once per draw or measurement pass
-- `Style` reads `snapshot.tokens`
-- `Renderer` only consumes already-resolved frame data
+Key characteristics:
 
-This removes per-frame theme copying and prevents theme resolution work from happening inside style render code.
+-   No reflection, no magic
+-   Explicit data flow
+-   Clear separation of concerns
+-   Designed for real-time rendering (Processing `draw()` loop)
 
-## Theme lifecycle
+------------------------------------------------------------------------
 
-1. A sketch owns a `ThemeManager`
-2. The sketch decides which theme data to apply and calls `setTheme(...)`
-3. `ThemeManager` stores that theme data and rebuilds a cached `ThemeSnapshot`
-4. `Style` maps `ViewState` + snapshot tokens into `RenderStyle`
-6. `Renderer` draws with constant-time inputs
+## Quick Example
 
-## Per-sketch example
-
-```java
-ThemeManager themeManager = new ThemeManager(new LightTheme());
-
-ButtonView buttonView = new ButtonView(this, buttonViewModel, 180f, 150f, 220f, 60f);
-buttonView.setStyle(ButtonDefaultStyles.primary(themeManager));
+``` java
+Binding.bind(sliderViewModel::getValue, value ->
+labelViewModel.setText(value.toString()), sliderViewModel::addListener
+);
 ```
 
-## Notes
+`Slider` updates `Label` through an explicit unidirectional binding.
 
-- No global mutable theme state
-- Theme toggling in example sketches is managed explicitly by sketch state, not by `instanceof` checks on `Theme`
-- Styles without an explicit provider use a local `ThemeManager`, not a shared static fallback
-- Input, overlay, and focus managers remain instance-based
+More advanced examples (including bidirectional binding) are available in `BindingDevSketch`.
+
+------------------------------------------------------------------------
+
+## Getting Started
+
+1. Add Processing to your project.
+2. Include this library in your classpath.
+3. Create your ViewModels and Views.
+4. Register input using InputManager.
+5. Call `draw()` inside the Processing loop.
+
+Typical flow:
+
+- ViewModels handle state and interaction
+- Views handle layout and ViewState creation
+- Styles resolve visual properties
+- Renderers draw using Processing
+
+You can find working examples in:
+
+`src/com/cpz/processing/controls/dev`
+
+------------------------------------------------------------------------
+
+## Purpose
+
+This project explores how to build reusable Processing controls without collapsing rendering, interaction, and state into the same class.
+
+Key goals:
+
+-   keep `Model`, `ViewModel`, `View`, `Style`, and `Renderer` responsibilities explicit
+-   centralize pointer and keyboard dispatch instead of handling input ad hoc in each sketch
+-   support theming and overlays without adding per-frame architectural noise
+-   validate lightweight ViewModel binding without coupling the binding layer to specific controls
+
+------------------------------------------------------------------------
+
+## Architecture
+
+The main rendering and interaction flow is:
+
+```text
+Model -> ViewModel -> View -> ViewState -> Style -> RenderStyle ->  Renderer
+```
+
+Layer responsibilities:
+
+-   `Model`: persistent control state with no rendering logic
+-   `ViewModel`: interaction state, commands, validation, and synchronization with the model
+-   `View`: layout, hit testing, text measurement, and `ViewState` construction
+-   `ViewState`: immutable frame data prepared by the view
+-   `Style`: visual resolution from `ViewState` plus `ThemeSnapshot`
+-   `Renderer`: pure drawing using already resolved values
+
+Supporting infrastructure:
+
+-   `InputManager` dispatches pointer and keyboard events by layer priority
+-   `FocusManager` owns keyboard focus and restoration
+-   `OverlayManager` coordinates overlay ordering
+-   `ThemeManager` exposes cached `ThemeSnapshot` instances to styles
+
+------------------------------------------------------------------------
+
+## Rendering Model
+
+The render path is designed for Processing's high-frequency `draw()` loop:
+
+-   a sketch owns the managers it needs
+-   `ThemeManager` rebuilds its snapshot only when the theme changes
+-   views read the cached snapshot once per draw or measurement pass
+-   styles resolve colors, typography, and geometry-free render data
+-   renderers only draw and do not infer interaction state
+
+This keeps theme work outside the hot render path and preserves MVVM boundaries.
+
+------------------------------------------------------------------------
+
+## Binding
+
+The core binding utility is intentionally small and explicit.
+
+-   Unidirectional binding is part of the core API through `Binding.bind(...)`
+-   Multiple targets are supported by wiring more than one listener from the same source
+-   Bidirectional binding is not part of the core API and is demonstrated only as an advanced example in `BindingDevSketch`
+
+This design avoids hidden data flows and keeps all synchronization logic
+visible at the application level.
+
+See [docs/binding.md](docs/binding.md).
+
+------------------------------------------------------------------------
+
+## Project Structure
+
+-   `src/com/cpz/processing/controls/common`: shared infrastructure such as binding
+-   `src/com/cpz/processing/controls/core`: cross-cutting MVVM, input, theme, overlay, focus, and layout primitives
+-   `src/com/cpz/processing/controls/controls`: concrete controls organized by feature
+-   `src/com/cpz/processing/controls/dev`: development sketches used as interactive playgrounds
+-   `docs`: human-facing documentation
+-   `docs/uml`: PlantUML diagrams
+
+------------------------------------------------------------------------
 
 ## Documentation
 
-- [Architecture](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/architecture.md)
-- [Input System](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/input-system.md)
-- [Button](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/button.md)
-- [Checkbox](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/checkbox.md)
-- [DropDown](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/dropdown.md)
-- [Label](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/label.md)
-- [NumericField](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/numericfield.md)
-- [RadioGroup](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/radiogroup.md)
-- [Slider](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/slider.md)
-- [TextField](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/textfield.md)
-- [Toggle](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/toggle.md)
+-   [Architecture](docs/architecture.md)
+-   [Binding](docs/binding.md)
+-   [Input System](docs/input-system.md)
+-   [Button](docs/button.md)
+-   [Checkbox](docs/checkbox.md)
+-   [Dropdown](docs/dropdown.md)
+-   [Label](docs/label.md)
+-   [NumericField](docs/numericfield.md)
+-   [RadioGroup](docs/radiogroup.md)
+-   [Slider](docs/slider.md)
+-   [TextField](docs/textfield.md)
+-   [Toggle](docs/toggle.md)
+
+------------------------------------------------------------------------
+
+## Design Philosophy
+
+-   Explicit over implicit
+-   Composition over coupling
+-   Rendering and interaction are strictly separated
+
+------------------------------------------------------------------------
+
+## Status
+
+This project is actively used to validate MVVM patterns in Processing, including input routing, rendering separation, and `ViewModel` synchronization.
+
+The focus is on architectural clarity and explicit behavior rather than framework-level abstraction or automation.
+
+------------------------------------------------------------------------
+
+## License
+
+This project is licensed under the MIT License.

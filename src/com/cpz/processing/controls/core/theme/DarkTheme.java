@@ -2,7 +2,26 @@ package com.cpz.processing.controls.core.theme;
 
 import com.cpz.processing.controls.core.util.Colors;
 
+/**
+ * Theme component for dark theme.
+ *
+ * Responsibilities:
+ * - Represent theme data or theme access for the rendering pipeline.
+ * - Keep theme concerns explicit and reusable.
+ *
+ * Behavior:
+ * - Keeps the public role isolated from unrelated concerns.
+ *
+ * Notes:
+ * - This type is part of the public project surface.
+ */
 public final class DarkTheme extends Theme {
+   /**
+    * Creates a dark theme.
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public DarkTheme() {
       super(createTokens());
    }

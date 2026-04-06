@@ -3,34 +3,103 @@ package com.cpz.processing.controls.controls.toggle.viewmodel;
 import com.cpz.processing.controls.controls.toggle.model.ToggleModel;
 import com.cpz.processing.controls.core.viewmodel.AbstractInteractiveControlViewModel;
 
+/**
+ * ViewModel for toggle view model.
+ *
+ * Responsibilities:
+ * - Expose control state to the view layer.
+ * - Coordinate interaction and synchronize with the backing model.
+ *
+ * Behavior:
+ * - Does not perform drawing directly.
+ *
+ * Notes:
+ * - This type belongs to the MVVM ViewModel layer.
+ */
 public class ToggleViewModel extends AbstractInteractiveControlViewModel {
+   /**
+    * Creates a toggle view model.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public ToggleViewModel(ToggleModel var1) {
       super(var1);
       this.setTotalStates(var1.getTotalStates());
    }
 
+   /**
+    * Returns state.
+    *
+    * @return current state
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public int getState() {
       return ((ToggleModel)this.model).getState();
    }
 
+   /**
+    * Returns prev state.
+    *
+    * @return current prev state
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public int getPrevState() {
       return ((ToggleModel)this.model).getPrevState();
    }
 
+   /**
+    * Returns whether changed.
+    *
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public boolean hasChanged() {
       return ((ToggleModel)this.model).getState() != ((ToggleModel)this.model).getPrevState();
    }
 
+   /**
+    * Returns whether first state.
+    *
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public boolean isFirstState() {
       return ((ToggleModel)this.model).getState() == 0;
    }
 
+   /**
+    * Updates total states.
+    *
+    * @param var1 new total states
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setTotalStates(int var1) {
       int var2 = Math.max(1, var1);
       ((ToggleModel)this.model).setTotalStates(var2);
       this.clampState(var2);
    }
 
+   /**
+    * Returns total states.
+    *
+    * @return current total states
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public int getTotalStates() {
       return ((ToggleModel)this.model).getTotalStates();
    }

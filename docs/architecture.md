@@ -6,38 +6,52 @@
 Model -> ViewModel -> View -> ViewState -> Style -> RenderStyle -> Renderer
 ```
 
-## Boundaries
+## Layer Responsibilities
 
-- `Model`: pure state
-- `ViewModel`: interaction logic
-- `View`: geometry, measurement, and `ViewState` construction
-- `ViewState`: immutable frame input for style resolution
-- `Style`: pure mapping from state plus `ThemeSnapshot` to render values
-- `Renderer`: drawing only
+- `Model`: stores durable control state and constraints
+- `ViewModel`: owns interaction, validation, focus-related state, and model updates
+- `View`: owns layout, hit testing, text measurement, and `ViewState` creation
+- `ViewState`: immutable per-frame data prepared for visual resolution
+- `Style`: maps `ViewState` and `ThemeSnapshot` into concrete render values
+- `Renderer`: performs drawing only and does not decide behavior
 
-## Theme architecture
+## Data Flow
 
-- `ThemeProvider` exposes the cached `ThemeSnapshot`
+1. Input adapters translate sketch events into `ViewModel` operations.
+2. The `ViewModel` updates its model and interaction state.
+3. The `View` reads the `ViewModel`, computes geometry, and builds a `ViewState`.
+4. The `Style` resolves visual values using the current `ThemeSnapshot`.
+5. The `Renderer` draws the final frame.
+
+This keeps behavior decisions out of the view and keeps rendering decisions out of the model.
+
+## Theme Flow
+
+- `ThemeProvider` exposes a cached `ThemeSnapshot`
 - `ThemeManager` implements `ThemeProvider`
-- `ThemeSnapshot` is rebuilt only when the theme changes
-- `View` reads the snapshot once and passes it to style resolution
-- styles must not resolve theme objects dynamically during render
+- `ThemeSnapshot` is rebuilt when the theme changes, not during every draw call
+- views read the snapshot once per draw or measurement pass
+- styles consume snapshot tokens directly and do not perform theme lookup of their own
 
-## Performance principle
+## Input And Focus
 
-No theme allocation in the render loop:
+- `InputManager` dispatches pointer and keyboard events through ordered `InputLayer`s
+- `FocusManager` owns keyboard focus, traversal, and restoration
+- controls that need keyboard interaction implement `KeyboardInputTarget`
+- pointer-oriented controls expose hit testing through `PointerInteractable`
 
-- no per-frame `Theme.copy()`
-- no per-frame `ThemeTokens` copying
-- no per-frame theme lookup inside styles
+## Binding
 
-Theme work happens at theme-change time, not frame time.
+Binding is intentionally explicit.
 
-## Theme toggle flow
+- `Binding.bind(...)` supports unidirectional propagation between ViewModels
+- the binding layer does not use reflection or control-specific contracts
+- advanced bidirectional synchronization can be composed outside the core API when needed
 
-`ThemeDevSketch` owns a `ThemeManager`, passes that instance into every themed control style during `setup()`, and tracks the active theme explicitly in sketch state. On `t`, the sketch flips that flag and calls `themeManager.setTheme(...)` with the matching theme data. Because each view reads the cached snapshot from its bound style on every draw, the next frame reflects the new theme without per-frame allocation.
+See [Binding](binding.md).
 
-## Related
+## Related Documents
 
-- [README](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/README.md)
-- [Input System](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/input-system.md)
+- [README](../README.md)
+- [Input System](input-system.md)
+- [Binding](binding.md)

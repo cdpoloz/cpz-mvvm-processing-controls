@@ -9,6 +9,19 @@ import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ * ViewModel for numeric field view model.
+ *
+ * Responsibilities:
+ * - Expose control state to the view layer.
+ * - Coordinate interaction and synchronize with the backing model.
+ *
+ * Behavior:
+ * - Does not perform drawing directly.
+ *
+ * Notes:
+ * - This type belongs to the MVVM ViewModel layer.
+ */
 public final class NumericFieldViewModel extends AbstractInteractiveControlViewModel implements KeyboardInputTarget {
    private final ClipboardService clipboardService = new ClipboardService();
    private String textBuffer;
@@ -22,6 +35,14 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    private BigDecimal lastSyncedValue;
    private Consumer<BigDecimal> onValueChanged;
 
+   /**
+    * Creates a numeric field view model.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public NumericFieldViewModel(NumericFieldModel var1) {
       super(var1);
       this.textBuffer = this.formatValue(var1.getValue());
@@ -32,80 +53,224 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       this.lastSyncedValue = var1.getValue();
    }
 
+   /**
+    * Returns text.
+    *
+    * @return current text
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public String getText() {
       this.syncFromModelIfNotEditing();
       return this.textBuffer;
    }
 
+   /**
+    * Returns value.
+    *
+    * @return current value
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public BigDecimal getValue() {
       this.syncFromModelIfNotEditing();
       return ((NumericFieldModel)this.model).getValue();
    }
 
+   /**
+    * Returns whether editing.
+    *
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public boolean isEditing() {
       return this.editing;
    }
 
+   /**
+    * Returns cursor position.
+    *
+    * @return current cursor position
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public int getCursorPosition() {
       this.syncSelectionBounds();
       return this.cursorPosition;
    }
 
+   /**
+    * Updates cursor position.
+    *
+    * @param var1 new cursor position
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setCursorPosition(int var1) {
       this.cursorPosition = this.clampIndex(var1);
       this.clearSelection();
    }
 
+   /**
+    * Updates cursor position without selection reset.
+    *
+    * @param var1 new cursor position without selection reset
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setCursorPositionWithoutSelectionReset(int var1) {
       this.cursorPosition = this.clampIndex(var1);
    }
 
+   /**
+    * Returns selection start.
+    *
+    * @return current selection start
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public int getSelectionStart() {
       this.syncSelectionBounds();
       return this.selectionStart;
    }
 
+   /**
+    * Updates selection start.
+    *
+    * @param var1 new selection start
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setSelectionStart(int var1) {
       this.selectionStart = this.clampIndex(var1);
    }
 
+   /**
+    * Returns selection end.
+    *
+    * @return current selection end
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public int getSelectionEnd() {
       this.syncSelectionBounds();
       return this.selectionEnd;
    }
 
+   /**
+    * Updates selection end.
+    *
+    * @param var1 new selection end
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setSelectionEnd(int var1) {
       this.selectionEnd = this.clampIndex(var1);
    }
 
+   /**
+    * Updates selection anchor.
+    *
+    * @param var1 new selection anchor
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setSelectionAnchor(int var1) {
       this.selectionAnchor = this.clampIndex(var1);
    }
 
+   /**
+    * Returns whether selecting.
+    *
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public boolean isSelecting() {
       return this.selecting;
    }
 
+   /**
+    * Updates selecting.
+    *
+    * @param var1 new selecting
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setSelecting(boolean var1) {
       this.selecting = var1 && this.focused && this.isEnabled() && this.isVisible();
    }
 
+   /**
+    * Returns selection min.
+    *
+    * @return current selection min
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public int getSelectionMin() {
       return Math.min(this.selectionStart, this.selectionEnd);
    }
 
+   /**
+    * Returns selection max.
+    *
+    * @return current selection max
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public int getSelectionMax() {
       return Math.max(this.selectionStart, this.selectionEnd);
    }
 
+   /**
+    * Returns whether selection.
+    *
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public boolean hasSelection() {
       return this.selectionStart != this.selectionEnd;
    }
 
+   /**
+    * Returns whether focused.
+    *
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public boolean isFocused() {
       return this.focused;
    }
 
+   /**
+    * Updates focused.
+    *
+    * @param var1 new focused
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setFocused(boolean var1) {
       this.focused = var1 && this.isEditableContext();
       if (!this.focused) {
@@ -115,26 +280,62 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
 
    }
 
+   /**
+    * Returns whether show cursor.
+    *
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public boolean isShowCursor() {
       return this.focused;
    }
 
+   /**
+    * Updates on value changed.
+    *
+    * @param var1 new on value changed
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setOnValueChanged(Consumer<BigDecimal> var1) {
       this.onValueChanged = var1;
    }
 
+   /**
+    * Handles focus gained.
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
    public void onFocusGained() {
       this.focused = this.isEditableContext();
       this.syncFromModelIfNotEditing();
       this.selecting = false;
    }
 
+   /**
+    * Handles focus lost.
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
    public void onFocusLost() {
       this.focused = false;
       this.commit();
       this.selecting = false;
    }
 
+   /**
+    * Handles key typed.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
    public void onKeyTyped(char var1) {
       if (!Character.isISOControl(var1)) {
          this.insertText(String.valueOf(var1));
@@ -142,6 +343,14 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
 
    }
 
+   /**
+    * Performs insert text.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void insertText(String var1) {
       if (this.canEdit() && var1 != null && !var1.isEmpty()) {
          if (this.isInsertAllowed(var1)) {
@@ -161,6 +370,12 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       }
    }
 
+   /**
+    * Performs backspace.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void backspace() {
       if (this.canEdit()) {
          if (this.hasSelection()) {
@@ -176,6 +391,12 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       }
    }
 
+   /**
+    * Performs delete forward.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void deleteForward() {
       if (this.canEdit()) {
          if (this.hasSelection()) {
@@ -190,6 +411,12 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       }
    }
 
+   /**
+    * Performs move cursor left.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void moveCursorLeft() {
       if (this.focused) {
          this.cursorPosition = this.hasSelection() ? this.getSelectionMin() : Math.max(0, this.cursorPosition - 1);
@@ -197,6 +424,12 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       }
    }
 
+   /**
+    * Performs move cursor right.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void moveCursorRight() {
       if (this.focused) {
          this.cursorPosition = this.hasSelection() ? this.getSelectionMax() : Math.min(this.textBuffer.length(), this.cursorPosition + 1);
@@ -204,6 +437,12 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       }
    }
 
+   /**
+    * Performs move cursor left with selection.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void moveCursorLeftWithSelection() {
       if (this.focused) {
          this.ensureSelectionAnchor();
@@ -212,6 +451,12 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       }
    }
 
+   /**
+    * Performs move cursor right with selection.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void moveCursorRightWithSelection() {
       if (this.focused) {
          this.ensureSelectionAnchor();
@@ -220,6 +465,12 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       }
    }
 
+   /**
+    * Performs select all.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void selectAll() {
       if (this.focused) {
          this.selectionAnchor = 0;
@@ -229,6 +480,12 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       }
    }
 
+   /**
+    * Performs delete selection.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void deleteSelection() {
       if (this.canEdit() && this.hasSelection()) {
          this.deleteSelectionInternal();
@@ -237,14 +494,34 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       }
    }
 
+   /**
+    * Returns selected text.
+    *
+    * @return current selected text
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public String getSelectedText() {
       return !this.hasSelection() ? "" : this.textBuffer.substring(this.getSelectionMin(), this.getSelectionMax());
    }
 
+   /**
+    * Performs copy selection.
+    *
+    * Behavior:
+    * - Produces the public result required by the surrounding pipeline.
+    */
    public void copySelection() {
       this.clipboardService.copy(this.getSelectedText());
    }
 
+   /**
+    * Performs cut selection.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void cutSelection() {
       if (this.canEdit()) {
          this.clipboardService.copy(this.getSelectedText());
@@ -252,20 +529,54 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       }
    }
 
+   /**
+    * Performs paste from clipboard.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void pasteFromClipboard() {
       if (this.canEdit()) {
          this.insertText(this.clipboardService.paste());
       }
    }
 
+   /**
+    * Performs increment.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void increment(boolean var1, boolean var2) {
       this.applyStep(this.resolveAdjustedStep(var1, var2));
    }
 
+   /**
+    * Performs decrement.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void decrement(boolean var1, boolean var2) {
       this.applyStep(this.resolveAdjustedStep(var1, var2).negate());
    }
 
+   /**
+    * Handles mouse wheel.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
    public void onMouseWheel(float var1, boolean var2, boolean var3) {
       if (this.focused && this.isInteractive() && var1 != 0.0F) {
          if (var1 < 0.0F) {
@@ -277,6 +588,14 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       }
    }
 
+   /**
+    * Updates value.
+    *
+    * @param var1 new value
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setValue(BigDecimal var1) {
       BigDecimal var2 = ((NumericFieldModel)this.model).getValue();
       ((NumericFieldModel)this.model).setValue(this.clampAndNormalize(var1 == null ? this.fallbackForEmptyCommit() : var1));
@@ -547,6 +866,12 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       return this.isEnabled() && this.isVisible();
    }
 
+   /**
+    * Commits the current public state.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void commit() {
       this.commitValue();
    }

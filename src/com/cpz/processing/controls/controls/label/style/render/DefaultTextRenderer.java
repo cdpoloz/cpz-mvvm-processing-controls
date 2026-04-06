@@ -3,7 +3,33 @@ package com.cpz.processing.controls.controls.label.style.render;
 import com.cpz.processing.controls.controls.label.style.LabelRenderStyle;
 import processing.core.PApplet;
 
+/**
+ * Renderer for default text renderer.
+ *
+ * Responsibilities:
+ * - Draw already resolved frame data.
+ * - Keep rendering concerns separate from state decisions.
+ *
+ * Behavior:
+ * - Uses already resolved state and does not decide behavior.
+ *
+ * Notes:
+ * - This type belongs to the visual styling pipeline.
+ */
 public final class DefaultTextRenderer implements LabelRenderer {
+   /**
+    * Renders the current frame.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    * @param var4 parameter used by this operation
+    * @param var5 parameter used by this operation
+    * @param var6 parameter used by this operation
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void render(PApplet var1, float var2, float var3, float var4, float var5, LabelRenderStyle var6) {
       var1.pushStyle();
       if (var6.typography().font() != null) {

@@ -11,21 +11,61 @@ import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import processing.core.PApplet;
 
+/**
+ * Style component for default button style.
+ *
+ * Responsibilities:
+ * - Resolve visual values from immutable state and theme data.
+ * - Keep interaction rules outside the rendering layer.
+ *
+ * Behavior:
+ * - Does not process raw input or mutate the backing model.
+ *
+ * Notes:
+ * - This type belongs to the visual styling pipeline.
+ */
 public final class DefaultButtonStyle implements ButtonStyle {
    private final ButtonStyleConfig config;
    private final ButtonRenderer renderer;
    private final ThemeProvider themeProvider;
 
+   /**
+    * Creates a default button style.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public DefaultButtonStyle(ButtonStyleConfig var1) {
       this(var1, (ButtonRenderer)(var1 != null && var1.renderer != null ? var1.renderer : new DefaultButtonRenderer()));
    }
 
+   /**
+    * Creates a default button style.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public DefaultButtonStyle(ButtonStyleConfig var1, ButtonRenderer var2) {
       this.config = var1;
       this.renderer = var2;
       this.themeProvider = var1 != null && var1.themeProvider != null ? var1.themeProvider : new ThemeManager();
    }
 
+   /**
+    * Renders the current frame.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void render(PApplet var1, ButtonViewState var2, ThemeSnapshot var3) {
       ThemeTokens var4 = var3.tokens;
       int var5 = this.resolveColorOverride(var4.primary, this.config.fillOverride, this.config.baseColor);
@@ -51,6 +91,14 @@ public final class DefaultButtonStyle implements ButtonStyle {
       return var3 != null ? var3 : InteractiveStyleHelper.applyOverlay(var1, var2);
    }
 
+   /**
+    * Returns theme snapshot.
+    *
+    * @return current theme snapshot
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public ThemeSnapshot getThemeSnapshot() {
       return this.themeProvider.getSnapshot();
    }

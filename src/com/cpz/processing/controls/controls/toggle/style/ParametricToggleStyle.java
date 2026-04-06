@@ -9,10 +9,31 @@ import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import processing.core.PApplet;
 
+/**
+ * Style component for parametric toggle style.
+ *
+ * Responsibilities:
+ * - Resolve visual values from immutable state and theme data.
+ * - Keep interaction rules outside the rendering layer.
+ *
+ * Behavior:
+ * - Does not process raw input or mutate the backing model.
+ *
+ * Notes:
+ * - This type belongs to the visual styling pipeline.
+ */
 public final class ParametricToggleStyle implements ToggleStyle {
    private final ToggleStyleConfig cfg;
    private final ThemeProvider themeProvider;
 
+   /**
+    * Creates a parametric toggle style.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public ParametricToggleStyle(ToggleStyleConfig var1) {
       if (var1 == null) {
          throw new IllegalArgumentException("Config null");
@@ -24,6 +45,16 @@ public final class ParametricToggleStyle implements ToggleStyle {
       }
    }
 
+   /**
+    * Renders the current frame.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void render(PApplet var1, ToggleViewState var2, ThemeSnapshot var3) {
       ThemeTokens var4 = var3.tokens;
       int var5 = Math.max(0, var2.stateIndex());
@@ -59,6 +90,14 @@ public final class ParametricToggleStyle implements ToggleStyle {
       }
    }
 
+   /**
+    * Returns theme snapshot.
+    *
+    * @return current theme snapshot
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public ThemeSnapshot getThemeSnapshot() {
       return this.themeProvider.getSnapshot();
    }

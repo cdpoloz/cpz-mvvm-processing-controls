@@ -47,6 +47,19 @@ import java.util.Objects;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
 
+/**
+ * Development sketch for the theme dev flow.
+ *
+ * Responsibilities:
+ * - Exercise public controls in an interactive sketch.
+ * - Provide a development-time validation surface.
+ *
+ * Behavior:
+ * - Targets interactive validation rather than library reuse.
+ *
+ * Notes:
+ * - This type is intended for development and demonstration flows.
+ */
 public final class ThemeDevSketch extends PApplet {
     private final FocusManager focusManager = new FocusManager();
     private final InputManager inputManager = new InputManager();
@@ -74,11 +87,23 @@ public final class ThemeDevSketch extends PApplet {
     private LabelView sliderValueLabel;
     private LabelViewModel sliderValueLabelViewModel;
 
+    /**
+     * Updates tings.
+     *
+     * Behavior:
+     * - Updates the public state or registration owned by this type.
+     */
     public void settings() {
         this.size(920, 420);
         this.smooth(4);
     }
 
+    /**
+     * Updates up.
+     *
+     * Behavior:
+     * - Updates the public state or registration owned by this type.
+     */
     public void setup() {
         this.keyboardAdapter = new KeyboardInputAdapter(this.focusManager);
         this.buttonViewModel = new ButtonViewModel(new ButtonModel("Toggle Ready"));
@@ -123,6 +148,12 @@ public final class ThemeDevSketch extends PApplet {
         this.inputManager.registerLayer(new ThemeRootInputLayer());
     }
 
+    /**
+     * Draws the current frame.
+     *
+     * Behavior:
+     * - Uses already available state and does not define business rules.
+     */
     public void draw() {
         ThemeTokens var1 = this.themeManager.getSnapshot().tokens;
         this.background(var1.surfaceVariant);
@@ -138,36 +169,86 @@ public final class ThemeDevSketch extends PApplet {
         this.drawFooter(var1);
     }
 
+    /**
+     * Performs key released.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyReleased() {
         if (key == ESC) key = 0;
         this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
     }
 
+    /**
+     * Performs mouse moved.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mouseMoved() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
+    /**
+     * Performs mouse dragged.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mouseDragged() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
+    /**
+     * Performs mouse pressed.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mousePressed() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
+    /**
+     * Performs mouse released.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mouseReleased() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
+    /**
+     * Performs mouse wheel.
+     *
+     * @param var1 parameter used by this operation
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mouseWheel(MouseEvent var1) {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.WHEEL, (float) this.mouseX, (float) this.mouseY, this.mouseButton, (float) var1.getCount(), var1.isShiftDown(), var1.isControlDown()));
     }
 
+    /**
+     * Performs key pressed.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyPressed() {
         if (key == ESC) key = 0;
         this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.PRESS, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
     }
 
+    /**
+     * Performs key typed.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyTyped() {
         if (key == ESC) key = 0;
         this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.TYPE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
@@ -220,6 +301,15 @@ public final class ThemeDevSketch extends PApplet {
             super(0);
         }
 
+        /**
+         * Handles pointer event.
+         *
+         * @param var1 parameter used by this operation
+         * @return result of this operation
+         *
+         * Behavior:
+         * - Applies the public interaction flow exposed by this type.
+         */
         public boolean handlePointerEvent(PointerEvent var1) {
             switch (var1.getType()) {
                 case MOVE:
@@ -265,6 +355,15 @@ public final class ThemeDevSketch extends PApplet {
             }
         }
 
+        /**
+         * Handles keyboard event.
+         *
+         * @param var1 parameter used by this operation
+         * @return result of this operation
+         *
+         * Behavior:
+         * - Applies the public interaction flow exposed by this type.
+         */
         public boolean handleKeyboardEvent(KeyboardEvent var1) {
             /*
             ThemeDevSketch.this.keyboardAdapter.handleKeyboardEvent(var1);

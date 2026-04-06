@@ -3,14 +3,43 @@ package com.cpz.processing.controls.core.input;
 import com.cpz.processing.controls.core.focus.FocusManager;
 import processing.event.KeyEvent;
 
+/**
+ * Input component for keyboard input adapter.
+ *
+ * Responsibilities:
+ * - Translate public input flow into control operations.
+ * - Keep raw event handling outside business state.
+ *
+ * Behavior:
+ * - Keeps the public role isolated from unrelated concerns.
+ *
+ * Notes:
+ * - This type is part of the public project surface.
+ */
 public final class KeyboardInputAdapter {
    private final FocusManager focusManager;
    private boolean suppressTypedOnce;
 
+   /**
+    * Creates a keyboard input adapter.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public KeyboardInputAdapter(FocusManager var1) {
       this.focusManager = var1;
    }
 
+   /**
+    * Handles key typed.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
    public void onKeyTyped(char var1) {
       if (this.suppressTypedOnce) {
          this.suppressTypedOnce = false;
@@ -22,6 +51,16 @@ public final class KeyboardInputAdapter {
       }
    }
 
+   /**
+    * Handles key pressed.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
    public void onKeyPressed(char var1, int var2, KeyEvent var3) {
       boolean var4 = var3 != null && var3.isShiftDown();
       boolean var5 = var3 != null && var3.isControlDown();
@@ -29,6 +68,14 @@ public final class KeyboardInputAdapter {
       this.handlePressed(var2, var4, var5, var6);
    }
 
+   /**
+    * Handles keyboard event.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
    public void handleKeyboardEvent(KeyboardEvent var1) {
       if (var1 != null) {
          switch (var1.getType()) {

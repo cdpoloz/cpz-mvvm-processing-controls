@@ -12,6 +12,19 @@ import com.cpz.processing.controls.core.overlay.OverlayEntry;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
 import java.util.Objects;
 
+/**
+ * Utility component for drop down overlay controller.
+ *
+ * Responsibilities:
+ * - Expose a public architectural role.
+ * - Keep responsibilities explicit in the API surface.
+ *
+ * Behavior:
+ * - Keeps the public role isolated from unrelated concerns.
+ *
+ * Notes:
+ * - This type is part of the public project surface.
+ */
 public final class DropDownOverlayController {
    private final DropDownView view;
    private final DropDownViewModel viewModel;
@@ -24,6 +37,19 @@ public final class DropDownOverlayController {
    private TransferHandler transferHandler;
    private boolean registered;
 
+   /**
+    * Creates a drop down overlay controller.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    * @param var4 parameter used by this operation
+    * @param var5 parameter used by this operation
+    * @param var6 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public DropDownOverlayController(DropDownView var1, DropDownViewModel var2, FocusManager var3, OverlayManager var4, InputManager var5, int var6) {
       this.view = var1;
       this.viewModel = var2;
@@ -36,10 +62,24 @@ public final class DropDownOverlayController {
       this.overlayEntry = new OverlayEntry(var6, var1::draw, this.inputLayer, this::closeOverlay, var2);
    }
 
+   /**
+    * Updates transfer handler.
+    *
+    * @param var1 new transfer handler
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setTransferHandler(TransferHandler var1) {
       this.transferHandler = var1;
    }
 
+   /**
+    * Performs sync registration.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void syncRegistration() {
       if (this.viewModel.isExpanded()) {
          this.register();
@@ -49,22 +89,58 @@ public final class DropDownOverlayController {
 
    }
 
+   /**
+    * Performs dispose.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void dispose() {
       this.unregister();
    }
 
+   /**
+    * Returns view.
+    *
+    * @return current view
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public DropDownView getView() {
       return this.view;
    }
 
+   /**
+    * Returns view model.
+    *
+    * @return current view model
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public DropDownViewModel getViewModel() {
       return this.viewModel;
    }
 
+   /**
+    * Returns z index.
+    *
+    * @return current z index
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public int getZIndex() {
       return this.zIndex;
    }
 
+   /**
+    * Performs close overlay.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void closeOverlay() {
       this.viewModel.close();
       this.view.handleMouseMove(-1.0F, -1.0F);
@@ -92,14 +168,39 @@ public final class DropDownOverlayController {
          super(var2);
       }
 
+      /**
+       * Returns whether pointer capture enabled.
+       *
+       * @return whether the current condition is satisfied
+       *
+       * Behavior:
+       * - Returns the current value without applying side effects.
+       */
       public boolean isPointerCaptureEnabled() {
          return DropDownOverlayController.this.viewModel.isExpanded();
       }
 
+      /**
+       * Returns whether keyboard capture enabled.
+       *
+       * @return whether the current condition is satisfied
+       *
+       * Behavior:
+       * - Returns the current value without applying side effects.
+       */
       public boolean isKeyboardCaptureEnabled() {
          return false;
       }
 
+      /**
+       * Handles pointer event.
+       *
+       * @param var1 parameter used by this operation
+       * @return result of this operation
+       *
+       * Behavior:
+       * - Applies the public interaction flow exposed by this type.
+       */
       public boolean handlePointerEvent(PointerEvent var1) {
          boolean var2 = DropDownOverlayController.this.viewModel.isExpanded();
          if (!var2) {
@@ -125,11 +226,33 @@ public final class DropDownOverlayController {
          }
       }
 
+      /**
+       * Handles keyboard event.
+       *
+       * @param var1 parameter used by this operation
+       * @return result of this operation
+       *
+       * Behavior:
+       * - Applies the public interaction flow exposed by this type.
+       */
       public boolean handleKeyboardEvent(KeyboardEvent var1) {
          return false;
       }
    }
 
+   /**
+    * Utility component for transfer handler.
+    *
+    * Responsibilities:
+    * - Define a focused public contract.
+    * - Keep implementations replaceable.
+    *
+    * Behavior:
+    * - Declares the contract without prescribing implementation details.
+    *
+    * Notes:
+    * - This type is part of the public project surface.
+    */
    public interface TransferHandler {
       boolean handleTransfer(DropDownOverlayController var1, PointerEvent var2);
    }
