@@ -3,7 +3,28 @@ package com.cpz.processing.controls.dev;
 import java.util.Locale;
 import processing.core.PApplet;
 
+/**
+ * Entry point for launching development sketches.
+ *
+ * Responsibilities:
+ * - Exercise public controls in an interactive sketch.
+ * - Provide a development-time validation surface.
+ *
+ * Behavior:
+ * - Targets interactive validation rather than library reuse.
+ *
+ * Notes:
+ * - This type is intended for development and demonstration flows.
+ */
 public class Launcher {
+   /**
+    * Starts the public launcher flow.
+    *
+    * @param args launcher arguments
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public static void main(String[] args) {
       Locale.setDefault(Locale.forLanguageTag("en-US"));
       //PApplet.main(ButtonDevSketch.class);

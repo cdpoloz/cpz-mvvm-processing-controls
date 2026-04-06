@@ -17,6 +17,19 @@ import java.util.Objects;
 import processing.core.PApplet;
 import processing.core.PFont;
 
+/**
+ * Development sketch for the text field dev flow.
+ *
+ * Responsibilities:
+ * - Exercise public controls in an interactive sketch.
+ * - Provide a development-time validation surface.
+ *
+ * Behavior:
+ * - Targets interactive validation rather than library reuse.
+ *
+ * Notes:
+ * - This type is intended for development and demonstration flows.
+ */
 public class TextFieldDevSketch extends PApplet {
    private final FocusManager focusManager = new FocusManager();
    private final InputManager inputManager = new InputManager();
@@ -26,11 +39,23 @@ public class TextFieldDevSketch extends PApplet {
    private TextFieldInputAdapter defaultFontInput;
    private KeyboardInputAdapter keyboardAdapter;
 
+   /**
+    * Updates tings.
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void settings() {
       this.size(980, 420);
       this.smooth(4);
    }
 
+   /**
+    * Updates up.
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setup() {
       PFont var1 = this.createFont("data/font/abel-regular.ttf", 16.0F, true);
       this.keyboardAdapter = new KeyboardInputAdapter(this.focusManager);
@@ -47,6 +72,12 @@ public class TextFieldDevSketch extends PApplet {
       this.inputManager.registerLayer(new TextFieldRootInputLayer());
    }
 
+   /**
+    * Draws the current frame.
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void draw() {
       this.background(242);
       this.drawTitles();
@@ -54,18 +85,42 @@ public class TextFieldDevSketch extends PApplet {
       this.defaultFontView.draw();
    }
 
+   /**
+    * Performs mouse pressed.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void mousePressed() {
       this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float)this.mouseX, (float)this.mouseY, this.mouseButton));
    }
 
+   /**
+    * Performs mouse dragged.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void mouseDragged() {
       this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, (float)this.mouseX, (float)this.mouseY, this.mouseButton));
    }
 
+   /**
+    * Performs mouse released.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void mouseReleased() {
       this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float)this.mouseX, (float)this.mouseY, this.mouseButton));
    }
 
+   /**
+    * Performs key pressed.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void keyPressed() {
       if (this.key == 27) {
          this.key = 0;
@@ -74,6 +129,12 @@ public class TextFieldDevSketch extends PApplet {
       this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.PRESS, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
    }
 
+   /**
+    * Performs key released.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void keyReleased() {
       if (this.key == 27) {
          this.key = 0;
@@ -82,6 +143,12 @@ public class TextFieldDevSketch extends PApplet {
       this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
    }
 
+   /**
+    * Performs key typed.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void keyTyped() {
       this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.TYPE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
    }
@@ -130,6 +197,15 @@ public class TextFieldDevSketch extends PApplet {
          super(0);
       }
 
+      /**
+       * Handles pointer event.
+       *
+       * @param var1 parameter used by this operation
+       * @return result of this operation
+       *
+       * Behavior:
+       * - Applies the public interaction flow exposed by this type.
+       */
       public boolean handlePointerEvent(PointerEvent var1) {
          switch (var1.getType()) {
             case PRESS:
@@ -156,6 +232,15 @@ public class TextFieldDevSketch extends PApplet {
          }
       }
 
+      /**
+       * Handles keyboard event.
+       *
+       * @param var1 parameter used by this operation
+       * @return result of this operation
+       *
+       * Behavior:
+       * - Applies the public interaction flow exposed by this type.
+       */
       public boolean handleKeyboardEvent(KeyboardEvent var1) {
          switch (var1.getType()) {
             case PRESS:

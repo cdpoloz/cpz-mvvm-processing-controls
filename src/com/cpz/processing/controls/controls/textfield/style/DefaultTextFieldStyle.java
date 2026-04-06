@@ -10,15 +10,45 @@ import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 import processing.core.PApplet;
 
+/**
+ * Style component for default text field style.
+ *
+ * Responsibilities:
+ * - Resolve visual values from immutable state and theme data.
+ * - Keep interaction rules outside the rendering layer.
+ *
+ * Behavior:
+ * - Does not process raw input or mutate the backing model.
+ *
+ * Notes:
+ * - This type belongs to the visual styling pipeline.
+ */
 public final class DefaultTextFieldStyle implements TextFieldStyle {
    private final TextFieldStyleConfig config;
    private final TextFieldRenderer renderer;
    private final ThemeProvider themeProvider;
 
+   /**
+    * Creates a default text field style.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public DefaultTextFieldStyle(TextFieldStyleConfig var1) {
       this(var1, new DefaultTextFieldRenderer());
    }
 
+   /**
+    * Creates a default text field style.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public DefaultTextFieldStyle(TextFieldStyleConfig var1, TextFieldRenderer var2) {
       if (var1 == null) {
          throw new IllegalArgumentException("config must not be null");
@@ -29,10 +59,30 @@ public final class DefaultTextFieldStyle implements TextFieldStyle {
       }
    }
 
+   /**
+    * Renders the current frame.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void render(PApplet var1, TextFieldViewState var2, ThemeSnapshot var3) {
       this.renderer.render(var1, var2, this.resolveRenderStyle(var2, var3));
    }
 
+   /**
+    * Resolves render style.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @return resolved render style
+    *
+    * Behavior:
+    * - Produces the public result required by the surrounding pipeline.
+    */
    public TextFieldRenderStyle resolveRenderStyle(TextFieldViewState var1, ThemeSnapshot var2) {
       ThemeTokens var3 = var2.tokens;
       int var4 = this.resolveColorOverride(var3.surface, this.config.backgroundOverride, this.config.backgroundColor);
@@ -73,6 +123,14 @@ public final class DefaultTextFieldStyle implements TextFieldStyle {
       return Math.round((float)var1 + (float)(var2 - var1) * var3);
    }
 
+   /**
+    * Returns theme snapshot.
+    *
+    * @return current theme snapshot
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public ThemeSnapshot getThemeSnapshot() {
       return this.themeProvider.getSnapshot();
    }

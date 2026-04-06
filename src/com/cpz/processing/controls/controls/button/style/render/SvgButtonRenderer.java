@@ -4,9 +4,31 @@ import com.cpz.processing.controls.controls.button.style.ButtonRenderStyle;
 import processing.core.PApplet;
 import processing.core.PShape;
 
+/**
+ * Renderer for svg button renderer.
+ *
+ * Responsibilities:
+ * - Draw already resolved frame data.
+ * - Keep rendering concerns separate from state decisions.
+ *
+ * Behavior:
+ * - Uses already resolved state and does not decide behavior.
+ *
+ * Notes:
+ * - This type belongs to the visual styling pipeline.
+ */
 public final class SvgButtonRenderer implements ButtonRenderer {
    private final PShape shape;
 
+   /**
+    * Creates a svg button renderer.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public SvgButtonRenderer(PApplet var1, String var2) {
       this.shape = loadShape(var1, var2);
       if (this.shape != null) {
@@ -15,6 +37,19 @@ public final class SvgButtonRenderer implements ButtonRenderer {
 
    }
 
+   /**
+    * Renders the current frame.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    * @param var4 parameter used by this operation
+    * @param var5 parameter used by this operation
+    * @param var6 parameter used by this operation
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void render(PApplet var1, float var2, float var3, float var4, float var5, ButtonRenderStyle var6) {
       String var7 = var6.text();
       if (var7 == null) {

@@ -15,6 +15,19 @@ import java.util.List;
 import java.util.Objects;
 import processing.core.PApplet;
 
+/**
+ * Development sketch for the radio group dev flow.
+ *
+ * Responsibilities:
+ * - Exercise public controls in an interactive sketch.
+ * - Provide a development-time validation surface.
+ *
+ * Behavior:
+ * - Targets interactive validation rather than library reuse.
+ *
+ * Notes:
+ * - This type is intended for development and demonstration flows.
+ */
 public class RadioGroupDevSketch extends PApplet {
    private final FocusManager focusManager = new FocusManager();
    private final InputManager inputManager = new InputManager();
@@ -27,11 +40,23 @@ public class RadioGroupDevSketch extends PApplet {
    private KeyboardInputAdapter keyboardAdapter;
    private String statusText = "No selection yet";
 
+   /**
+    * Updates tings.
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void settings() {
       this.size(920, 520);
       this.smooth(4);
    }
 
+   /**
+    * Updates up.
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setup() {
       this.keyboardAdapter = new KeyboardInputAdapter(this.focusManager);
       this.mainGroupViewModel = new RadioGroupViewModel(new RadioGroupModel(List.of("Mercury", "Venus", "Earth", "Mars", "Jupiter"), 2));
@@ -47,6 +72,12 @@ public class RadioGroupDevSketch extends PApplet {
       this.inputManager.registerLayer(new RadioGroupRootInputLayer());
    }
 
+   /**
+    * Draws the current frame.
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void draw() {
       this.background(244);
       this.drawTitles();
@@ -55,22 +86,52 @@ public class RadioGroupDevSketch extends PApplet {
       this.drawDebug();
    }
 
+   /**
+    * Performs mouse moved.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void mouseMoved() {
       this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float)this.mouseX, (float)this.mouseY, this.mouseButton));
    }
 
+   /**
+    * Performs mouse dragged.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void mouseDragged() {
       this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, (float)this.mouseX, (float)this.mouseY, this.mouseButton));
    }
 
+   /**
+    * Performs mouse pressed.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void mousePressed() {
       this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float)this.mouseX, (float)this.mouseY, this.mouseButton));
    }
 
+   /**
+    * Performs mouse released.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void mouseReleased() {
       this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float)this.mouseX, (float)this.mouseY, this.mouseButton));
    }
 
+   /**
+    * Performs key pressed.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void keyPressed() {
       if (this.key == 27) {
          this.key = 0;
@@ -79,6 +140,12 @@ public class RadioGroupDevSketch extends PApplet {
       this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.PRESS, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
    }
 
+   /**
+    * Performs key released.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void keyReleased() {
       if (this.key == 27) {
          this.key = 0;
@@ -87,6 +154,12 @@ public class RadioGroupDevSketch extends PApplet {
       this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
    }
 
+   /**
+    * Performs key typed.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void keyTyped() {
       this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.TYPE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
    }
@@ -120,6 +193,15 @@ public class RadioGroupDevSketch extends PApplet {
          super(0);
       }
 
+      /**
+       * Handles pointer event.
+       *
+       * @param var1 parameter used by this operation
+       * @return result of this operation
+       *
+       * Behavior:
+       * - Applies the public interaction flow exposed by this type.
+       */
       public boolean handlePointerEvent(PointerEvent var1) {
          switch (var1.getType()) {
             case MOVE:
@@ -144,6 +226,15 @@ public class RadioGroupDevSketch extends PApplet {
          }
       }
 
+      /**
+       * Handles keyboard event.
+       *
+       * @param var1 parameter used by this operation
+       * @return result of this operation
+       *
+       * Behavior:
+       * - Applies the public interaction flow exposed by this type.
+       */
       public boolean handleKeyboardEvent(KeyboardEvent var1) {
          RadioGroupDevSketch.this.keyboardAdapter.handleKeyboardEvent(var1);
          return true;

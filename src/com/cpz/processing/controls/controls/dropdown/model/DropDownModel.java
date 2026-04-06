@@ -5,42 +5,120 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Model for drop down model.
+ *
+ * Responsibilities:
+ * - Store durable control state.
+ * - Remain independent from rendering and input code.
+ *
+ * Behavior:
+ * - Keeps state mutation independent from rendering concerns.
+ *
+ * Notes:
+ * - This type belongs to the MVVM Model layer.
+ */
 public final class DropDownModel implements Enableable {
    private List<String> items;
    private int selectedIndex;
    private boolean enabled;
 
+   /**
+    * Creates a drop down model.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public DropDownModel(List<String> var1) {
       this(var1, -1);
    }
 
+   /**
+    * Creates a drop down model.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public DropDownModel(List<String> var1, int var2) {
       this.items = sanitizeItems(var1);
       this.selectedIndex = normalizeSelectedIndex(var2, this.items.size());
       this.enabled = true;
    }
 
+   /**
+    * Returns items.
+    *
+    * @return current items
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public List<String> getItems() {
       return Collections.unmodifiableList(this.items);
    }
 
+   /**
+    * Updates items.
+    *
+    * @param var1 new items
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setItems(List<String> var1) {
       this.items = sanitizeItems(var1);
       this.selectedIndex = normalizeSelectedIndex(this.selectedIndex, this.items.size());
    }
 
+   /**
+    * Returns selected index.
+    *
+    * @return current selected index
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public int getSelectedIndex() {
       return this.selectedIndex;
    }
 
+   /**
+    * Updates selected index.
+    *
+    * @param var1 new selected index
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setSelectedIndex(int var1) {
       this.selectedIndex = normalizeSelectedIndex(var1, this.items.size());
    }
 
+   /**
+    * Returns whether enabled.
+    *
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public boolean isEnabled() {
       return this.enabled;
    }
 
+   /**
+    * Updates enabled.
+    *
+    * @param var1 new enabled
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setEnabled(boolean var1) {
       this.enabled = var1;
    }

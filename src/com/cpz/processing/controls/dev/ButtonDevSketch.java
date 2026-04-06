@@ -17,6 +17,19 @@ import java.util.Objects;
 
 import processing.core.PApplet;
 
+/**
+ * Development sketch for the button dev flow.
+ *
+ * Responsibilities:
+ * - Exercise public controls in an interactive sketch.
+ * - Provide a development-time validation surface.
+ *
+ * Behavior:
+ * - Targets interactive validation rather than library reuse.
+ *
+ * Notes:
+ * - This type is intended for development and demonstration flows.
+ */
 public class ButtonDevSketch extends PApplet {
     private final InputManager inputManager = new InputManager();
     private ButtonView primaryButtonView;
@@ -29,11 +42,23 @@ public class ButtonDevSketch extends PApplet {
     private String lastAction = "No clicks";
     private boolean svgEnabled = true;
 
+    /**
+     * Updates tings.
+     *
+     * Behavior:
+     * - Updates the public state or registration owned by this type.
+     */
     public void settings() {
         this.size(820, 440);
         this.smooth(4);
     }
 
+    /**
+     * Updates up.
+     *
+     * Behavior:
+     * - Updates the public state or registration owned by this type.
+     */
     public void setup() {
         this.primaryButtonViewModel = new ButtonViewModel(new ButtonModel("Primary"));
         this.primaryButtonViewModel.setClickListener(() -> {
@@ -52,6 +77,12 @@ public class ButtonDevSketch extends PApplet {
         this.inputManager.registerLayer(new ButtonRootInputLayer());
     }
 
+    /**
+     * Draws the current frame.
+     *
+     * Behavior:
+     * - Uses already available state and does not define business rules.
+     */
     public void draw() {
         this.background(28);
         this.drawTitles();
@@ -60,31 +91,73 @@ public class ButtonDevSketch extends PApplet {
         this.drawDebug();
     }
 
+    /**
+     * Performs key released.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyReleased() {
         if (this.key == ESC) this.key = 0;
         this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
     }
 
+    /**
+     * Performs key pressed.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyPressed() {
         if (key == ESC) key = 0;
     }
 
+    /**
+     * Performs key typed.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyTyped() {
         if (key == ESC) key = 0;
     }
 
+    /**
+     * Performs mouse moved.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mouseMoved() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
+    /**
+     * Performs mouse dragged.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mouseDragged() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
+    /**
+     * Performs mouse pressed.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mousePressed() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
 
+    /**
+     * Performs mouse released.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mouseReleased() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
     }
@@ -135,6 +208,15 @@ public class ButtonDevSketch extends PApplet {
             super(0);
         }
 
+        /**
+         * Handles pointer event.
+         *
+         * @param var1 parameter used by this operation
+         * @return result of this operation
+         *
+         * Behavior:
+         * - Applies the public interaction flow exposed by this type.
+         */
         public boolean handlePointerEvent(PointerEvent var1) {
             switch (var1.getType()) {
                 case MOVE:
@@ -155,6 +237,15 @@ public class ButtonDevSketch extends PApplet {
             }
         }
 
+        /**
+         * Handles keyboard event.
+         *
+         * @param var1 parameter used by this operation
+         * @return result of this operation
+         *
+         * Behavior:
+         * - Applies the public interaction flow exposed by this type.
+         */
         public boolean handleKeyboardEvent(KeyboardEvent var1) {
             return false;
         }

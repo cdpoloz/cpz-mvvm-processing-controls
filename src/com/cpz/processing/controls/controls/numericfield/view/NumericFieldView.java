@@ -10,6 +10,19 @@ import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import processing.core.PApplet;
 
+/**
+ * View for numeric field view.
+ *
+ * Responsibilities:
+ * - Own layout, hit testing, and frame-state construction.
+ * - Delegate visual resolution to styles and renderers.
+ *
+ * Behavior:
+ * - Does not own business rules or persistent model state.
+ *
+ * Notes:
+ * - This type belongs to the MVVM View layer.
+ */
 public final class NumericFieldView implements ControlView, PointerInteractable {
    private static final float HORIZONTAL_PADDING = 10.0F;
    private static final long DOUBLE_CLICK_THRESHOLD = 250L;
@@ -23,6 +36,19 @@ public final class NumericFieldView implements ControlView, PointerInteractable 
    private long lastClickTime;
    private int clickCount;
 
+   /**
+    * Creates a numeric field view.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    * @param var4 parameter used by this operation
+    * @param var5 parameter used by this operation
+    * @param var6 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public NumericFieldView(PApplet var1, NumericFieldViewModel var2, float var3, float var4, float var5, float var6) {
       this.sketch = var1;
       this.viewModel = var2;
@@ -33,6 +59,12 @@ public final class NumericFieldView implements ControlView, PointerInteractable 
       this.style = NumericFieldDefaultStyles.standard();
    }
 
+   /**
+    * Draws the current frame.
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void draw() {
       if (this.viewModel.isVisible()) {
          ThemeSnapshot var1 = this.style.getThemeSnapshot();
@@ -40,16 +72,42 @@ public final class NumericFieldView implements ControlView, PointerInteractable 
       }
    }
 
+   /**
+    * Updates position.
+    *
+    * @param var1 new position
+    * @param var2 parameter used by this operation
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setPosition(float var1, float var2) {
       this.x = var1;
       this.y = var2;
    }
 
+   /**
+    * Updates size.
+    *
+    * @param var1 new size
+    * @param var2 parameter used by this operation
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setSize(float var1, float var2) {
       this.width = var1;
       this.height = var2;
    }
 
+   /**
+    * Updates style.
+    *
+    * @param var1 new style
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setStyle(NumericFieldStyle var1) {
       if (var1 != null) {
          this.style = var1;
@@ -57,12 +115,31 @@ public final class NumericFieldView implements ControlView, PointerInteractable 
 
    }
 
+   /**
+    * Performs contains.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @return result of this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public boolean contains(float var1, float var2) {
       float var3 = this.width * 0.5F;
       float var4 = this.height * 0.5F;
       return var1 >= this.x - var3 && var1 <= this.x + var3 && var2 >= this.y - var4 && var2 <= this.y + var4;
    }
 
+   /**
+    * Performs position to cursor index.
+    *
+    * @param var1 parameter used by this operation
+    * @return result of this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public int positionToCursorIndex(float var1) {
       String var2 = this.viewModel.getText();
       float var3 = var1 - this.getTextStartX();
@@ -86,6 +163,14 @@ public final class NumericFieldView implements ControlView, PointerInteractable 
       }
    }
 
+   /**
+    * Handles mouse press.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
    public void handleMousePress(float var1) {
       int var2 = this.positionToCursorIndex(var1);
       this.updateClickCount();
@@ -105,6 +190,14 @@ public final class NumericFieldView implements ControlView, PointerInteractable 
       }
    }
 
+   /**
+    * Handles mouse drag.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
    public void handleMouseDrag(float var1) {
       if (this.viewModel.isSelecting()) {
          int var2 = this.positionToCursorIndex(var1);
@@ -113,6 +206,12 @@ public final class NumericFieldView implements ControlView, PointerInteractable 
       }
    }
 
+   /**
+    * Handles mouse release.
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
    public void handleMouseRelease() {
       this.viewModel.setSelecting(false);
    }

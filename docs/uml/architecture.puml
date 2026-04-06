@@ -3,31 +3,43 @@ title High-Level Architecture
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-package "Theme" {
-  interface ThemeProvider
-  class ThemeManager
-  class Theme
-  class ThemeSnapshot
-  class ThemeTokens
-}
-
-package "MVVM Pipeline" {
+package "MVVM" {
+  class Model
+  class ViewModel
   class View
   class ViewState
+}
+
+package "Rendering" {
   class Style
   class RenderStyle
   class Renderer
 }
 
+package "Infrastructure" {
+  interface ThemeProvider
+  class ThemeManager
+  class ThemeSnapshot
+  class InputManager
+  interface InputLayer
+  class FocusManager
+  class OverlayManager
+}
+
 ThemeManager ..|> ThemeProvider
-ThemeManager --> Theme
-ThemeManager --> ThemeSnapshot : rebuilds on setTheme()
-ThemeSnapshot --> ThemeTokens
-View --> ThemeProvider : reads cached snapshot
+ThemeProvider --> ThemeSnapshot
+
+ViewModel --> Model : updates
+View --> ViewModel : reads
 View --> ViewState : builds
-View --> ThemeSnapshot : passes to style
-Style --> ViewState
-Style --> ThemeSnapshot
-Style --> RenderStyle
-Renderer --> RenderStyle
+View --> ThemeProvider : reads snapshot
+Style --> ViewState : resolves
+Style --> ThemeSnapshot : consumes
+Style --> RenderStyle : creates
+Renderer --> RenderStyle : draws
+
+InputManager --> InputLayer : dispatches
+InputLayer --> ViewModel : forwards input
+FocusManager --> ViewModel : manages focus
+OverlayManager --> View : coordinates overlays
 @enduml

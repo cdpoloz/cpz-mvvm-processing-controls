@@ -5,54 +5,155 @@ import com.cpz.processing.controls.core.focus.Focusable;
 import com.cpz.processing.controls.core.viewmodel.AbstractControlViewModel;
 import java.util.List;
 
+/**
+ * ViewModel for drop down view model.
+ *
+ * Responsibilities:
+ * - Expose control state to the view layer.
+ * - Coordinate interaction and synchronize with the backing model.
+ *
+ * Behavior:
+ * - Does not perform drawing directly.
+ *
+ * Notes:
+ * - This type belongs to the MVVM ViewModel layer.
+ */
 public final class DropDownViewModel extends AbstractControlViewModel implements Focusable {
    private boolean hovered;
    private boolean pressed;
    private boolean focused;
    private boolean expanded;
 
+   /**
+    * Creates a drop down view model.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public DropDownViewModel(DropDownModel var1) {
       super(var1);
    }
 
+   /**
+    * Returns items.
+    *
+    * @return current items
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public List getItems() {
       return ((DropDownModel)this.model).getItems();
    }
 
+   /**
+    * Updates items.
+    *
+    * @param var1 new items
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setItems(List var1) {
       ((DropDownModel)this.model).setItems(var1);
    }
 
+   /**
+    * Returns selected index.
+    *
+    * @return current selected index
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public int getSelectedIndex() {
       return ((DropDownModel)this.model).getSelectedIndex();
    }
 
+   /**
+    * Returns selected text.
+    *
+    * @return current selected text
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public String getSelectedText() {
       int var1 = ((DropDownModel)this.model).getSelectedIndex();
       List var2 = ((DropDownModel)this.model).getItems();
       return var1 >= 0 && var1 < var2.size() ? (String)var2.get(var1) : "";
    }
 
+   /**
+    * Returns whether hovered.
+    *
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public boolean isHovered() {
       return this.hovered;
    }
 
+   /**
+    * Updates hovered.
+    *
+    * @param var1 new hovered
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setHovered(boolean var1) {
       this.hovered = var1 && this.isInteractive();
    }
 
+   /**
+    * Returns whether pressed.
+    *
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public boolean isPressed() {
       return this.pressed;
    }
 
+   /**
+    * Updates pressed.
+    *
+    * @param var1 new pressed
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setPressed(boolean var1) {
       this.pressed = var1 && this.isInteractive();
    }
 
+   /**
+    * Returns whether focused.
+    *
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public boolean isFocused() {
       return this.focused;
    }
 
+   /**
+    * Updates focused.
+    *
+    * @param var1 new focused
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setFocused(boolean var1) {
       this.focused = var1 && this.isInteractive();
       if (!this.focused) {
@@ -61,10 +162,24 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
 
    }
 
+   /**
+    * Returns whether expanded.
+    *
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public boolean isExpanded() {
       return this.expanded;
    }
 
+   /**
+    * Performs toggle expanded.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void toggleExpanded() {
       if (this.isInteractive() && !((DropDownModel)this.model).getItems().isEmpty()) {
          this.expanded = !this.expanded;
@@ -73,21 +188,47 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
       }
    }
 
+   /**
+    * Performs close.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void close() {
       this.expanded = false;
       this.pressed = false;
    }
 
+   /**
+    * Performs select index.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void selectIndex(int var1) {
       if (this.isInteractive()) {
          ((DropDownModel)this.model).setSelectedIndex(var1);
       }
    }
 
+   /**
+    * Handles focus gained.
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
    public void onFocusGained() {
       this.focused = this.isInteractive();
    }
 
+   /**
+    * Handles focus lost.
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
    public void onFocusLost() {
       this.focused = false;
       this.close();

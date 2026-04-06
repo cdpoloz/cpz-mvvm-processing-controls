@@ -28,6 +28,19 @@ import java.util.Objects;
 
 import processing.core.PApplet;
 
+/**
+ * Development sketch for the drop down dev flow.
+ *
+ * Responsibilities:
+ * - Exercise public controls in an interactive sketch.
+ * - Provide a development-time validation surface.
+ *
+ * Behavior:
+ * - Targets interactive validation rather than library reuse.
+ *
+ * Notes:
+ * - This type is intended for development and demonstration flows.
+ */
 public class DropDownDevSketch extends PApplet {
     private static final int ROOT_LAYER_PRIORITY = 0;
     private static final int DROPDOWN_OVERLAY_PRIORITY = 100;
@@ -47,16 +60,34 @@ public class DropDownDevSketch extends PApplet {
     private ButtonInputAdapter buttonInputAdapter;
     private String statusText;
 
+    /**
+     * Creates a drop down dev sketch.
+     *
+     * Behavior:
+     * - Initializes the public state required by this type.
+     */
     public DropDownDevSketch() {
         this.overlayManager = new OverlayManager(this.focusManager);
         this.statusText = "Sin interaccion";
     }
 
+    /**
+     * Updates tings.
+     *
+     * Behavior:
+     * - Updates the public state or registration owned by this type.
+     */
     public void settings() {
         this.size(960, 560);
         this.smooth(4);
     }
 
+    /**
+     * Updates up.
+     *
+     * Behavior:
+     * - Updates the public state or registration owned by this type.
+     */
     public void setup() {
         this.firstDropDownViewModel = new DropDownViewModel(new DropDownModel(List.of("Option Alpha", "Option Beta", "Option Gamma", "Option Delta", "Option Epsilon", "Option Zeta", "Option Eta"), 1));
         this.firstDropDownView = new DropDownView(this, this.firstDropDownViewModel, (float) this.width * 0.32F, 150.0F, 280.0F, 42.0F);
@@ -86,10 +117,26 @@ public class DropDownDevSketch extends PApplet {
                 Objects.requireNonNull(DropDownDevSketch.this);
             }
 
+            /**
+             * Returns center x.
+             *
+             * @return current center x
+             *
+             * Behavior:
+             * - Returns the current value without applying side effects.
+             */
             public float getCenterX() {
                 return DropDownDevSketch.this.firstDropDownView.getX();
             }
 
+            /**
+             * Returns top y.
+             *
+             * @return current top y
+             *
+             * Behavior:
+             * - Returns the current value without applying side effects.
+             */
             public float getTopY() {
                 return DropDownDevSketch.this.firstDropDownView.getY() - DropDownDevSketch.this.firstDropDownView.getHeight() * 0.5F;
             }
@@ -102,10 +149,26 @@ public class DropDownDevSketch extends PApplet {
                 Objects.requireNonNull(DropDownDevSketch.this);
             }
 
+            /**
+             * Returns center x.
+             *
+             * @return current center x
+             *
+             * Behavior:
+             * - Returns the current value without applying side effects.
+             */
             public float getCenterX() {
                 return DropDownDevSketch.this.secondDropDownView.getX();
             }
 
+            /**
+             * Returns top y.
+             *
+             * @return current top y
+             *
+             * Behavior:
+             * - Returns the current value without applying side effects.
+             */
             public float getTopY() {
                 return DropDownDevSketch.this.secondDropDownView.getY() - DropDownDevSketch.this.secondDropDownView.getHeight() * 0.5F;
             }
@@ -115,10 +178,26 @@ public class DropDownDevSketch extends PApplet {
                 Objects.requireNonNull(DropDownDevSketch.this);
             }
 
+            /**
+             * Returns center x.
+             *
+             * @return current center x
+             *
+             * Behavior:
+             * - Returns the current value without applying side effects.
+             */
             public float getCenterX() {
                 return DropDownDevSketch.this.buttonView.getX();
             }
 
+            /**
+             * Returns top y.
+             *
+             * @return current top y
+             *
+             * Behavior:
+             * - Returns the current value without applying side effects.
+             */
             public float getTopY() {
                 return DropDownDevSketch.this.buttonView.getY() - DropDownDevSketch.this.buttonView.getHeight() * 0.5F;
             }
@@ -127,6 +206,12 @@ public class DropDownDevSketch extends PApplet {
         this.syncOverlayControllers();
     }
 
+    /**
+     * Draws the current frame.
+     *
+     * Behavior:
+     * - Uses already available state and does not define business rules.
+     */
     public void draw() {
         this.syncOverlayControllers();
         this.syncTooltipControllers();
@@ -138,6 +223,12 @@ public class DropDownDevSketch extends PApplet {
         this.drawRegisteredOverlays();
     }
 
+    /**
+     * Performs mouse moved.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mouseMoved() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
         this.syncOverlayControllers();
@@ -149,17 +240,35 @@ public class DropDownDevSketch extends PApplet {
 
     }
 
+    /**
+     * Performs mouse pressed.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mousePressed() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
         this.syncOverlayControllers();
         this.updateStatusAfterInput();
     }
 
+    /**
+     * Performs mouse released.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void mouseReleased() {
         this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) this.mouseX, (float) this.mouseY, this.mouseButton));
         this.syncOverlayControllers();
     }
 
+    /**
+     * Performs key pressed.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyPressed() {
         if (this.key == ESC) {
             this.key = 0;
@@ -171,15 +280,33 @@ public class DropDownDevSketch extends PApplet {
         }
     }
 
+    /**
+     * Performs key released.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyReleased() {
         if (this.key == ESC) this.key = 0;
         this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
     }
 
+    /**
+     * Performs key typed.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyTyped() {
         if (key == ESC) key = 0;
     }
 
+    /**
+     * Performs exit.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void exit() {
         this.firstOverlayController.dispose();
         this.secondOverlayController.dispose();
@@ -342,6 +469,15 @@ public class DropDownDevSketch extends PApplet {
             super(0);
         }
 
+        /**
+         * Handles pointer event.
+         *
+         * @param var1 parameter used by this operation
+         * @return result of this operation
+         *
+         * Behavior:
+         * - Applies the public interaction flow exposed by this type.
+         */
         public boolean handlePointerEvent(PointerEvent var1) {
             switch (var1.getType()) {
                 case MOVE:
@@ -359,6 +495,15 @@ public class DropDownDevSketch extends PApplet {
             }
         }
 
+        /**
+         * Handles keyboard event.
+         *
+         * @param var1 parameter used by this operation
+         * @return result of this operation
+         *
+         * Behavior:
+         * - Applies the public interaction flow exposed by this type.
+         */
         public boolean handleKeyboardEvent(KeyboardEvent var1) {
             return false;
         }

@@ -8,7 +8,31 @@ import com.cpz.processing.controls.controls.slider.view.SliderGeometry;
 import processing.core.PApplet;
 import processing.core.PShape;
 
+/**
+ * Renderer for slider renderer.
+ *
+ * Responsibilities:
+ * - Draw already resolved frame data.
+ * - Keep rendering concerns separate from state decisions.
+ *
+ * Behavior:
+ * - Uses already resolved state and does not decide behavior.
+ *
+ * Notes:
+ * - This type belongs to the visual styling pipeline.
+ */
 public final class SliderRenderer {
+   /**
+    * Renders the current frame.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    * @param var4 parameter used by this operation
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void render(PApplet var1, SliderGeometry var2, SliderViewState var3, SliderRenderStyle var4) {
       var1.pushStyle();
       this.drawBaseTrack(var1, var2, var4);

@@ -9,6 +9,19 @@ import com.cpz.processing.controls.controls.label.view.LabelView;
 import com.cpz.processing.controls.controls.label.viewmodel.LabelViewModel;
 import processing.core.PApplet;
 
+/**
+ * Development sketch for the label dev flow.
+ *
+ * Responsibilities:
+ * - Exercise public controls in an interactive sketch.
+ * - Provide a development-time validation surface.
+ *
+ * Behavior:
+ * - Targets interactive validation rather than library reuse.
+ *
+ * Notes:
+ * - This type is intended for development and demonstration flows.
+ */
 public class LabelDevSketch extends PApplet {
     private LabelView labelDefault;
     private LabelView labelMultiline;
@@ -16,10 +29,22 @@ public class LabelDevSketch extends PApplet {
     private LabelView labelDisabled;
     private LabelView labelCustom;
 
+    /**
+     * Updates tings.
+     *
+     * Behavior:
+     * - Updates the public state or registration owned by this type.
+     */
     public void settings() {
         this.size(900, 600);
     }
 
+    /**
+     * Updates up.
+     *
+     * Behavior:
+     * - Updates the public state or registration owned by this type.
+     */
     public void setup() {
         LabelViewModel var1 = new LabelViewModel(new LabelModel());
         var1.setText("Default Label");
@@ -49,6 +74,12 @@ public class LabelDevSketch extends PApplet {
         this.labelCustom.centerBlockAround((float) this.width / 2.0F, 450.0F);
     }
 
+    /**
+     * Draws the current frame.
+     *
+     * Behavior:
+     * - Uses already available state and does not define business rules.
+     */
     public void draw() {
         this.background(240);
         this.labelDefault.draw();
@@ -58,14 +89,32 @@ public class LabelDevSketch extends PApplet {
         this.labelCustom.draw();
     }
 
+    /**
+     * Performs key released.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyReleased() {
         if (this.key == ESC) this.key = 0;
     }
 
+    /**
+     * Performs key pressed.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyPressed() {
         if (key == ESC) key = 0;
     }
 
+    /**
+     * Performs key typed.
+     *
+     * Behavior:
+     * - Executes the public operation exposed by this type.
+     */
     public void keyTyped() {
         if (key == ESC) key = 0;
     }

@@ -12,6 +12,19 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import processing.core.PApplet;
 
+/**
+ * Overlay component for tooltip overlay controller.
+ *
+ * Responsibilities:
+ * - Coordinate overlay-specific state or drawing flow.
+ * - Keep overlay behavior isolated from base controls.
+ *
+ * Behavior:
+ * - Keeps the public role isolated from unrelated concerns.
+ *
+ * Notes:
+ * - This type is part of the public project surface.
+ */
 public final class TooltipOverlayController {
    private final TooltipView view;
    private final TooltipViewModel viewModel;
@@ -22,10 +35,35 @@ public final class TooltipOverlayController {
    private final OverlayEntry overlayEntry;
    private boolean registered;
 
+   /**
+    * Creates a tooltip overlay controller.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    * @param var4 parameter used by this operation
+    * @param var5 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public TooltipOverlayController(PApplet var1, OverlayManager var2, Supplier var3, Supplier var4, AnchorBoundsProvider var5) {
       this(var1, var2, var3, var4, var5, new DefaultTooltipStyle(new TooltipStyleConfig()));
    }
 
+   /**
+    * Creates a tooltip overlay controller.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    * @param var4 parameter used by this operation
+    * @param var5 parameter used by this operation
+    * @param var6 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public TooltipOverlayController(PApplet var1, OverlayManager var2, Supplier var3, Supplier var4, AnchorBoundsProvider var5, DefaultTooltipStyle var6) {
       this.overlayManager = var2;
       this.hoverSupplier = var3;
@@ -40,6 +78,12 @@ public final class TooltipOverlayController {
       this.overlayEntry = new OverlayEntry(10, var10004::draw, var7, this::hideTooltip);
    }
 
+   /**
+    * Performs sync.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void sync() {
       boolean var1 = this.hoverSupplier != null && Boolean.TRUE.equals(this.hoverSupplier.get());
       String var2 = this.textSupplier == null ? "" : (String)this.textSupplier.get();
@@ -57,6 +101,12 @@ public final class TooltipOverlayController {
       }
    }
 
+   /**
+    * Performs dispose.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void dispose() {
       this.hideTooltip();
    }
@@ -75,15 +125,44 @@ public final class TooltipOverlayController {
          super(10);
       }
 
+      /**
+       * Returns whether pointer capture enabled.
+       *
+       * @return whether the current condition is satisfied
+       *
+       * Behavior:
+       * - Returns the current value without applying side effects.
+       */
       public boolean isPointerCaptureEnabled() {
          return false;
       }
 
+      /**
+       * Returns whether keyboard capture enabled.
+       *
+       * @return whether the current condition is satisfied
+       *
+       * Behavior:
+       * - Returns the current value without applying side effects.
+       */
       public boolean isKeyboardCaptureEnabled() {
          return false;
       }
    }
 
+   /**
+    * Overlay component for anchor bounds provider.
+    *
+    * Responsibilities:
+    * - Coordinate overlay-specific state or drawing flow.
+    * - Keep overlay behavior isolated from base controls.
+    *
+    * Behavior:
+    * - Declares the contract without prescribing implementation details.
+    *
+    * Notes:
+    * - This type is part of the public project surface.
+    */
    public interface AnchorBoundsProvider {
       float getCenterX();
 

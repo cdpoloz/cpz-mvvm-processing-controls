@@ -11,6 +11,19 @@ import com.cpz.processing.controls.core.view.ControlView;
 import java.util.ArrayList;
 import processing.core.PApplet;
 
+/**
+ * View for radio group view.
+ *
+ * Responsibilities:
+ * - Own layout, hit testing, and frame-state construction.
+ * - Delegate visual resolution to styles and renderers.
+ *
+ * Behavior:
+ * - Does not own business rules or persistent model state.
+ *
+ * Notes:
+ * - This type belongs to the MVVM View layer.
+ */
 public final class RadioGroupView implements ControlView, PointerInteractable {
    private final PApplet sketch;
    private final RadioGroupViewModel viewModel;
@@ -23,6 +36,18 @@ public final class RadioGroupView implements ControlView, PointerInteractable {
    private boolean customItemHeight;
    private boolean customItemSpacing;
 
+   /**
+    * Creates a radio group view.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    * @param var4 parameter used by this operation
+    * @param var5 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public RadioGroupView(PApplet var1, RadioGroupViewModel var2, float var3, float var4, float var5) {
       this.sketch = var1;
       this.viewModel = var2;
@@ -33,6 +58,12 @@ public final class RadioGroupView implements ControlView, PointerInteractable {
       this.applyConfiguredLayoutDefaults();
    }
 
+   /**
+    * Draws the current frame.
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void draw() {
       if (this.viewModel.isVisible()) {
          ThemeSnapshot var1 = this.style.getThemeSnapshot();
@@ -40,25 +71,66 @@ public final class RadioGroupView implements ControlView, PointerInteractable {
       }
    }
 
+   /**
+    * Updates position.
+    *
+    * @param var1 new position
+    * @param var2 parameter used by this operation
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setPosition(float var1, float var2) {
       this.x = var1;
       this.y = var2;
    }
 
+   /**
+    * Updates width.
+    *
+    * @param var1 new width
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setWidth(float var1) {
       this.width = var1;
    }
 
+   /**
+    * Updates item height.
+    *
+    * @param var1 new item height
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setItemHeight(float var1) {
       this.itemHeight = Math.max(this.style.getMinimumItemHeight(), var1);
       this.customItemHeight = true;
    }
 
+   /**
+    * Updates item spacing.
+    *
+    * @param var1 new item spacing
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setItemSpacing(float var1) {
       this.itemSpacing = Math.max(0.0F, var1);
       this.customItemSpacing = true;
    }
 
+   /**
+    * Updates style.
+    *
+    * @param var1 new style
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setStyle(RadioGroupStyle var1) {
       if (var1 != null) {
          this.style = var1;
@@ -67,10 +139,30 @@ public final class RadioGroupView implements ControlView, PointerInteractable {
 
    }
 
+   /**
+    * Performs contains.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @return result of this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public boolean contains(float var1, float var2) {
       return this.getOptionIndexAt(var1, var2) >= 0;
    }
 
+   /**
+    * Returns option index at.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @return current option index at
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public int getOptionIndexAt(float var1, float var2) {
       float var3 = this.x - this.width * 0.5F;
       float var4 = this.y - this.itemHeight * 0.5F;
@@ -88,6 +180,14 @@ public final class RadioGroupView implements ControlView, PointerInteractable {
       }
    }
 
+   /**
+    * Returns height.
+    *
+    * @return current height
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public float getHeight() {
       return this.viewModel.getOptions().isEmpty() ? 0.0F : (float)this.viewModel.getOptions().size() * this.itemHeight + (float)Math.max(0, this.viewModel.getOptions().size() - 1) * this.itemSpacing;
    }

@@ -3,10 +3,32 @@ package com.cpz.processing.controls.controls.label.style.render;
 import com.cpz.processing.controls.controls.label.style.HorizontalAlign;
 import com.cpz.processing.controls.controls.label.style.VerticalAlign;
 
+/**
+ * Renderer for label align mapper.
+ *
+ * Responsibilities:
+ * - Draw already resolved frame data.
+ * - Keep rendering concerns separate from state decisions.
+ *
+ * Behavior:
+ * - Uses already resolved state and does not decide behavior.
+ *
+ * Notes:
+ * - This type belongs to the visual styling pipeline.
+ */
 public final class LabelAlignMapper {
    private LabelAlignMapper() {
    }
 
+   /**
+    * Performs map horizontal.
+    *
+    * @param var0 parameter used by this operation
+    * @return result of this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public static int mapHorizontal(HorizontalAlign var0) {
       HorizontalAlign var1 = var0 == null ? HorizontalAlign.START : var0;
       switch (var1) {
@@ -20,6 +42,15 @@ public final class LabelAlignMapper {
       }
    }
 
+   /**
+    * Performs map vertical.
+    *
+    * @param var0 parameter used by this operation
+    * @return result of this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public static int mapVertical(VerticalAlign var0) {
       VerticalAlign var1 = var0 == null ? VerticalAlign.BASELINE : var0;
       switch (var1) {
@@ -35,6 +66,15 @@ public final class LabelAlignMapper {
       }
    }
 
+   /**
+    * Performs from processing horizontal.
+    *
+    * @param var0 parameter used by this operation
+    * @return result of this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public static HorizontalAlign fromProcessingHorizontal(int var0) {
       switch (var0) {
          case 3:
@@ -47,6 +87,15 @@ public final class LabelAlignMapper {
       }
    }
 
+   /**
+    * Performs from processing vertical.
+    *
+    * @param var0 parameter used by this operation
+    * @return result of this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public static VerticalAlign fromProcessingVertical(int var0) {
       switch (var0) {
          case 0:

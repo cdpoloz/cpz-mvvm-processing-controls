@@ -7,6 +7,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Public class for focus manager.
+ *
+ * Responsibilities:
+ * - Expose a public architectural role.
+ * - Keep responsibilities explicit in the API surface.
+ *
+ * Behavior:
+ * - Keeps the public role isolated from unrelated concerns.
+ *
+ * Notes:
+ * - This type is part of the public project surface.
+ */
 public final class FocusManager {
    private final List focusables = new ArrayList();
    private final List focusHistory = new ArrayList();
@@ -14,6 +27,14 @@ public final class FocusManager {
    private Focusable focused;
    private int focusedIndex = -1;
 
+   /**
+    * Performs register.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void register(Focusable var1) {
       if (var1 != null && !this.focusables.contains(var1)) {
          this.focusables.add(var1);
@@ -21,6 +42,14 @@ public final class FocusManager {
 
    }
 
+   /**
+    * Performs request focus.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void requestFocus(Focusable var1) {
       if (var1 != null && var1.isVisible() && var1.isEnabled()) {
          this.register(var1);
@@ -38,16 +67,39 @@ public final class FocusManager {
       }
    }
 
+   /**
+    * Clears focus.
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void clearFocus() {
       this.clearCurrentFocus();
       this.focused = null;
       this.focusedIndex = -1;
    }
 
+   /**
+    * Returns whether focused.
+    *
+    * @param var1 parameter used by this operation
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public boolean isFocused(Focusable var1) {
       return this.focused == var1 && var1 != null && var1.isFocused();
    }
 
+   /**
+    * Performs push focus.
+    *
+    * @return result of this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public FocusToken pushFocus() {
       FocusToken var1 = new FocusToken();
       this.snapshots.put(var1, new FocusSnapshot(this.focused, this.focusedIndex));
@@ -55,14 +107,36 @@ public final class FocusManager {
       return var1;
    }
 
+   /**
+    * Performs pop focus.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void popFocus(FocusToken var1) {
       this.releaseFocusToken(var1, true);
    }
 
+   /**
+    * Performs discard focus.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void discardFocus(FocusToken var1) {
       this.releaseFocusToken(var1, false);
    }
 
+   /**
+    * Updates focus for next.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void focusNext() {
       if (this.focusables.isEmpty()) {
          this.clearFocus();
@@ -82,6 +156,12 @@ public final class FocusManager {
       }
    }
 
+   /**
+    * Updates focus for previous.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void focusPrevious() {
       if (this.focusables.isEmpty()) {
          this.clearFocus();
@@ -101,10 +181,26 @@ public final class FocusManager {
       }
    }
 
+   /**
+    * Returns focused keyboard target.
+    *
+    * @return current focused keyboard target
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public KeyboardInputTarget getFocusedKeyboardTarget() {
       return this.focused instanceof KeyboardInputTarget ? (KeyboardInputTarget)this.focused : null;
    }
 
+   /**
+    * Returns focused.
+    *
+    * @return current focused
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public Focusable getFocused() {
       return this.focused;
    }
@@ -144,6 +240,19 @@ public final class FocusManager {
       }
    }
 
+   /**
+    * Public class for focus token.
+    *
+    * Responsibilities:
+    * - Expose a public architectural role.
+    * - Keep responsibilities explicit in the API surface.
+    *
+    * Behavior:
+    * - Keeps the public role isolated from unrelated concerns.
+    *
+    * Notes:
+    * - This type is part of the public project surface.
+    */
    public static final class FocusToken {
       private final String id = UUID.randomUUID().toString();
    }

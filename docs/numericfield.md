@@ -1,7 +1,25 @@
 # NumericField
 
-`NumericFieldView` reads a cached `ThemeSnapshot` once per draw or measurement pass and passes it into `NumericFieldStyle`. Measurement helpers reuse that same snapshot, so themed text layout stays allocation-free from the theme side.
+## Responsibilities
 
-## Performance note
+- `NumericFieldModel` stores numeric constraints and formatting scale
+- `NumericFieldViewModel` manages editing, selection, commit, and numeric validation
+- `NumericFieldView` handles layout, cursor positioning, and `NumericFieldViewState`
+- `NumericFieldStyle` resolves colors and text visuals from theme data
+- `DefaultNumericFieldRenderer` renders the resolved frame without deciding interaction rules
 
-Theme-related allocations were removed from the numeric field render path. Snapshot access is constant-time and reused across frame work.
+## Behavior
+
+- intermediate states such as `""`, `"-"`, and `"0."` remain local to the editor buffer
+- only valid numeric transitions update the committed model value
+- external updates are synchronized back into the text buffer only when the user is not editing
+
+## Notes
+
+- this makes the control suitable as a safe binding target
+- bidirectional examples should be composed outside the core API
+
+## Related
+
+- [Architecture](architecture.md)
+- [Binding](binding.md)

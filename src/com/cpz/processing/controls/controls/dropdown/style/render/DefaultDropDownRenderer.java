@@ -4,7 +4,30 @@ import com.cpz.processing.controls.controls.dropdown.state.DropDownViewState;
 import com.cpz.processing.controls.controls.dropdown.style.DropDownRenderStyle;
 import processing.core.PApplet;
 
+/**
+ * Renderer for default drop down renderer.
+ *
+ * Responsibilities:
+ * - Draw already resolved frame data.
+ * - Keep rendering concerns separate from state decisions.
+ *
+ * Behavior:
+ * - Uses already resolved state and does not decide behavior.
+ *
+ * Notes:
+ * - This type belongs to the visual styling pipeline.
+ */
 public final class DefaultDropDownRenderer {
+   /**
+    * Renders the current frame.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @param var3 parameter used by this operation
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void render(PApplet var1, DropDownViewState var2, DropDownRenderStyle var3) {
       float var4 = var2.x() - var2.width() * 0.5F;
       float var5 = var2.y() - var2.height() * 0.5F;

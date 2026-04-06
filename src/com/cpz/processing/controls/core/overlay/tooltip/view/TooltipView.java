@@ -9,6 +9,19 @@ import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import processing.core.PApplet;
 
+/**
+ * View for tooltip view.
+ *
+ * Responsibilities:
+ * - Own layout, hit testing, and frame-state construction.
+ * - Delegate visual resolution to styles and renderers.
+ *
+ * Behavior:
+ * - Does not own business rules or persistent model state.
+ *
+ * Notes:
+ * - This type belongs to the MVVM View layer.
+ */
 public final class TooltipView implements ControlView {
    private static final float VERTICAL_OFFSET = 10.0F;
    private final PApplet sketch;
@@ -19,12 +32,27 @@ public final class TooltipView implements ControlView {
    private float height;
    private DefaultTooltipStyle style;
 
+   /**
+    * Creates a tooltip view.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public TooltipView(PApplet var1, TooltipViewModel var2) {
       this.sketch = var1;
       this.viewModel = var2;
       this.style = new DefaultTooltipStyle(new TooltipStyleConfig());
    }
 
+   /**
+    * Draws the current frame.
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void draw() {
       if (this.viewModel.isVisible()) {
          ThemeSnapshot var1 = this.style.getThemeSnapshot();
@@ -34,11 +62,29 @@ public final class TooltipView implements ControlView {
       }
    }
 
+   /**
+    * Updates position.
+    *
+    * @param var1 new position
+    * @param var2 parameter used by this operation
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setPosition(float var1, float var2) {
       this.x = var1;
       this.y = var2;
    }
 
+   /**
+    * Updates anchor bounds.
+    *
+    * @param var1 new anchor bounds
+    * @param var2 parameter used by this operation
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setAnchorBounds(float var1, float var2) {
       ThemeSnapshot var3 = this.style.getThemeSnapshot();
       this.measureFromText(this.style.resolveRenderStyle(var3));
@@ -46,6 +92,14 @@ public final class TooltipView implements ControlView {
       this.y = var2 - this.height * 0.5F - 10.0F;
    }
 
+   /**
+    * Updates style.
+    *
+    * @param var1 new style
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setStyle(DefaultTooltipStyle var1) {
       if (var1 != null) {
          this.style = var1;

@@ -4,6 +4,19 @@ import com.cpz.processing.controls.core.model.Enableable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+/**
+ * Model for slider model.
+ *
+ * Responsibilities:
+ * - Store durable control state.
+ * - Remain independent from rendering and input code.
+ *
+ * Behavior:
+ * - Keeps state mutation independent from rendering concerns.
+ *
+ * Notes:
+ * - This type belongs to the MVVM Model layer.
+ */
 public final class SliderModel implements Enableable {
    private static final BigDecimal DEFAULT_MIN;
    private static final BigDecimal DEFAULT_MAX;
@@ -16,6 +29,12 @@ public final class SliderModel implements Enableable {
    private SnapMode snapMode;
    private boolean enabled;
 
+   /**
+    * Creates a slider model.
+    *
+    * Behavior:
+    * - Initializes the public state required by this type.
+    */
    public SliderModel() {
       this.min = DEFAULT_MIN;
       this.max = DEFAULT_MAX;
@@ -26,10 +45,26 @@ public final class SliderModel implements Enableable {
       this.setValue(DEFAULT_VALUE);
    }
 
+   /**
+    * Returns min.
+    *
+    * @return current min
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public BigDecimal getMin() {
       return this.min;
    }
 
+   /**
+    * Updates min.
+    *
+    * @param var1 new min
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setMin(BigDecimal var1) {
       BigDecimal var2 = requireNonNull(var1, "min");
       if (var2.compareTo(this.max) >= 0) {
@@ -40,10 +75,26 @@ public final class SliderModel implements Enableable {
       }
    }
 
+   /**
+    * Returns max.
+    *
+    * @return current max
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public BigDecimal getMax() {
       return this.max;
    }
 
+   /**
+    * Updates max.
+    *
+    * @param var1 new max
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setMax(BigDecimal var1) {
       BigDecimal var2 = requireNonNull(var1, "max");
       if (var2.compareTo(this.min) <= 0) {
@@ -54,10 +105,26 @@ public final class SliderModel implements Enableable {
       }
    }
 
+   /**
+    * Returns step.
+    *
+    * @return current step
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public BigDecimal getStep() {
       return this.step;
    }
 
+   /**
+    * Updates step.
+    *
+    * @param var1 new step
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setStep(BigDecimal var1) {
       BigDecimal var2 = requireNonNull(var1, "step");
       if (var2.compareTo(BigDecimal.ZERO) <= 0) {
@@ -68,32 +135,90 @@ public final class SliderModel implements Enableable {
       }
    }
 
+   /**
+    * Returns value.
+    *
+    * @return current value
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public BigDecimal getValue() {
       return this.value;
    }
 
+   /**
+    * Updates value.
+    *
+    * @param var1 new value
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setValue(BigDecimal var1) {
       this.value = this.normalizeValue(requireNonNull(var1, "value"), this.shouldSnapImmediately());
    }
 
+   /**
+    * Performs normalize value.
+    *
+    * @param var1 parameter used by this operation
+    * @param var2 parameter used by this operation
+    * @return result of this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public BigDecimal normalizeValue(BigDecimal var1, boolean var2) {
       BigDecimal var3 = requireNonNull(var1, "value");
       return var2 ? this.clampAndSnap(var3) : this.clampValue(var3);
    }
 
+   /**
+    * Returns snap mode.
+    *
+    * @return current snap mode
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public SnapMode getSnapMode() {
       return this.snapMode;
    }
 
+   /**
+    * Updates snap mode.
+    *
+    * @param var1 new snap mode
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setSnapMode(SnapMode var1) {
       this.snapMode = var1 == null ? SnapMode.ALWAYS : var1;
       this.value = this.normalizeValue(this.value, this.shouldSnapImmediately());
    }
 
+   /**
+    * Returns whether enabled.
+    *
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
    public boolean isEnabled() {
       return this.enabled;
    }
 
+   /**
+    * Updates enabled.
+    *
+    * @param var1 new enabled
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setEnabled(boolean var1) {
       this.enabled = var1;
    }

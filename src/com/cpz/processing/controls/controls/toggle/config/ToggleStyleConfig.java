@@ -3,6 +3,19 @@ package com.cpz.processing.controls.controls.toggle.config;
 import com.cpz.processing.controls.controls.toggle.style.render.ToggleShapeRenderer;
 import com.cpz.processing.controls.core.theme.ThemeProvider;
 
+/**
+ * Configuration holder for toggle style config.
+ *
+ * Responsibilities:
+ * - Collect configuration values for a public component.
+ * - Keep initialization details outside the runtime pipeline.
+ *
+ * Behavior:
+ * - Keeps the public role isolated from unrelated concerns.
+ *
+ * Notes:
+ * - This type is part of the public project surface.
+ */
 public final class ToggleStyleConfig {
    public ToggleShapeRenderer shape;
    public Integer offFillOverride;
@@ -19,10 +32,26 @@ public final class ToggleStyleConfig {
    public Integer disabledAlpha;
    public ThemeProvider themeProvider;
 
+   /**
+    * Updates shape renderer.
+    *
+    * @param var1 new shape renderer
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setShapeRenderer(ToggleShapeRenderer var1) {
       this.shape = var1;
    }
 
+   /**
+    * Updates theme provider.
+    *
+    * @param var1 new theme provider
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setThemeProvider(ThemeProvider var1) {
       this.themeProvider = var1;
    }

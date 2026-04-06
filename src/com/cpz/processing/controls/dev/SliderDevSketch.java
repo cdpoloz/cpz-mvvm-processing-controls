@@ -22,6 +22,19 @@ import processing.core.PApplet;
 import processing.core.PShape;
 import processing.event.MouseEvent;
 
+/**
+ * Development sketch for the slider dev flow.
+ *
+ * Responsibilities:
+ * - Exercise public controls in an interactive sketch.
+ * - Provide a development-time validation surface.
+ *
+ * Behavior:
+ * - Targets interactive validation rather than library reuse.
+ *
+ * Notes:
+ * - This type is intended for development and demonstration flows.
+ */
 public class SliderDevSketch extends PApplet {
    private final InputManager inputManager = new InputManager();
    private SliderView horizontalSliderView;
@@ -37,11 +50,23 @@ public class SliderDevSketch extends PApplet {
    private SliderInputAdapter fallbackInputAdapter;
    private SliderInputAdapter releaseSnapInputAdapter;
 
+   /**
+    * Updates tings.
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void settings() {
       this.size(1100, 620);
       this.smooth(4);
    }
 
+   /**
+    * Updates up.
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
    public void setup() {
       PShape var1 = this.loadSvg("data/img/test.svg");
       PShape var2 = this.loadSvg("data/img/test.svg");
@@ -69,6 +94,12 @@ public class SliderDevSketch extends PApplet {
       this.inputManager.registerLayer(new SliderRootInputLayer());
    }
 
+   /**
+    * Draws the current frame.
+    *
+    * Behavior:
+    * - Uses already available state and does not define business rules.
+    */
    public void draw() {
       this.background(24);
       this.drawTitles();
@@ -79,35 +110,85 @@ public class SliderDevSketch extends PApplet {
       this.drawDebugPanel();
    }
 
+   /**
+    * Performs key released.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void keyReleased() {
       if (key == ESC) key = 0;
       this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
    }
 
+   /**
+    * Performs key pressed.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void keyPressed() {
       if (key == ESC) key = 0;
    }
 
+   /**
+    * Performs key typed.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void keyTyped() {
       if (key == ESC) key = 0;
    }
 
+   /**
+    * Performs mouse moved.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void mouseMoved() {
       this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float)this.mouseX, (float)this.mouseY, this.mouseButton));
    }
 
+   /**
+    * Performs mouse dragged.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void mouseDragged() {
       this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, (float)this.mouseX, (float)this.mouseY, this.mouseButton));
    }
 
+   /**
+    * Performs mouse pressed.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void mousePressed() {
       this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float)this.mouseX, (float)this.mouseY, this.mouseButton));
    }
 
+   /**
+    * Performs mouse released.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void mouseReleased() {
       this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float)this.mouseX, (float)this.mouseY, this.mouseButton));
    }
 
+   /**
+    * Performs mouse wheel.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
    public void mouseWheel(MouseEvent var1) {
       this.inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.WHEEL, (float)this.mouseX, (float)this.mouseY, this.mouseButton, (float)var1.getCount(), var1.isShiftDown(), var1.isControlDown()));
    }
@@ -251,6 +332,15 @@ public class SliderDevSketch extends PApplet {
          super(0);
       }
 
+      /**
+       * Handles pointer event.
+       *
+       * @param var1 parameter used by this operation
+       * @return result of this operation
+       *
+       * Behavior:
+       * - Applies the public interaction flow exposed by this type.
+       */
       public boolean handlePointerEvent(PointerEvent var1) {
          switch (var1.getType()) {
             case MOVE:
@@ -288,6 +378,15 @@ public class SliderDevSketch extends PApplet {
          }
       }
 
+      /**
+       * Handles keyboard event.
+       *
+       * @param var1 parameter used by this operation
+       * @return result of this operation
+       *
+       * Behavior:
+       * - Applies the public interaction flow exposed by this type.
+       */
       public boolean handleKeyboardEvent(KeyboardEvent var1) {
          return false;
       }

@@ -14,7 +14,7 @@ This keeps the MVVM layers clear: one ViewModel exposes a value, another ViewMod
 
 ## Example
 
-```java
+``` java
 Binding.bind(
     sliderVM::getValue,
     value -> labelVM.setText(value.toString()),
@@ -26,14 +26,69 @@ Binding.bind(
 
 Binding in this library is intentionally small and explicit. The goal is to validate a simple MVVM-friendly flow without introducing generic base abstractions too early.
 
+Bidirectional binding is not part of the core API and is implemented as an example using listeners.
+
 ## Current demo
 
 `BindingDevSketch` demonstrates:
 
 - `SliderViewModel` as the source
-- `LabelViewModel` as the target
+- `LabelViewModel` as one target
+- `NumericFieldViewModel` as another target
 - immediate initial synchronization
 - reactive updates when the slider value changes
+
+## Multiple Targets
+
+Binding can be applied to multiple targets from a single source.
+
+``` java
+Binding.bind(
+    sliderVM::getValue,
+    value -> labelVM.setText(value.toString()),
+    sliderVM::addListener
+);
+
+Binding.bind(
+    sliderVM::getValue,
+    numericVM::setValue,
+    sliderVM::addListener
+);
+```
+
+> NumericFieldViewModel safely ignores external updates while the user is editing.
+
+## Bidirectional Binding (Advanced)
+
+Bidirectional binding is not part of the core API but can be implemented in a sketch or composition root using existing listeners.
+
+``` java
+boolean internalUpdate = false;
+
+sliderVM.addListener(value -> {
+    if (internalUpdate) return;
+
+    internalUpdate = true;
+    try {
+        numericVM.setValue(value);
+    } finally {
+        internalUpdate = false;
+    }
+});
+
+numericVM.setOnValueChanged(value -> {
+    if (internalUpdate) return;
+
+    internalUpdate = true;
+    try {
+        sliderVM.setValue(value);
+    } finally {
+        internalUpdate = false;
+    }
+});
+```
+
+> This approach avoids infinite loops by using a local update guard.
 
 ## Note
 
