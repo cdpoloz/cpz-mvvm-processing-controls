@@ -1,31 +1,7 @@
 # RadioGroup
 
-## Concept
+`RadioGroupView` builds a plain `RadioGroupViewState`, reads a cached `ThemeSnapshot` once from its style, and `RadioGroupStyle` uses snapshot tokens for item render styles.
 
-Mutually exclusive selection control for choosing one option from a list.
+## Performance note
 
-## MVVM pieces
-
-- Model: `RadioGroupModel`
-- ViewModel: `RadioGroupViewModel`
-- View: `RadioGroupView`
-- Style: `RadioGroupStyle`
-- Renderer: `DefaultRadioGroupRenderer`
-
-## Theme-aware customization
-
-```java
-RadioGroupStyleConfig config = new RadioGroupStyleConfig();
-config.themeProvider = themeManager;
-config.itemHeight = 30f;
-config.itemSpacing = 8f;
-
-view.setStyle(new RadioGroupStyle(config));
-```
-
-## Related
-
-- `InputManager`
-- `FocusManager`
-- `RadioGroupInputAdapter`
-- `ThemeProvider`
+Theme mapping is snapshot-based and no longer resolved dynamically inside style rendering.

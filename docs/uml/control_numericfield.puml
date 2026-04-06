@@ -3,54 +3,17 @@ title NumericField Control Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-package "Core" {
-  interface Enableable
-  interface Visible
-  interface ControlView
-  interface PointerInputTarget
-  interface PointerInteractable
-  interface KeyboardInputTarget
-  abstract class AbstractControlViewModel
-  abstract class AbstractInteractiveControlViewModel
-  class PointerInputAdapter
-  class KeyboardInputAdapter
-  class FocusManager
-  interface ThemeProvider
-}
+class NumericFieldView
+class NumericFieldViewState
+class NumericFieldStyle
+class NumericFieldRenderStyle
+class DefaultNumericFieldRenderer
+class ThemeSnapshot
 
-package "NumericField" {
-  class NumericFieldModel
-  class NumericFieldViewModel
-  class NumericFieldView
-  class NumericFieldInputAdapter
-  class NumericFieldViewState
-  class NumericFieldStyle
-  class NumericFieldRenderStyle
-  class DefaultNumericFieldRenderer
-}
-
-AbstractControlViewModel ..|> Visible
-AbstractControlViewModel ..|> Enableable
-AbstractInteractiveControlViewModel --|> AbstractControlViewModel
-AbstractInteractiveControlViewModel ..|> PointerInputTarget
-KeyboardInputTarget ..|> Visible
-KeyboardInputTarget ..|> Enableable
-NumericFieldModel ..|> Enableable
-NumericFieldViewModel --|> AbstractControlViewModel
-NumericFieldViewModel ..|> KeyboardInputTarget
-NumericFieldView ..|> ControlView
-NumericFieldView ..|> PointerInteractable
-AbstractControlViewModel *-- Enableable : model
-NumericFieldViewModel --> NumericFieldModel
-NumericFieldView --> NumericFieldViewModel
-NumericFieldView --> NumericFieldViewState : builds
-NumericFieldView --> NumericFieldStyle : uses
+NumericFieldView --> NumericFieldViewState
+NumericFieldView --> ThemeSnapshot
 NumericFieldStyle --> NumericFieldViewState
-NumericFieldStyle --> NumericFieldRenderStyle : creates
-NumericFieldStyle --> DefaultNumericFieldRenderer : delegates
-NumericFieldStyle --> ThemeProvider
-PointerInputAdapter --> PointerInteractable
-PointerInputAdapter --> PointerInputTarget
-KeyboardInputAdapter --> FocusManager
-NumericFieldInputAdapter *-- PointerInputAdapter : delegate
+NumericFieldStyle --> ThemeSnapshot
+NumericFieldStyle --> NumericFieldRenderStyle
+DefaultNumericFieldRenderer --> NumericFieldRenderStyle
 @enduml

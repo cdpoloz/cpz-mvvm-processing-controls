@@ -38,7 +38,6 @@ import com.cpz.processing.controls.core.input.KeyboardInputAdapter;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.theme.DarkTheme;
 import com.cpz.processing.controls.core.theme.LightTheme;
-import com.cpz.processing.controls.core.theme.Theme;
 import com.cpz.processing.controls.core.theme.ThemeManager;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
 
@@ -52,6 +51,7 @@ public final class ThemeDevSketch extends PApplet {
     private final FocusManager focusManager = new FocusManager();
     private final InputManager inputManager = new InputManager();
     private final ThemeManager themeManager = new ThemeManager(new LightTheme());
+    private boolean isLightTheme = true;
     private ButtonView buttonView;
     private ButtonViewModel buttonViewModel;
     private ButtonInputAdapter buttonInput;
@@ -124,7 +124,7 @@ public final class ThemeDevSketch extends PApplet {
     }
 
     public void draw() {
-        ThemeTokens var1 = this.themeManager.getTheme().tokens();
+        ThemeTokens var1 = this.themeManager.getSnapshot().tokens;
         this.background(var1.surfaceVariant);
         this.sliderValueLabelViewModel.setText(this.sliderViewModel.getFormattedValue());
         this.drawHeader(var1);
@@ -202,17 +202,16 @@ public final class ThemeDevSketch extends PApplet {
     }
 
     private void toggleTheme() {
-        Theme var1 = this.themeManager.getTheme();
-        if (var1 instanceof LightTheme) {
-            this.themeManager.setTheme(new DarkTheme());
-        } else {
+        this.isLightTheme = !this.isLightTheme;
+        if (this.isLightTheme) {
             this.themeManager.setTheme(new LightTheme());
+        } else {
+            this.themeManager.setTheme(new DarkTheme());
         }
-
     }
 
     private String currentThemeName() {
-        return this.themeManager.getTheme() instanceof LightTheme ? "Light" : "Dark";
+        return this.isLightTheme ? "Light" : "Dark";
     }
 
     private final class ThemeRootInputLayer extends DefaultInputLayer {
@@ -267,17 +266,36 @@ public final class ThemeDevSketch extends PApplet {
         }
 
         public boolean handleKeyboardEvent(KeyboardEvent var1) {
-            if (var1.getType() != KeyboardEvent.Type.PRESS || var1.getKey() != 't' && var1.getKey() != 'T') {
-                if (var1.getType() != KeyboardEvent.Type.TYPE || var1.getKey() != 't' && var1.getKey() != 'T') {
-                    ThemeDevSketch.this.keyboardAdapter.handleKeyboardEvent(var1);
-                    return true;
-                } else {
-                    return true;
-                }
-            } else {
+            /*
+            ThemeDevSketch.this.keyboardAdapter.handleKeyboardEvent(var1);
+            if (ThemeDevSketch.this.focusManager.getFocused() != null) {
+                return true;
+            }
+
+            if (var1.getType() == KeyboardEvent.Type.PRESS && (var1.getKey() == 't' || var1.getKey() == 'T')) {
+                ThemeDevSketch.this.toggleTheme();
+            }
+            System.out.println("handleKeyboardEvent");
+            return true;
+        }
+        */
+            // 1. Primero delegar SIEMPRE
+            ThemeDevSketch.this.keyboardAdapter.handleKeyboardEvent(var1);
+
+            // 2. Si hay foco → no shortcuts globales
+            if (ThemeDevSketch.this.focusManager.getFocused() != null) {
+                return true;
+            }
+
+            // 3. Shortcut global SOLO en TYPE (no PRESS)
+            if (var1.getType() == KeyboardEvent.Type.TYPE &&
+                    (var1.getKey() == 't' || var1.getKey() == 'T')) {
+
                 ThemeDevSketch.this.toggleTheme();
                 return true;
             }
+
+            return true;
         }
     }
 }

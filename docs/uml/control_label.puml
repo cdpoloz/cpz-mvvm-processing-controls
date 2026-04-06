@@ -3,41 +3,17 @@ title Label Control Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-package "Core" {
-  interface Enableable
-  interface Visible
-  interface ControlView
-  abstract class AbstractControlViewModel
-  interface ThemeProvider
-}
+class LabelView
+class LabelViewState
+class DefaultLabelStyle
+class LabelRenderStyle
+class DefaultTextRenderer
+class ThemeSnapshot
 
-package "Label" {
-  class LabelModel
-  class LabelViewModel
-  class LabelView
-  class LabelViewState
-  interface LabelStyle
-  class DefaultLabelStyle
-  class LabelRenderStyle
-  interface LabelRenderer
-  class DefaultTextRenderer
-}
-
-AbstractControlViewModel ..|> Visible
-AbstractControlViewModel ..|> Enableable
-LabelModel ..|> Enableable
-LabelViewModel --|> AbstractControlViewModel
-LabelView ..|> ControlView
-AbstractControlViewModel *-- Enableable : model
-LabelViewModel --> LabelModel
-LabelView --> LabelViewModel
-LabelView --> LabelViewState : builds
-LabelView --> LabelStyle : uses
-LabelStyle --> LabelViewState
-DefaultLabelStyle ..|> LabelStyle
-DefaultLabelStyle --> LabelRenderStyle : creates
-DefaultLabelStyle --> LabelRenderer : delegates
-DefaultLabelStyle --> ThemeProvider
-LabelRenderer --> LabelRenderStyle
-DefaultTextRenderer ..|> LabelRenderer
+LabelView --> LabelViewState
+LabelView --> ThemeSnapshot
+DefaultLabelStyle --> LabelViewState
+DefaultLabelStyle --> ThemeSnapshot
+DefaultLabelStyle --> LabelRenderStyle
+DefaultTextRenderer --> LabelRenderStyle
 @enduml

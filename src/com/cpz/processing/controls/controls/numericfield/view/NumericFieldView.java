@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.numericfield.style.NumericFieldRende
 import com.cpz.processing.controls.controls.numericfield.style.NumericFieldStyle;
 import com.cpz.processing.controls.controls.numericfield.viewmodel.NumericFieldViewModel;
 import com.cpz.processing.controls.core.input.PointerInteractable;
+import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import processing.core.PApplet;
 
@@ -34,7 +35,8 @@ public final class NumericFieldView implements ControlView, PointerInteractable 
 
    public void draw() {
       if (this.viewModel.isVisible()) {
-         this.style.render(this.sketch, this.buildViewState());
+         ThemeSnapshot var1 = this.style.getThemeSnapshot();
+         this.style.render(this.sketch, this.buildViewState(var1), var1);
       }
    }
 
@@ -66,9 +68,10 @@ public final class NumericFieldView implements ControlView, PointerInteractable 
       float var3 = var1 - this.getTextStartX();
       if (!(var3 <= 0.0F) && !var2.isEmpty()) {
          float var4 = 0.0F;
+         ThemeSnapshot var8 = this.style.getThemeSnapshot();
 
          for(int var5 = 0; var5 < var2.length(); ++var5) {
-            float var6 = this.measureTextWidth(var2.substring(0, var5 + 1));
+            float var6 = this.measureTextWidth(var2.substring(0, var5 + 1), var8);
             float var7 = var4 + (var6 - var4) * 0.5F;
             if (var3 < var7) {
                return var5;
@@ -114,18 +117,18 @@ public final class NumericFieldView implements ControlView, PointerInteractable 
       this.viewModel.setSelecting(false);
    }
 
-   private NumericFieldViewState buildViewState() {
-      String var1 = this.viewModel.getText();
-      float var2 = this.getTextStartX();
-      int var3 = this.viewModel.getSelectionMin();
-      int var4 = this.viewModel.getSelectionMax();
-      String var5 = var1.substring(0, var3);
-      String var6 = var1.substring(var3, var4);
-      String var7 = var1.substring(var4);
-      float var8 = var2 + this.measureTextWidth(var5);
-      float var9 = var8 + this.measureTextWidth(var6);
-      float var10 = var2 + this.measureTextWidth(var1.substring(0, this.viewModel.getCursorPosition()));
-      return new NumericFieldViewState(this.x, this.y, this.width, this.height, var1, var5, var6, var7, this.viewModel.getCursorPosition(), this.viewModel.getSelectionStart(), this.viewModel.getSelectionEnd(), this.viewModel.isFocused(), this.viewModel.isHovered(), this.viewModel.isPressed(), this.viewModel.isEditing(), this.viewModel.isShowCursor(), this.viewModel.isEnabled(), var2, var10, var8, var9);
+   private NumericFieldViewState buildViewState(ThemeSnapshot var1) {
+      String var2 = this.viewModel.getText();
+      float var3 = this.getTextStartX();
+      int var4 = this.viewModel.getSelectionMin();
+      int var5 = this.viewModel.getSelectionMax();
+      String var6 = var2.substring(0, var4);
+      String var7 = var2.substring(var4, var5);
+      String var8 = var2.substring(var5);
+      float var9 = var3 + this.measureTextWidth(var6, var1);
+      float var10 = var9 + this.measureTextWidth(var7, var1);
+      float var11 = var3 + this.measureTextWidth(var2.substring(0, this.viewModel.getCursorPosition()), var1);
+      return new NumericFieldViewState(this.x, this.y, this.width, this.height, var2, var6, var7, var8, this.viewModel.getCursorPosition(), this.viewModel.getSelectionStart(), this.viewModel.getSelectionEnd(), this.viewModel.isFocused(), this.viewModel.isHovered(), this.viewModel.isPressed(), this.viewModel.isEditing(), this.viewModel.isShowCursor(), this.viewModel.isEnabled(), var3, var11, var9, var10);
    }
 
    private float getTextStartX() {
@@ -173,23 +176,23 @@ public final class NumericFieldView implements ControlView, PointerInteractable 
       return Character.isDigit(var1) || var1 == '.' || var1 == '-';
    }
 
-   private float measureTextWidth(String var1) {
-      NumericFieldRenderStyle var2 = this.style.resolveRenderStyle(this.buildMeasureState());
+   private float measureTextWidth(String var1, ThemeSnapshot var2) {
+      NumericFieldRenderStyle var3 = this.style.resolveRenderStyle(this.buildMeasureState(), var2);
       this.sketch.pushStyle();
-      if (var2.font() != null) {
-         this.sketch.textFont(var2.font(), var2.textSize());
+      if (var3.font() != null) {
+         this.sketch.textFont(var3.font(), var3.textSize());
       } else {
-         this.sketch.textSize(var2.textSize());
+         this.sketch.textSize(var3.textSize());
       }
 
       this.sketch.textAlign(37, 3);
-      float var3 = this.sketch.textWidth(var1 == null ? "" : var1);
+      float var4 = this.sketch.textWidth(var1 == null ? "" : var1);
       this.sketch.popStyle();
-      return var3;
+      return var4;
    }
 
    private NumericFieldViewState buildMeasureState() {
-      float var1 = this.getTextStartX();
-      return new NumericFieldViewState(this.x, this.y, this.width, this.height, this.viewModel.getText(), "", "", "", this.viewModel.getCursorPosition(), this.viewModel.getSelectionStart(), this.viewModel.getSelectionEnd(), this.viewModel.isFocused(), this.viewModel.isHovered(), this.viewModel.isPressed(), this.viewModel.isEditing(), this.viewModel.isShowCursor(), this.viewModel.isEnabled(), var1, var1, var1, var1);
+      float var2 = this.getTextStartX();
+      return new NumericFieldViewState(this.x, this.y, this.width, this.height, this.viewModel.getText(), "", "", "", this.viewModel.getCursorPosition(), this.viewModel.getSelectionStart(), this.viewModel.getSelectionEnd(), this.viewModel.isFocused(), this.viewModel.isHovered(), this.viewModel.isPressed(), this.viewModel.isEditing(), this.viewModel.isShowCursor(), this.viewModel.isEnabled(), var2, var2, var2, var2);
    }
 }
