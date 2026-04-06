@@ -1,10 +1,13 @@
 package com.cpz.processing.controls.controls.slider.viewmodel;
 
+import com.cpz.processing.controls.common.binding.ValueListener;
 import com.cpz.processing.controls.controls.slider.model.SliderModel;
 import com.cpz.processing.controls.controls.slider.model.SnapMode;
 import com.cpz.processing.controls.core.viewmodel.AbstractControlViewModel;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -15,6 +18,7 @@ public final class SliderViewModel extends AbstractControlViewModel {
    private boolean showText = true;
    private Function<BigDecimal, String> formatter;
    private Consumer<BigDecimal> onValueChanged;
+   private final List<ValueListener<BigDecimal>> listeners = new ArrayList<>();
 
    public SliderViewModel(SliderModel var1) {
       super(var1);
@@ -92,12 +96,22 @@ public final class SliderViewModel extends AbstractControlViewModel {
       this.showText = var1;
    }
 
+   public void addListener(ValueListener<BigDecimal> var1) {
+      if (var1 != null) {
+         this.listeners.add(var1);
+      }
+   }
+
    public BigDecimal getValue() {
       return ((SliderModel)this.model).getValue();
    }
 
    public void setValue(BigDecimal var1) {
       BigDecimal var2 = ((SliderModel)this.model).getValue();
+      if (var2 != null && var2.equals(var1)) {
+         return;
+      }
+
       ((SliderModel)this.model).setValue(var1);
       this.notifyValueChanged(var2);
    }
@@ -202,8 +216,20 @@ public final class SliderViewModel extends AbstractControlViewModel {
    }
 
    private void notifyValueChanged(BigDecimal var1) {
-      if (this.onValueChanged != null && var1.compareTo(((SliderModel)this.model).getValue()) != 0) {
-         this.onValueChanged.accept(((SliderModel)this.model).getValue());
+      BigDecimal var2 = ((SliderModel)this.model).getValue();
+      if (var1.compareTo(var2) != 0) {
+         if (this.onValueChanged != null) {
+            this.onValueChanged.accept(var2);
+         }
+
+         this.notifyListeners(var2);
+      }
+
+   }
+
+   private void notifyListeners(BigDecimal var1) {
+      for(ValueListener<BigDecimal> var3 : this.listeners) {
+         var3.onChange(var1);
       }
 
    }

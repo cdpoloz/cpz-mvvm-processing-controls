@@ -13,8 +13,10 @@ public class Launcher {
       //PApplet.main(NumericFieldDevSketch.class);
       //PApplet.main(RadioGroupDevSketch.class);
       //PApplet.main(SliderDevSketch.class);
+      //PApplet.main(BindingDevSketch.class);
       //PApplet.main(ToggleDevSketch.class);
       //PApplet.main(TextFieldDevSketch.class);
-      PApplet.main(ThemeDevSketch.class);
+      //PApplet.main(ThemeDevSketch.class);
+      PApplet.main(BindingDevSketch.class);
    }
 }

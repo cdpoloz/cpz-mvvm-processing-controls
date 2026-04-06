@@ -47,9 +47,16 @@ buttonView.setStyle(ButtonDefaultStyles.primary(themeManager));
 - Styles without an explicit provider use a local `ThemeManager`, not a shared static fallback
 - Input, overlay, and focus managers remain instance-based
 
+## Binding (Experimental)
+
+The library includes a minimal unidirectional binding mechanism for ViewModels.
+
+See: [docs/binding.md](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/binding.md)
+
 ## Documentation
 
 - [Architecture](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/architecture.md)
+- [Binding](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/binding.md)
 - [Input System](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/input-system.md)
 - [Button](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/button.md)
 - [Checkbox](/C:/Users/carlos.polo/Software/CPZ/cpz-mvvm-processing-controls/docs/checkbox.md)
