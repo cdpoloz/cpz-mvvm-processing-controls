@@ -17,6 +17,8 @@ package "Rendering" {
 }
 
 package "Infrastructure" {
+  class ProcessingKeyboardAdapter
+  class KeyboardState
   interface ThemeProvider
   class ThemeManager
   class ThemeSnapshot
@@ -38,6 +40,8 @@ Style --> ThemeSnapshot : consumes
 Style --> RenderStyle : creates
 Renderer --> RenderStyle : draws
 
+ProcessingKeyboardAdapter --> KeyboardState : updates
+ProcessingKeyboardAdapter --> InputManager : dispatches keyboard
 InputManager --> InputLayer : dispatches
 InputLayer --> ViewModel : forwards input
 FocusManager --> ViewModel : manages focus

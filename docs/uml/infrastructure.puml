@@ -4,6 +4,8 @@ skinparam packageStyle rectangle
 skinparam shadowing false
 
 package "Input" {
+  class ProcessingKeyboardAdapter
+  class KeyboardState
   class InputManager
   interface InputLayer
   interface PointerInputTarget
@@ -31,6 +33,8 @@ ThemeManager ..|> ThemeProvider
 ThemeProvider --> ThemeSnapshot
 ThemeSnapshot --> ThemeTokens
 
+ProcessingKeyboardAdapter --> KeyboardState : updates
+ProcessingKeyboardAdapter --> InputManager : dispatches keyboard
 InputManager --> InputLayer : dispatches
 InputLayer --> PointerInputTarget : pointer events
 InputLayer --> KeyboardInputTarget : keyboard events

@@ -35,6 +35,9 @@ This keeps behavior decisions out of the view and keeps rendering decisions out 
 
 ## Input And Focus
 
+- Processing is treated as a raw event source only
+- `ProcessingKeyboardAdapter` converts raw `key` and `keyCode` callbacks into framework-owned `KeyboardEvent` dispatch
+- `KeyboardState` owns pressed-key tracking and derives modifier state internally
 - `InputManager` dispatches pointer and keyboard events through ordered `InputLayer`s
 - `FocusManager` owns keyboard focus, traversal, and restoration
 - controls that need keyboard interaction implement `KeyboardInputTarget`
