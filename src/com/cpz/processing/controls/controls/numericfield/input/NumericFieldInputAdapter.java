@@ -3,6 +3,7 @@ package com.cpz.processing.controls.controls.numericfield.input;
 import com.cpz.processing.controls.controls.numericfield.view.NumericFieldView;
 import com.cpz.processing.controls.controls.numericfield.viewmodel.NumericFieldViewModel;
 import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.input.PointerEvent;
 
 /**
  * Input component for numeric field input adapter.
@@ -121,5 +122,34 @@ public final class NumericFieldInputAdapter {
     */
    public void handleMouseWheel(float var1, boolean var2, boolean var3) {
       this.viewModel.onMouseWheel(var1, var2, var3);
+   }
+
+   /**
+    * Handles pointer event.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
+   public void handlePointerEvent(PointerEvent var1) {
+      if (var1 != null) {
+         switch (var1.getType()) {
+            case MOVE:
+               this.handleMouseMove(var1.getX(), var1.getY());
+               break;
+            case PRESS:
+               this.handleMousePress(var1.getX(), var1.getY());
+               break;
+            case DRAG:
+               this.handleMouseDrag(var1.getX(), var1.getY());
+               break;
+            case RELEASE:
+               this.handleMouseRelease(var1.getX(), var1.getY());
+               break;
+            case WHEEL:
+               this.handleMouseWheel(var1.getWheelDelta(), var1.isShiftDown(), var1.isControlDown());
+         }
+      }
    }
 }

@@ -81,4 +81,28 @@ public final class PointerInputAdapter {
          this.viewModel.onPointerRelease(this.view.contains(var1, var2));
       }
    }
+
+   /**
+    * Handles pointer event.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
+   public void handlePointerEvent(PointerEvent var1) {
+      if (var1 != null) {
+         switch (var1.getType()) {
+            case MOVE:
+            case DRAG:
+               this.handleMouseMove(var1.getX(), var1.getY());
+               break;
+            case PRESS:
+               this.handleMousePress(var1.getX(), var1.getY());
+               break;
+            case RELEASE:
+               this.handleMouseRelease(var1.getX(), var1.getY());
+         }
+      }
+   }
 }

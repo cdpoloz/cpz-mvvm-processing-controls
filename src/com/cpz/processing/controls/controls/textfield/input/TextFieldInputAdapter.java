@@ -3,6 +3,7 @@ package com.cpz.processing.controls.controls.textfield.input;
 import com.cpz.processing.controls.controls.textfield.view.TextFieldView;
 import com.cpz.processing.controls.controls.textfield.viewmodel.TextFieldViewModel;
 import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.input.PointerEvent;
 
 /**
  * Input component for text field input adapter.
@@ -86,5 +87,28 @@ public final class TextFieldInputAdapter {
     */
    public void handleMouseRelease() {
       this.view.handleMouseRelease();
+   }
+
+   /**
+    * Handles pointer event.
+    *
+    * @param var1 parameter used by this operation
+    *
+    * Behavior:
+    * - Applies the public interaction flow exposed by this type.
+    */
+   public void handlePointerEvent(PointerEvent var1) {
+      if (var1 != null) {
+         switch (var1.getType()) {
+            case PRESS:
+               this.handleMousePress(var1.getX(), var1.getY());
+               break;
+            case DRAG:
+               this.handleMouseDrag(var1.getX(), var1.getY());
+               break;
+            case RELEASE:
+               this.handleMouseRelease();
+         }
+      }
    }
 }
