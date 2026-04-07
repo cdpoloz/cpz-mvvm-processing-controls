@@ -21,14 +21,14 @@ import processing.core.PApplet;
 
 /**
  * Development sketch for the button dev flow.
- *
+ * <p>
  * Responsibilities:
  * - Exercise public controls in an interactive sketch.
  * - Provide a development-time validation surface.
- *
+ * <p>
  * Behavior:
  * - Targets interactive validation rather than library reuse.
- *
+ * <p>
  * Notes:
  * - This type is intended for development and demonstration flows.
  */
@@ -48,7 +48,7 @@ public class ButtonDevSketch extends PApplet {
 
     /**
      * Updates tings.
-     *
+     * <p>
      * Behavior:
      * - Updates the public state or registration owned by this type.
      */
@@ -59,7 +59,7 @@ public class ButtonDevSketch extends PApplet {
 
     /**
      * Updates up.
-     *
+     * <p>
      * Behavior:
      * - Updates the public state or registration owned by this type.
      */
@@ -85,7 +85,7 @@ public class ButtonDevSketch extends PApplet {
 
     /**
      * Draws the current frame.
-     *
+     * <p>
      * Behavior:
      * - Uses already available state and does not define business rules.
      */
@@ -99,7 +99,7 @@ public class ButtonDevSketch extends PApplet {
 
     /**
      * Performs key released.
-     *
+     * <p>
      * Behavior:
      * - Executes the public operation exposed by this type.
      */
@@ -110,7 +110,7 @@ public class ButtonDevSketch extends PApplet {
 
     /**
      * Performs key pressed.
-     *
+     * <p>
      * Behavior:
      * - Executes the public operation exposed by this type.
      */
@@ -121,7 +121,7 @@ public class ButtonDevSketch extends PApplet {
 
     /**
      * Performs key typed.
-     *
+     * <p>
      * Behavior:
      * - Executes the public operation exposed by this type.
      */
@@ -132,7 +132,7 @@ public class ButtonDevSketch extends PApplet {
 
     /**
      * Performs mouse moved.
-     *
+     * <p>
      * Behavior:
      * - Executes the public operation exposed by this type.
      */
@@ -142,7 +142,7 @@ public class ButtonDevSketch extends PApplet {
 
     /**
      * Performs mouse dragged.
-     *
+     * <p>
      * Behavior:
      * - Executes the public operation exposed by this type.
      */
@@ -152,7 +152,7 @@ public class ButtonDevSketch extends PApplet {
 
     /**
      * Performs mouse pressed.
-     *
+     * <p>
      * Behavior:
      * - Executes the public operation exposed by this type.
      */
@@ -162,7 +162,7 @@ public class ButtonDevSketch extends PApplet {
 
     /**
      * Performs mouse released.
-     *
+     * <p>
      * Behavior:
      * - Executes the public operation exposed by this type.
      */
@@ -221,7 +221,7 @@ public class ButtonDevSketch extends PApplet {
          *
          * @param var1 parameter used by this operation
          * @return result of this operation
-         *
+         * <p>
          * Behavior:
          * - Applies the public interaction flow exposed by this type.
          */
@@ -250,7 +250,7 @@ public class ButtonDevSketch extends PApplet {
          *
          * @param var1 parameter used by this operation
          * @return result of this operation
-         *
+         * <p>
          * Behavior:
          * - Applies the public interaction flow exposed by this type.
          */

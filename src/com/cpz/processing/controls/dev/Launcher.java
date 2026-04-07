@@ -27,7 +27,7 @@ public class Launcher {
     */
    public static void main(String[] args) {
       Locale.setDefault(Locale.forLanguageTag("en-US"));
-      //PApplet.main(ButtonDevSketch.class);
+      PApplet.main(ButtonDevSketch.class);
       //PApplet.main(CheckboxDevSketch.class);
       //PApplet.main(DropDownDevSketch.class);
       //PApplet.main(LabelDevSketch.class);
@@ -37,7 +37,7 @@ public class Launcher {
       //PApplet.main(BindingDevSketch.class);
       //PApplet.main(ToggleDevSketch.class);
       //PApplet.main(TextFieldDevSketch.class);
-      PApplet.main(ThemeDevSketch.class);
+      //PApplet.main(ThemeDevSketch.class);
       //PApplet.main(BindingDevSketch.class);
    }
 }
