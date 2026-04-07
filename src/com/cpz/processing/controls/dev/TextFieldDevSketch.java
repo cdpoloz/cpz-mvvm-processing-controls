@@ -13,6 +13,8 @@ import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.KeyboardInputAdapter;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.util.Colors;
+import com.cpz.processing.controls.input.KeyboardState;
+import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
 import java.util.Objects;
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -38,6 +40,8 @@ public class TextFieldDevSketch extends PApplet {
    private TextFieldInputAdapter customFontInput;
    private TextFieldInputAdapter defaultFontInput;
    private KeyboardInputAdapter keyboardAdapter;
+   private KeyboardState keyboardState;
+   private ProcessingKeyboardAdapter processingKeyboardAdapter;
 
    /**
     * Updates tings.
@@ -59,6 +63,8 @@ public class TextFieldDevSketch extends PApplet {
    public void setup() {
       PFont var1 = this.createFont("data/font/abel-regular.ttf", 16.0F, true);
       this.keyboardAdapter = new KeyboardInputAdapter(this.focusManager);
+      this.keyboardState = new KeyboardState();
+      this.processingKeyboardAdapter = new ProcessingKeyboardAdapter(this.keyboardState, this.inputManager);
       TextFieldViewModel var2 = new TextFieldViewModel(new TextFieldModel());
       var2.setText("Custom font field");
       this.customFontView = new TextFieldView(this, var2, (float)this.width * 0.5F, 140.0F, 420.0F, 46.0F);
@@ -126,7 +132,7 @@ public class TextFieldDevSketch extends PApplet {
          this.key = 0;
       }
 
-      this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.PRESS, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+      this.processingKeyboardAdapter.keyPressed(this.key, this.keyCode);
    }
 
    /**
@@ -140,7 +146,7 @@ public class TextFieldDevSketch extends PApplet {
          this.key = 0;
       }
 
-      this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+      this.processingKeyboardAdapter.keyReleased(this.key, this.keyCode);
    }
 
    /**
@@ -150,7 +156,7 @@ public class TextFieldDevSketch extends PApplet {
     * - Executes the public operation exposed by this type.
     */
    public void keyTyped() {
-      this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.TYPE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+      this.processingKeyboardAdapter.keyTyped(this.key, this.keyCode);
    }
 
    private void drawTitles() {

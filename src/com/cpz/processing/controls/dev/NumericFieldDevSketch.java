@@ -11,6 +11,8 @@ import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.KeyboardInputAdapter;
 import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.input.KeyboardState;
+import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
 import java.math.BigDecimal;
 import java.util.Objects;
 import processing.core.PApplet;
@@ -39,6 +41,8 @@ public class NumericFieldDevSketch extends PApplet {
    private NumericFieldInputAdapter primaryFieldInput;
    private NumericFieldInputAdapter secondaryFieldInput;
    private KeyboardInputAdapter keyboardAdapter;
+   private KeyboardState keyboardState;
+   private ProcessingKeyboardAdapter processingKeyboardAdapter;
    private String lastChangeMessage = "No committed change yet";
    private int externalUpdateCount;
 
@@ -61,6 +65,8 @@ public class NumericFieldDevSketch extends PApplet {
     */
    public void setup() {
       this.keyboardAdapter = new KeyboardInputAdapter(this.focusManager);
+      this.keyboardState = new KeyboardState();
+      this.processingKeyboardAdapter = new ProcessingKeyboardAdapter(this.keyboardState, this.inputManager);
       this.primaryFieldViewModel = new NumericFieldViewModel(new NumericFieldModel(new BigDecimal("12.50"), BigDecimal.ZERO, new BigDecimal("99.99"), new BigDecimal("0.25"), false, true, 2));
       this.primaryFieldView = new NumericFieldView(this, this.primaryFieldViewModel, (float)this.width * 0.5F, 145.0F, 380.0F, 46.0F);
       this.primaryFieldView.setStyle(NumericFieldDefaultStyles.standard());
@@ -151,7 +157,7 @@ public class NumericFieldDevSketch extends PApplet {
          this.key = 0;
       }
 
-      this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.PRESS, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+      this.processingKeyboardAdapter.keyPressed(this.key, this.keyCode);
    }
 
    /**
@@ -165,7 +171,7 @@ public class NumericFieldDevSketch extends PApplet {
          this.key = 0;
       }
 
-      this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+      this.processingKeyboardAdapter.keyReleased(this.key, this.keyCode);
    }
 
    /**
@@ -175,7 +181,7 @@ public class NumericFieldDevSketch extends PApplet {
     * - Executes the public operation exposed by this type.
     */
    public void keyTyped() {
-      this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.TYPE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+      this.processingKeyboardAdapter.keyTyped(this.key, this.keyCode);
    }
 
    private void drawTitles() {

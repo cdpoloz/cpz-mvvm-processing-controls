@@ -40,6 +40,8 @@ import com.cpz.processing.controls.core.theme.DarkTheme;
 import com.cpz.processing.controls.core.theme.LightTheme;
 import com.cpz.processing.controls.core.theme.ThemeManager;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
+import com.cpz.processing.controls.input.KeyboardState;
+import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -75,6 +77,8 @@ public final class ThemeDevSketch extends PApplet {
     private TextFieldViewModel textFieldViewModel;
     private TextFieldInputAdapter textFieldInput;
     private KeyboardInputAdapter keyboardAdapter;
+    private KeyboardState keyboardState;
+    private ProcessingKeyboardAdapter processingKeyboardAdapter;
     private ToggleView switchView;
     private ToggleViewModel switchViewModel;
     private ToggleInputAdapter switchInput;
@@ -106,6 +110,8 @@ public final class ThemeDevSketch extends PApplet {
      */
     public void setup() {
         this.keyboardAdapter = new KeyboardInputAdapter(this.focusManager);
+        this.keyboardState = new KeyboardState();
+        this.processingKeyboardAdapter = new ProcessingKeyboardAdapter(this.keyboardState, this.inputManager);
         this.buttonViewModel = new ButtonViewModel(new ButtonModel("Toggle Ready"));
         this.buttonViewModel.setClickListener(() -> this.checkboxViewModel.setChecked(!this.checkboxViewModel.isChecked()));
         this.buttonView = new ButtonView(this, this.buttonViewModel, 180.0F, 150.0F, 220.0F, 60.0F);
@@ -177,7 +183,7 @@ public final class ThemeDevSketch extends PApplet {
      */
     public void keyReleased() {
         if (key == ESC) key = 0;
-        this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+        this.processingKeyboardAdapter.keyReleased(this.key, this.keyCode);
     }
 
     /**
@@ -240,7 +246,7 @@ public final class ThemeDevSketch extends PApplet {
      */
     public void keyPressed() {
         if (key == ESC) key = 0;
-        this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.PRESS, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+        this.processingKeyboardAdapter.keyPressed(this.key, this.keyCode);
     }
 
     /**
@@ -251,7 +257,7 @@ public final class ThemeDevSketch extends PApplet {
      */
     public void keyTyped() {
         if (key == ESC) key = 0;
-        this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.TYPE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+        this.processingKeyboardAdapter.keyTyped(this.key, this.keyCode);
     }
 
     private void drawHeader(ThemeTokens var1) {

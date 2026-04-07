@@ -37,7 +37,7 @@ public class Launcher {
       //PApplet.main(BindingDevSketch.class);
       //PApplet.main(ToggleDevSketch.class);
       //PApplet.main(TextFieldDevSketch.class);
-      //PApplet.main(ThemeDevSketch.class);
-      PApplet.main(BindingDevSketch.class);
+      PApplet.main(ThemeDevSketch.class);
+      //PApplet.main(BindingDevSketch.class);
    }
 }

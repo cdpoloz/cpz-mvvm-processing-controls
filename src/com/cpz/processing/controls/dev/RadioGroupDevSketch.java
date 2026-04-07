@@ -11,6 +11,8 @@ import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.KeyboardInputAdapter;
 import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.input.KeyboardState;
+import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
 import java.util.List;
 import java.util.Objects;
 import processing.core.PApplet;
@@ -38,6 +40,8 @@ public class RadioGroupDevSketch extends PApplet {
    private RadioGroupInputAdapter mainGroupInput;
    private RadioGroupInputAdapter secondaryGroupInput;
    private KeyboardInputAdapter keyboardAdapter;
+   private KeyboardState keyboardState;
+   private ProcessingKeyboardAdapter processingKeyboardAdapter;
    private String statusText = "No selection yet";
 
    /**
@@ -59,6 +63,8 @@ public class RadioGroupDevSketch extends PApplet {
     */
    public void setup() {
       this.keyboardAdapter = new KeyboardInputAdapter(this.focusManager);
+      this.keyboardState = new KeyboardState();
+      this.processingKeyboardAdapter = new ProcessingKeyboardAdapter(this.keyboardState, this.inputManager);
       this.mainGroupViewModel = new RadioGroupViewModel(new RadioGroupModel(List.of("Mercury", "Venus", "Earth", "Mars", "Jupiter"), 2));
       this.mainGroupViewModel.setOnOptionSelected((var1) -> this.statusText = "Main selected index: " + var1);
       this.mainGroupView = new RadioGroupView(this, this.mainGroupViewModel, 250.0F, 170.0F, 280.0F);
@@ -137,7 +143,7 @@ public class RadioGroupDevSketch extends PApplet {
          this.key = 0;
       }
 
-      this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.PRESS, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+      this.processingKeyboardAdapter.keyPressed(this.key, this.keyCode);
    }
 
    /**
@@ -151,7 +157,7 @@ public class RadioGroupDevSketch extends PApplet {
          this.key = 0;
       }
 
-      this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+      this.processingKeyboardAdapter.keyReleased(this.key, this.keyCode);
    }
 
    /**
@@ -161,7 +167,7 @@ public class RadioGroupDevSketch extends PApplet {
     * - Executes the public operation exposed by this type.
     */
    public void keyTyped() {
-      this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.TYPE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+      this.processingKeyboardAdapter.keyTyped(this.key, this.keyCode);
    }
 
    private void drawTitles() {

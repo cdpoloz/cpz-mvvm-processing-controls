@@ -15,6 +15,8 @@ import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.input.hit.CircleHitTest;
 import com.cpz.processing.controls.core.input.hit.RectHitTest;
 import com.cpz.processing.controls.core.util.Colors;
+import com.cpz.processing.controls.input.KeyboardState;
+import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
 import java.util.Objects;
 import processing.core.PApplet;
 
@@ -39,6 +41,8 @@ public class ToggleDevSketch extends PApplet {
    private ToggleView swView2;
    private ToggleInputAdapter swInput1;
    private ToggleInputAdapter swInput2;
+   private KeyboardState keyboardState;
+   private ProcessingKeyboardAdapter processingKeyboardAdapter;
 
    /**
     * Updates tings.
@@ -59,6 +63,8 @@ public class ToggleDevSketch extends PApplet {
     */
    public void setup() {
       this.noStroke();
+      this.keyboardState = new KeyboardState();
+      this.processingKeyboardAdapter = new ProcessingKeyboardAdapter(this.keyboardState, this.inputManager);
       this.swViewModel1 = new ToggleViewModel(new ToggleModel());
       this.swViewModel1.setTotalStates(2);
       this.swView1 = new ToggleView(this, this.swViewModel1, 220.0F, 220.0F, 76.0F);
@@ -93,7 +99,7 @@ public class ToggleDevSketch extends PApplet {
     */
    public void keyReleased() {
       if (key == ESC) key = 0;
-      this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+      this.processingKeyboardAdapter.keyReleased(this.key, this.keyCode);
    }
 
    /**
@@ -104,6 +110,7 @@ public class ToggleDevSketch extends PApplet {
     */
    public void keyPressed() {
       if (key == ESC) key = 0;
+      this.processingKeyboardAdapter.keyPressed(this.key, this.keyCode);
    }
 
    /**
@@ -114,6 +121,7 @@ public class ToggleDevSketch extends PApplet {
     */
    public void keyTyped() {
       if (key == ESC) key = 0;
+      this.processingKeyboardAdapter.keyTyped(this.key, this.keyCode);
    }
 
    /**

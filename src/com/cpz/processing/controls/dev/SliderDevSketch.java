@@ -14,6 +14,8 @@ import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.util.Colors;
+import com.cpz.processing.controls.input.KeyboardState;
+import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
@@ -49,6 +51,8 @@ public class SliderDevSketch extends PApplet {
    private SliderInputAdapter verticalInputAdapter;
    private SliderInputAdapter fallbackInputAdapter;
    private SliderInputAdapter releaseSnapInputAdapter;
+   private KeyboardState keyboardState;
+   private ProcessingKeyboardAdapter processingKeyboardAdapter;
 
    /**
     * Updates tings.
@@ -68,6 +72,8 @@ public class SliderDevSketch extends PApplet {
     * - Updates the public state or registration owned by this type.
     */
    public void setup() {
+      this.keyboardState = new KeyboardState();
+      this.processingKeyboardAdapter = new ProcessingKeyboardAdapter(this.keyboardState, this.inputManager);
       PShape var1 = this.loadSvg("data/img/test.svg");
       PShape var2 = this.loadSvg("data/img/test.svg");
       this.horizontalSliderViewModel = new SliderViewModel(this.createModel(new BigDecimal("0"), new BigDecimal("1"), new BigDecimal("0.01"), new BigDecimal("0.35")));
@@ -118,7 +124,7 @@ public class SliderDevSketch extends PApplet {
     */
    public void keyReleased() {
       if (key == ESC) key = 0;
-      this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+      this.processingKeyboardAdapter.keyReleased(this.key, this.keyCode);
    }
 
    /**
@@ -129,6 +135,7 @@ public class SliderDevSketch extends PApplet {
     */
    public void keyPressed() {
       if (key == ESC) key = 0;
+      this.processingKeyboardAdapter.keyPressed(this.key, this.keyCode);
    }
 
    /**
@@ -139,6 +146,7 @@ public class SliderDevSketch extends PApplet {
     */
    public void keyTyped() {
       if (key == ESC) key = 0;
+      this.processingKeyboardAdapter.keyTyped(this.key, this.keyCode);
    }
 
    /**

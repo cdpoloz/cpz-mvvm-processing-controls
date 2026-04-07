@@ -1,7 +1,6 @@
 package com.cpz.processing.controls.core.input;
 
 import com.cpz.processing.controls.core.focus.FocusManager;
-import processing.event.KeyEvent;
 
 /**
  * Input component for keyboard input adapter.
@@ -57,21 +56,6 @@ public final class KeyboardInputAdapter {
     * @param var1 parameter used by this operation
     * @param var2 parameter used by this operation
     * @param var3 parameter used by this operation
-    *
-    * Behavior:
-    * - Applies the public interaction flow exposed by this type.
-    */
-   public void onKeyPressed(char var1, int var2, KeyEvent var3) {
-      boolean var4 = var3 != null && var3.isShiftDown();
-      boolean var5 = var3 != null && var3.isControlDown();
-      int var6 = var3 != null ? var3.getKeyCode() : var2;
-      this.handlePressed(var2, var4, var5, var6);
-   }
-
-   /**
-    * Handles keyboard event.
-    *
-    * @param var1 parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.

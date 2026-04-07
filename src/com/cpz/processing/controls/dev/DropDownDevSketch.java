@@ -22,6 +22,8 @@ import com.cpz.processing.controls.core.overlay.OverlayEntry;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
 import com.cpz.processing.controls.core.overlay.tooltip.util.TooltipOverlayController;
 import com.cpz.processing.controls.core.util.Colors;
+import com.cpz.processing.controls.input.KeyboardState;
+import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
 
 import java.util.List;
 import java.util.Objects;
@@ -58,6 +60,8 @@ public class DropDownDevSketch extends PApplet {
     private TooltipOverlayController buttonTooltipController;
     private ButtonView buttonView;
     private ButtonInputAdapter buttonInputAdapter;
+    private KeyboardState keyboardState;
+    private ProcessingKeyboardAdapter processingKeyboardAdapter;
     private String statusText;
 
     /**
@@ -89,6 +93,8 @@ public class DropDownDevSketch extends PApplet {
      * - Updates the public state or registration owned by this type.
      */
     public void setup() {
+        this.keyboardState = new KeyboardState();
+        this.processingKeyboardAdapter = new ProcessingKeyboardAdapter(this.keyboardState, this.inputManager);
         this.firstDropDownViewModel = new DropDownViewModel(new DropDownModel(List.of("Option Alpha", "Option Beta", "Option Gamma", "Option Delta", "Option Epsilon", "Option Zeta", "Option Eta"), 1));
         this.firstDropDownView = new DropDownView(this, this.firstDropDownViewModel, (float) this.width * 0.32F, 150.0F, 280.0F, 42.0F);
         this.firstDropDownView.setStyle(new DefaultDropDownStyle(this.createDropDownStyle()));
@@ -276,7 +282,7 @@ public class DropDownDevSketch extends PApplet {
             this.syncOverlayControllers();
             this.updateStatusAfterInput();
         } else {
-            this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.PRESS, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+            this.processingKeyboardAdapter.keyPressed(this.key, this.keyCode);
         }
     }
 
@@ -288,7 +294,7 @@ public class DropDownDevSketch extends PApplet {
      */
     public void keyReleased() {
         if (this.key == ESC) this.key = 0;
-        this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+        this.processingKeyboardAdapter.keyReleased(this.key, this.keyCode);
     }
 
     /**
@@ -299,6 +305,7 @@ public class DropDownDevSketch extends PApplet {
      */
     public void keyTyped() {
         if (key == ESC) key = 0;
+        this.processingKeyboardAdapter.keyTyped(this.key, this.keyCode);
     }
 
     /**

@@ -14,6 +14,8 @@ import com.cpz.processing.controls.core.input.DefaultInputLayer;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.input.KeyboardState;
+import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
 
 import java.util.Objects;
 
@@ -57,6 +59,8 @@ public class CheckboxDevSketch extends PApplet {
     private LabelViewModel labelSvgTitleViewModel;
     private LabelViewModel labelSvgStatusViewModel;
     private LabelViewModel helperLabelViewModel;
+    private KeyboardState keyboardState;
+    private ProcessingKeyboardAdapter processingKeyboardAdapter;
 
     /**
      * Updates tings.
@@ -76,6 +80,8 @@ public class CheckboxDevSketch extends PApplet {
      * - Updates the public state or registration owned by this type.
      */
     public void setup() {
+        this.keyboardState = new KeyboardState();
+        this.processingKeyboardAdapter = new ProcessingKeyboardAdapter(this.keyboardState, this.inputManager);
         this.checkboxAViewModel = new CheckboxViewModel(new CheckboxModel(true));
         this.checkboxAView = new CheckboxView(this, this.checkboxAViewModel, 90.0F, 110.0F, 30.0F);
         this.checkboxAInput = new CheckboxInputAdapter(this.checkboxAView, this.checkboxAViewModel);
@@ -135,7 +141,7 @@ public class CheckboxDevSketch extends PApplet {
      */
     public void keyReleased() {
         if (this.key == ESC) this.key = 0;
-        this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+        this.processingKeyboardAdapter.keyReleased(this.key, this.keyCode);
     }
 
     /**
@@ -146,6 +152,7 @@ public class CheckboxDevSketch extends PApplet {
      */
     public void keyTyped() {
         if (key == ESC) key = 0;
+        this.processingKeyboardAdapter.keyTyped(this.key, this.keyCode);
     }
 
     /**
@@ -196,7 +203,7 @@ public class CheckboxDevSketch extends PApplet {
      */
     public void keyPressed() {
         if (key == ESC) key = 0;
-        this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.PRESS, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+        this.processingKeyboardAdapter.keyPressed(this.key, this.keyCode);
     }
 
     private void updateStatusLabels() {

@@ -20,6 +20,8 @@ import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.KeyboardInputAdapter;
 import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.input.KeyboardState;
+import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
@@ -52,6 +54,8 @@ public final class BindingDevSketch extends PApplet {
    private NumericFieldViewModel numericViewModel;
    private NumericFieldInputAdapter numericFieldInputAdapter;
    private KeyboardInputAdapter keyboardAdapter;
+   private KeyboardState keyboardState;
+   private ProcessingKeyboardAdapter processingKeyboardAdapter;
 
    /**
     * Updates tings.
@@ -72,6 +76,8 @@ public final class BindingDevSketch extends PApplet {
     */
    public void setup() {
       this.keyboardAdapter = new KeyboardInputAdapter(this.focusManager);
+      this.keyboardState = new KeyboardState();
+      this.processingKeyboardAdapter = new ProcessingKeyboardAdapter(this.keyboardState, this.inputManager);
       SliderModel var1 = new SliderModel();
       var1.setMin(BigDecimal.ZERO);
       var1.setMax(new BigDecimal("100"));
@@ -137,7 +143,7 @@ public final class BindingDevSketch extends PApplet {
     */
    public void keyReleased() {
       if (key == ESC) key = 0;
-      this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+      this.processingKeyboardAdapter.keyReleased(this.key, this.keyCode);
    }
 
    /**
@@ -148,7 +154,7 @@ public final class BindingDevSketch extends PApplet {
     */
    public void keyPressed() {
       if (key == ESC) key = 0;
-      this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.PRESS, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+      this.processingKeyboardAdapter.keyPressed(this.key, this.keyCode);
    }
 
    /**
@@ -159,7 +165,7 @@ public final class BindingDevSketch extends PApplet {
     */
    public void keyTyped() {
       if (key == ESC) key = 0;
-      this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.TYPE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+      this.processingKeyboardAdapter.keyTyped(this.key, this.keyCode);
    }
 
    /**

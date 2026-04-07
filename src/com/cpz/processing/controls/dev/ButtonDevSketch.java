@@ -12,6 +12,8 @@ import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.util.Colors;
+import com.cpz.processing.controls.input.KeyboardState;
+import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
 
 import java.util.Objects;
 
@@ -38,6 +40,8 @@ public class ButtonDevSketch extends PApplet {
     private ButtonViewModel svgButtonViewModel;
     private ButtonInputAdapter primaryButtonInput;
     private ButtonInputAdapter svgButtonInput;
+    private KeyboardState keyboardState;
+    private ProcessingKeyboardAdapter processingKeyboardAdapter;
     private int clickCount;
     private String lastAction = "No clicks";
     private boolean svgEnabled = true;
@@ -60,6 +64,8 @@ public class ButtonDevSketch extends PApplet {
      * - Updates the public state or registration owned by this type.
      */
     public void setup() {
+        this.keyboardState = new KeyboardState();
+        this.processingKeyboardAdapter = new ProcessingKeyboardAdapter(this.keyboardState, this.inputManager);
         this.primaryButtonViewModel = new ButtonViewModel(new ButtonModel("Primary"));
         this.primaryButtonViewModel.setClickListener(() -> {
             ++this.clickCount;
@@ -99,7 +105,7 @@ public class ButtonDevSketch extends PApplet {
      */
     public void keyReleased() {
         if (this.key == ESC) this.key = 0;
-        this.inputManager.dispatchKeyboard(new KeyboardEvent(KeyboardEvent.Type.RELEASE, this.key, this.keyCode, this.keyEvent != null && this.keyEvent.isShiftDown(), this.keyEvent != null && this.keyEvent.isControlDown(), this.keyEvent != null && this.keyEvent.isAltDown()));
+        this.processingKeyboardAdapter.keyReleased(this.key, this.keyCode);
     }
 
     /**
@@ -110,6 +116,7 @@ public class ButtonDevSketch extends PApplet {
      */
     public void keyPressed() {
         if (key == ESC) key = 0;
+        this.processingKeyboardAdapter.keyPressed(this.key, this.keyCode);
     }
 
     /**
@@ -120,6 +127,7 @@ public class ButtonDevSketch extends PApplet {
      */
     public void keyTyped() {
         if (key == ESC) key = 0;
+        this.processingKeyboardAdapter.keyTyped(this.key, this.keyCode);
     }
 
     /**
