@@ -2,60 +2,101 @@
 
 ## Purpose
 
-The input layer decouples sketch events from control behavior.
+The input layer decouples host-framework callbacks from control behavior.
 
-Instead of each Processing sketch manually mutating controls, input is routed through reusable adapters and managers.
+The controls project does not depend on Processing for input dispatch. External sources are expected to translate host events into framework-owned `PointerEvent` and `KeyboardEvent` instances, then submit those events to `InputManager`.
 
 ## Input Model
 
-The input system follows a hybrid approach:
+The input system is state-driven.
 
-- Event-driven at the boundary (Processing callbacks)
-- State-driven within the framework (KeyboardState)
+- External adapters own source-specific callback handling
+- `PointerEvent` and `KeyboardEvent` carry the state needed by the framework
+- `InputManager` dispatches framework-owned events without knowing where they came from
+- control input adapters translate event data plus view geometry into `ViewModel` operations
 
-This allows deterministic behavior, consistent modifier handling, and support for complex interactions such as key combinations and continuous input. This model ensures that input handling remains predictable, testable, and independent of the underlying rendering framework.
+This keeps interaction deterministic, testable, and source-agnostic.
 
 ## Main Components
 
-- `ProcessingKeyboardAdapter`: converts raw Processing key callbacks into framework-owned keyboard events
-- `KeyboardState`: tracks pressed keys and derives modifier state (`SHIFT`, `CTRL`, `ALT`) without relying on Processing event objects
+- External source: any host environment that produces raw input, such as Processing
+- External adapter: converts source-specific callbacks or state into framework-owned events
+- `PointerEvent`: immutable pointer snapshot used for dispatch
+- `KeyboardEvent`: immutable keyboard snapshot used for dispatch
+- `KeyboardState`: tracks pressed keys and derives modifier state for keyboard dispatch
 - `InputManager`: dispatches pointer and keyboard events in priority order
 - `InputLayer`: defines capture order and event ownership
 - `FocusManager`: tracks keyboard focus and focus restoration
 - `PointerInputTarget`: contract for pointer-aware ViewModels
 - `KeyboardInputTarget`: contract for focusable text-oriented ViewModels
-- Control-specific input adapters: translate geometry-aware events from the view into ViewModel calls
+- Control-specific input adapters: handle `PointerEvent` or `KeyboardEvent` and translate geometry-aware input into `ViewModel` calls
+
+## PointerEvent
+
+`PointerEvent` represents a framework-owned pointer snapshot. It currently includes:
+
+- `type`: `MOVE`, `PRESS`, `RELEASE`, `DRAG`, `WHEEL`
+- `x`, `y`: pointer position in control-space coordinates
+- `pressed`: whether the pointer is currently pressed
+- `button`: source-defined button identifier
+- `shift`, `ctrl`, `alt`: modifier key state at dispatch time
+- `wheelDelta`: signed wheel delta for wheel events
+
+The framework consumes this structure directly. Pointer-aware adapters should accept `PointerEvent` rather than Processing-specific event types.
+
+## KeyboardEvent
+
+`KeyboardEvent` represents a framework-owned keyboard snapshot. It includes:
+
+- `type`: `PRESS`, `TYPE`, `RELEASE`
+- `key`: character value when available
+- `keyCode`: source-defined key code
+- `shift`, `ctrl`, `alt`: modifier key state at dispatch time
+
+Keyboard dispatch is also source-agnostic. A host adapter is responsible for updating any external keyboard state and constructing `KeyboardEvent`.
 
 ## Flow
 
-Keyboard input follows the flow below. Pointer input follows a similar path but bypasses the keyboard adapter.
-```text {id="inputflow"}
-Processing -> ProcessingKeyboardAdapter -> KeyboardState -> InputManager -> input adapters -> ViewModel
+The full source-agnostic flow is:
+
+```text
+External Source -> Adapter -> InputManager -> InputLayer -> InputAdapter -> ViewModel
 ```
 
-1. Processing acts only as a raw event source.
-2. Pointer callbacks create `PointerEvent` directly, while keyboard callbacks go through `ProcessingKeyboardAdapter`.
-3. `ProcessingKeyboardAdapter` updates `KeyboardState` before dispatching a `KeyboardEvent`.
-4. `InputManager` forwards the event to active layers from highest to lowest priority.
-5. A layer may consume the event and stop propagation.
-6. Adapters interpret coordinates or keys and call the ViewModel.
-7. The ViewModel updates state without needing direct access to Processing event objects or deprecated Processing keyboard APIs.
+In practice:
+
+1. A host environment emits raw pointer or keyboard input.
+2. An external adapter converts that source-specific input into `PointerEvent` or `KeyboardEvent`.
+3. `InputManager` forwards the event to active layers from highest to lowest priority.
+4. Each `InputLayer` decides whether it should handle the event and whether propagation stops.
+5. A control or overlay input adapter interprets coordinates, buttons, wheel delta, or key data.
+6. The adapter calls the `ViewModel`.
+7. The `ViewModel` updates interaction state and model data without any dependency on Processing APIs.
+
+## Dispatch Rules
+
+- `InputManager` does not depend on Processing types
+- layers are ordered by priority
+- inactive layers are skipped
+- a layer that consumes an event stops propagation
+- pointer and keyboard dispatch share the same layer ordering model
+- focus remains managed by `FocusManager`, not by the external source
 
 ## Keyboard State
 
 - `KeyboardState` maintains the set of currently pressed keys
-- Modifier flags are derived from internal state, not from deprecated Processing keyboard event state
-- Keyboard handling is state-driven rather than relying on transient event objects
-- The framework owns keyboard state and only consumes raw `key` and `keyCode` values from Processing
+- modifier flags are derived from state rather than deprecated host APIs
+- keyboard handling remains state-driven even when the host delivers transient callbacks
+- `ProcessingKeyboardAdapter` is one example of an external adapter, not a requirement of the framework
 
 ## MVVM Boundary
 
-- Views provide layout and hit testing
-- Input adapters translate events using that view geometry
+- views provide layout and hit testing
+- input adapters consume framework-owned events using that view geometry
 - ViewModels own interaction rules
-- Models remain passive
+- models remain passive
 
-This ensures that interaction logic remains independent from both the rendering pipeline and the host framework.
+This keeps interaction logic independent from both the rendering pipeline and the host environment.
 
 ## Related
 

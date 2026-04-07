@@ -3,6 +3,9 @@ title Slider Control Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
+class PointerEvent
+class SliderInputAdapter
+class SliderViewModel
 class SliderView
 class SliderViewState
 class SliderStyle
@@ -10,6 +13,9 @@ class SliderRenderStyle
 class SliderRenderer
 class ThemeSnapshot
 
+PointerEvent --> SliderInputAdapter : handled directly
+SliderInputAdapter --> SliderView : hit test / normalize
+SliderInputAdapter --> SliderViewModel : move/press/drag/release/wheel
 SliderView --> SliderViewState
 SliderView --> ThemeSnapshot
 SliderStyle --> SliderViewState

@@ -3,6 +3,10 @@ title DropDown Control Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
+class PointerEvent
+class InputLayer
+class DropDownOverlayController
+class DropDownViewModel
 class DropDownView
 class DropDownViewState
 class DefaultDropDownStyle
@@ -10,6 +14,10 @@ class DropDownRenderStyle
 class DefaultDropDownRenderer
 class ThemeSnapshot
 
+PointerEvent --> InputLayer : dispatched
+InputLayer --> DropDownOverlayController : overlay capture
+DropDownOverlayController --> DropDownView : forwards pointer state
+DropDownOverlayController --> DropDownViewModel : updates expansion / selection
 DropDownView --> DropDownViewState
 DropDownView --> ThemeSnapshot
 DefaultDropDownStyle --> DropDownViewState

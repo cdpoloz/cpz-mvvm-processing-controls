@@ -3,6 +3,9 @@ title TextField Control Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
+class PointerEvent
+class TextFieldInputAdapter
+class TextFieldViewModel
 class TextFieldView
 class TextFieldViewState
 class DefaultTextFieldStyle
@@ -10,6 +13,9 @@ class TextFieldRenderStyle
 class DefaultTextFieldRenderer
 class ThemeSnapshot
 
+PointerEvent --> TextFieldInputAdapter : handled directly
+TextFieldInputAdapter --> TextFieldView : hit test / cursor geometry
+TextFieldInputAdapter --> TextFieldViewModel : focus / selection updates
 TextFieldView --> TextFieldViewState
 TextFieldView --> ThemeSnapshot
 DefaultTextFieldStyle --> TextFieldViewState

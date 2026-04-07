@@ -3,6 +3,38 @@ title High-Level Architecture
 skinparam packageStyle rectangle
 skinparam shadowing false
 
+package "External Boundary" {
+  class ExternalSource
+  class ExternalAdapter
+}
+
+package "Input" {
+  class PointerEvent {
+    +type : MOVE|PRESS|RELEASE|DRAG|WHEEL
+    +x : float
+    +y : float
+    +pressed : boolean
+    +button : int
+    +shift : boolean
+    +ctrl : boolean
+    +alt : boolean
+    +wheelDelta : float
+  }
+  class KeyboardEvent {
+    +type : PRESS|TYPE|RELEASE
+    +key : char
+    +keyCode : int
+    +shift : boolean
+    +ctrl : boolean
+    +alt : boolean
+  }
+  class KeyboardState
+  class InputManager
+  interface InputLayer
+  class InputAdapter
+  class FocusManager
+}
+
 package "MVVM" {
   class Model
   class ViewModel
@@ -17,19 +49,24 @@ package "Rendering" {
 }
 
 package "Infrastructure" {
-  class ProcessingKeyboardAdapter
-  class KeyboardState
   interface ThemeProvider
   class ThemeManager
   class ThemeSnapshot
-  class InputManager
-  interface InputLayer
-  class FocusManager
   class OverlayManager
 }
 
 ThemeManager ..|> ThemeProvider
 ThemeProvider --> ThemeSnapshot
+
+ExternalSource --> ExternalAdapter : raw callbacks or state
+ExternalAdapter --> PointerEvent : creates
+ExternalAdapter --> KeyboardEvent : creates
+ExternalAdapter --> KeyboardState : updates when needed
+ExternalAdapter --> InputManager : dispatches events
+InputManager --> InputLayer : dispatches
+InputLayer --> InputAdapter : forwards
+InputAdapter --> ViewModel : updates interaction
+FocusManager --> ViewModel : manages focus
 
 ViewModel --> Model : updates
 View --> ViewModel : reads
@@ -39,11 +76,5 @@ Style --> ViewState : resolves
 Style --> ThemeSnapshot : consumes
 Style --> RenderStyle : creates
 Renderer --> RenderStyle : draws
-
-ProcessingKeyboardAdapter --> KeyboardState : updates
-ProcessingKeyboardAdapter --> InputManager : dispatches keyboard
-InputManager --> InputLayer : dispatches
-InputLayer --> ViewModel : forwards input
-FocusManager --> ViewModel : manages focus
 OverlayManager --> View : coordinates overlays
 @enduml

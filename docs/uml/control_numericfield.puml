@@ -3,6 +3,9 @@ title NumericField Control Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
+class PointerEvent
+class NumericFieldInputAdapter
+class NumericFieldViewModel
 class NumericFieldView
 class NumericFieldViewState
 class NumericFieldStyle
@@ -10,6 +13,9 @@ class NumericFieldRenderStyle
 class DefaultNumericFieldRenderer
 class ThemeSnapshot
 
+PointerEvent --> NumericFieldInputAdapter : handled directly
+NumericFieldInputAdapter --> NumericFieldView : hit test / cursor geometry
+NumericFieldInputAdapter --> NumericFieldViewModel : move/press/drag/release/wheel
 NumericFieldView --> NumericFieldViewState
 NumericFieldView --> ThemeSnapshot
 NumericFieldStyle --> NumericFieldViewState
