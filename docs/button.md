@@ -13,27 +13,26 @@ sketch changes theme.
 
 ---
 
-## Responsabilities
+## Responsibilities
 
 The `Button` control follows the standard MVVM separation used across the framework:
 
-- Model → stores base state (e.g. text, enabled)
-- ViewModel → handles interaction (hover, pressed, click)
-- View → layout, hit testing, and `ViewState` construction
-- Style → resolves visual appearance (no business logic)
-- Renderer → performs drawing only
+- `Model` → stores base state (e.g. text, enabled)
+- `ViewModel` → handles interaction (hover, pressed, click)
+- `View` → layout, hit testing, and `ViewState` construction
+- `Style` → resolves visual appearance (no business logic)
+- `Renderer` → performs drawing only
 
 Rendering pipeline:
 
 ```text
 ViewModel → ViewState → Style → RenderStyle → Renderer
 ```
-
 ---
 
 ## Minimal example
 
-A minimal button requieres:
+A minimal button requires:
 
 1. `ButtonModel`
 2. `ButtonViewModel`
@@ -42,17 +41,26 @@ A minimal button requieres:
 5. An `InputLayer`
 6. Forwarded pointer events
 
+The framework does not provide input sources.
+
+The application is responsible for capturing input and forwarding normalized input events.
+
 ---
 
 ## Step-by-step setup
 
-This section shows how to build a `Button` step by step usaing a Processing sketch.
+This section shows how to build a `Button` step by step in a Processing sketch.
 
+High-level interaction and rendering flow:
+
+```text
+Processing → PointerEvent → InputManager → InputLayer → Adapter → ViewModel → View → Style → Renderer
+```
 ---
 
 ### 1. Create the model and view model
 
-``` Java
+```java
 ButtonViewModel buttonViewModel = new ButtonViewModel(new ButtonModel("Text-on-Button"));
 ```
 
@@ -63,10 +71,10 @@ ButtonViewModel buttonViewModel = new ButtonViewModel(new ButtonModel("Text-on-B
 
 ### 2. Assign the click action
 
-``` Java
+```java
 buttonViewModel.setClickListener(() -> {
     // the code that executes after a button click goes here, for example:
-    System.out.println("You clicked the button!")
+    System.out.println("You clicked the button!");
 });
 ```
 
@@ -76,7 +84,7 @@ This defines what happens when the button is clicked.
 
 ### 3. Create the view
 
-``` Java
+```java
 float x = 210f;
 float y = 150f;
 float w = 190f;
@@ -96,7 +104,7 @@ It does not contain business logic.
 
 ### 4. Optional: customize the style
 
-``` Java
+```java
 ButtonStyleConfig bsc = new ButtonStyleConfig();
 bsc.baseColor = Colors.rgb(219, 98, 48);
 bsc.textColor = Colors.gray(255);
@@ -107,8 +115,7 @@ bsc.cornerRadius = 18.0f;
 bsc.disabledAlpha = 90;
 bsc.hoverBlendWithWhite = 0.12f;
 bsc.pressedBlendWithBlack = 0.25f;
-
-buttonView.setStyle(bsc);
+buttonView.setStyle(new DefaultButtonStyle(bsc));
 ```
 
 This configuration controls the visual appearance:
@@ -129,7 +136,7 @@ Styles resolve visuals only. They do not contain logic.
 
 ### 5. Create the input adapter
 
-``` Java
+```java
 ButtonInputAdapter buttonInput = new ButtonInputAdapter(buttonView, buttonViewModel);
 ```
 
@@ -146,7 +153,7 @@ The adapter:
 
 ### 6. Register an input layer
 
-``` Java
+```java
 InputManager inputManager = new InputManager();
 inputManager.registerLayer(new ButtonRootInputLayer());
 ```
@@ -157,15 +164,15 @@ It does not know about buttons or controls.
 
 Instead:
 
-* it receives normalized events
-* it forwards them to registered `InputLayer`
-* each layer decides how to route them
+- it receives normalized events
+- it forwards them to registered `InputLayer`s
+- each layer decides how to route them
 
 ---
 
 ### 7. Draw the button
 
-``` Java
+```java
 public void draw() {
     background(28);
     buttonView.draw();
@@ -183,11 +190,13 @@ During `draw()`:
 
 ## Input flow
 
+> The framework does not own the input source. It only consumes normalized input events provided by the application.
+
 Processing provides callbacks like `mouseMoved`, `mousePressed`, etc.
 
 These are converted into `PointerEvent` and sent to the `InputManager`.
 
-``` Java
+```java
 // mouseX, mouseY and mouseButton are public Processing variables
 
 public void mouseMoved() {
@@ -209,38 +218,61 @@ public void mouseReleased() {
 
 Event roles:
 
-* `MOVE` → hover updates
-* `DRAG` → continuous interaction
-* `PRESS` → start of click
-* `RELEASE` → end of click (may trigger action)
+- `MOVE` → hover updates
+- `DRAG` → continuous interaction
+- `PRESS` → start of click
+- `RELEASE` → end of click (may trigger action)
 
 > This decouples the framework from Processing-specific APIs.
 
 ---
 
+## State transitions
+
+A button typically moves through the following interaction states:
+
+```text
+idle → hovered → pressed → released → idle
+                          ↘
+                           clicked
+```
+
+Typical flow:
+
+- `MOVE` inside the view → sets hover state
+- `PRESS` inside the view → sets pressed state
+- `RELEASE` inside the view → clears pressed state and triggers click
+- `MOVE` outside the view → clears hover state
+- `RELEASE` outside the view → ends press without click
+
+In practice, the exact transition logic is handled by the `ButtonInputAdapter` and reflected in the `ButtonViewModel`.
+
+The click is triggered on release inside the view.
+
+---
+
 ## Input layer
 
-Example layer inside `ButtonDevSketch` (our Processing test sketch):
+Example input layer in a Processing sketch:
 
-``` Java
+```java
 private final class ButtonRootInputLayer extends DefaultInputLayer {
     private ButtonRootInputLayer() {
-        Objects.requireNonNull(ButtonDevSketch.this);
+        Objects.requireNonNull(ButtonTest.this);
         super(0);
     }
 
     public boolean handlePointerEvent(PointerEvent pointerEvent) {
         switch (pointerEvent.getType()) {
             case MOVE:
-                break;
             case DRAG:
-                ButtonDevSketch.this.buttonInput.handleMouseMove(pointerEvent.getX(), pointerEvent.getY());
+                buttonInput.handleMouseMove(pointerEvent.getX(), pointerEvent.getY());
                 return true;
             case PRESS:
-                ButtonDevSketch.this.buttonInput.handleMousePress(pointerEvent.getX(), pointerEvent.getY());
+                buttonInput.handleMousePress(pointerEvent.getX(), pointerEvent.getY());
                 return true;
             case RELEASE:
-                ButtonDevSketch.this.buttonInput.handleMouseRelease(pointerEvent.getX(), pointerEvent.getY());
+                buttonInput.handleMouseRelease(pointerEvent.getX(), pointerEvent.getY());
                 return true;
             default:
                 return false;
@@ -257,29 +289,44 @@ private final class ButtonRootInputLayer extends DefaultInputLayer {
 
 The input layer:
 
-* centralizes event routing
-* connects `InputManager` with adapters
-* groups multiple controls
-* keeps the system scalable
-* allows priority-based input handling
+- centralizes event routing
+- connects `InputManager` with adapters
+- groups multiple controls
+- keeps the system scalable
+- allows priority-based input handling
 
 In this example, the layer forwards events to:
 
-* `buttonInput`
+- `buttonInput`
 
 > Separation of responsibilities:
 >
->* `InputManager` → dispatch
->* `InputLayer` → routing
->* `Adapter` → control logic
->* `ViewModel` → state update
+>- `InputManager` → dispatch
+>- `InputLayer` → routing
+>- `Adapter` → control logic
+>- `ViewModel` → state update
 
 ---
 
 ## Full example
 
-``` Java
-public class ButtonDevSketch extends PApplet {
+```java
+import com.cpz.processing.controls.controls.button.config.ButtonStyleConfig;
+import com.cpz.processing.controls.controls.button.input.ButtonInputAdapter;
+import com.cpz.processing.controls.controls.button.model.ButtonModel;
+import com.cpz.processing.controls.controls.button.style.DefaultButtonStyle;
+import com.cpz.processing.controls.controls.button.view.ButtonView;
+import com.cpz.processing.controls.controls.button.viewmodel.ButtonViewModel;
+import com.cpz.processing.controls.core.input.DefaultInputLayer;
+import com.cpz.processing.controls.core.input.InputManager;
+import com.cpz.processing.controls.core.input.KeyboardEvent;
+import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.core.util.Colors;
+import processing.core.PApplet;
+
+import java.util.Objects;
+
+public class ButtonTest extends PApplet {
 
     private InputManager inputManager;
     private ButtonView buttonView;
@@ -296,7 +343,7 @@ public class ButtonDevSketch extends PApplet {
         buttonViewModel = new ButtonViewModel(new ButtonModel("Text-on-Button"));
         buttonViewModel.setClickListener(() -> {
             // the code that executes after a button click goes here, for example:
-            System.out.println("You clicked the button!")
+            System.out.println("You clicked the button!");
         });
         // view
         float x = 210f;
@@ -315,9 +362,9 @@ public class ButtonDevSketch extends PApplet {
         bsc.disabledAlpha = 90;
         bsc.hoverBlendWithWhite = 0.12f;
         bsc.pressedBlendWithBlack = 0.25f;
-        buttonView.setStyle(bsc);
+        buttonView.setStyle(new DefaultButtonStyle(bsc));
         // inputAdapter
-        ButtonInputAdapter buttonInput = new ButtonInputAdapter(buttonView, buttonViewModel);
+        buttonInput = new ButtonInputAdapter(buttonView, buttonViewModel);
         // inputManager
         inputManager = new InputManager();
         inputManager.registerLayer(new ButtonRootInputLayer());
@@ -348,22 +395,21 @@ public class ButtonDevSketch extends PApplet {
     // input layer
     private final class ButtonRootInputLayer extends DefaultInputLayer {
         private ButtonRootInputLayer() {
-            Objects.requireNonNull(ButtonDevSketch.this);
+            Objects.requireNonNull(ButtonTest.this);
             super(0);
         }
 
         public boolean handlePointerEvent(PointerEvent pointerEvent) {
             switch (pointerEvent.getType()) {
                 case MOVE:
-                    break;
                 case DRAG:
-                    ButtonDevSketch.this.buttonInput.handleMouseMove(pointerEvent.getX(), pointerEvent.getY());
+                    buttonInput.handleMouseMove(pointerEvent.getX(), pointerEvent.getY());
                     return true;
                 case PRESS:
-                    ButtonDevSketch.this.buttonInput.handleMousePress(pointerEvent.getX(), pointerEvent.getY());
+                    buttonInput.handleMousePress(pointerEvent.getX(), pointerEvent.getY());
                     return true;
                 case RELEASE:
-                    ButtonDevSketch.this.buttonInput.handleMouseRelease(pointerEvent.getX(), pointerEvent.getY());
+                    buttonInput.handleMouseRelease(pointerEvent.getX(), pointerEvent.getY());
                     return true;
                 default:
                     return false;
@@ -382,5 +428,5 @@ public class ButtonDevSketch extends PApplet {
 
 ## See also
 
-* [InputSystem](docs/input-system.md)
-* [Architecture](docs/architecture.md)
+- [Input system](docs/input-system.md)
+- [Architecture](docs/architecture.md)

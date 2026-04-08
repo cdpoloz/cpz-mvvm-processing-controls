@@ -27,7 +27,8 @@ public class Launcher {
     */
    public static void main(String[] args) {
       Locale.setDefault(Locale.forLanguageTag("en-US"));
-      PApplet.main(ButtonDevSketch.class);
+      //PApplet.main(ButtonDevSketch.class);
+      PApplet.main(ButtonTest.class);
       //PApplet.main(CheckboxDevSketch.class);
       //PApplet.main(DropDownDevSketch.class);
       //PApplet.main(LabelDevSketch.class);
