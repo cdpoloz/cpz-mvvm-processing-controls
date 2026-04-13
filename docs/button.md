@@ -61,7 +61,7 @@ Processing → PointerEvent → InputManager → InputLayer → Adapter → View
 ### 1. Create the model and view model
 
 ```java
-ButtonViewModel buttonViewModel = new ButtonViewModel(new ButtonModel("Text-on-Button"));
+ButtonViewModel buttonViewModel = new ButtonViewModel(new ButtonModel("Simple Button"));
 ```
 
 - `ButtonModel` stores the base state (text, enabled state).
@@ -85,9 +85,9 @@ This defines what happens when the button is clicked.
 ### 3. Create the view
 
 ```java
-float x = 210f;
+float x = 300f;
 float y = 150f;
-float w = 190f;
+float w = 200f;
 float h = 60f;
 buttonView = new ButtonView(this, buttonViewModel, x, y, w, h);
 ```
@@ -106,7 +106,7 @@ It does not contain business logic.
 
 ```java
 ButtonStyleConfig bsc = new ButtonStyleConfig();
-bsc.baseColor = Colors.rgb(219, 98, 48);
+bsc.baseColor = Colors.rgb(48, 98, 219);
 bsc.textColor = Colors.gray(255);
 bsc.strokeColor = Colors.gray(255);
 bsc.strokeWeight = 2.0f;
@@ -131,6 +131,8 @@ This configuration controls the visual appearance:
 - `pressedBlendWithBlack` → darken effect on press
 
 Styles resolve visuals only. They do not contain logic.
+
+The button can also be rendered using SVG. See [Button (SVG)](button-svg.md) for a complete example.
 
 ---
 
@@ -334,26 +336,26 @@ public class ButtonTest extends PApplet {
     private ButtonInputAdapter buttonInput;
 
     public void settings() {
-        size(820, 440);
+        size(600, 300);
         smooth(4);
     }
 
     public void setup() {
         // viewModel
-        buttonViewModel = new ButtonViewModel(new ButtonModel("Text-on-Button"));
+        buttonViewModel = new ButtonViewModel(new ButtonModel("Simple Button"));
         buttonViewModel.setClickListener(() -> {
             // the code that executes after a button click goes here, for example:
             System.out.println("You clicked the button!");
         });
         // view
-        float x = 210f;
+        float x = 300f;
         float y = 150f;
-        float w = 190f;
+        float w = 200f;
         float h = 60f;
         buttonView = new ButtonView(this, buttonViewModel, x, y, w, h);
         // style (optional)
         ButtonStyleConfig bsc = new ButtonStyleConfig();
-        bsc.baseColor = Colors.rgb(219, 98, 48);
+        bsc.baseColor = Colors.rgb(48, 98, 219);
         bsc.textColor = Colors.gray(255);
         bsc.strokeColor = Colors.gray(255);
         bsc.strokeWeight = 2.0f;
@@ -430,3 +432,4 @@ public class ButtonTest extends PApplet {
 
 - [Input system](docs/input-system.md)
 - [Architecture](docs/architecture.md)
+- [Button (SVG)](button-svg.md)

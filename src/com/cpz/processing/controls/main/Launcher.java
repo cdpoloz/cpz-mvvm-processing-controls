@@ -1,6 +1,8 @@
-package com.cpz.processing.controls.dev;
+package com.cpz.processing.controls.main;
 
 import java.util.Locale;
+
+import com.cpz.processing.controls.examples.*;
 import processing.core.PApplet;
 
 /**
@@ -27,8 +29,9 @@ public class Launcher {
     */
    public static void main(String[] args) {
       Locale.setDefault(Locale.forLanguageTag("en-US"));
-      //PApplet.main(ButtonDevSketch.class);
-      PApplet.main(ButtonTest.class);
+      // You can choose an example from the list below
+      //PApplet.main(ButtonTest.class);
+      PApplet.main(ButtonSvgTest.class);
       //PApplet.main(CheckboxDevSketch.class);
       //PApplet.main(DropDownDevSketch.class);
       //PApplet.main(LabelDevSketch.class);

@@ -1,4 +1,4 @@
-package com.cpz.processing.controls.dev;
+package com.cpz.processing.controls.examples;
 
 import com.cpz.processing.controls.controls.toggle.config.ToggleStyleConfig;
 import com.cpz.processing.controls.controls.toggle.model.ToggleModel;

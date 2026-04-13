@@ -1,4 +1,4 @@
-package com.cpz.processing.controls.dev;
+package com.cpz.processing.controls.examples;
 
 import com.cpz.processing.controls.controls.button.config.ButtonStyleConfig;
 import com.cpz.processing.controls.controls.button.input.ButtonInputAdapter;
@@ -23,26 +23,26 @@ public class ButtonTest extends PApplet {
     private ButtonInputAdapter buttonInput;
 
     public void settings() {
-        size(820, 440);
-        smooth(4);
+        size(600, 300);
+        smooth(8);
     }
 
     public void setup() {
         // viewModel
-        buttonViewModel = new ButtonViewModel(new ButtonModel("Text-on-Button"));
+        buttonViewModel = new ButtonViewModel(new ButtonModel("Simple Button"));
         buttonViewModel.setClickListener(() -> {
             // the code that executes after a button click goes here, for example:
             System.out.println("You clicked the button!");
         });
         // view
-        float x = 210f;
+        float x = 300f;
         float y = 150f;
-        float w = 190f;
+        float w = 200f;
         float h = 60f;
         buttonView = new ButtonView(this, buttonViewModel, x, y, w, h);
         // style (optional)
         ButtonStyleConfig bsc = new ButtonStyleConfig();
-        bsc.baseColor = Colors.rgb(219, 98, 48);
+        bsc.baseColor = Colors.rgb(48, 98, 219);
         bsc.textColor = Colors.gray(255);
         bsc.strokeColor = Colors.gray(255);
         bsc.strokeWeight = 2.0f;

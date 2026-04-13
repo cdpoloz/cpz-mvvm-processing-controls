@@ -1,4 +1,4 @@
-package com.cpz.processing.controls.dev;
+package com.cpz.processing.controls.examples;
 
 import com.cpz.processing.controls.controls.button.model.ButtonModel;
 import com.cpz.processing.controls.controls.button.input.ButtonInputAdapter;

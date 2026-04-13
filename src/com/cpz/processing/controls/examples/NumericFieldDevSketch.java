@@ -1,4 +1,4 @@
-package com.cpz.processing.controls.dev;
+package com.cpz.processing.controls.examples;
 
 import com.cpz.processing.controls.controls.numericfield.model.NumericFieldModel;
 import com.cpz.processing.controls.controls.numericfield.style.NumericFieldDefaultStyles;
