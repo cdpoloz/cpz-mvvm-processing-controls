@@ -2,9 +2,9 @@
 
 This document shows how to create controls from JSON configuration files.
 
-In the current iteration, the framework supports a single `Button` or a single `Checkbox` created from JSON, including an optional SVG renderer configured through the style block.
+In the current iteration, the framework supports a single `Button`, a single `Checkbox`, or a single `Toggle` created from JSON, including an optional SVG renderer configured through the style block.
 
-JSON configuration is an additional layer on top of the existing public API. It does not replace direct control creation with `Button` or `Checkbox`, and it does not change the internal MVVM architecture of the framework.
+JSON configuration is an additional layer on top of the existing public API. It does not replace direct control creation with `Button`, `Checkbox`, or `Toggle`, and it does not change the internal MVVM architecture of the framework.
 
 ---
 
@@ -34,14 +34,15 @@ The config-driven flows are:
 ```text
 JSON → ButtonConfigLoader → ButtonConfig → ButtonFactory → Button facade → MVVM internals
 JSON → CheckboxConfigLoader → CheckboxConfig → CheckboxFactory → Checkbox facade → MVVM internals
+JSON → ToggleConfigLoader → ToggleConfig → ToggleFactory → Toggle facade → MVVM internals
 ```
 
 Responsibilities:
 
-- `ButtonConfig` and `CheckboxConfig` store the parsed control data
-- `ButtonConfigLoader` and `CheckboxConfigLoader` read the JSON file and validate the supported fields
-- `ButtonFactory` and `CheckboxFactory` create the public facade and apply state and style
-- `Button` and `Checkbox` remain the public facades used by the sketch
+- `ButtonConfig`, `CheckboxConfig`, and `ToggleConfig` store the parsed control data
+- `ButtonConfigLoader`, `CheckboxConfigLoader`, and `ToggleConfigLoader` read the JSON file and validate the supported fields
+- `ButtonFactory`, `CheckboxFactory`, and `ToggleFactory` create the public facade and apply state and style
+- `Button`, `Checkbox`, and `Toggle` remain the public facades used by the sketch
 
 This means the external setup becomes config-driven, but the runtime control pipeline remains the same.
 
@@ -127,6 +128,46 @@ public void setup() {
 }
 ```
 
+### 3. Toggle
+
+Minimal JSON:
+
+```json
+{
+  "code": "tglJsonTest",
+  "state": 0,
+  "totalStates": 3,
+  "x": 300.0,
+  "y": 130.0,
+  "width": 96.0,
+  "height": 96.0,
+  "enabled": true,
+  "visible": true
+}
+```
+
+Minimal Java sketch flow:
+
+```java
+private static final String TOGGLE_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "toggle-test.json";
+
+private InputManager inputManager;
+private Toggle toggle;
+
+public void setup() {
+    ToggleConfigLoader loader = new ToggleConfigLoader(this);
+    ToggleConfig config = loader.load(TOGGLE_CONFIG_PATH);
+    toggle = ToggleFactory.create(this, config);
+
+    toggle.setChangeListener(value -> {
+        System.out.println("Toggle state = " + value);
+    });
+
+    inputManager = new InputManager();
+    inputManager.registerLayer(new ToggleInputLayer(0, toggle));
+}
+```
+
 The important part is unchanged from the regular control flow:
 
 - the sketch still assigns the listener in Java
@@ -135,6 +176,11 @@ The important part is unchanged from the regular control flow:
 - the JSON now provides the stable control identity through the required `code` field
 
 The configuration only defines structure and appearance. Behavior remains defined in Java.
+
+For `Toggle`, the JSON route is stricter than the direct Java API:
+
+- invalid `totalStates` or `state` values fail fast during loading
+- the loader throws a clear exception instead of coercing the values
 
 ---
 
@@ -218,6 +264,43 @@ Both groups map internally to the checkbox style config used by the control.
 
 The style block only controls appearance. It does not define listeners, input routing, or business behavior.
 
+### 3. Toggle style
+
+Example:
+
+```json
+"style": {
+  "stateColors": ["#464646", "#E89B2C", "#20BCB0"],
+  "strokeColor": "#FFFFFF",
+  "strokeWidth": 2.0,
+  "strokeWidthHover": 4.0,
+  "hoverBlendWithWhite": 0.18,
+  "pressedBlendWithBlack": 0.20,
+  "disabledAlpha": 70
+}
+```
+
+Supported toggle style fields in the current iteration:
+
+- `offFillOverride`
+- `onFillOverride`
+- `hoverFillOverride`
+- `pressedFillOverride`
+- `strokeOverride`
+- `stateColors`
+- `strokeColor`
+- `strokeWidth`
+- `strokeWidthHover`
+- `hoverBlendWithWhite`
+- `pressedBlendWithBlack`
+- `disabledAlpha`
+
+`stateColors` is the most direct way to configure a multi-state toggle because it defines the fill color sequence used across the available state indices.
+
+The override fields remain available for lower-level control when needed.
+
+The style block only controls appearance. It does not define listeners, input routing, or business behavior.
+
 ---
 
 ## SVG renderer
@@ -240,6 +323,7 @@ Notes:
 - the factory creates the corresponding SVG renderer internally when this block is present
 - `Button` uses `SvgButtonRenderer`
 - `Checkbox` uses `SvgCheckboxRenderer`
+- `Toggle` uses `SvgShapeRenderer`
 
 This keeps the external JSON declarative while reusing the same rendering mechanism already used by the direct Java API.
 
@@ -633,15 +717,213 @@ public class CheckboxSvgJsonTest extends PApplet {
 
 ---
 
+### 5. Normal toggle from JSON
+
+JSON:
+
+```json
+{
+  "code": "tglJsonTest",
+  "state": 0,
+  "totalStates": 3,
+  "x": 300.0,
+  "y": 130.0,
+  "width": 96.0,
+  "height": 96.0,
+  "enabled": true,
+  "visible": true,
+  "style": {
+    "stateColors": ["#464646", "#E89B2C", "#20BCB0"],
+    "strokeColor": "#FFFFFF",
+    "strokeWidth": 2.0,
+    "strokeWidthHover": 4.0,
+    "hoverBlendWithWhite": 0.18,
+    "pressedBlendWithBlack": 0.20,
+    "disabledAlpha": 70
+  }
+}
+```
+
+Java:
+
+```java
+import com.cpz.processing.controls.controls.toggle.Toggle;
+import com.cpz.processing.controls.controls.toggle.ToggleFactory;
+import com.cpz.processing.controls.controls.toggle.config.ToggleConfig;
+import com.cpz.processing.controls.controls.toggle.config.ToggleConfigLoader;
+import com.cpz.processing.controls.controls.toggle.input.ToggleInputLayer;
+import com.cpz.processing.controls.core.input.InputManager;
+import com.cpz.processing.controls.core.input.PointerEvent;
+import processing.core.PApplet;
+
+import java.io.File;
+
+public class ToggleJsonTest extends PApplet {
+    private static final String TOGGLE_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "toggle-test.json";
+
+    private InputManager inputManager;
+    private Toggle toggle;
+    private int currentState;
+
+    public void settings() {
+        size(600, 320);
+        smooth(8);
+    }
+
+    public void setup() {
+        ToggleConfigLoader loader = new ToggleConfigLoader(this);
+        ToggleConfig config = loader.load(TOGGLE_CONFIG_PATH);
+        toggle = ToggleFactory.create(this, config);
+        toggle.setChangeListener(value -> currentState = value);
+        currentState = toggle.getState();
+
+        inputManager = new InputManager();
+        inputManager.registerLayer(new ToggleInputLayer(0, toggle));
+
+        textAlign(CENTER, CENTER);
+    }
+
+    public void draw() {
+        background(28);
+        toggle.draw();
+        text(toggle.getCode() + " | state = " + currentState + " / " + (toggle.getTotalStates() - 1), 300, 210);
+        text("click to cycle 0 → 1 → 2 → 0", 300, 250);
+    }
+
+    public void mouseMoved() {
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) mouseX, (float) mouseY, mouseButton));
+    }
+
+    public void mouseDragged() {
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, (float) mouseX, (float) mouseY, mouseButton));
+    }
+
+    public void mousePressed() {
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float) mouseX, (float) mouseY, mouseButton));
+    }
+
+    public void mouseReleased() {
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) mouseX, (float) mouseY, mouseButton));
+    }
+}
+```
+
+---
+
+### 6. SVG toggle from JSON
+
+JSON:
+
+```json
+{
+  "code": "tglSvgJsonTest",
+  "state": 0,
+  "totalStates": 3,
+  "x": 300.0,
+  "y": 130.0,
+  "width": 96.0,
+  "height": 96.0,
+  "enabled": true,
+  "visible": true,
+  "style": {
+    "stateColors": ["#5064DC", "#EBA028", "#20BCB0"],
+    "strokeColor": "#FFFFFF",
+    "strokeWidth": 1.5,
+    "strokeWidthHover": 3.5,
+    "hoverBlendWithWhite": 0.14,
+    "pressedBlendWithBlack": 0.24,
+    "disabledAlpha": 70,
+    "renderer": {
+      "type": "svg",
+      "path": "data/img/test.svg"
+    }
+  }
+}
+```
+
+Java:
+
+```java
+import com.cpz.processing.controls.controls.toggle.Toggle;
+import com.cpz.processing.controls.controls.toggle.ToggleFactory;
+import com.cpz.processing.controls.controls.toggle.config.ToggleConfig;
+import com.cpz.processing.controls.controls.toggle.config.ToggleConfigLoader;
+import com.cpz.processing.controls.controls.toggle.input.ToggleInputLayer;
+import com.cpz.processing.controls.core.input.InputManager;
+import com.cpz.processing.controls.core.input.PointerEvent;
+import processing.core.PApplet;
+
+import java.io.File;
+
+public class ToggleSvgJsonTest extends PApplet {
+    private static final String TOGGLE_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "toggle-svg-test.json";
+
+    private InputManager inputManager;
+    private Toggle toggle;
+    private int currentState;
+
+    public void settings() {
+        size(600, 320);
+        smooth(8);
+    }
+
+    public void setup() {
+        ToggleConfigLoader loader = new ToggleConfigLoader(this);
+        ToggleConfig config = loader.load(TOGGLE_CONFIG_PATH);
+        toggle = ToggleFactory.create(this, config);
+        toggle.setChangeListener(value -> currentState = value);
+        currentState = toggle.getState();
+
+        inputManager = new InputManager();
+        inputManager.registerLayer(new ToggleInputLayer(0, toggle));
+
+        textAlign(CENTER, CENTER);
+    }
+
+    public void draw() {
+        background(28);
+        toggle.draw();
+        text(toggle.getCode() + " | state = " + currentState + " / " + (toggle.getTotalStates() - 1), 300, 215);
+        text("click to cycle 0 → 1 → 2 → 0", 300, 250);
+    }
+
+    public void mouseMoved() {
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) mouseX, (float) mouseY, mouseButton));
+    }
+
+    public void mouseDragged() {
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, (float) mouseX, (float) mouseY, mouseButton));
+    }
+
+    public void mousePressed() {
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float) mouseX, (float) mouseY, mouseButton));
+    }
+
+    public void mouseReleased() {
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) mouseX, (float) mouseY, mouseButton));
+    }
+}
+```
+
+---
+
 ## Validation rules
 
 The current loaders apply a small set of semantic validations:
 
 - `code` is required for `Button` and `Checkbox` JSON configs
+- `code` is required for `Toggle` JSON configs
 - `width` must be greater than `0`
 - `height` must be greater than `0`
+- `totalStates` must be greater than `0` for `Toggle`
+- `state` must be between `0` and `totalStates - 1` for `Toggle`
 - `renderer.type` must be `"svg"` when a renderer block is provided
 - `renderer.path` must be non-empty when `renderer.type` is `"svg"`
+
+For `Toggle`, these JSON rules are stricter than the direct facade API:
+
+- `ToggleConfigLoader` rejects invalid `totalStates` and out-of-range `state` values
+- the direct `Toggle` API keeps runtime calls permissive: `setTotalStates(int)` coerces to at least `1`, and `setState(int)` clamps to the current valid range
 
 Supported color formats:
 
@@ -658,7 +940,7 @@ If a required value is missing or invalid, the loader throws an `IllegalArgument
 The current config-driven layer is intentionally minimal:
 
 - only one control per JSON file
-- only `Button` and `Checkbox` are supported
+- only `Button`, `Checkbox`, and `Toggle` are supported
 - no multiple controls
 - no listeners declared in JSON
 - no binding
@@ -675,5 +957,7 @@ This keeps the feature focused on validating the configuration flow without chan
 - [Button (SVG)](button-svg.md)
 - [Checkbox](checkbox.md)
 - [Checkbox (SVG)](checkbox-svg.md)
+- [Toggle](toggle.md)
+- [Toggle (SVG)](toggle-svg.md)
 - [Architecture](architecture.md)
 - [Input system](input-system.md)

@@ -52,14 +52,6 @@ public final class Checkbox {
         this.notifyChangeIfNeeded(before);
     }
 
-    public CheckboxView getView() {
-        return this.view;
-    }
-
-    public CheckboxViewModel getViewModel() {
-        return this.viewModel;
-    }
-
     public String getCode() {
         return this.model.getCode();
     }

@@ -84,14 +84,6 @@ public final class Button {
     }
 
     // <editor-fold defaultstate="collapsed" desc="*** setter & getter ***">
-    public ButtonView getView() {
-        return this.view;
-    }
-
-    public ButtonViewModel getViewModel() {
-        return this.viewModel;
-    }
-
     public String getCode() {
         return this.model.getCode();
     }

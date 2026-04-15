@@ -1,0 +1,20 @@
+{
+  "code": "tglJsonTest",
+  "state": 0,
+  "totalStates": 3,
+  "x": 300.0,
+  "y": 130.0,
+  "width": 96.0,
+  "height": 96.0,
+  "enabled": true,
+  "visible": true,
+  "style": {
+    "stateColors": ["#464646", "#E89B2C", "#20BCB0"],
+    "strokeColor": "#FFFFFF",
+    "strokeWidth": 2.0,
+    "strokeWidthHover": 4.0,
+    "hoverBlendWithWhite": 0.18,
+    "pressedBlendWithBlack": 0.20,
+    "disabledAlpha": 70
+  }
+}

@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.core.util;
 
+import processing.data.JSONArray;
 import processing.data.JSONObject;
 
 /**
@@ -14,14 +15,20 @@ public final class JsonConfigSupport {
             return null;
         }
 
-        Object value = json.get(key);
-        if (value instanceof Number) {
-            return ((Number) value).intValue();
+        return parseColorValue(json.get(key), key, path);
+    }
+
+    public static Integer[] getOptionalColorArray(JSONObject json, String key, String path) {
+        if (!json.hasKey(key) || json.isNull(key)) {
+            return null;
         }
-        if (value instanceof String) {
-            return parseColor((String) value, key, path);
+
+        JSONArray array = json.getJSONArray(key);
+        Integer[] result = new Integer[array.size()];
+        for (int i = 0; i < array.size(); i++) {
+            result[i] = parseColorValue(array.get(i), key + "[" + i + "]", path);
         }
-        throw new IllegalArgumentException("Unsupported color value for key '" + key + "' in " + path + ": " + value + ". Expected integer or hex string.");
+        return result;
     }
 
     public static Integer getOptionalInt(JSONObject json, String key) {
@@ -49,6 +56,16 @@ public final class JsonConfigSupport {
         if (value <= 0.0f) {
             throw new IllegalArgumentException("Invalid '" + key + "' value in " + path + ": " + value + ". Expected a number greater than 0.");
         }
+    }
+
+    public static Integer parseColorValue(Object value, String key, String path) {
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        if (value instanceof String) {
+            return parseColor((String) value, key, path);
+        }
+        throw new IllegalArgumentException("Unsupported color value for key '" + key + "' in " + path + ": " + value + ". Expected integer or hex string.");
     }
 
     private static int parseColor(String value, String key, String path) {
