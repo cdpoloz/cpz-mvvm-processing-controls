@@ -1,65 +1,58 @@
 # Button (SVG)
 
-This tutorial shows how to create a `Button` using an SVG rendered via `SvgButtonRenderer`.
+This tutorial shows the SVG variant of the public `Button` API using `SvgButtonRenderer`.
 
-> For the base `Button` setup, architecture, and input system, see [button.md](button.md)
+For the base control architecture, input pipeline, and recommended non-SVG setup, see [button.md](button.md).
 
 ---
 
 ## What changes when using SVG
 
-The overall control architecture remains the same:
+The control architecture and input flow stay the same.
 
-- `Model`
-- `ViewModel`
-- `View`
-- `InputAdapter`
-- `InputLayer`
+The only change is the renderer configured through the button style:
 
-The only difference is the visual representation layer:
+- the button is still created through the public `Button` facade
+- input is still routed through `InputManager` and `ButtonInputLayer`
+- visuals are rendered through `SvgButtonRenderer` instead of the default primitive-only renderer path
 
-- instead of rendering only primitive shapes, the button uses an SVG rendered via `SvgButtonRenderer`.
+So this document only focuses on the SVG-specific part of the setup. The public API remains identical to the base button example.
 
 ---
 
 ## Step-by-step setup
 
-This section focuses only on what changes compared to the base button example. The control architecture and input handling remain unchanged.
+### 1. Create the button
+
+```java
+private InputManager inputManager;
+private Button button;
+
+public void setup() {
+    float x = 300f;
+    float y = 125f;
+    float w = 150f;
+    float h = 130f;
+    button = new Button(this, "SVG Button", x, y, w, h);
+}
+```
+
+This is the same public setup used in the regular button example.
 
 ---
 
-### 1. Create the model and view model
-
-This step is identical to the base button example:
+### 2. Assign the click action
 
 ```java
-ButtonViewModel buttonViewModel = new ButtonViewModel(new ButtonModel("SVG Button"));
-
-buttonViewModel.setClickListener(() -> {
+button.setClickListener(() -> {
+    // the code that executes after a button click goes here, for example:
     System.out.println("You clicked the SVG button!");
 });
 ```
 
 ---
 
-### 2. Create the view
-
-```java
-float x = 300f;
-float y = 150f;
-float w = 200f;
-float h = 173f;
-
-buttonView = new ButtonView(this, buttonViewModel, x, y, w, h);
-```
-
----
-
-### 3. Apply the SVG to the button
-
-This is the key difference.
-
-Use the existing API from the framework to assign the SVG to the button.
+### 3. Configure the style and SVG renderer
 
 ```java
 ButtonStyleConfig bsc = new ButtonStyleConfig();
@@ -74,61 +67,61 @@ bsc.hoverBlendWithWhite = 0.12f;
 bsc.pressedBlendWithBlack = 0.25f;
 bsc.setRenderer(new SvgButtonRenderer(this, "data" + File.separator + "img" + File.separator + "test.svg"));
 
-buttonView.setStyle(new DefaultButtonStyle(bsc));
+button.setStyle(new DefaultButtonStyle(bsc));
 ```
+
+This is the key SVG-specific step.
+
+The cross-platform asset path matches the example sketch:
+
+`"data" + File.separator + "img" + File.separator + "test.svg"`
 
 ---
 
-### 4. Input handling
-
-Input handling is identical to the base button example.
+### 4. Register the reusable input layer
 
 ```java
-ButtonInputAdapter buttonInput = new ButtonInputAdapter(buttonView, buttonViewModel);
-
-InputManager inputManager = new InputManager();
-inputManager.registerLayer(new ButtonRootInputLayer());
+inputManager = new InputManager();
+inputManager.registerLayer(new ButtonInputLayer(0, button));
 ```
+
+The sketch still owns the `InputManager`. The control does not take over global input responsibilities.
 
 ---
 
-### 5. Draw
+### 5. Draw the button
 
 ```java
 public void draw() {
     background(28);
-    buttonView.draw();
+    button.draw();
 }
 ```
+
+The facade still delegates to the same internal rendering pipeline. Only the configured renderer changes.
 
 ---
 
 ## Full example
 
 ```java
+import com.cpz.processing.controls.controls.button.Button;
 import com.cpz.processing.controls.controls.button.config.ButtonStyleConfig;
-import com.cpz.processing.controls.controls.button.input.ButtonInputAdapter;
-import com.cpz.processing.controls.controls.button.model.ButtonModel;
+import com.cpz.processing.controls.controls.button.input.ButtonInputLayer;
 import com.cpz.processing.controls.controls.button.style.DefaultButtonStyle;
 import com.cpz.processing.controls.controls.button.style.render.SvgButtonRenderer;
-import com.cpz.processing.controls.controls.button.view.ButtonView;
-import com.cpz.processing.controls.controls.button.viewmodel.ButtonViewModel;
-import com.cpz.processing.controls.core.input.DefaultInputLayer;
 import com.cpz.processing.controls.core.input.InputManager;
-import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.util.Colors;
 import processing.core.PApplet;
 
 import java.io.File;
-import java.util.Objects;
 
 public class ButtonSvgTest extends PApplet {
 
     private InputManager inputManager;
-    private ButtonView buttonView;
-    private ButtonViewModel buttonViewModel;
-    private ButtonInputAdapter buttonInput;
+    private Button button;
+    private int clickCount;
 
     public void settings() {
         size(600, 300);
@@ -136,19 +129,17 @@ public class ButtonSvgTest extends PApplet {
     }
 
     public void setup() {
-        // viewModel
-        buttonViewModel = new ButtonViewModel(new ButtonModel("SVG Button"));
-        buttonViewModel.setClickListener(() -> {
+        float x = 300f;
+        float y = 125f;
+        float w = 150f;
+        float h = 130f;
+        button = new Button(this, "SVG Button", x, y, w, h);
+        button.setClickListener(() -> {
             // the code that executes after a button click goes here, for example:
             System.out.println("You clicked the SVG button!");
+            clickCount++;
         });
-        // view
-        float x = 300f;
-        float y = 150f;
-        float w = 200f;
-        float h = 173f;
-        buttonView = new ButtonView(this, buttonViewModel, x, y, w, h);
-        // style (optional)
+        // style
         ButtonStyleConfig bsc = new ButtonStyleConfig();
         bsc.baseColor = Colors.rgb(48, 98, 219);
         bsc.textColor = Colors.gray(255);
@@ -160,20 +151,20 @@ public class ButtonSvgTest extends PApplet {
         bsc.hoverBlendWithWhite = 0.12f;
         bsc.pressedBlendWithBlack = 0.25f;
         bsc.setRenderer(new SvgButtonRenderer(this, "data" + File.separator + "img" + File.separator + "test.svg"));
-        buttonView.setStyle(new DefaultButtonStyle(bsc));
-        // inputAdapter
-        buttonInput = new ButtonInputAdapter(buttonView, buttonViewModel);
-        // inputManager
+        button.setStyle(new DefaultButtonStyle(bsc));
+        // input manager
         inputManager = new InputManager();
-        inputManager.registerLayer(new ButtonRootInputLayer());
+        inputManager.registerLayer(new ButtonInputLayer(0, button));
+        // text output
+        textAlign(CENTER, CENTER);
     }
 
     public void draw() {
         background(28);
-        buttonView.draw();
+        button.draw();
+        text("Current click count = " + clickCount, 300, 225);
     }
 
-    // mouse events
     public void mouseMoved() {
         inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) mouseX, (float) mouseY, mouseButton));
     }
@@ -189,36 +180,6 @@ public class ButtonSvgTest extends PApplet {
     public void mouseReleased() {
         inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) mouseX, (float) mouseY, mouseButton));
     }
-
-    // input layer
-    private final class ButtonRootInputLayer extends DefaultInputLayer {
-        private ButtonRootInputLayer() {
-            Objects.requireNonNull(ButtonSvgTest.this);
-            super(0);
-        }
-
-        public boolean handlePointerEvent(PointerEvent pointerEvent) {
-            switch (pointerEvent.getType()) {
-                case MOVE:
-                case DRAG:
-                    buttonInput.handleMouseMove(pointerEvent.getX(), pointerEvent.getY());
-                    return true;
-                case PRESS:
-                    buttonInput.handleMousePress(pointerEvent.getX(), pointerEvent.getY());
-                    return true;
-                case RELEASE:
-                    buttonInput.handleMouseRelease(pointerEvent.getX(), pointerEvent.getY());
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        public boolean handleKeyboardEvent(KeyboardEvent keyboardEvent) {
-            return false;
-        }
-    }
-
 }
 ```
 
@@ -226,15 +187,15 @@ public class ButtonSvgTest extends PApplet {
 
 ## Notes
 
-- The SVG is rendered through `SvgButtonRenderer`, which handles shape loading and rendering.
-- Prefer simple, single-color SVGs for best visual consistency.
-- SVG rendering depends on Processing's `PShape` behavior.
-- Keep SVG assets lightweight to avoid performance issues.
+- `SvgButtonRenderer` handles SVG loading and drawing
+- simple, lightweight SVG assets usually give the most predictable results
+- Processing's SVG rendering behavior still applies because the renderer ultimately relies on Processing shape support
+- this tutorial intentionally reuses the same input structure as the base `Button` example
 
 ---
 
 ## See also
 
 - [Button](button.md)
-- [Input system](docs/input-system.md)
-- [Architecture](docs/architecture.md)
+- [Input system](input-system.md)
+- [Architecture](architecture.md)

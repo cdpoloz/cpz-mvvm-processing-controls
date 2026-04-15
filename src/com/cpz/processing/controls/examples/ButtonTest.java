@@ -1,26 +1,19 @@
 package com.cpz.processing.controls.examples;
 
+import com.cpz.processing.controls.controls.button.Button;
 import com.cpz.processing.controls.controls.button.config.ButtonStyleConfig;
-import com.cpz.processing.controls.controls.button.input.ButtonInputAdapter;
-import com.cpz.processing.controls.controls.button.model.ButtonModel;
+import com.cpz.processing.controls.controls.button.input.ButtonInputLayer;
 import com.cpz.processing.controls.controls.button.style.DefaultButtonStyle;
-import com.cpz.processing.controls.controls.button.view.ButtonView;
-import com.cpz.processing.controls.controls.button.viewmodel.ButtonViewModel;
-import com.cpz.processing.controls.core.input.DefaultInputLayer;
 import com.cpz.processing.controls.core.input.InputManager;
-import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.util.Colors;
 import processing.core.PApplet;
 
-import java.util.Objects;
-
 public class ButtonTest extends PApplet {
 
     private InputManager inputManager;
-    private ButtonView buttonView;
-    private ButtonViewModel buttonViewModel;
-    private ButtonInputAdapter buttonInput;
+    private Button button;
+    private int clickCount;
 
     public void settings() {
         size(600, 300);
@@ -28,18 +21,16 @@ public class ButtonTest extends PApplet {
     }
 
     public void setup() {
-        // viewModel
-        buttonViewModel = new ButtonViewModel(new ButtonModel("Simple Button"));
-        buttonViewModel.setClickListener(() -> {
-            // the code that executes after a button click goes here, for example:
-            System.out.println("You clicked the button!");
-        });
-        // view
         float x = 300f;
-        float y = 150f;
+        float y = 125f;
         float w = 200f;
         float h = 60f;
-        buttonView = new ButtonView(this, buttonViewModel, x, y, w, h);
+        button = new Button(this, "Simple Button", x, y, w, h);
+        button.setClickListener(() -> {
+            // the code that executes after a button click goes here, for example:
+            System.out.println("You clicked the button!");
+            clickCount++;
+        });
         // style (optional)
         ButtonStyleConfig bsc = new ButtonStyleConfig();
         bsc.baseColor = Colors.rgb(48, 98, 219);
@@ -51,17 +42,18 @@ public class ButtonTest extends PApplet {
         bsc.disabledAlpha = 90;
         bsc.hoverBlendWithWhite = 0.12f;
         bsc.pressedBlendWithBlack = 0.25f;
-        buttonView.setStyle(new DefaultButtonStyle(bsc));
-        // inputAdapter
-        buttonInput = new ButtonInputAdapter(buttonView, buttonViewModel);
+        button.setStyle(new DefaultButtonStyle(bsc));
         // inputManager
         inputManager = new InputManager();
-        inputManager.registerLayer(new ButtonRootInputLayer());
+        inputManager.registerLayer(new ButtonInputLayer(0, button));
+        // text output
+        textAlign(CENTER, CENTER);
     }
 
     public void draw() {
         background(28);
-        buttonView.draw();
+        button.draw();
+        text("Current click count = " + clickCount, 300, 200);
     }
 
     // mouse events
@@ -80,34 +72,4 @@ public class ButtonTest extends PApplet {
     public void mouseReleased() {
         inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) mouseX, (float) mouseY, mouseButton));
     }
-
-    // input layer
-    private final class ButtonRootInputLayer extends DefaultInputLayer {
-        private ButtonRootInputLayer() {
-            Objects.requireNonNull(ButtonTest.this);
-            super(0);
-        }
-
-        public boolean handlePointerEvent(PointerEvent pointerEvent) {
-            switch (pointerEvent.getType()) {
-                case MOVE:
-                case DRAG:
-                    buttonInput.handleMouseMove(pointerEvent.getX(), pointerEvent.getY());
-                    return true;
-                case PRESS:
-                    buttonInput.handleMousePress(pointerEvent.getX(), pointerEvent.getY());
-                    return true;
-                case RELEASE:
-                    buttonInput.handleMouseRelease(pointerEvent.getX(), pointerEvent.getY());
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        public boolean handleKeyboardEvent(KeyboardEvent keyboardEvent) {
-            return false;
-        }
-    }
-
 }

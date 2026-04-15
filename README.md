@@ -115,7 +115,7 @@ Typical flow:
 
 You can find working examples in:
 
-`src/com/cpz/processing/controls/dev`
+`src/com/cpz/processing/controls/examples`
 
 ------------------------------------------------------------------------
 
@@ -137,7 +137,7 @@ Key goals:
 The main rendering and interaction flow is:
 
 ```text
-Model -> ViewModel -> View -> ViewState -> Style -> RenderStyle -> Renderer
+Model → ViewModel → View → ViewState → Style → RenderStyle → Renderer
 ```
 
 Layer responsibilities:
@@ -200,7 +200,7 @@ That template demonstrates how to connect Processing callbacks to the framework 
 - `src/com/cpz/processing/controls/common`: shared infrastructure such as binding
 - `src/com/cpz/processing/controls/core`: cross-cutting MVVM, input, theme, overlay, focus, and layout primitives
 - `src/com/cpz/processing/controls/controls`: concrete controls organized by feature
-- `src/com/cpz/processing/controls/dev`: development sketches used as interactive playgrounds
+- `src/com/cpz/processing/controls/examples`: example sketches used as interactive playgrounds
 - `docs`: human-facing documentation
 - `docs/uml`: PlantUML diagrams
 

@@ -1,78 +1,102 @@
 # Button
 
-`ButtonView` builds a plain `ButtonViewState`, reads the cached `ThemeSnapshot` once from its style, and passes that
-snapshot into `DefaultButtonStyle`. The style reads tokens from the snapshot instead of resolving theme objects during
-render.
+`Button` is the public facade recommended for the simple single-button case.
+
+Internally, the control still follows the framework's MVVM architecture. The facade does not replace that structure: it composes the existing `ButtonModel`, `ButtonViewModel`, `ButtonView`, and `ButtonInputAdapter` for you so the public API stays ergonomic without hiding the design of the framework.
 
 ---
 
 ## Performance note
 
-Themed button rendering no longer allocates from theme resolution in `draw()`. Theme snapshots are reused until the
-sketch changes theme.
+`ButtonView` builds a plain `ButtonViewState`, reads the cached `ThemeSnapshot` once from its style, and passes that snapshot into `DefaultButtonStyle`. The style reads tokens from the snapshot instead of resolving theme objects during render.
+
+Themed button rendering no longer allocates from theme resolution in `draw()`. Theme snapshots are reused until the sketch changes theme.
 
 ---
 
 ## Responsibilities
 
-The `Button` control follows the standard MVVM separation used across the framework:
+The `Button` control keeps the standard MVVM separation used across the framework:
 
-- `Model` → stores base state (e.g. text, enabled)
-- `ViewModel` → handles interaction (hover, pressed, click)
-- `View` → layout, hit testing, and `ViewState` construction
-- `Style` → resolves visual appearance (no business logic)
-- `Renderer` → performs drawing only
+- `Model` stores base state such as text and enabled state
+- `ViewModel` handles interaction state such as hover, press, and click
+- `View` owns layout, hit testing, and `ViewState` construction
+- `Style` resolves visual appearance
+- `Renderer` performs drawing only
 
 Rendering pipeline:
 
 ```text
 ViewModel → ViewState → Style → RenderStyle → Renderer
 ```
+
+This separation still exists even when the sketch uses the facade.
+
+---
+
+## Public facade
+
+`Button` is a convenience facade for the common case:
+
+- it composes the default internal MVVM pieces
+- it exposes a small public API for text, state, style, and click handling
+- it keeps `InputManager` ownership in the sketch
+- it works with `ButtonInputLayer` for the simple one-button routing case
+
+Use this API when you want the recommended public flow without manually wiring internal pieces. This is the recommended entry point for most use cases.
+
+If you need to study or extend the architecture, see [Under the hood](#under-the-hood).
+
 ---
 
 ## Minimal example
 
-A minimal button requires:
+A minimal public setup requires:
 
-1. `ButtonModel`
-2. `ButtonViewModel`
-3. `ButtonView`
-4. `ButtonInputAdapter`
-5. An `InputLayer`
-6. Forwarded pointer events
+1. `Button`
+2. `InputManager`
+3. `ButtonInputLayer`
+4. Forwarded `PointerEvent` callbacks from Processing
 
 The framework does not provide input sources.
 
-The application is responsible for capturing input and forwarding normalized input events.
+The application is responsible for capturing input and forwarding normalized events into the input pipeline.
+
+High-level interaction and rendering flow:
+
+```text
+Processing → PointerEvent → InputManager → ButtonInputLayer → Button → View → Style → Renderer
+```
 
 ---
 
 ## Step-by-step setup
 
-This section shows how to build a `Button` step by step in a Processing sketch.
+This section shows the recommended public setup in a Processing sketch.
 
-High-level interaction and rendering flow:
-
-```text
-Processing → PointerEvent → InputManager → InputLayer → Adapter → ViewModel → View → Style → Renderer
-```
----
-
-### 1. Create the model and view model
+### 1. Create the button
 
 ```java
-ButtonViewModel buttonViewModel = new ButtonViewModel(new ButtonModel("Simple Button"));
+private InputManager inputManager;
+private Button button;
+
+public void setup() {
+    float x = 300f;
+    float y = 125f;
+    float w = 200f;
+    float h = 60f;
+    button = new Button(this, "Simple Button", x, y, w, h);
+}
 ```
 
-- `ButtonModel` stores the base state (text, enabled state).
-- `ButtonViewModel` manages interaction state and exposes behavior such as click handling.
+The facade creates the internal control composition for you.
 
 ---
 
 ### 2. Assign the click action
 
 ```java
-buttonViewModel.setClickListener(() -> {
+button.setClickListener(() -> {
     // the code that executes after a button click goes here, for example:
     System.out.println("You clicked the button!");
 });
@@ -82,27 +106,7 @@ This defines what happens when the button is clicked.
 
 ---
 
-### 3. Create the view
-
-```java
-float x = 300f;
-float y = 150f;
-float w = 200f;
-float h = 60f;
-buttonView = new ButtonView(this, buttonViewModel, x, y, w, h);
-```
-
-The `View` is responsible for:
-
-- layout (position and size)
-- hit testing (`contains(x, y)`)
-- building the `ViewState`
-
-It does not contain business logic.
-
----
-
-### 4. Optional: customize the style
+### 3. Optional: customize the style
 
 ```java
 ButtonStyleConfig bsc = new ButtonStyleConfig();
@@ -115,92 +119,69 @@ bsc.cornerRadius = 18.0f;
 bsc.disabledAlpha = 90;
 bsc.hoverBlendWithWhite = 0.12f;
 bsc.pressedBlendWithBlack = 0.25f;
-buttonView.setStyle(new DefaultButtonStyle(bsc));
+button.setStyle(new DefaultButtonStyle(bsc));
 ```
 
 This configuration controls the visual appearance:
 
-- `baseColor` → main color
-- `textColor` → text color
-- `strokeColor` → border color
-- `strokeWeight` → default border width
-- `strokeWeightHover` → border width on hover
-- `cornerRadius` → rounded corners
-- `disabledAlpha` → transparency when disabled
-- `hoverBlendWithWhite` → lighten effect on hover
-- `pressedBlendWithBlack` → darken effect on press
+- `baseColor` is the main color
+- `textColor` is the label color
+- `strokeColor` is the border color
+- `strokeWeight` is the default border width
+- `strokeWeightHover` is the border width on hover
+- `cornerRadius` controls rounded corners
+- `disabledAlpha` controls disabled transparency
+- `hoverBlendWithWhite` lightens the button on hover
+- `pressedBlendWithBlack` darkens the button while pressed
 
-Styles resolve visuals only. They do not contain logic.
+Styles resolve visuals only. They do not contain interaction logic.
 
-The button can also be rendered using SVG. See [Button (SVG)](button-svg.md) for a complete example.
+The button can also be rendered using SVG. See [Button (SVG)](button-svg.md) for the specialized variant.
 
 ---
 
-### 5. Create the input adapter
+### 4. Register the reusable input layer
 
 ```java
-ButtonInputAdapter buttonInput = new ButtonInputAdapter(buttonView, buttonViewModel);
+inputManager = new InputManager();
+inputManager.registerLayer(new ButtonInputLayer(0, button));
 ```
 
-The adapter:
+`InputManager` remains application-owned.
 
-- receives pointer input
-- checks if the pointer is inside the view
-- updates the `ViewModel` (hover, pressed, click)
+`ButtonInputLayer` is the reusable bridge for the simple single-button case:
 
-> The adapter is independent from Processing.
-> It only consumes normalized input data.
+- the sketch still owns the global input pipeline
+- the layer forwards pointer events to the button facade
+- the control itself does not own the application's `InputManager`
 
 ---
 
-### 6. Register an input layer
-
-```java
-InputManager inputManager = new InputManager();
-inputManager.registerLayer(new ButtonRootInputLayer());
-```
-
-`InputManager` is responsible for dispatching events.
-
-It does not know about buttons or controls.
-
-Instead:
-
-- it receives normalized events
-- it forwards them to registered `InputLayer`s
-- each layer decides how to route them
-
----
-
-### 7. Draw the button
+### 5. Draw the button
 
 ```java
 public void draw() {
     background(28);
-    buttonView.draw();
+    button.draw();
 }
 ```
 
 During `draw()`:
 
-1. `View` reads state from `ViewModel`
-2. Builds `ViewState`
-3. Style resolves `RenderStyle`
-4. Renderer draws
+1. the facade delegates to its internal `View`
+2. the view reads state from the internal `ViewModel`
+3. the style resolves `RenderStyle`
+4. the renderer draws the final result
 
 ---
 
 ## Input flow
 
-> The framework does not own the input source. It only consumes normalized input events provided by the application.
+The framework does not own the input source. It only consumes normalized input events provided by the application.
 
-Processing provides callbacks like `mouseMoved`, `mousePressed`, etc.
-
-These are converted into `PointerEvent` and sent to the `InputManager`.
+Processing callbacks such as `mouseMoved` and `mousePressed` are converted into `PointerEvent` and sent to the `InputManager`.
 
 ```java
-// mouseX, mouseY and mouseButton are public Processing variables
-
 public void mouseMoved() {
     inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) mouseX, (float) mouseY, mouseButton));
 }
@@ -220,140 +201,102 @@ public void mouseReleased() {
 
 Event roles:
 
-- `MOVE` → hover updates
-- `DRAG` → continuous interaction
-- `PRESS` → start of click
-- `RELEASE` → end of click (may trigger action)
+- `MOVE` updates hover state
+- `DRAG` keeps pointer interaction continuous
+- `PRESS` starts a click interaction
+- `RELEASE` ends a click interaction and may trigger the action
 
-> This decouples the framework from Processing-specific APIs.
+This keeps the framework decoupled from Processing-specific APIs.
 
 ---
 
 ## State transitions
 
-A button typically moves through the following interaction states:
+A button typically moves through these interaction states:
 
 ```text
 idle → hovered → pressed → released → idle
-                          ↘
-                           clicked
+                         ↘ 
+                            clicked
 ```
 
 Typical flow:
 
-- `MOVE` inside the view → sets hover state
-- `PRESS` inside the view → sets pressed state
-- `RELEASE` inside the view → clears pressed state and triggers click
-- `MOVE` outside the view → clears hover state
-- `RELEASE` outside the view → ends press without click
+- `MOVE` inside the view sets hover state
+- `PRESS` inside the view sets pressed state
+- `RELEASE` inside the view clears pressed state and triggers click
+- `MOVE` outside the view clears hover state
+- `RELEASE` outside the view ends the press without click
 
-In practice, the exact transition logic is handled by the `ButtonInputAdapter` and reflected in the `ButtonViewModel`.
+In practice, these transitions are handled by the internal input adapter and reflected in the internal `ButtonViewModel`.
 
-The click is triggered on release inside the view.
+The public facade keeps that behavior unchanged.
 
 ---
 
-## Input layer
+## Under the hood
 
-Example input layer in a Processing sketch:
+Internally, `Button` still composes:
 
-```java
-private final class ButtonRootInputLayer extends DefaultInputLayer {
-    private ButtonRootInputLayer() {
-        Objects.requireNonNull(ButtonTest.this);
-        super(0);
-    }
+- `ButtonModel`
+- `ButtonViewModel`
+- `ButtonView`
+- `ButtonInputAdapter`
 
-    public boolean handlePointerEvent(PointerEvent pointerEvent) {
-        switch (pointerEvent.getType()) {
-            case MOVE:
-            case DRAG:
-                buttonInput.handleMouseMove(pointerEvent.getX(), pointerEvent.getY());
-                return true;
-            case PRESS:
-                buttonInput.handleMousePress(pointerEvent.getX(), pointerEvent.getY());
-                return true;
-            case RELEASE:
-                buttonInput.handleMouseRelease(pointerEvent.getX(), pointerEvent.getY());
-                return true;
-            default:
-                return false;
-        }
-    }
+So the architecture remains:
 
-    public boolean handleKeyboardEvent(KeyboardEvent keyboardEvent) {
-        return false;
-    }
-}
+```text
+Button facade
+  → ButtonModel
+  → ButtonViewModel
+  → ButtonView
+  → ButtonInputAdapter
 ```
 
-### Why is this needed?
+This matters for two reasons:
 
-The input layer:
+- the public API is simpler for onboarding and common usage
+- the architectural layers remain available conceptually and in code for extension, debugging, and advanced scenarios
 
-- centralizes event routing
-- connects `InputManager` with adapters
-- groups multiple controls
-- keeps the system scalable
-- allows priority-based input handling
-
-In this example, the layer forwards events to:
-
-- `buttonInput`
-
-> Separation of responsibilities:
->
->- `InputManager` → dispatch
->- `InputLayer` → routing
->- `Adapter` → control logic
->- `ViewModel` → state update
+The facade is therefore a convenience entry point, not a new architecture.
 
 ---
 
 ## Full example
 
 ```java
+import com.cpz.processing.controls.controls.button.Button;
 import com.cpz.processing.controls.controls.button.config.ButtonStyleConfig;
-import com.cpz.processing.controls.controls.button.input.ButtonInputAdapter;
-import com.cpz.processing.controls.controls.button.model.ButtonModel;
+import com.cpz.processing.controls.controls.button.input.ButtonInputLayer;
 import com.cpz.processing.controls.controls.button.style.DefaultButtonStyle;
-import com.cpz.processing.controls.controls.button.view.ButtonView;
-import com.cpz.processing.controls.controls.button.viewmodel.ButtonViewModel;
-import com.cpz.processing.controls.core.input.DefaultInputLayer;
 import com.cpz.processing.controls.core.input.InputManager;
-import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.util.Colors;
 import processing.core.PApplet;
 
-import java.util.Objects;
-
 public class ButtonTest extends PApplet {
 
     private InputManager inputManager;
-    private ButtonView buttonView;
-    private ButtonViewModel buttonViewModel;
-    private ButtonInputAdapter buttonInput;
+    private Button button;
+    private int clickCount;
 
     public void settings() {
         size(600, 300);
-        smooth(4);
+        smooth(8);
     }
 
     public void setup() {
-        // viewModel
-        buttonViewModel = new ButtonViewModel(new ButtonModel("Simple Button"));
-        buttonViewModel.setClickListener(() -> {
-            // the code that executes after a button click goes here, for example:
-            System.out.println("You clicked the button!");
-        });
-        // view
         float x = 300f;
-        float y = 150f;
+        float y = 125f;
         float w = 200f;
         float h = 60f;
-        buttonView = new ButtonView(this, buttonViewModel, x, y, w, h);
-        // style (optional)
+        button = new Button(this, "Simple Button", x, y, w, h);
+        button.setClickListener(() -> {
+            // the code that executes after a button click goes here, for example:
+            System.out.println("You clicked the button!");
+            clickCount++;
+        });
+        // style
         ButtonStyleConfig bsc = new ButtonStyleConfig();
         bsc.baseColor = Colors.rgb(48, 98, 219);
         bsc.textColor = Colors.gray(255);
@@ -364,20 +307,20 @@ public class ButtonTest extends PApplet {
         bsc.disabledAlpha = 90;
         bsc.hoverBlendWithWhite = 0.12f;
         bsc.pressedBlendWithBlack = 0.25f;
-        buttonView.setStyle(new DefaultButtonStyle(bsc));
-        // inputAdapter
-        buttonInput = new ButtonInputAdapter(buttonView, buttonViewModel);
-        // inputManager
+        button.setStyle(new DefaultButtonStyle(bsc));
+        // input manager
         inputManager = new InputManager();
-        inputManager.registerLayer(new ButtonRootInputLayer());
+        inputManager.registerLayer(new ButtonInputLayer(0, button));
+        // text output
+        textAlign(CENTER, CENTER);
     }
 
     public void draw() {
         background(28);
-        buttonView.draw();
+        button.draw();
+        text("Current click count = " + clickCount, 300, 200);
     }
-    
-    // mouse events
+
     public void mouseMoved() {
         inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) mouseX, (float) mouseY, mouseButton));
     }
@@ -393,36 +336,6 @@ public class ButtonTest extends PApplet {
     public void mouseReleased() {
         inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) mouseX, (float) mouseY, mouseButton));
     }
-    
-    // input layer
-    private final class ButtonRootInputLayer extends DefaultInputLayer {
-        private ButtonRootInputLayer() {
-            Objects.requireNonNull(ButtonTest.this);
-            super(0);
-        }
-
-        public boolean handlePointerEvent(PointerEvent pointerEvent) {
-            switch (pointerEvent.getType()) {
-                case MOVE:
-                case DRAG:
-                    buttonInput.handleMouseMove(pointerEvent.getX(), pointerEvent.getY());
-                    return true;
-                case PRESS:
-                    buttonInput.handleMousePress(pointerEvent.getX(), pointerEvent.getY());
-                    return true;
-                case RELEASE:
-                    buttonInput.handleMouseRelease(pointerEvent.getX(), pointerEvent.getY());
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        public boolean handleKeyboardEvent(KeyboardEvent keyboardEvent) {
-            return false;
-        }
-    }
-
 }
 ```
 
@@ -430,6 +343,6 @@ public class ButtonTest extends PApplet {
 
 ## See also
 
-- [Input system](docs/input-system.md)
-- [Architecture](docs/architecture.md)
 - [Button (SVG)](button-svg.md)
+- [Input system](input-system.md)
+- [Architecture](architecture.md)
