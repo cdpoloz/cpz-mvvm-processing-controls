@@ -7,6 +7,7 @@ import com.cpz.processing.controls.controls.button.util.ButtonListener;
 import com.cpz.processing.controls.controls.button.view.ButtonView;
 import com.cpz.processing.controls.controls.button.viewmodel.ButtonViewModel;
 import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.core.util.ControlCode;
 
 import java.util.Objects;
 
@@ -43,10 +44,14 @@ public final class Button {
      * @param var6 height
      */
     public Button(PApplet var1, String var2, float var3, float var4, float var5, float var6) {
+        this(var1, ControlCode.auto("button"), var2, var3, var4, var5, var6);
+    }
+
+    public Button(PApplet var1, String var2, String var3, float var4, float var5, float var6, float var7) {
         Objects.requireNonNull(var1, "sketch");
-        this.model = new ButtonModel(var2);
+        this.model = new ButtonModel(var2, var3);
         this.viewModel = new ButtonViewModel(this.model);
-        this.view = new ButtonView(var1, this.viewModel, var3, var4, var5, var6);
+        this.view = new ButtonView(var1, this.viewModel, var4, var5, var6, var7);
         this.inputAdapter = new ButtonInputAdapter(this.view, this.viewModel);
     }
 
@@ -85,6 +90,10 @@ public final class Button {
 
     public ButtonViewModel getViewModel() {
         return this.viewModel;
+    }
+
+    public String getCode() {
+        return this.model.getCode();
     }
 
     public String getText() {

@@ -1,7 +1,9 @@
 package com.cpz.processing.controls.controls.numericfield.model;
 
 import com.cpz.processing.controls.core.model.Enableable;
+import com.cpz.processing.controls.core.util.ControlCode;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * Model for numeric field model.
@@ -17,6 +19,7 @@ import java.math.BigDecimal;
  * - This type belongs to the MVVM Model layer.
  */
 public final class NumericFieldModel implements Enableable {
+   private final String code;
    private BigDecimal value;
    private BigDecimal min;
    private BigDecimal max;
@@ -41,19 +44,28 @@ public final class NumericFieldModel implements Enableable {
     * - Initializes the public state required by this type.
     */
    public NumericFieldModel(BigDecimal var1, BigDecimal var2, BigDecimal var3, BigDecimal var4, boolean var5, boolean var6, int var7) {
-      this.min = var2 == null ? BigDecimal.ZERO : var2;
-      this.max = var3 == null ? this.min : var3;
+      this(ControlCode.auto("numericfield"), var1, var2, var3, var4, var5, var6, var7);
+   }
+
+   public NumericFieldModel(String var1, BigDecimal var2, BigDecimal var3, BigDecimal var4, BigDecimal var5, boolean var6, boolean var7, int var8) {
+      this.code = Objects.requireNonNull(var1, "code");
+      this.min = var3 == null ? BigDecimal.ZERO : var3;
+      this.max = var4 == null ? this.min : var4;
       if (this.max.compareTo(this.min) < 0) {
-         BigDecimal var8 = this.min;
+         BigDecimal var9 = this.min;
          this.min = this.max;
-         this.max = var8;
+         this.max = var9;
       }
 
-      this.setScale(var7);
-      this.setStep(var4);
-      this.allowNegative = var5;
-      this.allowDecimal = var6;
-      this.setValue(var1 == null ? this.min : var1);
+      this.setScale(var8);
+      this.setStep(var5);
+      this.allowNegative = var6;
+      this.allowDecimal = var7;
+      this.setValue(var2 == null ? this.min : var2);
+   }
+
+   public String getCode() {
+      return this.code;
    }
 
    /**

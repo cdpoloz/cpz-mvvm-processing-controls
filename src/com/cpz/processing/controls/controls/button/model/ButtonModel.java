@@ -1,6 +1,9 @@
 package com.cpz.processing.controls.controls.button.model;
 
+import com.cpz.processing.controls.core.util.ControlCode;
 import com.cpz.processing.controls.core.model.Enableable;
+
+import java.util.Objects;
 
 /**
  * Model for button model.
@@ -16,6 +19,8 @@ import com.cpz.processing.controls.core.model.Enableable;
  * - This type belongs to the MVVM Model layer.
  */
 public final class ButtonModel implements Enableable {
+   private final String code;
+
    private String text;
    private boolean enabled;
 
@@ -28,8 +33,17 @@ public final class ButtonModel implements Enableable {
     * - Initializes the public state required by this type.
     */
    public ButtonModel(String var1) {
-      this.text = this.normalizeText(var1);
+      this(ControlCode.auto("button"), var1);
+   }
+
+   public ButtonModel(String var1, String var2) {
+      this.code = Objects.requireNonNull(var1, "code");
+      this.text = this.normalizeText(var2);
       this.enabled = true;
+   }
+
+   public String getCode() {
+      return this.code;
    }
 
    /**

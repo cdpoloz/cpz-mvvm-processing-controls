@@ -1,8 +1,10 @@
 package com.cpz.processing.controls.controls.slider.model;
 
 import com.cpz.processing.controls.core.model.Enableable;
+import com.cpz.processing.controls.core.util.ControlCode;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 /**
  * Model for slider model.
@@ -22,6 +24,7 @@ public final class SliderModel implements Enableable {
    private static final BigDecimal DEFAULT_MAX;
    private static final BigDecimal DEFAULT_STEP;
    private static final BigDecimal DEFAULT_VALUE;
+   private final String code;
    private BigDecimal min;
    private BigDecimal max;
    private BigDecimal step;
@@ -36,6 +39,11 @@ public final class SliderModel implements Enableable {
     * - Initializes the public state required by this type.
     */
    public SliderModel() {
+      this(ControlCode.auto("slider"));
+   }
+
+   public SliderModel(String var1) {
+      this.code = Objects.requireNonNull(var1, "code");
       this.min = DEFAULT_MIN;
       this.max = DEFAULT_MAX;
       this.step = DEFAULT_STEP;
@@ -43,6 +51,10 @@ public final class SliderModel implements Enableable {
       this.snapMode = SnapMode.ALWAYS;
       this.enabled = true;
       this.setValue(DEFAULT_VALUE);
+   }
+
+   public String getCode() {
+      return this.code;
    }
 
    /**

@@ -1,9 +1,11 @@
 package com.cpz.processing.controls.controls.radiogroup.model;
 
 import com.cpz.processing.controls.core.model.Enableable;
+import com.cpz.processing.controls.core.util.ControlCode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Model for radio group model.
@@ -19,6 +21,7 @@ import java.util.List;
  * - This type belongs to the MVVM Model layer.
  */
 public final class RadioGroupModel implements Enableable {
+   private final String code;
    private List<String> options;
    private int selectedIndex;
    private boolean enabled;
@@ -32,7 +35,7 @@ public final class RadioGroupModel implements Enableable {
     * - Initializes the public state required by this type.
     */
    public RadioGroupModel(List<String> var1) {
-      this(var1, -1);
+      this(ControlCode.auto("radiogroup"), var1, -1);
    }
 
    /**
@@ -45,9 +48,22 @@ public final class RadioGroupModel implements Enableable {
     * - Initializes the public state required by this type.
     */
    public RadioGroupModel(List<String> var1, int var2) {
+      this(ControlCode.auto("radiogroup"), var1, var2);
+   }
+
+   public RadioGroupModel(String var1, List<String> var2) {
+      this(var1, var2, -1);
+   }
+
+   public RadioGroupModel(String var1, List<String> var2, int var3) {
+      this.code = Objects.requireNonNull(var1, "code");
       this.enabled = true;
-      this.options = this.sanitizeOptions(var1);
-      this.selectedIndex = this.normalizeIndex(var2, this.options.size());
+      this.options = this.sanitizeOptions(var2);
+      this.selectedIndex = this.normalizeIndex(var3, this.options.size());
+   }
+
+   public String getCode() {
+      return this.code;
    }
 
    /**

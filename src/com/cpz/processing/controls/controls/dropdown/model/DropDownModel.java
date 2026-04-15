@@ -1,9 +1,11 @@
 package com.cpz.processing.controls.controls.dropdown.model;
 
 import com.cpz.processing.controls.core.model.Enableable;
+import com.cpz.processing.controls.core.util.ControlCode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Model for drop down model.
@@ -19,6 +21,7 @@ import java.util.List;
  * - This type belongs to the MVVM Model layer.
  */
 public final class DropDownModel implements Enableable {
+   private final String code;
    private List<String> items;
    private int selectedIndex;
    private boolean enabled;
@@ -32,7 +35,7 @@ public final class DropDownModel implements Enableable {
     * - Initializes the public state required by this type.
     */
    public DropDownModel(List<String> var1) {
-      this(var1, -1);
+      this(ControlCode.auto("dropdown"), var1, -1);
    }
 
    /**
@@ -45,9 +48,22 @@ public final class DropDownModel implements Enableable {
     * - Initializes the public state required by this type.
     */
    public DropDownModel(List<String> var1, int var2) {
-      this.items = sanitizeItems(var1);
-      this.selectedIndex = normalizeSelectedIndex(var2, this.items.size());
+      this(ControlCode.auto("dropdown"), var1, var2);
+   }
+
+   public DropDownModel(String var1, List<String> var2) {
+      this(var1, var2, -1);
+   }
+
+   public DropDownModel(String var1, List<String> var2, int var3) {
+      this.code = Objects.requireNonNull(var1, "code");
+      this.items = sanitizeItems(var2);
+      this.selectedIndex = normalizeSelectedIndex(var3, this.items.size());
       this.enabled = true;
+   }
+
+   public String getCode() {
+      return this.code;
    }
 
    /**

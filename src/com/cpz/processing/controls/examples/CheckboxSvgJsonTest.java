@@ -1,22 +1,22 @@
 package com.cpz.processing.controls.examples;
 
-import com.cpz.processing.controls.controls.button.Button;
-import com.cpz.processing.controls.controls.button.ButtonFactory;
-import com.cpz.processing.controls.controls.button.config.ButtonConfig;
-import com.cpz.processing.controls.controls.button.config.ButtonConfigLoader;
-import com.cpz.processing.controls.controls.button.input.ButtonInputLayer;
+import com.cpz.processing.controls.controls.checkbox.Checkbox;
+import com.cpz.processing.controls.controls.checkbox.CheckboxFactory;
+import com.cpz.processing.controls.controls.checkbox.config.CheckboxConfig;
+import com.cpz.processing.controls.controls.checkbox.config.CheckboxConfigLoader;
+import com.cpz.processing.controls.controls.checkbox.input.CheckboxInputLayer;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import processing.core.PApplet;
 
 import java.io.File;
 
-public class ButtonJsonTest extends PApplet {
-    private static final String BUTTON_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "button-test.json";
+public class CheckboxSvgJsonTest extends PApplet {
+    private static final String CHECKBOX_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "checkbox-svg-test.json";
 
     private InputManager inputManager;
-    private Button button;
-    private int clickCount;
+    private Checkbox checkbox;
+    private boolean currentValue;
 
     public void settings() {
         size(600, 300);
@@ -24,24 +24,22 @@ public class ButtonJsonTest extends PApplet {
     }
 
     public void setup() {
-        ButtonConfigLoader loader = new ButtonConfigLoader(this);
-        ButtonConfig config = loader.load(BUTTON_CONFIG_PATH);
-        button = ButtonFactory.create(this, config);
-        button.setClickListener(() -> {
-            System.out.println("You clicked the JSON button!");
-            clickCount++;
-        });
-        // input manager
+        CheckboxConfigLoader loader = new CheckboxConfigLoader(this);
+        CheckboxConfig config = loader.load(CHECKBOX_CONFIG_PATH);
+        checkbox = CheckboxFactory.create(this, config);
+        checkbox.setChangeListener(value -> currentValue = value);
+        currentValue = checkbox.isChecked();
+
         inputManager = new InputManager();
-        inputManager.registerLayer(new ButtonInputLayer(0, button));
-        // text output
+        inputManager.registerLayer(new CheckboxInputLayer(0, checkbox));
+
         textAlign(CENTER, CENTER);
     }
 
     public void draw() {
         background(28);
-        button.draw();
-        text(button.getCode() + " | Current click count = " + clickCount, 300, 200);
+        checkbox.draw();
+        text(checkbox.getCode() + " | Current checked state = " + currentValue, 300, 225);
     }
 
     public void mouseMoved() {

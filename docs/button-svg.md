@@ -33,7 +33,7 @@ public void setup() {
     float y = 125f;
     float w = 150f;
     float h = 130f;
-    button = new Button(this, "SVG Button", x, y, w, h);
+    button = new Button(this, "btnSvgPrimary", "SVG Button", x, y, w, h);
 }
 ```
 
@@ -75,6 +75,13 @@ This is the key SVG-specific step.
 The cross-platform asset path matches the example sketch:
 
 `"data" + File.separator + "img" + File.separator + "test.svg"`
+
+The SVG renderer can be configured in two equivalent ways:
+
+- programmatically, as shown here with `ButtonStyleConfig` and `SvgButtonRenderer`
+- through JSON using the `renderer` block described in [JSON Configuration](json-configuration.md)
+
+Both approaches use the same internal styling and rendering infrastructure.
 
 ---
 
@@ -133,7 +140,7 @@ public class ButtonSvgTest extends PApplet {
         float y = 125f;
         float w = 150f;
         float h = 130f;
-        button = new Button(this, "SVG Button", x, y, w, h);
+        button = new Button(this, "btnSvgTest", "SVG Button", x, y, w, h);
         button.setClickListener(() -> {
             // the code that executes after a button click goes here, for example:
             System.out.println("You clicked the SVG button!");
@@ -162,7 +169,7 @@ public class ButtonSvgTest extends PApplet {
     public void draw() {
         background(28);
         button.draw();
-        text("Current click count = " + clickCount, 300, 225);
+        text(button.getCode() + " | Current click count = " + clickCount, 300, 225);
     }
 
     public void mouseMoved() {

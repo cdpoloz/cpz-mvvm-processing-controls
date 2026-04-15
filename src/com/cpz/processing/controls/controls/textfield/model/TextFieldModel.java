@@ -1,6 +1,9 @@
 package com.cpz.processing.controls.controls.textfield.model;
 
 import com.cpz.processing.controls.core.model.Enableable;
+import com.cpz.processing.controls.core.util.ControlCode;
+
+import java.util.Objects;
 
 /**
  * Model for text field model.
@@ -16,8 +19,21 @@ import com.cpz.processing.controls.core.model.Enableable;
  * - This type belongs to the MVVM Model layer.
  */
 public final class TextFieldModel implements Enableable {
+   private final String code;
    private String text = "";
    private boolean enabled = true;
+
+   public TextFieldModel() {
+      this(ControlCode.auto("textfield"));
+   }
+
+   public TextFieldModel(String var1) {
+      this.code = Objects.requireNonNull(var1, "code");
+   }
+
+   public String getCode() {
+      return this.code;
+   }
 
    /**
     * Returns text.

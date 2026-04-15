@@ -1,6 +1,9 @@
 package com.cpz.processing.controls.controls.checkbox.model;
 
 import com.cpz.processing.controls.core.model.Enableable;
+import com.cpz.processing.controls.core.util.ControlCode;
+
+import java.util.Objects;
 
 /**
  * Model for checkbox model.
@@ -16,6 +19,7 @@ import com.cpz.processing.controls.core.model.Enableable;
  * - This type belongs to the MVVM Model layer.
  */
 public final class CheckboxModel implements Enableable {
+   private final String code;
    private boolean checked;
    private boolean enabled = true;
 
@@ -26,6 +30,7 @@ public final class CheckboxModel implements Enableable {
     * - Initializes the public state required by this type.
     */
    public CheckboxModel() {
+      this(ControlCode.auto("checkbox"), false);
    }
 
    /**
@@ -37,7 +42,16 @@ public final class CheckboxModel implements Enableable {
     * - Initializes the public state required by this type.
     */
    public CheckboxModel(boolean var1) {
-      this.checked = var1;
+      this(ControlCode.auto("checkbox"), var1);
+   }
+
+   public CheckboxModel(String var1, boolean var2) {
+      this.code = Objects.requireNonNull(var1, "code");
+      this.checked = var2;
+   }
+
+   public String getCode() {
+      return this.code;
    }
 
    /**

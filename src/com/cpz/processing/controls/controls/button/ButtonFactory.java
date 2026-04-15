@@ -16,7 +16,7 @@ public final class ButtonFactory {
         Objects.requireNonNull(sketch, "sketch");
         Objects.requireNonNull(config, "config");
 
-        Button button = new Button(sketch, config.getText(), config.getX(), config.getY(), config.getWidth(), config.getHeight());
+        Button button = new Button(sketch, config.getCode(), config.getText(), config.getX(), config.getY(), config.getWidth(), config.getHeight());
         button.setEnabled(config.isEnabled());
         button.setVisible(config.isVisible());
 

@@ -25,7 +25,7 @@ public class ButtonTest extends PApplet {
         float y = 125f;
         float w = 200f;
         float h = 60f;
-        button = new Button(this, "Simple Button", x, y, w, h);
+        button = new Button(this, "btnTest", "Simple Button", x, y, w, h);
         button.setClickListener(() -> {
             // the code that executes after a button click goes here, for example:
             System.out.println("You clicked the button!");
@@ -53,7 +53,7 @@ public class ButtonTest extends PApplet {
     public void draw() {
         background(28);
         button.draw();
-        text("Current click count = " + clickCount, 300, 200);
+        text(button.getCode() + " | Current click count = " + clickCount, 300, 200);
     }
 
     // mouse events

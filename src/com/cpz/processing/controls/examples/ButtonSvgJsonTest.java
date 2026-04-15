@@ -41,7 +41,7 @@ public class ButtonSvgJsonTest extends PApplet {
     public void draw() {
         background(28);
         button.draw();
-        text("Current click count = " + clickCount, 300, 225);
+        text(button.getCode() + " | Current click count = " + clickCount, 300, 225);
     }
 
     public void mouseMoved() {

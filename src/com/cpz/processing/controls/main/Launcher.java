@@ -30,12 +30,16 @@ public class Launcher {
    public static void main(String[] args) {
       Locale.setDefault(Locale.forLanguageTag("en-US"));
       // You can choose an example from the list below
-      // Button
+      // Button ****************************************
       //PApplet.main(ButtonTest.class);
       //PApplet.main(ButtonSvgTest.class);
       //PApplet.main(ButtonJsonTest.class);
-      PApplet.main(ButtonSvgJsonTest.class);
-      //PApplet.main(CheckboxDevSketch.class);
+      //PApplet.main(ButtonSvgJsonTest.class);
+      // Checkbox **************************************
+      PApplet.main(CheckboxTest.class);
+      //PApplet.main(CheckboxJsonTest.class);
+      //PApplet.main(CheckboxSvgJsonTest.class);
+
       //PApplet.main(DropDownDevSketch.class);
       //PApplet.main(LabelDevSketch.class);
       //PApplet.main(NumericFieldDevSketch.class);

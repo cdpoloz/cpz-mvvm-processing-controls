@@ -1,6 +1,9 @@
 package com.cpz.processing.controls.controls.toggle.model;
 
 import com.cpz.processing.controls.core.model.Enableable;
+import com.cpz.processing.controls.core.util.ControlCode;
+
+import java.util.Objects;
 
 /**
  * Model for toggle model.
@@ -16,10 +19,23 @@ import com.cpz.processing.controls.core.model.Enableable;
  * - This type belongs to the MVVM Model layer.
  */
 public final class ToggleModel implements Enableable {
+   private final String code;
    private int state;
    private int prevState;
    private int totalStates = 2;
    private boolean enabled = true;
+
+   public ToggleModel() {
+      this(ControlCode.auto("toggle"));
+   }
+
+   public ToggleModel(String var1) {
+      this.code = Objects.requireNonNull(var1, "code");
+   }
+
+   public String getCode() {
+      return this.code;
+   }
 
    /**
     * Updates total states.

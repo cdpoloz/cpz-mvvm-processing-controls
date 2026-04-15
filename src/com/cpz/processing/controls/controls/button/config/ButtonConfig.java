@@ -6,6 +6,7 @@ import java.util.Objects;
  * Minimal config DTO for a single button created from external data.
  */
 public final class ButtonConfig {
+    private final String code;
     private final String text;
     private final float x;
     private final float y;
@@ -15,7 +16,8 @@ public final class ButtonConfig {
     private final boolean visible;
     private final StyleConfig style;
 
-    public ButtonConfig(String text, float x, float y, float width, float height, boolean enabled, boolean visible, StyleConfig style) {
+    public ButtonConfig(String code, String text, float x, float y, float width, float height, boolean enabled, boolean visible, StyleConfig style) {
+        this.code = Objects.requireNonNull(code, "code");
         this.text = Objects.requireNonNull(text, "text");
         this.x = x;
         this.y = y;
@@ -24,6 +26,10 @@ public final class ButtonConfig {
         this.enabled = enabled;
         this.visible = visible;
         this.style = style;
+    }
+
+    public String getCode() {
+        return this.code;
     }
 
     public String getText() {

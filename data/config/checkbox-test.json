@@ -1,0 +1,22 @@
+{
+  "code": "chkJsonTest",
+  "checked": true,
+  "x": 300.0,
+  "y": 125.0,
+  "width": 42.0,
+  "height": 42.0,
+  "enabled": true,
+  "visible": true,
+  "style": {
+    "boxColor": "#3062DB",
+    "boxHoverColor": "#4A7AEA",
+    "boxPressedColor": "#224DB8",
+    "checkColor": "#FFFFFF",
+    "borderColor": "#FFFFFF",
+    "borderWidth": 2.0,
+    "borderWidthHover": 4.0,
+    "cornerRadius": 10.0,
+    "disabledAlpha": 90,
+    "checkInset": 0.20
+  }
+}

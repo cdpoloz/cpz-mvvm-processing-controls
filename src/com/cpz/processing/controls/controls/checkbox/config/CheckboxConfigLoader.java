@@ -1,4 +1,4 @@
-package com.cpz.processing.controls.controls.button.config;
+package com.cpz.processing.controls.controls.checkbox.config;
 
 import com.cpz.processing.controls.core.util.JsonConfigSupport;
 import processing.core.PApplet;
@@ -8,20 +8,20 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Loads a minimal button config from a JSON file.
+ * Loads a minimal checkbox config from a JSON file.
  */
-public final class ButtonConfigLoader {
+public final class CheckboxConfigLoader {
     private final PApplet sketch;
 
-    public ButtonConfigLoader(PApplet sketch) {
+    public CheckboxConfigLoader(PApplet sketch) {
         this.sketch = Objects.requireNonNull(sketch, "sketch");
     }
 
-    public ButtonConfig load(String path) {
+    public CheckboxConfig load(String path) {
         Objects.requireNonNull(path, "path");
         JSONObject root = this.sketch.loadJSONObject(path);
         if (root == null) {
-            throw new IllegalArgumentException("Could not load button JSON config: " + path);
+            throw new IllegalArgumentException("Could not load checkbox JSON config: " + path);
         }
 
         float width = root.getFloat("width");
@@ -29,9 +29,9 @@ public final class ButtonConfigLoader {
         JsonConfigSupport.validatePositiveDimension("width", width, path);
         JsonConfigSupport.validatePositiveDimension("height", height, path);
 
-        return new ButtonConfig(
-                JsonConfigSupport.getRequiredString(root, "code", path, "button"),
-                root.getString("text"),
+        return new CheckboxConfig(
+                JsonConfigSupport.getRequiredString(root, "code", path, "checkbox"),
+                root.getBoolean("checked", false),
                 root.getFloat("x"),
                 root.getFloat("y"),
                 width,
@@ -42,27 +42,34 @@ public final class ButtonConfigLoader {
         );
     }
 
-    private ButtonConfig.StyleConfig readStyle(JSONObject root, String path) {
+    private CheckboxConfig.StyleConfig readStyle(JSONObject root, String path) {
         if (!root.hasKey("style") || root.isNull("style")) {
             return null;
         }
 
         JSONObject style = root.getJSONObject("style");
-        return new ButtonConfig.StyleConfig(
-                JsonConfigSupport.getOptionalColor(style, "baseColor", path),
-                JsonConfigSupport.getOptionalColor(style, "textColor", path),
-                JsonConfigSupport.getOptionalColor(style, "strokeColor", path),
-                JsonConfigSupport.getOptionalFloat(style, "strokeWeight"),
-                JsonConfigSupport.getOptionalFloat(style, "strokeWeightHover"),
+        return new CheckboxConfig.StyleConfig(
+                JsonConfigSupport.getOptionalColor(style, "checkedFillOverride", path),
+                JsonConfigSupport.getOptionalColor(style, "uncheckedFillOverride", path),
+                JsonConfigSupport.getOptionalColor(style, "hoverFillOverride", path),
+                JsonConfigSupport.getOptionalColor(style, "pressedFillOverride", path),
+                JsonConfigSupport.getOptionalColor(style, "checkOverride", path),
+                JsonConfigSupport.getOptionalColor(style, "strokeOverride", path),
+                JsonConfigSupport.getOptionalColor(style, "boxColor", path),
+                JsonConfigSupport.getOptionalColor(style, "boxHoverColor", path),
+                JsonConfigSupport.getOptionalColor(style, "boxPressedColor", path),
+                JsonConfigSupport.getOptionalColor(style, "checkColor", path),
+                JsonConfigSupport.getOptionalColor(style, "borderColor", path),
+                JsonConfigSupport.getOptionalFloat(style, "borderWidth"),
+                JsonConfigSupport.getOptionalFloat(style, "borderWidthHover"),
                 JsonConfigSupport.getOptionalFloat(style, "cornerRadius"),
                 JsonConfigSupport.getOptionalInt(style, "disabledAlpha"),
-                JsonConfigSupport.getOptionalFloat(style, "hoverBlendWithWhite"),
-                JsonConfigSupport.getOptionalFloat(style, "pressedBlendWithBlack"),
+                JsonConfigSupport.getOptionalFloat(style, "checkInset"),
                 this.readRenderer(style, path)
         );
     }
 
-    private ButtonConfig.RendererConfig readRenderer(JSONObject style, String path) {
+    private CheckboxConfig.RendererConfig readRenderer(JSONObject style, String path) {
         if (!style.hasKey("renderer") || style.isNull("renderer")) {
             return null;
         }
@@ -80,6 +87,6 @@ public final class ButtonConfigLoader {
             throw new IllegalArgumentException("Invalid 'path' value in " + path + " for style.renderer: \"" + rendererPath + "\". Expected a non-empty SVG path.");
         }
 
-        return new ButtonConfig.RendererConfig(normalizedType, normalizedPath);
+        return new CheckboxConfig.RendererConfig(normalizedType, normalizedPath);
     }
 }

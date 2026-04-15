@@ -1,6 +1,9 @@
 package com.cpz.processing.controls.controls.label.model;
 
 import com.cpz.processing.controls.core.model.Enableable;
+import com.cpz.processing.controls.core.util.ControlCode;
+
+import java.util.Objects;
 
 /**
  * Model for label model.
@@ -16,8 +19,21 @@ import com.cpz.processing.controls.core.model.Enableable;
  * - This type belongs to the MVVM Model layer.
  */
 public final class LabelModel implements Enableable {
+   private final String code;
    private String text = "";
    private boolean enabled = true;
+
+   public LabelModel() {
+      this(ControlCode.auto("label"));
+   }
+
+   public LabelModel(String var1) {
+      this.code = Objects.requireNonNull(var1, "code");
+   }
+
+   public String getCode() {
+      return this.code;
+   }
 
    /**
     * Updates text.

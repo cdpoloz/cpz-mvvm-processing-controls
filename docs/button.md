@@ -40,6 +40,7 @@ This separation still exists even when the sketch uses the facade.
 
 - it composes the default internal MVVM pieces
 - it exposes a small public API for text, state, style, and click handling
+- it exposes the stable control identity through `getCode()`
 - it keeps `InputManager` ownership in the sketch
 - it works with `ButtonInputLayer` for the simple one-button routing case
 
@@ -85,7 +86,7 @@ public void setup() {
     float y = 125f;
     float w = 200f;
     float h = 60f;
-    button = new Button(this, "Simple Button", x, y, w, h);
+    button = new Button(this, "btnPrimary", "Simple Button", x, y, w, h);
 }
 ```
 
@@ -103,6 +104,8 @@ button.setClickListener(() -> {
 ```
 
 This defines what happens when the button is clicked.
+
+The stable control identity is available through `button.getCode()`.
 
 ---
 
@@ -290,7 +293,7 @@ public class ButtonTest extends PApplet {
         float y = 125f;
         float w = 200f;
         float h = 60f;
-        button = new Button(this, "Simple Button", x, y, w, h);
+        button = new Button(this, "btnTest", "Simple Button", x, y, w, h);
         button.setClickListener(() -> {
             // the code that executes after a button click goes here, for example:
             System.out.println("You clicked the button!");
@@ -318,7 +321,7 @@ public class ButtonTest extends PApplet {
     public void draw() {
         background(28);
         button.draw();
-        text("Current click count = " + clickCount, 300, 200);
+        text(button.getCode() + " | Current click count = " + clickCount, 300, 200);
     }
 
     public void mouseMoved() {

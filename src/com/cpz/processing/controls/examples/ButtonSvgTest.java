@@ -28,7 +28,7 @@ public class ButtonSvgTest extends PApplet {
         float y = 125f;
         float w = 150f;
         float h = 130f;
-        button = new Button(this, "SVG Button", x, y, w, h);
+        button = new Button(this, "btnSvgTest", "SVG Button", x, y, w, h);
         button.setClickListener(() -> {
             // the code that executes after a button click goes here, for example:
             System.out.println("You clicked the SVG button!");
@@ -57,7 +57,7 @@ public class ButtonSvgTest extends PApplet {
     public void draw() {
         background(28);
         button.draw();
-        text("Current click count = " + clickCount, 300, 225);
+        text(button.getCode() + " | Current click count = " + clickCount, 300, 225);
     }
 
     // mouse events
