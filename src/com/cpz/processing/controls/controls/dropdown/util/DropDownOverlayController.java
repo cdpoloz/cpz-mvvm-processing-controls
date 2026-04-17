@@ -10,6 +10,8 @@ import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -26,6 +28,7 @@ import java.util.Objects;
  * - This type is part of the public project surface.
  */
 public final class DropDownOverlayController {
+   private static final List<DropDownOverlayController> CONTROLLERS = new ArrayList<>();
    private final DropDownView view;
    private final DropDownViewModel viewModel;
    private final FocusManager focusManager;
@@ -34,7 +37,6 @@ public final class DropDownOverlayController {
    private final int zIndex;
    private final InputLayer inputLayer;
    private final OverlayEntry overlayEntry;
-   private TransferHandler transferHandler;
    private boolean registered;
 
    /**
@@ -59,19 +61,8 @@ public final class DropDownOverlayController {
       this.zIndex = var6;
       this.inputLayer = new OverlayInputLayer(var6);
       Objects.requireNonNull(var1);
-      this.overlayEntry = new OverlayEntry(var6, var1::draw, this.inputLayer, this::closeOverlay, var2);
-   }
-
-   /**
-    * Updates transfer handler.
-    *
-    * @param var1 new transfer handler
-    *
-    * Behavior:
-    * - Updates the public state or registration owned by this type.
-    */
-   public void setTransferHandler(TransferHandler var1) {
-      this.transferHandler = var1;
+      this.overlayEntry = new OverlayEntry(var6, var1::draw, this.inputLayer, this::closeOverlay);
+      CONTROLLERS.add(this);
    }
 
    /**
@@ -97,42 +88,7 @@ public final class DropDownOverlayController {
     */
    public void dispose() {
       this.unregister();
-   }
-
-   /**
-    * Returns view.
-    *
-    * @return current view
-    *
-    * Behavior:
-    * - Returns the current value without applying side effects.
-    */
-   public DropDownView getView() {
-      return this.view;
-   }
-
-   /**
-    * Returns view model.
-    *
-    * @return current view model
-    *
-    * Behavior:
-    * - Returns the current value without applying side effects.
-    */
-   public DropDownViewModel getViewModel() {
-      return this.viewModel;
-   }
-
-   /**
-    * Returns z index.
-    *
-    * @return current z index
-    *
-    * Behavior:
-    * - Returns the current value without applying side effects.
-    */
-   public int getZIndex() {
-      return this.zIndex;
+      CONTROLLERS.remove(this);
    }
 
    /**
@@ -143,7 +99,11 @@ public final class DropDownOverlayController {
     */
    public void closeOverlay() {
       this.viewModel.close();
-      this.view.handleMouseMove(-1.0F, -1.0F);
+      this.view.clearHoverState();
+      this.unregister();
+      if (this.focusManager != null && this.focusManager.isFocused(this.viewModel)) {
+         this.focusManager.clearFocus();
+      }
    }
 
    private void register() {
@@ -160,6 +120,23 @@ public final class DropDownOverlayController {
          this.inputManager.unregisterLayer(this.inputLayer);
          this.registered = false;
       }
+   }
+
+   private boolean routePressToSibling(PointerEvent var1) {
+      for(DropDownOverlayController var3 : CONTROLLERS) {
+         if (var3 != this && var3.viewModel.isVisible() && var3.viewModel.isEnabled() && var3.view.contains(var1.getX(), var1.getY())) {
+            this.closeOverlay();
+            var3.handleTransferredPress(var1.getX(), var1.getY());
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   private void handleTransferredPress(float var1, float var2) {
+      this.view.handleMousePress(var1, var2, this.focusManager);
+      this.syncRegistration();
    }
 
    private final class OverlayInputLayer extends DefaultInputLayer {
@@ -211,11 +188,21 @@ public final class DropDownOverlayController {
                   DropDownOverlayController.this.view.handleMouseMove(var1.getX(), var1.getY());
                   return true;
                case PRESS:
-                  if (DropDownOverlayController.this.transferHandler != null && DropDownOverlayController.this.transferHandler.handleTransfer(DropDownOverlayController.this, var1)) {
+                  if (DropDownOverlayController.this.routePressToSibling(var1)) {
                      return true;
                   }
 
-                  DropDownOverlayController.this.view.handleMousePress(var1.getX(), var1.getY(), DropDownOverlayController.this.focusManager);
+                  boolean var3 = DropDownOverlayController.this.view.handleMousePress(var1.getX(), var1.getY(), DropDownOverlayController.this.focusManager);
+                  if (!var3) {
+                     DropDownOverlayController.this.closeOverlay();
+                     return true;
+                  }
+
+                  if (!DropDownOverlayController.this.viewModel.isExpanded() && DropDownOverlayController.this.focusManager != null && DropDownOverlayController.this.focusManager.isFocused(DropDownOverlayController.this.viewModel)) {
+                     DropDownOverlayController.this.focusManager.clearFocus();
+                  }
+
+                  DropDownOverlayController.this.syncRegistration();
                   return true;
                case RELEASE:
                   DropDownOverlayController.this.view.handleMouseRelease(var1.getX(), var1.getY());
@@ -238,22 +225,5 @@ public final class DropDownOverlayController {
       public boolean handleKeyboardEvent(KeyboardEvent var1) {
          return false;
       }
-   }
-
-   /**
-    * Utility component for transfer handler.
-    *
-    * Responsibilities:
-    * - Define a focused public contract.
-    * - Keep implementations replaceable.
-    *
-    * Behavior:
-    * - Declares the contract without prescribing implementation details.
-    *
-    * Notes:
-    * - This type is part of the public project surface.
-    */
-   public interface TransferHandler {
-      boolean handleTransfer(DropDownOverlayController var1, PointerEvent var2);
    }
 }

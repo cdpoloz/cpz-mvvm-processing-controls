@@ -145,6 +145,11 @@ public final class DropDownView implements ControlView, PointerInteractable {
       return this.containsBase(var1, var2) || this.containsExpandedList(var1, var2);
    }
 
+   public boolean containsBaseBounds(float var1, float var2) {
+      this.applyLayoutIfNeeded();
+      return this.containsBase(var1, var2);
+   }
+
    /**
     * Handles mouse move.
     *
@@ -308,6 +313,12 @@ public final class DropDownView implements ControlView, PointerInteractable {
     */
    public int getHoveredIndex() {
       return this.hoveredIndex;
+   }
+
+   public void clearHoverState() {
+      this.hoveredIndex = -1;
+      this.viewModel.setHovered(false);
+      this.viewModel.setPressed(false);
    }
 
    private DropDownViewState buildViewState() {

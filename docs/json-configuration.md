@@ -2,9 +2,9 @@
 
 This document shows how to create controls from JSON configuration files.
 
-In the current iteration, the framework supports a single `Button`, a single `Checkbox`, a single `Toggle`, a single `Slider`, a single `Label`, a single `RadioGroup`, a single `TextField`, or a single `NumericField` created from JSON, including optional SVG renderer setup configured through the style block for the controls that already support it.
+In the current iteration, the framework supports a single `Button`, a single `Checkbox`, a single `Toggle`, a single `Slider`, a single `Label`, a single `RadioGroup`, a single `TextField`, a single `NumericField`, or a single `DropDown` created from JSON, including optional SVG renderer setup configured through the style block for the controls that already support it.
 
-JSON configuration is an additional layer on top of the existing public API. It does not replace direct control creation with `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, or `NumericField`, and it does not change the internal MVVM architecture of the framework.
+JSON configuration is an additional layer on top of the existing public API. It does not replace direct control creation with `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, or `DropDown`, and it does not change the internal MVVM architecture of the framework.
 
 ---
 
@@ -40,14 +40,15 @@ JSON → LabelConfigLoader → LabelConfig → LabelFactory → Label facade →
 JSON → RadioGroupConfigLoader → RadioGroupConfig → RadioGroupFactory → RadioGroup facade → MVVM internals
 JSON → TextFieldConfigLoader → TextFieldConfig → TextFieldFactory → TextField facade → MVVM internals
 JSON → NumericFieldConfigLoader → NumericFieldConfig → NumericFieldFactory → NumericField facade → MVVM internals
+JSON -> DropDownConfigLoader -> DropDownConfig -> DropDownFactory -> DropDown facade -> MVVM internals
 ```
 
 Responsibilities:
 
-- `ButtonConfig`, `CheckboxConfig`, `ToggleConfig`, `SliderConfig`, `LabelConfig`, `RadioGroupConfig`, `TextFieldConfig`, and `NumericFieldConfig` store the parsed control data
-- `ButtonConfigLoader`, `CheckboxConfigLoader`, `ToggleConfigLoader`, `SliderConfigLoader`, `LabelConfigLoader`, `RadioGroupConfigLoader`, `TextFieldConfigLoader`, and `NumericFieldConfigLoader` read the JSON file and validate the supported fields
-- `ButtonFactory`, `CheckboxFactory`, `ToggleFactory`, `SliderFactory`, `LabelFactory`, `RadioGroupFactory`, `TextFieldFactory`, and `NumericFieldFactory` create the public facade and apply state and style
-- `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, and `NumericField` remain the public facades used by the sketch
+- `ButtonConfig`, `CheckboxConfig`, `ToggleConfig`, `SliderConfig`, `LabelConfig`, `RadioGroupConfig`, `TextFieldConfig`, `NumericFieldConfig`, and `DropDownConfig` store the parsed control data
+- `ButtonConfigLoader`, `CheckboxConfigLoader`, `ToggleConfigLoader`, `SliderConfigLoader`, `LabelConfigLoader`, `RadioGroupConfigLoader`, `TextFieldConfigLoader`, `NumericFieldConfigLoader`, and `DropDownConfigLoader` read the JSON file and validate the supported fields
+- `ButtonFactory`, `CheckboxFactory`, `ToggleFactory`, `SliderFactory`, `LabelFactory`, `RadioGroupFactory`, `TextFieldFactory`, `NumericFieldFactory`, and `DropDownFactory` create the public facade and apply state and style
+- `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, and `DropDown` remain the public facades used by the sketch
 
 This means the external setup becomes config-driven, but the runtime control pipeline remains the same.
 
@@ -369,6 +370,47 @@ public void setup() {
 }
 ```
 
+### 9. DropDown
+
+Minimal JSON:
+
+```json
+{
+  "code": "ddJsonTest",
+  "items": ["Mercury", "Venus", "Earth", "Mars", "Jupiter"],
+  "selectedIndex": 2,
+  "x": 380.0,
+  "y": 110.0,
+  "width": 420.0,
+  "height": 48.0,
+  "enabled": true,
+  "visible": true
+}
+```
+
+Minimal Java sketch flow:
+
+```java
+private static final String DROP_DOWN_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "dropdown-test.json";
+
+private InputManager inputManager;
+private OverlayManager overlayManager;
+private DropDown dropDown;
+
+public void setup() {
+    inputManager = new InputManager();
+    overlayManager = new OverlayManager();
+
+    DropDownConfigLoader loader = new DropDownConfigLoader(this);
+    DropDownConfig config = loader.load(DROP_DOWN_CONFIG_PATH);
+    dropDown = DropDownFactory.create(this, overlayManager, inputManager, config);
+
+    inputManager.registerLayer(new DropDownInputLayer(0, dropDown));
+}
+```
+
+`DropDown` still does not define keyboard behavior through JSON. If the host wants `ESC` to close the open overlay in a JSON-driven sketch, that remains host-side policy; in the public example this is only consumed while a top overlay exists, and otherwise Processing keeps its normal `ESC` behavior.
+
 The important part is unchanged from the regular control flow:
 
 - the sketch still assigns listeners in Java
@@ -414,6 +456,13 @@ For `NumericField`, the JSON route validates its small numeric editing surface d
 - `code` is required
 - `text` defaults to `""` when omitted
 - `text` must use only digits, an optional leading `-`, and an optional `.`
+- `width` and `height` must be greater than `0`
+
+For `DropDown`, the JSON route validates its small single-selection surface directly:
+
+- `code` is required
+- `items` is required and must contain at least one string
+- `selectedIndex` must be `-1` or a valid item index
 - `width` and `height` must be greater than `0`
 
 ---
@@ -705,6 +754,45 @@ Supported numeric field style fields in the current iteration:
 - `selectionColor`
 - `selectionTextColor`
 - `textSize`
+
+### 9. DropDown style
+
+Example:
+
+```json
+"style": {
+  "baseFillOverride": "#ECF2F8",
+  "listFillOverride": "#F5F8FC",
+  "textOverride": "#1C2C3E",
+  "borderOverride": "#48749C",
+  "focusedBorderOverride": "#2684D4",
+  "hoverItemOverlayOverride": "#302684D4",
+  "selectedItemOverlayOverride": "#482684D4",
+  "textSize": 16.0,
+  "itemHeight": 38.0,
+  "maxVisibleItems": 5
+}
+```
+
+Supported drop down style fields in the current iteration:
+
+- `baseFillOverride`
+- `listFillOverride`
+- `textOverride`
+- `borderOverride`
+- `hoverItemOverlayOverride`
+- `selectedItemOverlayOverride`
+- `focusedBorderOverride`
+- `cornerRadius`
+- `listCornerRadius`
+- `strokeWeight`
+- `focusedStrokeWeight`
+- `textSize`
+- `itemHeight`
+- `textPadding`
+- `arrowPadding`
+- `maxVisibleItems`
+- `disabledAlpha`
 
 ---
 
@@ -1047,23 +1135,14 @@ public class RadioGroupJsonTest extends PApplet {
     }
 
     public void keyPressed() {
-        if (key == ESC) {
-            key = 0;
-        }
         processingKeyboardAdapter.keyPressed(key, keyCode);
     }
 
     public void keyReleased() {
-        if (key == ESC) {
-            key = 0;
-        }
         processingKeyboardAdapter.keyReleased(key, keyCode);
     }
 
     public void keyTyped() {
-        if (key == ESC) {
-            key = 0;
-        }
         processingKeyboardAdapter.keyTyped(key, keyCode);
     }
 }

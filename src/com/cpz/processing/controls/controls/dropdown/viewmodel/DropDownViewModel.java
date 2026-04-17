@@ -4,6 +4,7 @@ import com.cpz.processing.controls.controls.dropdown.model.DropDownModel;
 import com.cpz.processing.controls.core.focus.Focusable;
 import com.cpz.processing.controls.core.viewmodel.AbstractControlViewModel;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * ViewModel for drop down view model.
@@ -23,6 +24,7 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
    private boolean pressed;
    private boolean focused;
    private boolean expanded;
+   private Consumer<Integer> onSelectionChanged;
 
    /**
     * Creates a drop down view model.
@@ -44,7 +46,7 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
     * Behavior:
     * - Returns the current value without applying side effects.
     */
-   public List getItems() {
+   public List<String> getItems() {
       return ((DropDownModel)this.model).getItems();
    }
 
@@ -56,8 +58,14 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setItems(List var1) {
+   public void setItems(List<String> var1) {
+      int var2 = ((DropDownModel)this.model).getSelectedIndex();
       ((DropDownModel)this.model).setItems(var1);
+      if (((DropDownModel)this.model).getItems().isEmpty()) {
+         this.close();
+      }
+
+      this.notifySelectionIfChanged(var2);
    }
 
    /**
@@ -174,6 +182,14 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
       return this.expanded;
    }
 
+   public void open() {
+      if (this.isInteractive() && !((DropDownModel)this.model).getItems().isEmpty()) {
+         this.expanded = true;
+      } else {
+         this.expanded = false;
+      }
+   }
+
    /**
     * Performs toggle expanded.
     *
@@ -181,10 +197,10 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
     * - Executes the public operation exposed by this type.
     */
    public void toggleExpanded() {
-      if (this.isInteractive() && !((DropDownModel)this.model).getItems().isEmpty()) {
-         this.expanded = !this.expanded;
+      if (this.expanded) {
+         this.close();
       } else {
-         this.expanded = false;
+         this.open();
       }
    }
 
@@ -208,9 +224,13 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
     * - Executes the public operation exposed by this type.
     */
    public void selectIndex(int var1) {
-      if (this.isInteractive()) {
-         ((DropDownModel)this.model).setSelectedIndex(var1);
-      }
+      int var2 = ((DropDownModel)this.model).getSelectedIndex();
+      ((DropDownModel)this.model).setSelectedIndex(var1);
+      this.notifySelectionIfChanged(var2);
+   }
+
+   public void setOnSelectionChanged(Consumer<Integer> var1) {
+      this.onSelectionChanged = var1;
    }
 
    /**
@@ -246,5 +266,12 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
 
    private boolean isInteractive() {
       return this.isVisible() && this.isEnabled();
+   }
+
+   private void notifySelectionIfChanged(int var1) {
+      int var2 = ((DropDownModel)this.model).getSelectedIndex();
+      if (var1 != var2 && this.onSelectionChanged != null) {
+         this.onSelectionChanged.accept(var2);
+      }
    }
 }

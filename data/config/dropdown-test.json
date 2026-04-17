@@ -1,0 +1,23 @@
+{
+  "code": "ddJsonTest",
+  "items": ["Mercury", "Venus", "Earth", "Mars", "Jupiter"],
+  "selectedIndex": 2,
+  "x": 380.0,
+  "y": 110.0,
+  "width": 420.0,
+  "height": 48.0,
+  "enabled": true,
+  "visible": true,
+  "style": {
+    "baseFillOverride": "#ECF2F8",
+    "listFillOverride": "#F5F8FC",
+    "textOverride": "#1C2C3E",
+    "borderOverride": "#48749C",
+    "focusedBorderOverride": "#2684D4",
+    "hoverItemOverlayOverride": "#302684D4",
+    "selectedItemOverlayOverride": "#482684D4",
+    "textSize": 16.0,
+    "itemHeight": 38.0,
+    "maxVisibleItems": 5
+  }
+}
