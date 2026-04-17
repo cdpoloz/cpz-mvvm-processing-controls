@@ -1,4 +1,4 @@
-package com.cpz.processing.controls.examples;
+package com.cpz.processing.controls.examples.checkbox;
 
 import com.cpz.processing.controls.controls.checkbox.Checkbox;
 import com.cpz.processing.controls.controls.checkbox.config.CheckboxStyleConfig;

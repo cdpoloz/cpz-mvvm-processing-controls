@@ -1,4 +1,4 @@
-package com.cpz.processing.controls.examples;
+package com.cpz.processing.controls.examples.checkbox;
 
 import com.cpz.processing.controls.controls.checkbox.Checkbox;
 import com.cpz.processing.controls.controls.checkbox.CheckboxFactory;
@@ -11,8 +11,8 @@ import processing.core.PApplet;
 
 import java.io.File;
 
-public class CheckboxJsonTest extends PApplet {
-    private static final String CHECKBOX_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "checkbox-test.json";
+public class CheckboxSvgJsonTest extends PApplet {
+    private static final String CHECKBOX_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "checkbox-svg-test.json";
 
     private InputManager inputManager;
     private Checkbox checkbox;
@@ -29,17 +29,17 @@ public class CheckboxJsonTest extends PApplet {
         checkbox = CheckboxFactory.create(this, config);
         checkbox.setChangeListener(value -> currentValue = value);
         currentValue = checkbox.isChecked();
-        // input manager
+
         inputManager = new InputManager();
         inputManager.registerLayer(new CheckboxInputLayer(0, checkbox));
-        // text output
+
         textAlign(CENTER, CENTER);
     }
 
     public void draw() {
         background(28);
         checkbox.draw();
-        text(checkbox.getCode() + " | Current checked state = " + currentValue, 300, 200);
+        text(checkbox.getCode() + " | Current checked state = " + currentValue, 300, 225);
     }
 
     public void mouseMoved() {

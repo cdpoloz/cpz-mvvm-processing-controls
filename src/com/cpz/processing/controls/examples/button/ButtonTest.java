@@ -1,4 +1,4 @@
-package com.cpz.processing.controls.examples;
+package com.cpz.processing.controls.examples.button;
 
 import com.cpz.processing.controls.controls.button.Button;
 import com.cpz.processing.controls.controls.button.config.ButtonStyleConfig;

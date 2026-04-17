@@ -1,19 +1,16 @@
-package com.cpz.processing.controls.examples;
+package com.cpz.processing.controls.examples.toggle;
 
 import com.cpz.processing.controls.controls.toggle.Toggle;
-import com.cpz.processing.controls.controls.toggle.ToggleFactory;
-import com.cpz.processing.controls.controls.toggle.config.ToggleConfig;
-import com.cpz.processing.controls.controls.toggle.config.ToggleConfigLoader;
+import com.cpz.processing.controls.controls.toggle.config.ToggleStyleConfig;
 import com.cpz.processing.controls.controls.toggle.input.ToggleInputLayer;
+import com.cpz.processing.controls.controls.toggle.style.ParametricToggleStyle;
+import com.cpz.processing.controls.controls.toggle.style.render.CircleShapeRenderer;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.core.util.Colors;
 import processing.core.PApplet;
 
-import java.io.File;
-
-public class ToggleJsonTest extends PApplet {
-    private static final String TOGGLE_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "toggle-test.json";
-
+public class ToggleTest extends PApplet {
     private InputManager inputManager;
     private Toggle toggle;
     private int currentState;
@@ -21,14 +18,35 @@ public class ToggleJsonTest extends PApplet {
     public void settings() {
         size(600, 320);
         smooth(8);
+
     }
 
     public void setup() {
-        ToggleConfigLoader loader = new ToggleConfigLoader(this);
-        ToggleConfig config = loader.load(TOGGLE_CONFIG_PATH);
-        toggle = ToggleFactory.create(this, config);
-        toggle.setChangeListener(value -> currentState = value);
+        float x = 300f;
+        float y = 125f;
+        float d = 100f;
+        toggle = new Toggle(this, "tglTest", 0, 3, x, y, d, d);
+        toggle.setChangeListener(value -> {
+            // the code that executes after a toggle click goes here, for example:
+            System.out.println("Toggle state = " + value);
+            currentState = value;
+        });
         currentState = toggle.getState();
+        // style
+        ToggleStyleConfig tsc = new ToggleStyleConfig();
+        tsc.setShapeRenderer(new CircleShapeRenderer());
+        tsc.stateColors = new Integer[]{
+                Colors.gray(70),
+                Colors.rgb(232, 155, 44),
+                Colors.rgb(32, 188, 176)
+        };
+        tsc.strokeColor = Colors.gray(255);
+        tsc.strokeWidth = 2.0f;
+        tsc.strokeWidthHover = 4.0f;
+        tsc.hoverBlendWithWhite = 0.18f;
+        tsc.pressedBlendWithBlack = 0.20f;
+        tsc.disabledAlpha = 70;
+        toggle.setStyle(new ParametricToggleStyle(tsc));
         // input manager
         inputManager = new InputManager();
         inputManager.registerLayer(new ToggleInputLayer(0, toggle));

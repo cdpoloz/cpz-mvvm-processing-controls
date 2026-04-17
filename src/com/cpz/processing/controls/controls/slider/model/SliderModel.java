@@ -53,6 +53,26 @@ public final class SliderModel implements Enableable {
       this.setValue(DEFAULT_VALUE);
    }
 
+   public SliderModel(String var1, BigDecimal var2, BigDecimal var3, BigDecimal var4, BigDecimal var5, SnapMode var6) {
+      this.code = Objects.requireNonNull(var1, "code");
+      BigDecimal var7 = requireNonNull(var2, "min");
+      BigDecimal var8 = requireNonNull(var3, "max");
+      BigDecimal var9 = requireNonNull(var4, "step");
+      BigDecimal var10 = requireNonNull(var5, "value");
+      if (var7.compareTo(var8) >= 0) {
+         throw new IllegalArgumentException("min must be < max");
+      } else if (var9.compareTo(BigDecimal.ZERO) <= 0) {
+         throw new IllegalArgumentException("step must be > 0");
+      } else {
+         this.min = var7;
+         this.max = var8;
+         this.step = var9;
+         this.snapMode = var6 == null ? SnapMode.ALWAYS : var6;
+         this.enabled = true;
+         this.value = this.normalizeValue(var10, this.shouldSnapImmediately());
+      }
+   }
+
    public String getCode() {
       return this.code;
    }

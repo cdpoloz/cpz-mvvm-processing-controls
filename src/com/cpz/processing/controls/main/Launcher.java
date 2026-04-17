@@ -43,16 +43,21 @@ public class Launcher {
       //PApplet.main(CheckboxSvgJsonTest.class);
 
       //Toggle *****************************************
-      PApplet.main(ToggleTest.class);
+      //PApplet.main(ToggleTest.class);
       //PApplet.main(ToggleSvgTest.class);
       //PApplet.main(ToggleJsonTest.class);
       //PApplet.main(ToggleSvgJsonTest.class);
+
+      //Slider *****************************************
+      //PApplet.main(SliderTest.class);
+      //PApplet.main(SliderSvgTest.class);
+      //PApplet.main(SliderJsonTest.class);
+      //PApplet.main(SliderSvgJsonTest.class);
 
       //PApplet.main(DropDownDevSketch.class);
       //PApplet.main(LabelDevSketch.class);
       //PApplet.main(NumericFieldDevSketch.class);
       //PApplet.main(RadioGroupDevSketch.class);
-      //PApplet.main(SliderDevSketch.class);
       //PApplet.main(BindingDevSketch.class);
       //PApplet.main(TextFieldDevSketch.class);
       //PApplet.main(ThemeDevSketch.class);

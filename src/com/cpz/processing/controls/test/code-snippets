@@ -1,0 +1,14 @@
+*** QUITARLE BORDE A LA VENTANA DE PROCESSING *************************************************************************
+
+    public PSurface initSurface() {
+        PSurface surface = super.initSurface();
+
+        PSurfaceAWT awtSurface = (PSurfaceAWT) surface;
+        PSurfaceAWT.SmoothCanvas canvas = (PSurfaceAWT.SmoothCanvas) awtSurface.getNative();
+        Frame frame = canvas.getFrame();
+
+        frame.setUndecorated(true);   // quita title bar y bordes
+        frame.setAlwaysOnTop(false);  // opcional
+
+        return surface;
+    }

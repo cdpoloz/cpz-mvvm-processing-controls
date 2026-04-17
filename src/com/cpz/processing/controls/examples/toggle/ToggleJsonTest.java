@@ -1,4 +1,4 @@
-package com.cpz.processing.controls.examples;
+package com.cpz.processing.controls.examples.toggle;
 
 import com.cpz.processing.controls.controls.toggle.Toggle;
 import com.cpz.processing.controls.controls.toggle.ToggleFactory;
@@ -11,8 +11,8 @@ import processing.core.PApplet;
 
 import java.io.File;
 
-public class ToggleSvgJsonTest extends PApplet {
-    private static final String TOGGLE_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "toggle-svg-test.json";
+public class ToggleJsonTest extends PApplet {
+    private static final String TOGGLE_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "toggle-test.json";
 
     private InputManager inputManager;
     private Toggle toggle;
@@ -39,7 +39,7 @@ public class ToggleSvgJsonTest extends PApplet {
     public void draw() {
         background(28);
         toggle.draw();
-        text(toggle.getCode() + " | state = " + currentState + " / " + (toggle.getTotalStates() - 1), 300, 215);
+        text(toggle.getCode() + " | state = " + currentState + " / " + (toggle.getTotalStates() - 1), 300, 210);
         text("click to cycle 0 → 1 → 2 → 0", 300, 250);
     }
 

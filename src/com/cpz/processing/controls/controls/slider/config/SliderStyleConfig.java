@@ -61,6 +61,13 @@ public final class SliderStyleConfig {
     * - Initializes the public state required by this type.
     */
    public SliderStyleConfig() {
+      this.trackStrokeWeight = 1.5F;
+      this.trackStrokeWeightHover = 2.5F;
+      this.trackThickness = 8.0F;
+      this.thumbStrokeWeight = 2.0F;
+      this.thumbStrokeWeightHover = 3.0F;
+      this.thumbSize = 24.0F;
+      this.showValueText = true;
       this.svgColorMode = SvgColorMode.USE_RENDER_STYLE;
    }
 

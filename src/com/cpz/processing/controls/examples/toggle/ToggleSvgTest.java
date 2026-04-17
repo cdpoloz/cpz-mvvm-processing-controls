@@ -1,18 +1,18 @@
-package com.cpz.processing.controls.examples;
+package com.cpz.processing.controls.examples.toggle;
 
 import com.cpz.processing.controls.controls.toggle.Toggle;
 import com.cpz.processing.controls.controls.toggle.config.ToggleStyleConfig;
 import com.cpz.processing.controls.controls.toggle.input.ToggleInputLayer;
 import com.cpz.processing.controls.controls.toggle.style.ParametricToggleStyle;
-import com.cpz.processing.controls.controls.toggle.style.render.CircleShapeRenderer;
+import com.cpz.processing.controls.controls.toggle.style.render.SvgShapeRenderer;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.util.Colors;
 import processing.core.PApplet;
 
-import java.awt.*;
+import java.io.File;
 
-public class ToggleTest extends PApplet {
+public class ToggleSvgTest extends PApplet {
     private InputManager inputManager;
     private Toggle toggle;
     private int currentState;
@@ -20,33 +20,28 @@ public class ToggleTest extends PApplet {
     public void settings() {
         size(600, 320);
         smooth(8);
-
     }
 
     public void setup() {
         float x = 300f;
         float y = 125f;
         float d = 100f;
-        toggle = new Toggle(this, "tglTest", 0, 3, x, y, d, d);
-        toggle.setChangeListener(value -> {
-            // the code that executes after a toggle click goes here, for example:
-            System.out.println("Toggle state = " + value);
-            currentState = value;
-        });
+        toggle = new Toggle(this, "tglSvgTest", 0, 3, x, y, d, d);
+        toggle.setChangeListener(value -> currentState = value);
         currentState = toggle.getState();
         // style
         ToggleStyleConfig tsc = new ToggleStyleConfig();
-        tsc.setShapeRenderer(new CircleShapeRenderer());
+        tsc.setShapeRenderer(new SvgShapeRenderer(this, "data" + File.separator + "img" + File.separator + "test.svg"));
         tsc.stateColors = new Integer[]{
                 Colors.gray(70),
-                Colors.rgb(232, 155, 44),
+                Colors.rgb(235, 160, 40),
                 Colors.rgb(32, 188, 176)
         };
         tsc.strokeColor = Colors.gray(255);
-        tsc.strokeWidth = 2.0f;
-        tsc.strokeWidthHover = 4.0f;
-        tsc.hoverBlendWithWhite = 0.18f;
-        tsc.pressedBlendWithBlack = 0.20f;
+        tsc.strokeWidth = 1.5f;
+        tsc.strokeWidthHover = 3.5f;
+        tsc.hoverBlendWithWhite = 0.14f;
+        tsc.pressedBlendWithBlack = 0.24f;
         tsc.disabledAlpha = 70;
         toggle.setStyle(new ParametricToggleStyle(tsc));
         // input manager
