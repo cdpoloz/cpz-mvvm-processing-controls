@@ -17,6 +17,8 @@ import java.util.Objects;
  *
  * Notes:
  * - This type belongs to the MVVM Model layer.
+ * - Internal fields such as min/max/step and parsing flags support the closed control
+ *   implementation and are not exposed through the current NumericField facade.
  */
 public final class NumericFieldModel implements Enableable {
    private final String code;

@@ -54,9 +54,6 @@ public final class NumericField {
     public void handlePointerEvent(PointerEvent event) {
         if (event != null) {
             this.inputAdapter.handlePointerEvent(event);
-            if (event.getType() == PointerEvent.Type.PRESS && !this.view.contains(event.getX(), event.getY())) {
-                this.focusManager.clearFocus();
-            }
         }
     }
 
@@ -76,6 +73,10 @@ public final class NumericField {
         this.viewModel.setText(text);
     }
 
+    /**
+     * Returns the numeric value derived from the current text buffer.
+     * This is not guaranteed to match the last committed model value while the user is editing.
+     */
     public BigDecimal getValue() {
         return this.viewModel.getParsedValue();
     }
@@ -84,6 +85,9 @@ public final class NumericField {
         this.viewModel.setValue(value);
     }
 
+    /**
+     * Returns whether the current text buffer can be parsed as a numeric value.
+     */
     public boolean isValid() {
         return this.viewModel.isValid();
     }

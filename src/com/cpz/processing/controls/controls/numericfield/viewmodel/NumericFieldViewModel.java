@@ -632,43 +632,6 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    }
 
    /**
-    * Performs increment.
-    *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    *
-    * Behavior:
-    * - Executes the public operation exposed by this type.
-    */
-   public void increment(boolean var1, boolean var2) {
-   }
-
-   /**
-    * Performs decrement.
-    *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    *
-    * Behavior:
-    * - Executes the public operation exposed by this type.
-    */
-   public void decrement(boolean var1, boolean var2) {
-   }
-
-   /**
-    * Handles mouse wheel.
-    *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    *
-    * Behavior:
-    * - Applies the public interaction flow exposed by this type.
-    */
-   public void onMouseWheel(float var1, boolean var2, boolean var3) {
-   }
-
-   /**
     * Updates value.
     *
     * @param var1 new value
@@ -689,17 +652,6 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    }
 
    protected void activate() {
-   }
-
-   private void applyStep(BigDecimal var1) {
-      if (this.focused && this.isInteractive()) {
-         if (this.editing) {
-            this.commitValue();
-         }
-
-         BigDecimal var2 = ((NumericFieldModel)this.model).getValue().add(var1);
-         this.setCommittedValue(var2);
-      }
    }
 
    private void setCommittedValue(BigDecimal var1) {
@@ -957,12 +909,4 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       return this.isEnabled() && this.isVisible();
    }
 
-   /**
-    * Commits the current public state.
-    *
-    * Behavior:
-    * - Executes the public operation exposed by this type.
-    */
-   public void commit() {
-   }
 }

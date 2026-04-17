@@ -23,11 +23,14 @@ public final class NumericFieldInputLayer extends DefaultInputLayer {
             return false;
         }
         this.numericField.handlePointerEvent(event);
-        return true;
+        if (event.getType() == PointerEvent.Type.MOVE) {
+            return false;
+        }
+        return this.numericField.isFocused();
     }
 
     public boolean handleKeyboardEvent(KeyboardEvent event) {
-        if (event == null || !this.numericField.isFocused()) {
+        if (event == null || !this.numericField.isFocused() || !this.numericField.isEnabled() || !this.numericField.isVisible()) {
             return false;
         }
         this.numericField.handleKeyboardEvent(event);

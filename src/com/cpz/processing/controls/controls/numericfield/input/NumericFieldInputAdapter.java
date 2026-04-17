@@ -68,6 +68,7 @@ public final class NumericFieldInputAdapter {
          boolean var3 = this.view.contains(var1, var2);
          this.viewModel.onPointerPress(var3);
          if (!var3) {
+            this.focusManager.clearFocus();
             return false;
          } else {
             this.focusManager.requestFocus(this.viewModel);
@@ -111,17 +112,10 @@ public final class NumericFieldInputAdapter {
    }
 
    /**
-    * Handles mouse wheel.
-    *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    *
-    * Behavior:
-    * - Applies the public interaction flow exposed by this type.
+    * Wheel-based value changes are intentionally not supported by NumericField in this iteration.
+    * The no-op method is kept so existing sketches can continue calling the adapter uniformly.
     */
    public void handleMouseWheel(float var1, boolean var2, boolean var3) {
-      this.viewModel.onMouseWheel(var1, var2, var3);
    }
 
    /**
@@ -148,7 +142,7 @@ public final class NumericFieldInputAdapter {
                this.handleMouseRelease(var1.getX(), var1.getY());
                break;
             case WHEEL:
-               this.handleMouseWheel(var1.getWheelDelta(), var1.isShiftDown(), var1.isControlDown());
+               break;
          }
       }
    }

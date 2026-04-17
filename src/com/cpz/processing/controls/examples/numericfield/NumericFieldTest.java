@@ -62,10 +62,10 @@ public class NumericFieldTest extends PApplet {
         background(28);
         numericField.draw();
         fill(180);
-        text(numericField.getCode() + " | focused = " + numericField.isFocused() + " | valid = " + currentValid, 380, 230);
-        text("text = " + currentText, 380, 260);
-        text("value = " + (currentValue == null ? "invalid" : currentValue.toPlainString()), 380, 285);
-        text("click to focus | digits, optional leading -, optional . | left/right/home/end move | enter no-op", 380, 315);
+        text(numericField.getCode() + " | focused = " + numericField.isFocused() + " | valid = " + currentValid, 380, 170);
+        text("text = " + currentText, 380, 200);
+        text("value = " + (currentValue == null ? "invalid" : currentValue.toPlainString()), 380, 225);
+        text("click to focus | digits, optional leading -, optional . | left/right/home/end move | enter no-op", 380, 260);
     }
 
     public void mousePressed() {

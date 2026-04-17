@@ -53,11 +53,11 @@ public class NumericFieldJsonTest extends PApplet {
         background(28);
         numericField.draw();
         fill(180);
-        text(numericField.getCode() + " | focused = " + numericField.isFocused() + " | valid = " + currentValid, 380, 230);
-        text("text = " + currentText, 380, 260);
-        text("value = " + (currentValue == null ? "invalid" : currentValue.toPlainString()), 380, 285);
-        text("config-driven numeric field using NumericFieldConfigLoader and NumericFieldFactory", 380, 310);
-        text("click to focus | digits, optional leading -, optional . | left/right/home/end move | enter no-op", 380, 332);
+        text(numericField.getCode() + " | focused = " + numericField.isFocused() + " | valid = " + currentValid, 380, 170);
+        text("text = " + currentText, 380, 200);
+        text("value = " + (currentValue == null ? "invalid" : currentValue.toPlainString()), 380, 225);
+        text("config-driven numeric field using NumericFieldConfigLoader and NumericFieldFactory", 380, 260);
+        text("click to focus | digits, optional leading -, optional . | left/right/home/end move | enter no-op", 380, 285);
     }
 
     public void mousePressed() {

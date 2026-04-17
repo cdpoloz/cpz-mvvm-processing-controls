@@ -74,8 +74,8 @@ public class Launcher {
       //PApplet.main(TextFieldJsonTest.class);
 
       // NumericField **********************************
-      //PApplet.main(NumericFieldTest.class);
-      //PApplet.main(NumericFieldJsonTest.class);
+      PApplet.main(NumericFieldTest.class);
+      PApplet.main(NumericFieldJsonTest.class);
 
       //PApplet.main(DropDownDevSketch.class);
       //PApplet.main(NumericFieldDevSketch.class);

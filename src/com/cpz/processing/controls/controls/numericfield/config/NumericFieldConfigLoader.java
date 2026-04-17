@@ -72,18 +72,25 @@ public final class NumericFieldConfigLoader {
             if (ch == '.') {
                 dots++;
                 if (dots > 1) {
-                    throw new IllegalArgumentException("Invalid numeric field text in " + path + ": " + text + ". Expected at most one '.'.");
+                    throw invalidText(path, text);
                 }
                 continue;
             }
             if (ch == '-') {
                 minus++;
                 if (minus > 1 || i != 0) {
-                    throw new IllegalArgumentException("Invalid numeric field text in " + path + ": " + text + ". Expected an optional leading '-'.");
+                    throw invalidText(path, text);
                 }
                 continue;
             }
-            throw new IllegalArgumentException("Invalid numeric field text in " + path + ": " + text + ". Expected digits, an optional leading '-', and an optional '.'.");
+            throw invalidText(path, text);
         }
+    }
+
+    private static IllegalArgumentException invalidText(String path, String text) {
+        return new IllegalArgumentException(
+                "Invalid numeric field text in " + path + ": " + text
+                        + ". Expected only digits, an optional leading '-', and at most one '.'."
+        );
     }
 }

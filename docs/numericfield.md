@@ -20,7 +20,7 @@ In the current iteration:
 - allowed characters are digits, an optional leading `-`, and a single optional `.`
 - intermediate states such as `""`, `"-"`, `"."`, and `"-."` are allowed during editing
 - those intermediate states are not considered valid numeric values
-- `getValue()` returns the parsed `BigDecimal` when the current text is valid, or `null` otherwise
+- `getValue()` returns the parsed value derived from the current text buffer, or `null` while the current text is not a valid number
 - `enter` is a no-op for the public single-line control
 - SVG is not supported for `NumericField` in this iteration
 
@@ -31,6 +31,7 @@ In the current iteration:
 The control keeps the standard MVVM separation used across the framework:
 
 - `Model` stores durable numeric state and stable `code`
+- `Model` may keep extra numeric constraints used internally by the closed implementation, but the public facade does not expose them in this iteration
 - `ViewModel` owns numeric text editing, cursor movement, parsing, and validity
 - `View` owns layout, hit testing, and `ViewState` construction
 - `Style` resolves visual appearance from immutable state and theme data
@@ -80,7 +81,7 @@ Supported keyboard behavior in the current iteration:
 - `end` moves the cursor to the end of the text
 - `enter` is currently a no-op
 
-The sketch forwards keyboard input as delivered by the host application. Special host-key handling such as `ESC` remains an application decision and is not imposed by `NumericField`.
+The sketch forwards keyboard input as delivered by the host application. Special host-key handling such as `ESC` remains an application decision and is not imposed by `NumericField`; the control does not reserve `ESC` or attach any built-in revert behavior.
 
 ---
 
@@ -133,8 +134,9 @@ boolean valid = numericField.isValid();
 ```
 
 - `getText()` returns the current visible buffer
-- `isValid()` reports whether the current text is a valid decimal number
-- `getValue()` returns a parsed `BigDecimal` only when the current text is valid
+- `isValid()` reports whether the current visible buffer can be parsed right now as a numeric value
+- `getValue()` returns the parsed `BigDecimal` derived from the current visible buffer only when that buffer is valid
+- while editing, `getValue()` may temporarily differ from the last committed internal model value until focus is lost or another commit path normalizes the text
 
 This keeps intermediate editing states usable without exposing MVVM internals.
 
@@ -207,7 +209,7 @@ public void keyTyped() {
 }
 ```
 
-`NumericFieldInputLayer` only routes keyboard events while the field is focused, and it ignores wheel input in this simple public version.
+`NumericFieldInputLayer` only routes keyboard events while the field is focused, enabled, and visible. Pointer events are only consumed when the field keeps focus ownership after handling them, and wheel input is ignored in this simple public version.
 
 ---
 
@@ -299,7 +301,7 @@ The loader validates the small supported surface directly:
 
 - `code` is required
 - `text` defaults to `""` when omitted
-- `text` must use only digits, an optional leading `-`, and an optional `.`
+- `text` must follow the same simple text rules as the control buffer: digits, an optional leading `-`, and at most one `.`
 - `width` and `height` must be greater than `0`
 
 ---
