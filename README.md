@@ -3,10 +3,12 @@
 ![Processing](https://img.shields.io/badge/Processing-4.5.x-blue)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
+[![GitHub](https://img.shields.io/badge/GitHub-cdpoloz-181717?logo=github)](https://github.com/cdpoloz)
 
-UI controls organized around a strict MVVM pipeline, explicit input routing, and theme-aware rendering.
+A UI control framework for Processing built around a strict MVVM architecture,
+explicit input routing, and high-performance rendering.
 
-------------------------------------------------------------------------
+---
 
 ## Overview
 
@@ -16,7 +18,7 @@ The framework does not depend on Processing internally for input dispatch or int
 
 That separation keeps rendering concerns, interaction logic, and host-framework integration independent from each other.
 
-------------------------------------------------------------------------
+---
 
 ## Why this library?
 
@@ -31,7 +33,7 @@ Key characteristics:
 - Clear separation of concerns
 - Designed for real-time rendering and external input integration
 
-------------------------------------------------------------------------
+---
 
 ## Input Philosophy
 
@@ -41,7 +43,7 @@ The framework does not own any input source. It only consumes normalized events 
 - State-driven events make pointer and keyboard dispatch explicit and deterministic
 - Separation of concerns keeps adapters responsible for translation and ViewModels responsible for behavior
 
-------------------------------------------------------------------------
+---
 
 ## Input Flow (Simplified)
 
@@ -59,7 +61,7 @@ InputAdapter (per control)
 ViewModel
 ```
 
-------------------------------------------------------------------------
+---
 
 ## Event Model
 
@@ -81,7 +83,7 @@ ViewModel
 
 Both event types are normalized at the adapter boundary and consumed by the framework without any dependency on Processing-specific event objects.
 
-------------------------------------------------------------------------
+---
 
 ## Quick Example
 
@@ -95,7 +97,7 @@ labelViewModel.setText(value.toString()), sliderViewModel::addListener
 
 More advanced examples, including bidirectional binding demonstrations, are available in `BindingDevSketch`.
 
-------------------------------------------------------------------------
+---
 
 ## Getting Started
 
@@ -117,7 +119,7 @@ You can find working examples in:
 
 `src/com/cpz/processing/controls/examples`
 
-------------------------------------------------------------------------
+---
 
 ## Purpose
 
@@ -130,7 +132,7 @@ Key goals:
 - support theming and overlays without adding per-frame architectural noise
 - validate lightweight ViewModel binding without coupling the binding layer to specific controls
 
-------------------------------------------------------------------------
+---
 
 ## Architecture
 
@@ -157,7 +159,7 @@ Supporting infrastructure:
 - `OverlayManager` coordinates overlay ordering
 - `ThemeManager` exposes cached `ThemeSnapshot` instances to styles
 
-------------------------------------------------------------------------
+---
 
 ## Rendering Model
 
@@ -171,7 +173,7 @@ The render path is designed for high-frequency rendering loops:
 
 This keeps theme work outside the hot render path and preserves MVVM boundaries.
 
-------------------------------------------------------------------------
+---
 
 ## Binding
 
@@ -185,7 +187,7 @@ This design avoids hidden data flows and keeps all synchronization logic visible
 
 See [Binding](docs/binding.md).
 
-------------------------------------------------------------------------
+---
 
 ## Example Usage
 
@@ -193,7 +195,7 @@ See `cpz-mvvm-processing-template` for an integration example.
 
 That template demonstrates how to connect Processing callbacks to the framework through external adapters while keeping the control library itself source-agnostic.
 
-------------------------------------------------------------------------
+---
 
 ## Project Structure
 
@@ -204,7 +206,7 @@ That template demonstrates how to connect Processing callbacks to the framework 
 - `docs`: human-facing documentation
 - `docs/uml`: PlantUML diagrams
 
-------------------------------------------------------------------------
+---
 
 ## Documentation
 
@@ -221,7 +223,7 @@ That template demonstrates how to connect Processing callbacks to the framework 
 - [TextField](docs/textfield.md)
 - [Toggle](docs/toggle.md)
 
-------------------------------------------------------------------------
+---
 
 ## Design Philosophy
 
@@ -230,7 +232,7 @@ That template demonstrates how to connect Processing callbacks to the framework 
 - Rendering and interaction are strictly separated
 - Input sources stay outside the framework core
 
-------------------------------------------------------------------------
+---
 
 ## Status
 
@@ -238,8 +240,16 @@ This project is actively used to validate MVVM patterns, explicit input routing,
 
 The focus is on architectural clarity and explicit behavior rather than framework-level abstraction or automation.
 
-------------------------------------------------------------------------
+---
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+---
+
+## Author
+
+**Carlos Polo Zamora**  
+GitHub: https://github.com/cdpoloz  
+Alias: CPZ / cepezeta / cdpoloz
