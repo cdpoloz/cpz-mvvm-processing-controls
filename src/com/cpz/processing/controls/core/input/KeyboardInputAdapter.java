@@ -111,6 +111,12 @@ public final class KeyboardInputAdapter {
                var5.backspace();
             } else if (var1 == 127) {
                var5.deleteForward();
+            } else if (var1 == 36) {
+               this.suppressTypedOnce = true;
+               var5.moveCursorHome();
+            } else if (var1 == 35) {
+               this.suppressTypedOnce = true;
+               var5.moveCursorEnd();
             } else if (var1 == 37) {
                if (var2) {
                   var5.moveCursorLeftWithSelection();

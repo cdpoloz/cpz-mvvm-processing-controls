@@ -5,6 +5,8 @@ import com.cpz.processing.controls.core.input.ClipboardService;
 import com.cpz.processing.controls.core.input.KeyboardInputTarget;
 import com.cpz.processing.controls.core.viewmodel.AbstractControlViewModel;
 
+import java.util.function.Consumer;
+
 /**
  * ViewModel for text field view model.
  *
@@ -26,6 +28,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    private int selectionAnchor;
    private boolean selecting;
    private boolean focused;
+   private Consumer<String> onTextChanged;
 
    /**
     * Creates a text field view model.
@@ -67,6 +70,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
       ((TextFieldModel)this.model).setText(var1);
       this.cursorIndex = this.clampIndex(this.cursorIndex);
       this.clearSelection();
+      this.notifyTextChanged();
    }
 
    /**
@@ -328,6 +332,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
          ((TextFieldModel)this.model).setText(var3);
          this.cursorIndex += var1.length();
          this.clearSelection();
+         this.notifyTextChanged();
       }
    }
 
@@ -348,6 +353,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
             ((TextFieldModel)this.model).setText(var2);
             --this.cursorIndex;
             this.clearSelection();
+            this.notifyTextChanged();
          }
       }
    }
@@ -369,6 +375,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
                String var2 = var10000 + var1.substring(this.cursorIndex + 1);
                ((TextFieldModel)this.model).setText(var2);
                this.clearSelection();
+               this.notifyTextChanged();
             }
          }
       }
@@ -396,6 +403,32 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    public void moveCursorRight() {
       if (this.focused) {
          this.cursorIndex = this.hasSelection() ? this.getSelectionMax() : Math.min(((TextFieldModel)this.model).getText().length(), this.cursorIndex + 1);
+         this.clearSelection();
+      }
+   }
+
+   /**
+    * Performs move cursor home.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
+   public void moveCursorHome() {
+      if (this.focused) {
+         this.cursorIndex = 0;
+         this.clearSelection();
+      }
+   }
+
+   /**
+    * Performs move cursor end.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
+   public void moveCursorEnd() {
+      if (this.focused) {
+         this.cursorIndex = ((TextFieldModel)this.model).getText().length();
          this.clearSelection();
       }
    }
@@ -452,6 +485,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    public void deleteSelection() {
       if (this.canEdit() && this.hasSelection()) {
          this.deleteSelectionInternal();
+         this.notifyTextChanged();
       }
    }
 
@@ -507,6 +541,18 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
       }
    }
 
+   /**
+    * Updates on text changed.
+    *
+    * @param var1 new on text changed
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
+   public void setOnTextChanged(Consumer<String> var1) {
+      this.onTextChanged = var1;
+   }
+
    protected void onAvailabilityChanged() {
       if (!this.isEnabled() || !this.isVisible()) {
          this.focused = false;
@@ -558,5 +604,11 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
 
    private int clampIndex(int var1) {
       return Math.max(0, Math.min(((TextFieldModel)this.model).getText().length(), var1));
+   }
+
+   private void notifyTextChanged() {
+      if (this.onTextChanged != null) {
+         this.onTextChanged.accept(((TextFieldModel)this.model).getText());
+      }
    }
 }

@@ -38,6 +38,18 @@ public interface KeyboardInputTarget extends Focusable {
 
    void moveCursorRight();
 
+   /**
+    * Moves the cursor to the start of the current value when supported.
+    */
+   default void moveCursorHome() {
+   }
+
+   /**
+    * Moves the cursor to the end of the current value when supported.
+    */
+   default void moveCursorEnd() {
+   }
+
    void moveCursorLeftWithSelection();
 
    void moveCursorRightWithSelection();

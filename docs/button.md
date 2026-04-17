@@ -57,7 +57,7 @@ A minimal public setup requires:
 1. `Button`
 2. `InputManager`
 3. `ButtonInputLayer`
-4. Forwarded `PointerEvent` callbacks from Processing
+4. forwarded `PointerEvent` callbacks from Processing
 
 The framework does not provide input sources.
 

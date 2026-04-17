@@ -1,4 +1,4 @@
-package com.cpz.processing.controls.examples;
+package com.cpz.processing.controls.examples.radiogroup;
 
 import com.cpz.processing.controls.controls.radiogroup.RadioGroup;
 import com.cpz.processing.controls.controls.radiogroup.RadioGroupFactory;

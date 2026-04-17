@@ -2,11 +2,12 @@ package com.cpz.processing.controls.main;
 
 import java.util.Locale;
 
-import com.cpz.processing.controls.examples.*;
 import com.cpz.processing.controls.examples.button.*;
 import com.cpz.processing.controls.examples.checkbox.*;
 import com.cpz.processing.controls.examples.label.*;
+import com.cpz.processing.controls.examples.radiogroup.*;
 import com.cpz.processing.controls.examples.slider.*;
+import com.cpz.processing.controls.examples.textfield.*;
 import com.cpz.processing.controls.examples.toggle.*;
 import processing.core.PApplet;
 
@@ -64,8 +65,12 @@ public class Launcher {
       //PApplet.main(LabelJsonTest.class);
 
       // RadioGroup *************************************
-      PApplet.main(RadioGroupTest.class);
-      PApplet.main(RadioGroupJsonTest.class);
+      //PApplet.main(RadioGroupTest.class);
+      //PApplet.main(RadioGroupJsonTest.class);
+
+      // TextField *************************************
+      PApplet.main(TextFieldTest.class);
+      //PApplet.main(TextFieldJsonTest.class);
 
       //PApplet.main(DropDownDevSketch.class);
       //PApplet.main(LabelDevSketch.class);
