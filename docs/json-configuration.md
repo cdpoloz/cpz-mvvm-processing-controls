@@ -2,9 +2,9 @@
 
 This document shows how to create controls from JSON configuration files.
 
-In the current iteration, the framework supports a single `Button`, a single `Checkbox`, a single `Toggle`, a single `Slider`, or a single `Label` created from JSON, including optional SVG renderer setup configured through the style block for the controls that already support it.
+In the current iteration, the framework supports a single `Button`, a single `Checkbox`, a single `Toggle`, a single `Slider`, a single `Label`, or a single `RadioGroup` created from JSON, including optional SVG renderer setup configured through the style block for the controls that already support it.
 
-JSON configuration is an additional layer on top of the existing public API. It does not replace direct control creation with `Button`, `Checkbox`, `Toggle`, `Slider`, or `Label`, and it does not change the internal MVVM architecture of the framework.
+JSON configuration is an additional layer on top of the existing public API. It does not replace direct control creation with `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, or `RadioGroup`, and it does not change the internal MVVM architecture of the framework.
 
 ---
 
@@ -37,14 +37,15 @@ JSON → CheckboxConfigLoader → CheckboxConfig → CheckboxFactory → Checkbo
 JSON → ToggleConfigLoader → ToggleConfig → ToggleFactory → Toggle facade → MVVM internals
 JSON → SliderConfigLoader → SliderConfig → SliderFactory → Slider facade → MVVM internals
 JSON → LabelConfigLoader → LabelConfig → LabelFactory → Label facade → MVVM internals
+JSON → RadioGroupConfigLoader → RadioGroupConfig → RadioGroupFactory → RadioGroup facade → MVVM internals
 ```
 
 Responsibilities:
 
-- `ButtonConfig`, `CheckboxConfig`, `ToggleConfig`, `SliderConfig`, and `LabelConfig` store the parsed control data
-- `ButtonConfigLoader`, `CheckboxConfigLoader`, `ToggleConfigLoader`, `SliderConfigLoader`, and `LabelConfigLoader` read the JSON file and validate the supported fields
-- `ButtonFactory`, `CheckboxFactory`, `ToggleFactory`, `SliderFactory`, and `LabelFactory` create the public facade and apply state and style
-- `Button`, `Checkbox`, `Toggle`, `Slider`, and `Label` remain the public facades used by the sketch
+- `ButtonConfig`, `CheckboxConfig`, `ToggleConfig`, `SliderConfig`, `LabelConfig`, and `RadioGroupConfig` store the parsed control data
+- `ButtonConfigLoader`, `CheckboxConfigLoader`, `ToggleConfigLoader`, `SliderConfigLoader`, `LabelConfigLoader`, and `RadioGroupConfigLoader` read the JSON file and validate the supported fields
+- `ButtonFactory`, `CheckboxFactory`, `ToggleFactory`, `SliderFactory`, `LabelFactory`, and `RadioGroupFactory` create the public facade and apply state and style
+- `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, and `RadioGroup` remain the public facades used by the sketch
 
 This means the external setup becomes config-driven, but the runtime control pipeline remains the same.
 
@@ -245,6 +246,37 @@ public void setup() {
 }
 ```
 
+### 6. RadioGroup
+
+Minimal JSON:
+
+```json
+{
+  "code": "rgJsonTest",
+  "options": ["Mercury", "Venus", "Earth", "Mars", "Jupiter"],
+  "selectedIndex": 2,
+  "x": 350.0,
+  "y": 140.0,
+  "width": 320.0,
+  "enabled": true,
+  "visible": true
+}
+```
+
+Minimal Java sketch flow:
+
+```java
+private static final String RADIO_GROUP_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "radiogroup-test.json";
+
+private RadioGroup radioGroup;
+
+public void setup() {
+    RadioGroupConfigLoader loader = new RadioGroupConfigLoader(this);
+    RadioGroupConfig config = loader.load(RADIO_GROUP_CONFIG_PATH);
+    radioGroup = RadioGroupFactory.create(this, config);
+}
+```
+
 The important part is unchanged from the regular control flow:
 
 - the sketch still assigns listeners in Java
@@ -271,6 +303,13 @@ For `Label`, the JSON route validates the small supported surface directly:
 - `code` is required
 - `text` defaults to `""` when omitted
 - `width` and `height` must be greater than `0`
+
+For `RadioGroup`, the JSON route validates its minimal single-selection surface directly:
+
+- `code` is required
+- `options` is required and must contain at least one string
+- `selectedIndex` must be `-1` or a valid option index
+- `width` must be greater than `0`
 
 ---
 
@@ -468,6 +507,48 @@ Supported label style fields in the current iteration:
 - `alignY`
 - `disabledAlpha`
 
+### 6. RadioGroup style
+
+Example:
+
+```json
+"style": {
+  "textOverride": "#F5F5F5",
+  "indicatorOverride": "#FFFFFF",
+  "hoveredBackgroundOverride": "#2C384A",
+  "pressedBackgroundOverride": "#202A38",
+  "selectedDotOverride": "#389FE8",
+  "itemHeight": 34.0,
+  "itemSpacing": 10.0,
+  "indicatorOuterDiameter": 18.0,
+  "indicatorInnerDiameter": 8.0,
+  "strokeWeight": 1.8,
+  "textSize": 17.0,
+  "cornerRadius": 8.0,
+  "disabledAlpha": 85
+}
+```
+
+Supported radio group style fields in the current iteration:
+
+- `textOverride`
+- `indicatorOverride`
+- `backgroundOverride`
+- `hoveredBackgroundOverride`
+- `pressedBackgroundOverride`
+- `selectedDotOverride`
+- `itemHeight`
+- `itemSpacing`
+- `minimumItemHeight`
+- `indicatorOffsetX`
+- `textOffsetX`
+- `indicatorOuterDiameter`
+- `indicatorInnerDiameter`
+- `strokeWeight`
+- `textSize`
+- `cornerRadius`
+- `disabledAlpha`
+
 ---
 
 ## SVG renderer
@@ -493,6 +574,7 @@ Notes:
 - `Toggle` uses `SvgShapeRenderer`
 - `Slider` uses the same internal `SliderStyle` and `SliderRenderer` path, with the SVG asset applied to the thumb
 - `Label` does not provide SVG support in the current iteration
+- `RadioGroup` does not provide SVG support in the current iteration
 
 This keeps the external JSON declarative while reusing the same rendering mechanism already used by the direct Java API.
 
@@ -701,6 +783,132 @@ JSON:
     "alignY": "center",
     "disabledAlpha": 80
   }
+}
+```
+
+---
+
+### 4. RadioGroup from JSON
+
+JSON:
+
+```json
+{
+  "code": "rgJsonTest",
+  "options": ["Mercury", "Venus", "Earth", "Mars", "Jupiter"],
+  "selectedIndex": 2,
+  "x": 350.0,
+  "y": 140.0,
+  "width": 320.0,
+  "enabled": true,
+  "visible": true,
+  "style": {
+    "textOverride": "#F5F5F5",
+    "indicatorOverride": "#FFFFFF",
+    "hoveredBackgroundOverride": "#2C384A",
+    "pressedBackgroundOverride": "#202A38",
+    "selectedDotOverride": "#389FE8",
+    "itemHeight": 34.0,
+    "itemSpacing": 10.0,
+    "indicatorOuterDiameter": 18.0,
+    "indicatorInnerDiameter": 8.0,
+    "strokeWeight": 1.8,
+    "textSize": 17.0,
+    "cornerRadius": 8.0,
+    "disabledAlpha": 85
+  }
+}
+```
+
+Java:
+
+```java
+import com.cpz.processing.controls.controls.radiogroup.RadioGroup;
+import com.cpz.processing.controls.controls.radiogroup.RadioGroupFactory;
+import com.cpz.processing.controls.controls.radiogroup.config.RadioGroupConfig;
+import com.cpz.processing.controls.controls.radiogroup.config.RadioGroupConfigLoader;
+import com.cpz.processing.controls.controls.radiogroup.input.RadioGroupInputLayer;
+import com.cpz.processing.controls.core.input.InputManager;
+import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.input.KeyboardState;
+import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
+import processing.core.PApplet;
+
+import java.io.File;
+
+public class RadioGroupJsonTest extends PApplet {
+    private static final String RADIO_GROUP_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "radiogroup-test.json";
+
+    private InputManager inputManager;
+    private KeyboardState keyboardState;
+    private ProcessingKeyboardAdapter processingKeyboardAdapter;
+    private RadioGroup radioGroup;
+    private String currentSelection;
+
+    public void settings() {
+        size(700, 360);
+        smooth(8);
+    }
+
+    public void setup() {
+        RadioGroupConfigLoader loader = new RadioGroupConfigLoader(this);
+        RadioGroupConfig config = loader.load(RADIO_GROUP_CONFIG_PATH);
+        radioGroup = RadioGroupFactory.create(this, config);
+        radioGroup.setChangeListener(index -> currentSelection = radioGroup.getSelectedOption());
+        currentSelection = radioGroup.getSelectedOption();
+        // input manager
+        inputManager = new InputManager();
+        inputManager.registerLayer(new RadioGroupInputLayer(0, radioGroup));
+        keyboardState = new KeyboardState();
+        processingKeyboardAdapter = new ProcessingKeyboardAdapter(keyboardState, inputManager);
+        // text output
+        textAlign(CENTER, CENTER);
+    }
+
+    public void draw() {
+        background(28);
+        radioGroup.draw();
+        fill(180);
+        text(radioGroup.getCode() + " | selected = " + currentSelection, 350, 300);
+        text("config-driven radio group using RadioGroupConfigLoader and RadioGroupFactory", 350, 330);
+    }
+
+    public void mouseMoved() {
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) mouseX, (float) mouseY, mouseButton));
+    }
+
+    public void mouseDragged() {
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, (float) mouseX, (float) mouseY, mouseButton));
+    }
+
+    public void mousePressed() {
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float) mouseX, (float) mouseY, mouseButton));
+    }
+
+    public void mouseReleased() {
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) mouseX, (float) mouseY, mouseButton));
+    }
+
+    public void keyPressed() {
+        if (key == ESC) {
+            key = 0;
+        }
+        processingKeyboardAdapter.keyPressed(key, keyCode);
+    }
+
+    public void keyReleased() {
+        if (key == ESC) {
+            key = 0;
+        }
+        processingKeyboardAdapter.keyReleased(key, keyCode);
+    }
+
+    public void keyTyped() {
+        if (key == ESC) {
+            key = 0;
+        }
+        processingKeyboardAdapter.keyTyped(key, keyCode);
+    }
 }
 ```
 

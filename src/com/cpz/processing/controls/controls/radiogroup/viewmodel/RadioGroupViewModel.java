@@ -25,7 +25,7 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    private int pressedIndex = -1;
    private boolean focused;
    private int activeIndex = -1;
-   private Consumer onOptionSelected;
+   private Consumer<Integer> onOptionSelected;
 
    /**
     * Creates a radio group view model.
@@ -48,7 +48,7 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
     * Behavior:
     * - Returns the current value without applying side effects.
     */
-   public List getOptions() {
+   public List<String> getOptions() {
       return ((RadioGroupModel)this.model).getOptions();
    }
 
@@ -73,15 +73,21 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
     * - Updates the public state or registration owned by this type.
     */
    public void setSelectedIndex(int var1) {
-      if (this.isInteractive() && var1 >= 0 && var1 < ((RadioGroupModel)this.model).getOptions().size()) {
-         int var2 = ((RadioGroupModel)this.model).getSelectedIndex();
-         ((RadioGroupModel)this.model).setSelectedIndex(var1);
-         this.activeIndex = var1;
-         if (var2 != ((RadioGroupModel)this.model).getSelectedIndex() && this.onOptionSelected != null) {
-            this.onOptionSelected.accept(((RadioGroupModel)this.model).getSelectedIndex());
-         }
+      int var2 = ((RadioGroupModel)this.model).getSelectedIndex();
+      ((RadioGroupModel)this.model).setSelectedIndex(var1);
+      this.syncActiveIndex();
+      this.hoveredIndex = this.normalizeOptionIndex(this.hoveredIndex);
+      this.pressedIndex = this.normalizeOptionIndex(this.pressedIndex);
+      this.notifySelectionIfChanged(var2);
+   }
 
-      }
+   public void setOptions(List<String> var1) {
+      int var2 = ((RadioGroupModel)this.model).getSelectedIndex();
+      ((RadioGroupModel)this.model).setOptions(var1);
+      this.syncActiveIndex();
+      this.hoveredIndex = this.normalizeOptionIndex(this.hoveredIndex);
+      this.pressedIndex = this.normalizeOptionIndex(this.pressedIndex);
+      this.notifySelectionIfChanged(var2);
    }
 
    /**
@@ -177,7 +183,7 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setOnOptionSelected(Consumer var1) {
+   public void setOnOptionSelected(Consumer<Integer> var1) {
       this.onOptionSelected = var1;
    }
 
@@ -513,7 +519,7 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
     * - Executes the public operation exposed by this type.
     */
    public void increment(boolean var1, boolean var2) {
-      this.navigateNext();
+      this.navigatePrevious();
    }
 
    /**
@@ -526,7 +532,7 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
     * - Executes the public operation exposed by this type.
     */
    public void decrement(boolean var1, boolean var2) {
-      this.navigatePrevious();
+      this.navigateNext();
    }
 
    protected void onAvailabilityChanged() {
@@ -559,5 +565,12 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
 
    private boolean isInteractive() {
       return this.isEnabled() && this.isVisible();
+   }
+
+   private void notifySelectionIfChanged(int var1) {
+      int var2 = ((RadioGroupModel)this.model).getSelectedIndex();
+      if (var1 != var2 && this.onOptionSelected != null) {
+         this.onOptionSelected.accept(var2);
+      }
    }
 }

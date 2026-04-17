@@ -1,4 +1,4 @@
-package com.cpz.processing.controls.examples;
+package com.cpz.processing.controls.examples.label;
 
 import com.cpz.processing.controls.controls.label.Label;
 import com.cpz.processing.controls.controls.label.LabelFactory;
