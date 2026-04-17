@@ -33,6 +33,7 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    private boolean focused;
    private boolean editing;
    private BigDecimal lastSyncedValue;
+   private Consumer<String> onTextChanged;
    private Consumer<BigDecimal> onValueChanged;
 
    /**
@@ -77,6 +78,30 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    public BigDecimal getValue() {
       this.syncFromModelIfNotEditing();
       return ((NumericFieldModel)this.model).getValue();
+   }
+
+   /**
+    * Returns parsed value.
+    *
+    * @return current parsed value
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
+   public BigDecimal getParsedValue() {
+      return this.tryParseCurrentText();
+   }
+
+   /**
+    * Returns whether valid.
+    *
+    * @return whether the current condition is satisfied
+    *
+    * Behavior:
+    * - Returns the current value without applying side effects.
+    */
+   public boolean isValid() {
+      return this.tryParseCurrentText() != null;
    }
 
    /**
@@ -274,7 +299,7 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    public void setFocused(boolean var1) {
       this.focused = var1 && this.isEditableContext();
       if (!this.focused) {
-         this.commit();
+         this.commitValue();
          this.selecting = false;
       }
 
@@ -305,6 +330,18 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    }
 
    /**
+    * Updates on text changed.
+    *
+    * @param var1 new on text changed
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
+   public void setOnTextChanged(Consumer<String> var1) {
+      this.onTextChanged = var1;
+   }
+
+   /**
     * Handles focus gained.
     *
     * Behavior:
@@ -324,8 +361,31 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
     */
    public void onFocusLost() {
       this.focused = false;
-      this.commit();
+      this.commitValue();
       this.selecting = false;
+   }
+
+   /**
+    * Updates text.
+    *
+    * @param var1 new text
+    *
+    * Behavior:
+    * - Updates the public state or registration owned by this type.
+    */
+   public void setText(String var1) {
+      if (var1 == null) {
+         throw new IllegalArgumentException("text must not be null");
+      } else if (!this.isCandidateTextAllowed(var1)) {
+         throw new IllegalArgumentException("text must use only digits, an optional leading '-', and a single optional '.': " + var1);
+      } else {
+         this.textBuffer = var1;
+         this.cursorPosition = this.textBuffer.length();
+         this.clearSelection();
+         this.editing = true;
+         this.updateModelFromBufferIfParsable();
+         this.notifyTextChanged();
+      }
    }
 
    /**
@@ -365,6 +425,7 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
                this.clearSelection();
                this.editing = true;
                this.updateModelFromBufferIfParsable();
+               this.notifyTextChanged();
             }
          }
       }
@@ -387,6 +448,7 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
             this.clearSelection();
             this.editing = true;
             this.updateModelFromBufferIfParsable();
+            this.notifyTextChanged();
          }
       }
    }
@@ -407,6 +469,7 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
             this.clearSelection();
             this.editing = true;
             this.updateModelFromBufferIfParsable();
+            this.notifyTextChanged();
          }
       }
    }
@@ -433,6 +496,32 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    public void moveCursorRight() {
       if (this.focused) {
          this.cursorPosition = this.hasSelection() ? this.getSelectionMax() : Math.min(this.textBuffer.length(), this.cursorPosition + 1);
+         this.clearSelection();
+      }
+   }
+
+   /**
+    * Performs move cursor home.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
+   public void moveCursorHome() {
+      if (this.focused) {
+         this.cursorPosition = 0;
+         this.clearSelection();
+      }
+   }
+
+   /**
+    * Performs move cursor end.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
+   public void moveCursorEnd() {
+      if (this.focused) {
+         this.cursorPosition = this.textBuffer.length();
          this.clearSelection();
       }
    }
@@ -491,6 +580,7 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
          this.deleteSelectionInternal();
          this.editing = true;
          this.updateModelFromBufferIfParsable();
+         this.notifyTextChanged();
       }
    }
 
@@ -551,7 +641,6 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
     * - Executes the public operation exposed by this type.
     */
    public void increment(boolean var1, boolean var2) {
-      this.applyStep(this.resolveAdjustedStep(var1, var2));
    }
 
    /**
@@ -564,7 +653,6 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
     * - Executes the public operation exposed by this type.
     */
    public void decrement(boolean var1, boolean var2) {
-      this.applyStep(this.resolveAdjustedStep(var1, var2).negate());
    }
 
    /**
@@ -578,14 +666,6 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
     * - Applies the public interaction flow exposed by this type.
     */
    public void onMouseWheel(float var1, boolean var2, boolean var3) {
-      if (this.focused && this.isInteractive() && var1 != 0.0F) {
-         if (var1 < 0.0F) {
-            this.increment(var2, var3);
-         } else {
-            this.decrement(var2, var3);
-         }
-
-      }
    }
 
    /**
@@ -600,7 +680,12 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       BigDecimal var2 = ((NumericFieldModel)this.model).getValue();
       ((NumericFieldModel)this.model).setValue(this.clampAndNormalize(var1 == null ? this.fallbackForEmptyCommit() : var1));
       this.notifyValueChangedIfNeeded(var2, ((NumericFieldModel)this.model).getValue());
-      this.syncFromModelIfNotEditing();
+      this.textBuffer = this.formatValue(((NumericFieldModel)this.model).getValue());
+      this.editing = false;
+      this.lastSyncedValue = ((NumericFieldModel)this.model).getValue();
+      this.cursorPosition = this.textBuffer.length();
+      this.clearSelection();
+      this.notifyTextChanged();
    }
 
    protected void activate() {
@@ -619,6 +704,7 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
 
    private void setCommittedValue(BigDecimal var1) {
       BigDecimal var2 = ((NumericFieldModel)this.model).getValue();
+      String var4 = this.textBuffer;
       BigDecimal var3 = this.clampAndNormalize(var1 == null ? this.fallbackForEmptyCommit() : var1);
       ((NumericFieldModel)this.model).setValue(var3);
       this.notifyValueChangedIfNeeded(var2, ((NumericFieldModel)this.model).getValue());
@@ -627,6 +713,9 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       this.lastSyncedValue = ((NumericFieldModel)this.model).getValue();
       this.cursorPosition = this.textBuffer.length();
       this.clearSelection();
+      if (!Objects.equals(var4, this.textBuffer)) {
+         this.notifyTextChanged();
+      }
    }
 
    private void updateModelFromBufferIfParsable() {
@@ -765,26 +854,17 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       this.setCommittedValue(var2);
    }
 
-   private BigDecimal resolveAdjustedStep(boolean var1, boolean var2) {
-      BigDecimal var3 = ((NumericFieldModel)this.model).getStep();
-      if (var1) {
-         return var3.multiply(BigDecimal.TEN);
-      } else {
-         return var2 ? var3.divide(BigDecimal.TEN, Math.max(((NumericFieldModel)this.model).getScale() + 1, 1), RoundingMode.HALF_UP) : var3;
-      }
-   }
-
    private BigDecimal clampAndNormalize(BigDecimal var1) {
       return this.clamp(var1).setScale(((NumericFieldModel)this.model).getScale(), RoundingMode.HALF_UP);
    }
 
    private BigDecimal clamp(BigDecimal var1) {
       BigDecimal var2 = var1;
-      if (var1.compareTo(((NumericFieldModel)this.model).getMin()) < 0) {
+      if (((NumericFieldModel)this.model).getMin() != null && var1.compareTo(((NumericFieldModel)this.model).getMin()) < 0) {
          var2 = ((NumericFieldModel)this.model).getMin();
       }
 
-      if (var2.compareTo(((NumericFieldModel)this.model).getMax()) > 0) {
+      if (((NumericFieldModel)this.model).getMax() != null && var2.compareTo(((NumericFieldModel)this.model).getMax()) > 0) {
          var2 = ((NumericFieldModel)this.model).getMax();
       }
 
@@ -792,7 +872,7 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    }
 
    private String formatValue(BigDecimal var1) {
-      return var1.setScale(((NumericFieldModel)this.model).getScale(), RoundingMode.HALF_UP).toPlainString();
+      return var1.setScale(((NumericFieldModel)this.model).getScale(), RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
    }
 
    private boolean isValidInsertion(char var1, int var2, String var3) {
@@ -818,6 +898,17 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
 
          }
       }
+   }
+
+   private void notifyTextChanged() {
+      if (this.onTextChanged != null) {
+         this.onTextChanged.accept(this.textBuffer);
+      }
+   }
+
+   private BigDecimal tryParseCurrentText() {
+      this.syncFromModelIfNotEditing();
+      return this.tryParse(this.textBuffer == null ? "" : this.textBuffer.trim());
    }
 
    private void deleteSelectionInternal() {
@@ -873,6 +964,5 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
     * - Executes the public operation exposed by this type.
     */
    public void commit() {
-      this.commitValue();
    }
 }

@@ -1,0 +1,19 @@
+{
+  "code": "numJsonTest",
+  "text": "12.5",
+  "x": 380.0,
+  "y": 110.0,
+  "width": 420.0,
+  "height": 48.0,
+  "enabled": true,
+  "visible": true,
+  "style": {
+    "backgroundColor": "#ECF2F8",
+    "borderColor": "#48749C",
+    "textColor": "#1C2C3E",
+    "cursorColor": "#2684D4",
+    "selectionColor": "#B6D9F8",
+    "selectionTextColor": "#1C2C3E",
+    "textSize": 16.0
+  }
+}

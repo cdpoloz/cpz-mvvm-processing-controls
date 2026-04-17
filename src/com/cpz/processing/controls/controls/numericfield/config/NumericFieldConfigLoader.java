@@ -1,0 +1,89 @@
+package com.cpz.processing.controls.controls.numericfield.config;
+
+import com.cpz.processing.controls.core.util.JsonConfigSupport;
+import processing.core.PApplet;
+import processing.data.JSONObject;
+
+import java.util.Objects;
+
+/**
+ * Loads a minimal numeric field config from a JSON file.
+ */
+public final class NumericFieldConfigLoader {
+    private final PApplet sketch;
+
+    public NumericFieldConfigLoader(PApplet sketch) {
+        this.sketch = Objects.requireNonNull(sketch, "sketch");
+    }
+
+    public NumericFieldConfig load(String path) {
+        Objects.requireNonNull(path, "path");
+        JSONObject root = this.sketch.loadJSONObject(path);
+        if (root == null) {
+            throw new IllegalArgumentException("Could not load numeric field JSON config: " + path);
+        }
+
+        float width = root.getFloat("width");
+        float height = root.getFloat("height");
+        JsonConfigSupport.validatePositiveDimension("width", width, path);
+        JsonConfigSupport.validatePositiveDimension("height", height, path);
+
+        String text = root.getString("text", "");
+        validateText(text, path);
+
+        return new NumericFieldConfig(
+                JsonConfigSupport.getRequiredString(root, "code", path, "numericfield"),
+                text,
+                root.getFloat("x"),
+                root.getFloat("y"),
+                width,
+                height,
+                root.getBoolean("enabled", true),
+                root.getBoolean("visible", true),
+                this.readStyle(root, path)
+        );
+    }
+
+    private NumericFieldConfig.StyleConfig readStyle(JSONObject root, String path) {
+        if (!root.hasKey("style") || root.isNull("style")) {
+            return null;
+        }
+
+        JSONObject style = root.getJSONObject("style");
+        return new NumericFieldConfig.StyleConfig(
+                JsonConfigSupport.getOptionalColor(style, "backgroundColor", path),
+                JsonConfigSupport.getOptionalColor(style, "borderColor", path),
+                JsonConfigSupport.getOptionalColor(style, "textColor", path),
+                JsonConfigSupport.getOptionalColor(style, "cursorColor", path),
+                JsonConfigSupport.getOptionalColor(style, "selectionColor", path),
+                JsonConfigSupport.getOptionalColor(style, "selectionTextColor", path),
+                JsonConfigSupport.getOptionalFloat(style, "textSize")
+        );
+    }
+
+    private static void validateText(String text, String path) {
+        int dots = 0;
+        int minus = 0;
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (Character.isDigit(ch)) {
+                continue;
+            }
+            if (ch == '.') {
+                dots++;
+                if (dots > 1) {
+                    throw new IllegalArgumentException("Invalid numeric field text in " + path + ": " + text + ". Expected at most one '.'.");
+                }
+                continue;
+            }
+            if (ch == '-') {
+                minus++;
+                if (minus > 1 || i != 0) {
+                    throw new IllegalArgumentException("Invalid numeric field text in " + path + ": " + text + ". Expected an optional leading '-'.");
+                }
+                continue;
+            }
+            throw new IllegalArgumentException("Invalid numeric field text in " + path + ": " + text + ". Expected digits, an optional leading '-', and an optional '.'.");
+        }
+    }
+}

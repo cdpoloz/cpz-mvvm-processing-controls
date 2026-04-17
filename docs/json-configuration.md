@@ -2,9 +2,9 @@
 
 This document shows how to create controls from JSON configuration files.
 
-In the current iteration, the framework supports a single `Button`, a single `Checkbox`, a single `Toggle`, a single `Slider`, a single `Label`, a single `RadioGroup`, or a single `TextField` created from JSON, including optional SVG renderer setup configured through the style block for the controls that already support it.
+In the current iteration, the framework supports a single `Button`, a single `Checkbox`, a single `Toggle`, a single `Slider`, a single `Label`, a single `RadioGroup`, a single `TextField`, or a single `NumericField` created from JSON, including optional SVG renderer setup configured through the style block for the controls that already support it.
 
-JSON configuration is an additional layer on top of the existing public API. It does not replace direct control creation with `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, or `TextField`, and it does not change the internal MVVM architecture of the framework.
+JSON configuration is an additional layer on top of the existing public API. It does not replace direct control creation with `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, or `NumericField`, and it does not change the internal MVVM architecture of the framework.
 
 ---
 
@@ -39,14 +39,15 @@ JSON → SliderConfigLoader → SliderConfig → SliderFactory → Slider facade
 JSON → LabelConfigLoader → LabelConfig → LabelFactory → Label facade → MVVM internals
 JSON → RadioGroupConfigLoader → RadioGroupConfig → RadioGroupFactory → RadioGroup facade → MVVM internals
 JSON → TextFieldConfigLoader → TextFieldConfig → TextFieldFactory → TextField facade → MVVM internals
+JSON → NumericFieldConfigLoader → NumericFieldConfig → NumericFieldFactory → NumericField facade → MVVM internals
 ```
 
 Responsibilities:
 
-- `ButtonConfig`, `CheckboxConfig`, `ToggleConfig`, `SliderConfig`, `LabelConfig`, `RadioGroupConfig`, and `TextFieldConfig` store the parsed control data
-- `ButtonConfigLoader`, `CheckboxConfigLoader`, `ToggleConfigLoader`, `SliderConfigLoader`, `LabelConfigLoader`, `RadioGroupConfigLoader`, and `TextFieldConfigLoader` read the JSON file and validate the supported fields
-- `ButtonFactory`, `CheckboxFactory`, `ToggleFactory`, `SliderFactory`, `LabelFactory`, `RadioGroupFactory`, and `TextFieldFactory` create the public facade and apply state and style
-- `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, and `TextField` remain the public facades used by the sketch
+- `ButtonConfig`, `CheckboxConfig`, `ToggleConfig`, `SliderConfig`, `LabelConfig`, `RadioGroupConfig`, `TextFieldConfig`, and `NumericFieldConfig` store the parsed control data
+- `ButtonConfigLoader`, `CheckboxConfigLoader`, `ToggleConfigLoader`, `SliderConfigLoader`, `LabelConfigLoader`, `RadioGroupConfigLoader`, `TextFieldConfigLoader`, and `NumericFieldConfigLoader` read the JSON file and validate the supported fields
+- `ButtonFactory`, `CheckboxFactory`, `ToggleFactory`, `SliderFactory`, `LabelFactory`, `RadioGroupFactory`, `TextFieldFactory`, and `NumericFieldFactory` create the public facade and apply state and style
+- `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, and `NumericField` remain the public facades used by the sketch
 
 This means the external setup becomes config-driven, but the runtime control pipeline remains the same.
 
@@ -321,6 +322,53 @@ public void setup() {
 }
 ```
 
+### 8. NumericField
+
+Minimal JSON:
+
+```json
+{
+  "code": "numJsonTest",
+  "text": "12.5",
+  "x": 380.0,
+  "y": 110.0,
+  "width": 420.0,
+  "height": 48.0,
+  "enabled": true,
+  "visible": true
+}
+```
+
+Minimal Java sketch flow:
+
+```java
+private static final String NUMERIC_FIELD_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "numericfield-test.json";
+
+private InputManager inputManager;
+private KeyboardState keyboardState;
+private ProcessingKeyboardAdapter processingKeyboardAdapter;
+private NumericField numericField;
+
+public void setup() {
+    NumericFieldConfigLoader loader = new NumericFieldConfigLoader(this);
+    NumericFieldConfig config = loader.load(NUMERIC_FIELD_CONFIG_PATH);
+    numericField = NumericFieldFactory.create(this, config);
+
+    numericField.setChangeListener(value -> {
+        System.out.println("NumericField text = " + value);
+    });
+
+    numericField.setValueChangeListener(value -> {
+        System.out.println("NumericField value = " + value);
+    });
+
+    inputManager = new InputManager();
+    inputManager.registerLayer(new NumericFieldInputLayer(0, numericField));
+    keyboardState = new KeyboardState();
+    processingKeyboardAdapter = new ProcessingKeyboardAdapter(keyboardState, inputManager);
+}
+```
+
 The important part is unchanged from the regular control flow:
 
 - the sketch still assigns listeners in Java
@@ -359,6 +407,13 @@ For `TextField`, the JSON route validates the small supported editing surface di
 
 - `code` is required
 - `text` defaults to `""` when omitted
+- `width` and `height` must be greater than `0`
+
+For `NumericField`, the JSON route validates its small numeric editing surface directly:
+
+- `code` is required
+- `text` defaults to `""` when omitted
+- `text` must use only digits, an optional leading `-`, and an optional `.`
 - `width` and `height` must be greater than `0`
 
 ---
@@ -616,6 +671,32 @@ Example:
 ```
 
 Supported text field style fields in the current iteration:
+
+- `backgroundColor`
+- `borderColor`
+- `textColor`
+- `cursorColor`
+- `selectionColor`
+- `selectionTextColor`
+- `textSize`
+
+### 8. NumericField style
+
+Example:
+
+```json
+"style": {
+  "backgroundColor": "#ECF2F8",
+  "borderColor": "#48749C",
+  "textColor": "#1C2C3E",
+  "cursorColor": "#2684D4",
+  "selectionColor": "#B6D9F8",
+  "selectionTextColor": "#1C2C3E",
+  "textSize": 16.0
+}
+```
+
+Supported numeric field style fields in the current iteration:
 
 - `backgroundColor`
 - `borderColor`

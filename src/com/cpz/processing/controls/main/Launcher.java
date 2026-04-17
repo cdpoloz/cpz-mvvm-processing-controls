@@ -5,6 +5,7 @@ import java.util.Locale;
 import com.cpz.processing.controls.examples.button.*;
 import com.cpz.processing.controls.examples.checkbox.*;
 import com.cpz.processing.controls.examples.label.*;
+import com.cpz.processing.controls.examples.numericfield.*;
 import com.cpz.processing.controls.examples.radiogroup.*;
 import com.cpz.processing.controls.examples.slider.*;
 import com.cpz.processing.controls.examples.textfield.*;
@@ -69,16 +70,17 @@ public class Launcher {
       //PApplet.main(RadioGroupJsonTest.class);
 
       // TextField *************************************
-      PApplet.main(TextFieldTest.class);
+      //PApplet.main(TextFieldTest.class);
       //PApplet.main(TextFieldJsonTest.class);
 
+      // NumericField **********************************
+      //PApplet.main(NumericFieldTest.class);
+      //PApplet.main(NumericFieldJsonTest.class);
+
       //PApplet.main(DropDownDevSketch.class);
-      //PApplet.main(LabelDevSketch.class);
       //PApplet.main(NumericFieldDevSketch.class);
-      //PApplet.main(RadioGroupDevSketch.class);
-        //PApplet.main(BindingDevSketch.class);
-        //PApplet.main(TextFieldDevSketch.class);
-        //PApplet.main(ThemeDevSketch.class);
-        //PApplet.main(BindingDevSketch.class);
+      //PApplet.main(BindingDevSketch.class);
+      //PApplet.main(ThemeDevSketch.class);
+      //PApplet.main(BindingDevSketch.class);
     }
 }

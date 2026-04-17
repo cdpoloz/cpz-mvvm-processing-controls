@@ -49,9 +49,9 @@ public final class NumericFieldModel implements Enableable {
 
    public NumericFieldModel(String var1, BigDecimal var2, BigDecimal var3, BigDecimal var4, BigDecimal var5, boolean var6, boolean var7, int var8) {
       this.code = Objects.requireNonNull(var1, "code");
-      this.min = var3 == null ? BigDecimal.ZERO : var3;
-      this.max = var4 == null ? this.min : var4;
-      if (this.max.compareTo(this.min) < 0) {
+      this.min = var3;
+      this.max = var4;
+      if (this.min != null && this.max != null && this.max.compareTo(this.min) < 0) {
          BigDecimal var9 = this.min;
          this.min = this.max;
          this.max = var9;
@@ -61,7 +61,7 @@ public final class NumericFieldModel implements Enableable {
       this.setStep(var5);
       this.allowNegative = var6;
       this.allowDecimal = var7;
-      this.setValue(var2 == null ? this.min : var2);
+      this.setValue(var2 == null ? BigDecimal.ZERO : var2);
    }
 
    public String getCode() {
@@ -89,7 +89,7 @@ public final class NumericFieldModel implements Enableable {
     * - Updates the public state or registration owned by this type.
     */
    public void setValue(BigDecimal var1) {
-      this.value = this.clamp(var1 == null ? this.min : var1);
+      this.value = this.clamp(var1 == null ? BigDecimal.ZERO : var1);
    }
 
    /**
@@ -113,8 +113,8 @@ public final class NumericFieldModel implements Enableable {
     * - Updates the public state or registration owned by this type.
     */
    public void setMin(BigDecimal var1) {
-      this.min = var1 == null ? BigDecimal.ZERO : var1;
-      if (this.max.compareTo(this.min) < 0) {
+      this.min = var1;
+      if (this.min != null && this.max != null && this.max.compareTo(this.min) < 0) {
          this.max = this.min;
       }
 
@@ -142,8 +142,8 @@ public final class NumericFieldModel implements Enableable {
     * - Updates the public state or registration owned by this type.
     */
    public void setMax(BigDecimal var1) {
-      this.max = var1 == null ? this.min : var1;
-      if (this.max.compareTo(this.min) < 0) {
+      this.max = var1;
+      if (this.min != null && this.max != null && this.max.compareTo(this.min) < 0) {
          this.max = this.min;
       }
 
@@ -275,10 +275,10 @@ public final class NumericFieldModel implements Enableable {
    }
 
    private BigDecimal clamp(BigDecimal var1) {
-      if (var1.compareTo(this.min) < 0) {
+      if (this.min != null && var1.compareTo(this.min) < 0) {
          return this.min;
       } else {
-         return var1.compareTo(this.max) > 0 ? this.max : var1;
+         return this.max != null && var1.compareTo(this.max) > 0 ? this.max : var1;
       }
    }
 }
