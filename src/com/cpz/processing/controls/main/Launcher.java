@@ -84,7 +84,7 @@ public class Launcher {
         //PApplet.main(DropDownJsonTest.class);
 
         // Composition **********************************
-        PApplet.main(JsonMultiControlBindingTest.class);
+        //PApplet.main(JsonMultiControlBindingTest.class);
 
         //PApplet.main(ThemeDevSketch.class);
     }
