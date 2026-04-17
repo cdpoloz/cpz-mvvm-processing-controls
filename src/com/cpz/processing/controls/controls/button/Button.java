@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.controls.button;
 
+import com.cpz.processing.controls.controls.Control;
 import com.cpz.processing.controls.controls.button.input.ButtonInputAdapter;
 import com.cpz.processing.controls.controls.button.model.ButtonModel;
 import com.cpz.processing.controls.controls.button.style.ButtonStyle;
@@ -27,7 +28,7 @@ import processing.core.PApplet;
  * Notes:
  * - This type is a facade over the existing MVVM architecture, not a replacement for it.
  */
-public final class Button {
+public final class Button implements Control {
     private final ButtonModel model;
     private final ButtonViewModel viewModel;
     private final ButtonView view;

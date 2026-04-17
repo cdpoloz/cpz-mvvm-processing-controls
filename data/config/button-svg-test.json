@@ -1,25 +1,30 @@
 {
-  "code": "btnSvgJsonTest",
-  "text": "SVG Button",
-  "x": 300.0,
-  "y": 125.0,
-  "width": 150.0,
-  "height": 130.0,
-  "enabled": true,
-  "visible": true,
-  "style": {
-    "baseColor": "#3062DB",
-    "textColor": "#FFFFFF",
-    "strokeColor": "#FFFFFF",
-    "strokeWeight": 2.0,
-    "strokeWeightHover": 4.0,
-    "cornerRadius": 18.0,
-    "disabledAlpha": 90,
-    "hoverBlendWithWhite": 0.12,
-    "pressedBlendWithBlack": 0.25,
-    "renderer": {
-      "type": "svg",
-      "path": "data/img/test.svg"
+  "controls": [
+    {
+      "type": "button",
+      "code": "btnSvgJsonTest",
+      "text": "SVG Button",
+      "x": 300.0,
+      "y": 125.0,
+      "width": 150.0,
+      "height": 130.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "baseColor": "#3062DB",
+        "textColor": "#FFFFFF",
+        "strokeColor": "#FFFFFF",
+        "strokeWeight": 2.0,
+        "strokeWeightHover": 4.0,
+        "cornerRadius": 18.0,
+        "disabledAlpha": 90,
+        "hoverBlendWithWhite": 0.12,
+        "pressedBlendWithBlack": 0.25,
+        "renderer": {
+          "type": "svg",
+          "path": "data/img/test.svg"
+        }
+      }
     }
-  }
+  ]
 }

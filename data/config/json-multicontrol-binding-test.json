@@ -1,0 +1,138 @@
+{
+  "controls": [
+    {
+      "type": "label",
+      "code": "lblTitle",
+      "text": "JSON Multi-Control + Binding",
+      "x": 80.0,
+      "y": 32.0,
+      "width": 700.0,
+      "height": 34.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "textSize": 24.0,
+        "textColor": "#EAF4FF",
+        "lineSpacingMultiplier": 1.1,
+        "alignX": "start",
+        "alignY": "top",
+        "disabledAlpha": 80
+      }
+    },
+    {
+      "type": "label",
+      "code": "lblHelp",
+      "text": "Slider and NumericField are synchronized. Binding is resolved in the sketch, not in the JSON.",
+      "x": 80.0,
+      "y": 72.0,
+      "width": 700.0,
+      "height": 52.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "textSize": 15.0,
+        "textColor": "#BFD0E4",
+        "lineSpacingMultiplier": 1.2,
+        "alignX": "start",
+        "alignY": "top",
+        "disabledAlpha": 80
+      }
+    },
+    {
+      "type": "slider",
+      "code": "sldValue",
+      "min": 0.0,
+      "max": 100.0,
+      "step": 0.5,
+      "value": 42.0,
+      "x": 250.0,
+      "y": 150.0,
+      "width": 400.0,
+      "height": 64.0,
+      "orientation": "horizontal",
+      "snapMode": "always",
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "trackColor": "#3E4856",
+        "trackHoverColor": "#566274",
+        "trackPressedColor": "#2C3440",
+        "trackStrokeColor": "#DCDCDC",
+        "trackStrokeWeight": 1.5,
+        "trackStrokeWeightHover": 2.5,
+        "trackThickness": 10.0,
+        "activeTrackColor": "#389FE8",
+        "activeTrackHoverColor": "#62B8F4",
+        "activeTrackPressedColor": "#267CB8",
+        "thumbColor": "#FFFFFF",
+        "thumbHoverColor": "#C6EAFF",
+        "thumbPressedColor": "#AADCFF",
+        "thumbStrokeColor": "#204E78",
+        "thumbStrokeWeight": 2.0,
+        "thumbStrokeWeightHover": 3.0,
+        "thumbSize": 28.0,
+        "textColor": "#F5F5F5",
+        "disabledAlpha": 90,
+        "showValueText": true
+      }
+    },
+    {
+      "type": "numericfield",
+      "code": "numValue",
+      "text": "42.0",
+      "x": 600.0,
+      "y": 160.0,
+      "width": 180.0,
+      "height": 48.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "backgroundColor": "#ECF2F8",
+        "borderColor": "#48749C",
+        "textColor": "#1C2C3E",
+        "cursorColor": "#2684D4",
+        "selectionColor": "#B6D9F8",
+        "selectionTextColor": "#1C2C3E",
+        "textSize": 16.0
+      }
+    },
+    {
+      "type": "label",
+      "code": "lblCurrentValue",
+      "text": "Current value: 42.0",
+      "x": 80.0,
+      "y": 240.0,
+      "width": 320.0,
+      "height": 28.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "textSize": 17.0,
+        "textColor": "#F0F6FF",
+        "lineSpacingMultiplier": 1.1,
+        "alignX": "start",
+        "alignY": "top",
+        "disabledAlpha": 80
+      }
+    },
+    {
+      "type": "label",
+      "code": "lblValidity",
+      "text": "Valid value",
+      "x": 80.0,
+      "y": 274.0,
+      "width": 240.0,
+      "height": 28.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "textSize": 17.0,
+        "textColor": "#A9EBC0",
+        "lineSpacingMultiplier": 1.1,
+        "alignX": "start",
+        "alignY": "top",
+        "disabledAlpha": 80
+      }
+    }
+  ]
+}

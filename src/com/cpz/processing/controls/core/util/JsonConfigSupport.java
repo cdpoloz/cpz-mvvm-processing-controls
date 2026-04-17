@@ -1,13 +1,92 @@
 package com.cpz.processing.controls.core.util;
 
+import processing.core.PApplet;
 import processing.data.JSONArray;
 import processing.data.JSONObject;
+
+import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Small shared helpers for config-driven JSON loading.
  */
 public final class JsonConfigSupport {
     private JsonConfigSupport() {
+    }
+
+    public static JSONObject loadRequiredObject(PApplet sketch, String path, String context) {
+        Objects.requireNonNull(sketch, "sketch");
+        Objects.requireNonNull(path, "path");
+
+        try {
+            JSONObject root = sketch.loadJSONObject(path);
+            if (root == null) {
+                throw new IllegalArgumentException("Could not load " + context + " JSON config: " + path);
+            }
+            return root;
+        } catch (RuntimeException ex) {
+            throw new IllegalArgumentException("Could not load " + context + " JSON config: " + path, ex);
+        }
+    }
+
+    public static JSONObject unwrapSingleControlDocument(JSONObject root, String path, String expectedType, String context) {
+        Objects.requireNonNull(root, "root");
+        Objects.requireNonNull(path, "path");
+        Objects.requireNonNull(expectedType, "expectedType");
+        Objects.requireNonNull(context, "context");
+
+        if (!root.hasKey("controls")) {
+            return root;
+        }
+
+        JSONArray controls = getRequiredArray(root, "controls", path);
+        if (controls.size() != 1) {
+            throw new IllegalArgumentException(
+                    "Invalid 'controls' value in " + path + " for " + context
+                            + ". Expected exactly one control entry when using the control-specific loader."
+            );
+        }
+
+        Object rawControl = controls.get(0);
+        if (!(rawControl instanceof JSONObject)) {
+            throw new IllegalArgumentException(
+                    "Invalid 'controls[0]' value in " + path + " for " + context + ". Expected an object."
+            );
+        }
+
+        JSONObject controlJson = (JSONObject) rawControl;
+        String controlPath = path + " -> controls[0]";
+        String rawType = getRequiredString(controlJson, "type", controlPath, "control");
+        String normalizedType = normalizeControlType(rawType);
+        String normalizedExpectedType = normalizeControlType(expectedType);
+        if (!normalizedExpectedType.equals(normalizedType)) {
+            throw new IllegalArgumentException(
+                    "Invalid 'type' value in " + controlPath + ": " + rawType
+                            + ". Expected '" + expectedType + "' for " + context + "."
+            );
+        }
+
+        return controlJson;
+    }
+
+    public static JSONArray getRequiredArray(JSONObject json, String key, String path) {
+        if (!json.hasKey(key) || json.isNull(key)) {
+            throw new IllegalArgumentException("Missing required key '" + key + "' in " + path + ".");
+        }
+
+        Object value = json.get(key);
+        if (!(value instanceof JSONArray)) {
+            throw new IllegalArgumentException(
+                    "Invalid '" + key + "' value in " + path + ": expected an array."
+            );
+        }
+
+        return (JSONArray) value;
+    }
+
+    public static String normalizeControlType(String value) {
+        Objects.requireNonNull(value, "value");
+        return value.trim().toLowerCase(Locale.ROOT);
     }
 
     public static Integer getOptionalColor(JSONObject json, String key, String path) {
@@ -50,6 +129,16 @@ public final class JsonConfigSupport {
             throw new IllegalArgumentException("Missing required key '" + key + "' in " + path + " for " + context + ".");
         }
         return json.getString(key);
+    }
+
+    public static String getRequiredNonBlankString(JSONObject json, String key, String path, String context) {
+        String value = getRequiredString(json, key, path, context);
+        if (value.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Invalid '" + key + "' value in " + path + " for " + context + ": expected a non-blank string."
+            );
+        }
+        return value;
     }
 
     public static void validatePositiveDimension(String key, float value, String path) {

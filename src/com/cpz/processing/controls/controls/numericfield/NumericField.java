@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.numericfield;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
+import com.cpz.processing.controls.controls.Control;
 import com.cpz.processing.controls.controls.numericfield.input.NumericFieldInputAdapter;
 import com.cpz.processing.controls.controls.numericfield.model.NumericFieldModel;
 import com.cpz.processing.controls.controls.numericfield.style.NumericFieldStyle;
@@ -19,7 +20,7 @@ import java.util.Objects;
 /**
  * Convenience facade for the numeric field control.
  */
-public final class NumericField {
+public final class NumericField implements Control {
     private static final BigDecimal DEFAULT_MIN = null;
     private static final BigDecimal DEFAULT_MAX = null;
     private static final BigDecimal DEFAULT_STEP = BigDecimal.ONE;

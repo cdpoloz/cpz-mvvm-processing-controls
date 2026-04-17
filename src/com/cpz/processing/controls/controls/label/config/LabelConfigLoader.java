@@ -21,11 +21,16 @@ public final class LabelConfigLoader {
 
     public LabelConfig load(String path) {
         Objects.requireNonNull(path, "path");
-        JSONObject root = this.sketch.loadJSONObject(path);
-        if (root == null) {
-            throw new IllegalArgumentException("Could not load label JSON config: " + path);
-        }
+        JSONObject root = JsonConfigSupport.unwrapSingleControlDocument(
+                JsonConfigSupport.loadRequiredObject(this.sketch, path, "label"),
+                path,
+                "label",
+                "label"
+        );
+        return this.loadFromJson(root, path);
+    }
 
+    public LabelConfig loadFromJson(JSONObject root, String path) {
         float width = root.getFloat("width");
         float height = root.getFloat("height");
         JsonConfigSupport.validatePositiveDimension("width", width, path);

@@ -1,18 +1,23 @@
 {
-  "code": "lblJsonTest",
-  "text": "Label facade\nJSON example",
-  "x": 120.0,
-  "y": 70.0,
-  "width": 360.0,
-  "height": 100.0,
-  "enabled": true,
-  "visible": true,
-  "style": {
-    "textSize": 24.0,
-    "textColor": "#D2E4FF",
-    "lineSpacingMultiplier": 1.2,
-    "alignX": "center",
-    "alignY": "center",
-    "disabledAlpha": 80
-  }
+  "controls": [
+    {
+      "type": "label",
+      "code": "lblJsonTest",
+      "text": "Label facade\nJSON example",
+      "x": 120.0,
+      "y": 70.0,
+      "width": 360.0,
+      "height": 100.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "textSize": 24.0,
+        "textColor": "#D2E4FF",
+        "lineSpacingMultiplier": 1.2,
+        "alignX": "center",
+        "alignY": "center",
+        "disabledAlpha": 80
+      }
+    }
+  ]
 }

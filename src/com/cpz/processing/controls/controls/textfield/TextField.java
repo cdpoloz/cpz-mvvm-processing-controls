@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.textfield;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
+import com.cpz.processing.controls.controls.Control;
 import com.cpz.processing.controls.controls.textfield.input.TextFieldInputAdapter;
 import com.cpz.processing.controls.controls.textfield.model.TextFieldModel;
 import com.cpz.processing.controls.controls.textfield.style.TextFieldStyle;
@@ -18,7 +19,7 @@ import java.util.Objects;
 /**
  * Convenience facade for the text field control.
  */
-public final class TextField {
+public final class TextField implements Control {
     private final TextFieldModel model;
     private final TextFieldViewModel viewModel;
     private final TextFieldView view;

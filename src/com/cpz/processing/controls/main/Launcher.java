@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import com.cpz.processing.controls.examples.button.*;
 import com.cpz.processing.controls.examples.checkbox.*;
+import com.cpz.processing.controls.examples.composition.*;
 import com.cpz.processing.controls.examples.dropdown.*;
 import com.cpz.processing.controls.examples.label.*;
 import com.cpz.processing.controls.examples.numericfield.*;
@@ -82,7 +83,9 @@ public class Launcher {
         //PApplet.main(DropDownTest.class);
         //PApplet.main(DropDownJsonTest.class);
 
-        //PApplet.main(BindingDevSketch.class);
+        // Composition **********************************
+        PApplet.main(JsonMultiControlBindingTest.class);
+
         //PApplet.main(ThemeDevSketch.class);
     }
 }

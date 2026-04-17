@@ -49,11 +49,6 @@ package "Overlay" {
   class OverlayManager
 }
 
-package "Binding" {
-  class Binding
-  interface ValueListener<T>
-}
-
 ThemeManager ..|> ThemeProvider
 ThemeProvider --> ThemeSnapshot
 ThemeSnapshot --> ThemeTokens
@@ -70,6 +65,4 @@ InputLayer --> InputAdapter : forwards
 InputAdapter --> PointerInputTarget : pointer events
 InputAdapter --> KeyboardInputTarget : keyboard events
 FocusManager --> KeyboardInputTarget : focuses
-
-Binding --> ValueListener : registers
 @enduml

@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.slider;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
+import com.cpz.processing.controls.controls.Control;
 import com.cpz.processing.controls.controls.slider.input.SliderInputAdapter;
 import com.cpz.processing.controls.controls.slider.model.SliderModel;
 import com.cpz.processing.controls.controls.slider.model.SliderOrientation;
@@ -19,7 +20,7 @@ import java.util.function.Function;
 /**
  * Convenience facade for the slider control.
  */
-public final class Slider {
+public final class Slider implements Control {
     private final SliderModel model;
     private final SliderViewModel viewModel;
     private final SliderView view;

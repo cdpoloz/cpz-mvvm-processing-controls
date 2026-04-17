@@ -21,11 +21,16 @@ public final class DropDownConfigLoader {
 
     public DropDownConfig load(String path) {
         Objects.requireNonNull(path, "path");
-        JSONObject root = this.sketch.loadJSONObject(path);
-        if (root == null) {
-            throw new IllegalArgumentException("Could not load drop down JSON config: " + path);
-        }
+        JSONObject root = JsonConfigSupport.unwrapSingleControlDocument(
+                JsonConfigSupport.loadRequiredObject(this.sketch, path, "drop down"),
+                path,
+                "dropdown",
+                "dropdown"
+        );
+        return this.loadFromJson(root, path);
+    }
 
+    public DropDownConfig loadFromJson(JSONObject root, String path) {
         float width = root.getFloat("width");
         float height = root.getFloat("height");
         JsonConfigSupport.validatePositiveDimension("width", width, path);

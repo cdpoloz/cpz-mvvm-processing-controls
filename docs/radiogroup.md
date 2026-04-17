@@ -225,7 +225,7 @@ The public single-group flow supports:
 `RadioGroup` also supports the same minimal config-driven path used by the other closed controls:
 
 ```text
-JSON → RadioGroupConfigLoader → RadioGroupConfig → RadioGroupFactory → RadioGroup facade → MVVM internals
+JSON -> controls[] -> RadioGroupConfigLoader -> RadioGroupConfig -> RadioGroupFactory -> RadioGroup facade -> MVVM internals
 ```
 
 Minimal JSON:
@@ -264,7 +264,7 @@ The current JSON validation is intentionally small and explicit:
 - `selectedIndex` must be `-1` or a valid option index
 - `width` must be greater than `0`
 
-The config-driven layer still remains limited to one control per JSON file, with no listeners, no binding, and no layout document.
+For simple single-control examples, `RadioGroupConfigLoader` accepts the wrapped `controls` document when it contains exactly one `radiogroup` entry. Binding and listeners still remain outside JSON.
 
 ---
 
@@ -395,3 +395,4 @@ public class RadioGroupTest extends PApplet {
 - [JSON Configuration](json-configuration.md)
 - [Input system](input-system.md)
 - [Architecture](architecture.md)
+

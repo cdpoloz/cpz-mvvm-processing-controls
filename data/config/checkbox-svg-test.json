@@ -1,26 +1,31 @@
 {
-  "code": "chkSvgJsonTest",
-  "checked": true,
-  "x": 300.0,
-  "y": 125.0,
-  "width": 88.0,
-  "height": 72.0,
-  "enabled": true,
-  "visible": true,
-  "style": {
-    "boxColor": "#3062DB",
-    "boxHoverColor": "#4A7AEA",
-    "boxPressedColor": "#224DB8",
-    "checkColor": "#FFFFFF",
-    "borderColor": "#FFFFFF",
-    "borderWidth": 2.0,
-    "borderWidthHover": 4.0,
-    "cornerRadius": 0.0,
-    "disabledAlpha": 90,
-    "checkInset": 0.22,
-    "renderer": {
-      "type": "svg",
-      "path": "data/img/test.svg"
+  "controls": [
+    {
+      "type": "checkbox",
+      "code": "chkSvgJsonTest",
+      "checked": true,
+      "x": 300.0,
+      "y": 125.0,
+      "width": 88.0,
+      "height": 72.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "boxColor": "#3062DB",
+        "boxHoverColor": "#4A7AEA",
+        "boxPressedColor": "#224DB8",
+        "checkColor": "#FFFFFF",
+        "borderColor": "#FFFFFF",
+        "borderWidth": 2.0,
+        "borderWidthHover": 4.0,
+        "cornerRadius": 0.0,
+        "disabledAlpha": 90,
+        "checkInset": 0.22,
+        "renderer": {
+          "type": "svg",
+          "path": "data/img/test.svg"
+        }
+      }
     }
-  }
+  ]
 }

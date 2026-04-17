@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.toggle;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
+import com.cpz.processing.controls.controls.Control;
 import com.cpz.processing.controls.controls.toggle.input.ToggleInputAdapter;
 import com.cpz.processing.controls.controls.toggle.model.ToggleModel;
 import com.cpz.processing.controls.controls.toggle.style.ToggleStyle;
@@ -15,7 +16,7 @@ import java.util.Objects;
 /**
  * Convenience facade for the toggle control.
  */
-public final class Toggle {
+public final class Toggle implements Control {
     private final ToggleModel model;
     private final ToggleViewModel viewModel;
     private final ToggleView view;

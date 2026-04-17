@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.radiogroup;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
+import com.cpz.processing.controls.controls.Control;
 import com.cpz.processing.controls.controls.radiogroup.input.RadioGroupInputAdapter;
 import com.cpz.processing.controls.controls.radiogroup.model.RadioGroupModel;
 import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupStyle;
@@ -19,7 +20,7 @@ import java.util.Objects;
 /**
  * Convenience facade for the radio group control.
  */
-public final class RadioGroup {
+public final class RadioGroup implements Control {
     private final RadioGroupModel model;
     private final RadioGroupViewModel viewModel;
     private final RadioGroupView view;

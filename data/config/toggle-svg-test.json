@@ -1,24 +1,29 @@
 {
-  "code": "tglSvgJsonTest",
-  "state": 0,
-  "totalStates": 3,
-  "x": 300.0,
-  "y": 130.0,
-  "width": 96.0,
-  "height": 96.0,
-  "enabled": true,
-  "visible": true,
-  "style": {
-    "stateColors": ["#5064DC", "#EBA028", "#20BCB0"],
-    "strokeColor": "#FFFFFF",
-    "strokeWidth": 1.5,
-    "strokeWidthHover": 3.5,
-    "hoverBlendWithWhite": 0.14,
-    "pressedBlendWithBlack": 0.24,
-    "disabledAlpha": 70,
-    "renderer": {
-      "type": "svg",
-      "path": "data/img/test.svg"
+  "controls": [
+    {
+      "type": "toggle",
+      "code": "tglSvgJsonTest",
+      "state": 0,
+      "totalStates": 3,
+      "x": 300.0,
+      "y": 130.0,
+      "width": 96.0,
+      "height": 96.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "stateColors": ["#5064DC", "#EBA028", "#20BCB0"],
+        "strokeColor": "#FFFFFF",
+        "strokeWidth": 1.5,
+        "strokeWidthHover": 3.5,
+        "hoverBlendWithWhite": 0.14,
+        "pressedBlendWithBlack": 0.24,
+        "disabledAlpha": 70,
+        "renderer": {
+          "type": "svg",
+          "path": "data/img/test.svg"
+        }
+      }
     }
-  }
+  ]
 }

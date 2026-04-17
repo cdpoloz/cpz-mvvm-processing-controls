@@ -14,6 +14,12 @@ explicit input routing, and high-performance rendering.
 
 This project is a UI framework intended for Processing sketches and for other host environments that can provide normalized input events.
 
+The public control layer is exposed through closed ergonomic facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, and `DropDown`.
+
+Those facades also share a lightweight public contract, `Control`, for the small transversal surface that is common across the controls without exposing MVVM internals.
+
+The JSON layer can also create one or more controls from a single document and returns them as `Map<String, Control>`. JSON remains structural only: binding and behavior wiring stay in sketch code.
+
 The framework does not depend on Processing internally for input dispatch or interaction rules. It consumes framework-owned `PointerEvent` and `KeyboardEvent` instances that are expected to be produced by external adapters.
 
 That separation keeps rendering concerns, interaction logic, and host-framework integration independent from each other.
@@ -87,15 +93,23 @@ Both event types are normalized at the adapter boundary and consumed by the fram
 
 ## Quick Example
 
-``` java
-Binding.bind(sliderViewModel::getValue, value ->
-labelViewModel.setText(value.toString()), sliderViewModel::addListener
-);
+```java
+ControlConfigLoader loader = new ControlConfigLoader(this);
+Map<String, Control> controls = loader.load("data/config/json-multicontrol-binding-test.json");
+
+Slider slider = (Slider) controls.get("sldValue");
+NumericField numericField = (NumericField) controls.get("numValue");
+Label currentValue = (Label) controls.get("lblCurrentValue");
+
+slider.setChangeListener(value -> {
+    numericField.setValue(value);
+    currentValue.setText("Current value: " + slider.getFormattedValue());
+});
 ```
 
-`Slider` updates `Label` through an explicit unidirectional binding.
+This keeps structure in JSON and behavior in the sketch: `ControlConfigLoader` creates closed facades, `Map<String, Control>` provides the common composition surface, and the sketch wires the controls together.
 
-More advanced examples, including bidirectional binding demonstrations, are available in `BindingDevSketch`.
+The canonical multi-control example is `JsonMultiControlBindingTest`, which shows bidirectional sketch binding between `Slider` and `NumericField` and uses `Label` for all visible text.
 
 ---
 
@@ -103,17 +117,20 @@ More advanced examples, including bidirectional binding demonstrations, are avai
 
 1. Add Processing to your project when Processing is your host environment.
 2. Include this library in your classpath.
-3. Create your ViewModels and Views.
+3. Create controls directly through the public facades or load them from JSON with `ControlConfigLoader`.
 4. Provide normalized input events through an external adapter.
 5. Dispatch those events through `InputManager`.
-6. Call `draw()` inside your host render loop.
+6. Resolve listeners and binding in the sketch.
+7. Call `draw()` inside your host render loop.
 
 Typical flow:
 
-- ViewModels handle state and interaction
-- Views handle layout and `ViewState` creation
-- Styles resolve visual properties
-- Renderers draw using the host rendering layer
+- facades expose the public API used by the sketch
+- `Control` provides the minimal common contract when a mixed collection is enough
+- JSON can create `Map<String, Control>` for composition-oriented sketches
+- binding stays in the sketch instead of being declared in JSON
+
+At the public API level, each concrete facade keeps its own domain-specific methods, while `Control` provides only the minimal common contract for drawing, code identity, visibility, enabled state, and positioning.
 
 You can find working examples in:
 
@@ -159,6 +176,14 @@ Supporting infrastructure:
 - `OverlayManager` coordinates overlay ordering
 - `ThemeManager` exposes cached `ThemeSnapshot` instances to styles
 
+Public API notes:
+
+- closed concrete facades remain the main public entry points for each control
+- the public `Control` interface captures only the minimal transversal facade surface
+- `Control` is distinct from `ControlView`, which belongs to the internal MVVM view layer
+- the JSON layer creates closed facades and returns them through `Map<String, Control>`
+- JSON does not define binding; binding remains sketch-side
+
 ---
 
 ## Rendering Model
@@ -177,13 +202,14 @@ This keeps theme work outside the hot render path and preserves MVVM boundaries.
 
 ## Binding
 
-The core binding utility is intentionally small and explicit.
+Binding is explicit and sketch-side.
 
-- Unidirectional binding is part of the core API through `Binding.bind(...)`
-- Multiple targets are supported by wiring more than one listener from the same source
-- Bidirectional binding is not part of the core API and is demonstrated only as an advanced example in `BindingDevSketch`
+- controls are composed through public facades
+- JSON can load a mixed set of controls as `Map<String, Control>`
+- the sketch wires listeners and synchronization explicitly
+- JSON does not define binding
 
-This design avoids hidden data flows and keeps all synchronization logic visible at the application level.
+This keeps all synchronization logic visible at the application level and preserves a single public narrative around facades and composition.
 
 See [Binding](docs/binding.md).
 
@@ -199,9 +225,9 @@ That template demonstrates how to connect Processing callbacks to the framework 
 
 ## Project Structure
 
-- `src/com/cpz/processing/controls/common`: shared infrastructure such as binding
+- `src/com/cpz/processing/controls/common`: shared infrastructure and utilities
 - `src/com/cpz/processing/controls/core`: cross-cutting MVVM, input, theme, overlay, focus, and layout primitives
-- `src/com/cpz/processing/controls/controls`: concrete controls organized by feature
+- `src/com/cpz/processing/controls/controls`: public control facades and the minimal shared `Control` contract
 - `src/com/cpz/processing/controls/examples`: example sketches used as interactive playgrounds
 - `docs`: human-facing documentation
 - `docs/uml`: PlantUML diagrams
@@ -210,9 +236,11 @@ That template demonstrates how to connect Processing callbacks to the framework 
 
 ## Documentation
 
+- [Control](docs/control.md)
 - [Architecture](docs/architecture.md)
 - [Binding](docs/binding.md)
 - [Input System](docs/input-system.md)
+- [JSON Configuration](docs/json-configuration.md)
 - [Button](docs/button.md)
 - [Checkbox](docs/checkbox.md)
 - [Dropdown](docs/dropdown.md)
@@ -222,6 +250,8 @@ That template demonstrates how to connect Processing callbacks to the framework 
 - [Slider](docs/slider.md)
 - [TextField](docs/textfield.md)
 - [Toggle](docs/toggle.md)
+
+The JSON documentation includes a canonical multi-control example that loads `Map<String, Control>` from one document and resolves binding in the sketch with `Label` used for all visible text.
 
 ---
 

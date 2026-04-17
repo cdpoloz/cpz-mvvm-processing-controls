@@ -1,201 +1,3 @@
-# Binding
-
-Binding in this framework means explicit synchronization between public controls in the sketch.
-
-There is no declarative binding layer in JSON and there is no hidden runtime magic. The recommended composition flow is:
-
-- load or create closed facades
-- keep structure in JSON when useful
-- recover the typed facades needed for behavior
-- wire those controls together explicitly in the sketch
-
-The canonical example is:
-
-- `JsonMultiControlBindingTest`
-- [json-multicontrol-binding-test.json](../data/config/json-multicontrol-binding-test.json)
-
----
-
-## What The Canonical Example Demonstrates
-
-The canonical example shows:
-
-- a multi-control JSON document
-- loading with `ControlConfigLoader`
-- a `Map<String, Control>` as the composition surface
-- bidirectional sketch binding between `Slider` and `NumericField`
-- derived `Label` updates for current value and validity
-- `Label` used for all visible text in the example
-
-This is the recommended starting point for UI composition with the current facade-based public API.
-
----
-
-## JSON Of The Example
-
-The JSON file defines:
-
-- the control set
-- layout
-- style
-- base text
-
-It does not define:
-
-- listeners
-- binding
-- business behavior
-
-The document uses the multi-control format:
-
-```json
-{
-  "controls": [
-    {
-      "type": "label",
-      "code": "lblTitle",
-      "text": "JSON Multi-Control + Binding"
-    },
-    {
-      "type": "slider",
-      "code": "sldValue"
-    },
-    {
-      "type": "numericfield",
-      "code": "numValue"
-    }
-  ]
-}
-```
-
-The real example file is [json-multicontrol-binding-test.json](../data/config/json-multicontrol-binding-test.json).
-
-The important boundary is simple:
-
-- JSON defines structure
-- the sketch defines synchronization
-
----
-
-## Sketch Step By Step
-
-### 1. Load The JSON
-
-The sketch starts from the public multi-control loader:
-
-```java
-ControlConfigLoader loader = new ControlConfigLoader(this);
-Map<String, Control> controls = loader.load(CONFIG_PATH);
-```
-
-At this point the sketch has a heterogeneous collection of closed public facades.
-
-### 2. Recover The Controls Needed For Behavior
-
-The sketch only resolves typed references for the controls that participate in behavior:
-
-```java
-sldValue = requireControl(controls, "sldValue", Slider.class);
-numValue = requireControl(controls, "numValue", NumericField.class);
-lblCurrentValue = requireControl(controls, "lblCurrentValue", Label.class);
-lblValidity = requireControl(controls, "lblValidity", Label.class);
-```
-
-Other controls from the same JSON document, such as the title and help labels, can remain in the generic collection and still be drawn through `Control`.
-
-### 3. Register The Input Needed By Those Controls
-
-The sketch keeps input orchestration explicit:
-
-```java
-inputManager = new InputManager();
-inputManager.registerLayer(new SliderInputLayer(0, sldValue));
-inputManager.registerLayer(new NumericFieldInputLayer(1, numValue));
-keyboardState = new KeyboardState();
-processingKeyboardAdapter = new ProcessingKeyboardAdapter(keyboardState, inputManager);
-```
-
-### 4. Connect The Binding In The Sketch
-
-The synchronization is done with listeners on the public facades:
-
-```java
-sldValue.setChangeListener(value -> syncFromSlider());
-numValue.setChangeListener(value -> syncFromNumericField());
-```
-
-No part of that binding is declared in JSON.
-
-### 5. Avoid Loops With `internalUpdate`
-
-The sketch uses a local guard:
-
-```java
-private boolean internalUpdate;
-```
-
-Each synchronization path returns early if the current change was caused programmatically.
-
-### 6. Update The Derived Labels
-
-The sketch updates derived UI text explicitly:
-
-```java
-private void refreshDerivedLabels() {
-    lblCurrentValue.setText("Current value: " + sldValue.getFormattedValue());
-    lblValidity.setText(numValue.isValid() ? "Valid value" : "Invalid value");
-}
-```
-
-This keeps all visible text inside `Label` controls instead of using `text()`.
-
-### 7. Draw The Collection Uniformly
-
-The common `Control` contract makes the render pass simple:
-
-```java
-for (Control control : controls.values()) {
-    control.draw();
-}
-```
-
-That is the practical value of `Control` in composition-oriented sketches.
-
----
-
-## Anti-Loop And Synchronization
-
-Bidirectional synchronization needs a local guard because:
-
-- changing the slider updates the numeric field
-- changing the numeric field can update the slider
-- without a guard, one programmatic update can trigger the other recursively
-
-The example solves that with `internalUpdate`.
-
-The numeric-field path also does one extra thing:
-
-```java
-if (numValue.isValid()) {
-    BigDecimal parsedValue = numValue.getValue();
-    if (parsedValue != null) {
-        sldValue.setValue(parsedValue);
-        numValue.setValue(sldValue.getValue());
-    }
-}
-```
-
-That re-applies the final slider value back into `NumericField` after the slider has normalized it. This matters because the slider owns range and step normalization, so the sketch uses the final slider value as the committed synchronized value.
-
-If the numeric field is in an intermediate invalid state, the sketch does not push that state into the slider. It only refreshes the derived labels.
-
----
-
-## Complete Example
-
-Full sketch:
-
-```java
 package com.cpz.processing.controls.examples.composition;
 
 import com.cpz.processing.controls.controls.Control;
@@ -229,6 +31,7 @@ public class JsonMultiControlBindingTest extends PApplet {
     private Label lblCurrentValue;
     private Label lblValidity;
 
+    // Guards bidirectional updates triggered by programmatic synchronization.
     private boolean internalUpdate;
 
     public void settings() {
@@ -247,7 +50,7 @@ public class JsonMultiControlBindingTest extends PApplet {
         numValue = requireControl(controls, "numValue", NumericField.class);
         lblCurrentValue = requireControl(controls, "lblCurrentValue", Label.class);
         lblValidity = requireControl(controls, "lblValidity", Label.class);
-        
+
         // input manager
         inputManager = new InputManager();
         inputManager.registerLayer(new SliderInputLayer(0, sldValue));
@@ -314,6 +117,7 @@ public class JsonMultiControlBindingTest extends PApplet {
         internalUpdate = true;
         try {
             numValue.setValue(sldValue.getValue());
+            // Derived labels also belong to the sketch-side behavior layer.
             refreshDerivedLabels();
         } finally {
             internalUpdate = false;
@@ -345,6 +149,7 @@ public class JsonMultiControlBindingTest extends PApplet {
                 BigDecimal parsedValue = numValue.getValue();
                 if (parsedValue != null) {
                     sldValue.setValue(parsedValue);
+                    // Re-apply the normalized slider value so both controls show the same committed value.
                     numValue.setValue(sldValue.getValue());
                 }
             }
@@ -373,27 +178,3 @@ public class JsonMultiControlBindingTest extends PApplet {
         return type.cast(control);
     }
 }
-```
-
-The JSON used by that sketch is [json-multicontrol-binding-test.json](../data/config/json-multicontrol-binding-test.json).
-
----
-
-## Current Model
-
-For the current public facade architecture, the primary learning path is:
-
-1. compose controls through facades
-2. load them from JSON when useful
-3. use `Map<String, Control>` as the common surface
-4. resolve binding explicitly in the sketch
-
-This keeps the public API focused on facades, explicit composition, and sketch-side behavior.
-
----
-
-## Historical Note
-
-Earlier iterations of the project explored a lower-level binding helper around ViewModel synchronization.
-
-That approach was removed to enforce a single public composition model based on closed facades, `Control`, optional JSON multi-control loading, and explicit synchronization in the sketch.

@@ -1,21 +1,26 @@
 {
-  "code": "btnJsonTest",
-  "text": "JSON Button",
-  "x": 300.0,
-  "y": 125.0,
-  "width": 220.0,
-  "height": 60.0,
-  "enabled": true,
-  "visible": true,
-  "style": {
-    "baseColor": "#3062DB",
-    "textColor": "#FFFFFF",
-    "strokeColor": "#FFFFFF",
-    "strokeWeight": 2.0,
-    "strokeWeightHover": 4.0,
-    "cornerRadius": 18.0,
-    "disabledAlpha": 90,
-    "hoverBlendWithWhite": 0.12,
-    "pressedBlendWithBlack": 0.25
-  }
+  "controls": [
+    {
+      "type": "button",
+      "code": "btnJsonTest",
+      "text": "JSON Button",
+      "x": 300.0,
+      "y": 125.0,
+      "width": 220.0,
+      "height": 60.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "baseColor": "#3062DB",
+        "textColor": "#FFFFFF",
+        "strokeColor": "#FFFFFF",
+        "strokeWeight": 2.0,
+        "strokeWeightHover": 4.0,
+        "cornerRadius": 18.0,
+        "disabledAlpha": 90,
+        "hoverBlendWithWhite": 0.12,
+        "pressedBlendWithBlack": 0.25
+      }
+    }
+  ]
 }

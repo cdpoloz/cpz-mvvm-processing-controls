@@ -19,11 +19,16 @@ public final class ToggleConfigLoader {
 
     public ToggleConfig load(String path) {
         Objects.requireNonNull(path, "path");
-        JSONObject root = this.sketch.loadJSONObject(path);
-        if (root == null) {
-            throw new IllegalArgumentException("Could not load toggle JSON config: " + path);
-        }
+        JSONObject root = JsonConfigSupport.unwrapSingleControlDocument(
+                JsonConfigSupport.loadRequiredObject(this.sketch, path, "toggle"),
+                path,
+                "toggle",
+                "toggle"
+        );
+        return this.loadFromJson(root, path);
+    }
 
+    public ToggleConfig loadFromJson(JSONObject root, String path) {
         float width = root.getFloat("width");
         float height = root.getFloat("height");
         JsonConfigSupport.validatePositiveDimension("width", width, path);

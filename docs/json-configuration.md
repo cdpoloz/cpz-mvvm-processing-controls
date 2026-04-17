@@ -1,806 +1,276 @@
 # JSON Configuration
 
-This document shows how to create controls from JSON configuration files.
+This document describes the JSON configuration layer for the public control facades.
 
-In the current iteration, the framework supports a single `Button`, a single `Checkbox`, a single `Toggle`, a single `Slider`, a single `Label`, a single `RadioGroup`, a single `TextField`, a single `NumericField`, or a single `DropDown` created from JSON, including optional SVG renderer setup configured through the style block for the controls that already support it.
-
-JSON configuration is an additional layer on top of the existing public API. It does not replace direct control creation with `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, or `DropDown`, and it does not change the internal MVVM architecture of the framework.
+JSON configuration is an optional layer on top of the existing public API. It does not replace direct control creation, it does not change the internal MVVM architecture, and it does not define binding or behavior orchestration.
 
 ---
 
 ## Overview
 
-JSON configuration introduces an optional config-driven layer that solves a specific problem:
+The JSON layer supports one or more controls in the same document through a single root array:
 
-- it moves geometry and visual setup out of Java code
-- it makes simple control setup easier to externalize
-- it keeps behavior and input wiring in the sketch
+```json
+{
+  "controls": [
+    {
+      "type": "<control-type>",
+      "code": "<unique-code>"
+    }
+  ]
+}
+```
 
-The integration model is intentionally small:
+Rules:
 
-- JSON describes configuration
-- the loader parses JSON into a config DTO
-- the factory creates the public control facade
-- the sketch still owns input and behavior
+- `controls` is required
+- each entry represents one independent public control facade
+- `type` is required
+- `code` is required
+- all other fields remain control-specific
+- JSON does not define listeners
+- JSON does not define binding
 
-Internally, the framework still uses the same MVVM-based control implementations. JSON is only a configuration layer in front of that flow.
+Binding remains sketch-side code.
 
 ---
 
-## Architecture
+## Public Result
 
-The config-driven flows are:
+The main JSON loader returns:
+
+```java
+Map<String, Control>
+```
+
+Where:
+
+- the key is the control `code`
+- the value is the concrete public facade implementing `Control`
+- insertion order is preserved
+
+This keeps the result explicit and lightweight while staying aligned with the closed facade model of the framework.
+
+---
+
+## Main Loading Flow
+
+The primary multi-control flow is:
 
 ```text
-JSON → ButtonConfigLoader → ButtonConfig → ButtonFactory → Button facade → MVVM internals
-JSON → CheckboxConfigLoader → CheckboxConfig → CheckboxFactory → Checkbox facade → MVVM internals
-JSON → ToggleConfigLoader → ToggleConfig → ToggleFactory → Toggle facade → MVVM internals
-JSON → SliderConfigLoader → SliderConfig → SliderFactory → Slider facade → MVVM internals
-JSON → LabelConfigLoader → LabelConfig → LabelFactory → Label facade → MVVM internals
-JSON → RadioGroupConfigLoader → RadioGroupConfig → RadioGroupFactory → RadioGroup facade → MVVM internals
-JSON → TextFieldConfigLoader → TextFieldConfig → TextFieldFactory → TextField facade → MVVM internals
-JSON → NumericFieldConfigLoader → NumericFieldConfig → NumericFieldFactory → NumericField facade → MVVM internals
-JSON -> DropDownConfigLoader -> DropDownConfig -> DropDownFactory -> DropDown facade -> MVVM internals
+JSON -> ControlConfigLoader -> ControlFactoryRegistry -> concrete control factories -> Map<String, Control>
 ```
 
 Responsibilities:
 
-- `ButtonConfig`, `CheckboxConfig`, `ToggleConfig`, `SliderConfig`, `LabelConfig`, `RadioGroupConfig`, `TextFieldConfig`, `NumericFieldConfig`, and `DropDownConfig` store the parsed control data
-- `ButtonConfigLoader`, `CheckboxConfigLoader`, `ToggleConfigLoader`, `SliderConfigLoader`, `LabelConfigLoader`, `RadioGroupConfigLoader`, `TextFieldConfigLoader`, `NumericFieldConfigLoader`, and `DropDownConfigLoader` read the JSON file and validate the supported fields
-- `ButtonFactory`, `CheckboxFactory`, `ToggleFactory`, `SliderFactory`, `LabelFactory`, `RadioGroupFactory`, `TextFieldFactory`, `NumericFieldFactory`, and `DropDownFactory` create the public facade and apply state and style
-- `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, and `DropDown` remain the public facades used by the sketch
+- `ControlConfigLoader` reads the JSON document, validates the root structure, validates duplicate `code` values, and builds the public result map
+- `ControlFactoryRegistry` resolves `type` to the corresponding control-specific loader and factory
+- control-specific loaders validate the supported properties for their own control type
+- control-specific factories create the concrete public facades
 
-This means the external setup becomes config-driven, but the runtime control pipeline remains the same.
+The JSON layer still ends at public facades. It does not expose `View`, `ViewModel`, input adapters, or other MVVM internals.
 
 ---
 
-## Minimal examples
-
-### 1. Button
-
-Minimal JSON:
-
-```json
-{
-  "code": "btnJsonTest",
-  "text": "JSON Button",
-  "x": 300.0,
-  "y": 125.0,
-  "width": 220.0,
-  "height": 60.0,
-  "enabled": true,
-  "visible": true
-}
-```
-
-Minimal Java sketch flow:
-
-```java
-private static final String BUTTON_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "button-test.json";
-
-private InputManager inputManager;
-private Button button;
-
-public void setup() {
-    ButtonConfigLoader loader = new ButtonConfigLoader(this);
-    ButtonConfig config = loader.load(BUTTON_CONFIG_PATH);
-    button = ButtonFactory.create(this, config);
-
-    button.setClickListener(() -> {
-        System.out.println("You clicked the JSON button!");
-    });
-
-    inputManager = new InputManager();
-    inputManager.registerLayer(new ButtonInputLayer(0, button));
-}
-```
-
-### 2. Checkbox
-
-Minimal JSON:
-
-```json
-{
-  "code": "chkJsonTest",
-  "checked": true,
-  "x": 300.0,
-  "y": 125.0,
-  "width": 42.0,
-  "height": 42.0,
-  "enabled": true,
-  "visible": true
-}
-```
-
-Minimal Java sketch flow:
-
-```java
-private static final String CHECKBOX_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "checkbox-test.json";
-
-private InputManager inputManager;
-private Checkbox checkbox;
-
-public void setup() {
-    CheckboxConfigLoader loader = new CheckboxConfigLoader(this);
-    CheckboxConfig config = loader.load(CHECKBOX_CONFIG_PATH);
-    checkbox = CheckboxFactory.create(this, config);
-
-    checkbox.setChangeListener(value -> {
-        System.out.println("Checkbox checked = " + value);
-    });
-
-    inputManager = new InputManager();
-    inputManager.registerLayer(new CheckboxInputLayer(0, checkbox));
-}
-```
-
-### 3. Toggle
-
-Minimal JSON:
-
-```json
-{
-  "code": "tglJsonTest",
-  "state": 0,
-  "totalStates": 3,
-  "x": 300.0,
-  "y": 130.0,
-  "width": 96.0,
-  "height": 96.0,
-  "enabled": true,
-  "visible": true
-}
-```
-
-Minimal Java sketch flow:
-
-```java
-private static final String TOGGLE_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "toggle-test.json";
-
-private InputManager inputManager;
-private Toggle toggle;
-
-public void setup() {
-    ToggleConfigLoader loader = new ToggleConfigLoader(this);
-    ToggleConfig config = loader.load(TOGGLE_CONFIG_PATH);
-    toggle = ToggleFactory.create(this, config);
-
-    toggle.setChangeListener(value -> {
-        System.out.println("Toggle state = " + value);
-    });
-
-    inputManager = new InputManager();
-    inputManager.registerLayer(new ToggleInputLayer(0, toggle));
-}
-```
-
-### 4. Slider
-
-Minimal JSON:
-
-```json
-{
-  "code": "sldJsonTest",
-  "min": 0.0,
-  "max": 1.0,
-  "step": 0.05,
-  "value": 0.35,
-  "x": 300.0,
-  "y": 130.0,
-  "width": 320.0,
-  "height": 72.0,
-  "orientation": "horizontal",
-  "snapMode": "always",
-  "enabled": true,
-  "visible": true
-}
-```
-
-Minimal Java sketch flow:
-
-```java
-private static final String SLIDER_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "slider-test.json";
-
-private InputManager inputManager;
-private Slider slider;
-
-public void setup() {
-    SliderConfigLoader loader = new SliderConfigLoader(this);
-    SliderConfig config = loader.load(SLIDER_CONFIG_PATH);
-    slider = SliderFactory.create(this, config);
-
-    slider.setChangeListener(value -> {
-        System.out.println("Slider value = " + value);
-    });
-
-    inputManager = new InputManager();
-    inputManager.registerLayer(new SliderInputLayer(0, slider));
-}
-```
-
-### 5. Label
-
-Minimal JSON:
-
-```json
-{
-  "code": "lblJsonTest",
-  "text": "Label facade\nJSON example",
-  "x": 120.0,
-  "y": 70.0,
-  "width": 360.0,
-  "height": 100.0,
-  "enabled": true,
-  "visible": true
-}
-```
-
-Minimal Java sketch flow:
-
-```java
-private static final String LABEL_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "label-test.json";
-
-private Label label;
-
-public void setup() {
-    LabelConfigLoader loader = new LabelConfigLoader(this);
-    LabelConfig config = loader.load(LABEL_CONFIG_PATH);
-    label = LabelFactory.create(this, config);
-}
-```
-
-### 6. RadioGroup
-
-Minimal JSON:
-
-```json
-{
-  "code": "rgJsonTest",
-  "options": ["Mercury", "Venus", "Earth", "Mars", "Jupiter"],
-  "selectedIndex": 2,
-  "x": 350.0,
-  "y": 140.0,
-  "width": 320.0,
-  "enabled": true,
-  "visible": true
-}
-```
-
-Minimal Java sketch flow:
-
-```java
-private static final String RADIO_GROUP_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "radiogroup-test.json";
-
-private RadioGroup radioGroup;
-
-public void setup() {
-    RadioGroupConfigLoader loader = new RadioGroupConfigLoader(this);
-    RadioGroupConfig config = loader.load(RADIO_GROUP_CONFIG_PATH);
-    radioGroup = RadioGroupFactory.create(this, config);
-}
-```
-
-### 7. TextField
-
-Minimal JSON:
-
-```json
-{
-  "code": "txtJsonTest",
-  "text": "Config-driven text field",
-  "x": 380.0,
-  "y": 110.0,
-  "width": 420.0,
-  "height": 48.0,
-  "enabled": true,
-  "visible": true
-}
-```
-
-Minimal Java sketch flow:
-
-```java
-private static final String TEXT_FIELD_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "textfield-test.json";
-
-private InputManager inputManager;
-private KeyboardState keyboardState;
-private ProcessingKeyboardAdapter processingKeyboardAdapter;
-private TextField textField;
-
-public void setup() {
-    TextFieldConfigLoader loader = new TextFieldConfigLoader(this);
-    TextFieldConfig config = loader.load(TEXT_FIELD_CONFIG_PATH);
-    textField = TextFieldFactory.create(this, config);
-
-    textField.setChangeListener(value -> {
-        System.out.println("TextField text = " + value);
-    });
-
-    inputManager = new InputManager();
-    inputManager.registerLayer(new TextFieldInputLayer(0, textField));
-    keyboardState = new KeyboardState();
-    processingKeyboardAdapter = new ProcessingKeyboardAdapter(keyboardState, inputManager);
-}
-```
-
-### 8. NumericField
-
-Minimal JSON:
-
-```json
-{
-  "code": "numJsonTest",
-  "text": "12.5",
-  "x": 380.0,
-  "y": 110.0,
-  "width": 420.0,
-  "height": 48.0,
-  "enabled": true,
-  "visible": true
-}
-```
-
-Minimal Java sketch flow:
-
-```java
-private static final String NUMERIC_FIELD_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "numericfield-test.json";
-
-private InputManager inputManager;
-private KeyboardState keyboardState;
-private ProcessingKeyboardAdapter processingKeyboardAdapter;
-private NumericField numericField;
-
-public void setup() {
-    NumericFieldConfigLoader loader = new NumericFieldConfigLoader(this);
-    NumericFieldConfig config = loader.load(NUMERIC_FIELD_CONFIG_PATH);
-    numericField = NumericFieldFactory.create(this, config);
-
-    numericField.setChangeListener(value -> {
-        System.out.println("NumericField text = " + value);
-    });
-
-    numericField.setValueChangeListener(value -> {
-        System.out.println("NumericField value = " + value);
-    });
-
-    inputManager = new InputManager();
-    inputManager.registerLayer(new NumericFieldInputLayer(0, numericField));
-    keyboardState = new KeyboardState();
-    processingKeyboardAdapter = new ProcessingKeyboardAdapter(keyboardState, inputManager);
-}
-```
-
-### 9. DropDown
-
-Minimal JSON:
-
-```json
-{
-  "code": "ddJsonTest",
-  "items": ["Mercury", "Venus", "Earth", "Mars", "Jupiter"],
-  "selectedIndex": 2,
-  "x": 380.0,
-  "y": 110.0,
-  "width": 420.0,
-  "height": 48.0,
-  "enabled": true,
-  "visible": true
-}
-```
-
-Minimal Java sketch flow:
-
-```java
-private static final String DROP_DOWN_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "dropdown-test.json";
-
-private InputManager inputManager;
-private OverlayManager overlayManager;
-private DropDown dropDown;
-
-public void setup() {
-    inputManager = new InputManager();
-    overlayManager = new OverlayManager();
-
-    DropDownConfigLoader loader = new DropDownConfigLoader(this);
-    DropDownConfig config = loader.load(DROP_DOWN_CONFIG_PATH);
-    dropDown = DropDownFactory.create(this, overlayManager, inputManager, config);
-
-    inputManager.registerLayer(new DropDownInputLayer(0, dropDown));
-}
-```
-
-`DropDown` still does not define keyboard behavior through JSON. If the host wants `ESC` to close the open overlay in a JSON-driven sketch, that remains host-side policy; in the public example this is only consumed while a top overlay exists, and otherwise Processing keeps its normal `ESC` behavior.
-
-The important part is unchanged from the regular control flow:
-
-- the sketch still assigns listeners in Java
-- the sketch still creates the `InputManager`
-- the sketch still registers the control-specific input layer
-- the JSON provides the stable control identity through the required `code` field
-
-The configuration only defines structure and appearance. Behavior remains defined in Java.
-
-For `Toggle`, the JSON route is stricter than the direct Java API:
-
-- invalid `totalStates` or `state` values fail fast during loading
-- the loader throws a clear exception instead of coercing the values
-
-For `Slider`, the JSON route also validates configuration strictly before the control is created:
-
-- `min` must be lower than `max`
-- `step` must be greater than `0`
-- `value` must already be inside the configured range
-- `orientation`, `snapMode`, and `svgColorMode` only accept the documented values
-
-For `Label`, the JSON route validates the small supported surface directly:
-
-- `code` is required
-- `text` defaults to `""` when omitted
-- `width` and `height` must be greater than `0`
-
-For `RadioGroup`, the JSON route validates its minimal single-selection surface directly:
-
-- `code` is required
-- `options` is required and must contain at least one string
-- `selectedIndex` must be `-1` or a valid option index
-- `width` must be greater than `0`
-
-For `TextField`, the JSON route validates the small supported editing surface directly:
-
-- `code` is required
-- `text` defaults to `""` when omitted
-- `width` and `height` must be greater than `0`
-
-For `NumericField`, the JSON route validates its small numeric editing surface directly:
-
-- `code` is required
-- `text` defaults to `""` when omitted
-- `text` must use only digits, an optional leading `-`, and an optional `.`
-- `width` and `height` must be greater than `0`
-
-For `DropDown`, the JSON route validates its small single-selection surface directly:
-
-- `code` is required
-- `items` is required and must contain at least one string
-- `selectedIndex` must be `-1` or a valid item index
-- `width` and `height` must be greater than `0`
+## Supported Control Types
+
+The current registry supports:
+
+- `button`
+- `checkbox`
+- `toggle`
+- `slider`
+- `label`
+- `radiogroup`
+- `textfield`
+- `numericfield`
+- `dropdown`
+
+`dropdown` requires `OverlayManager` and `InputManager` when the main loader is used, because those are already required by the public `DropDown` facade.
 
 ---
 
-## Style configuration
+## Minimal Example
 
-The optional `style` block maps JSON values to the style config of the selected control.
-
-### 1. Button style
-
-Example:
+Single wrapped control:
 
 ```json
-"style": {
-  "baseColor": "#3062DB",
-  "textColor": "#FFFFFF",
-  "strokeColor": "#FFFFFF",
-  "strokeWeight": 2.0,
-  "strokeWeightHover": 4.0,
-  "cornerRadius": 18.0,
-  "disabledAlpha": 90,
-  "hoverBlendWithWhite": 0.12,
-  "pressedBlendWithBlack": 0.25
+{
+  "controls": [
+    {
+      "type": "button",
+      "code": "btnJsonTest",
+      "text": "JSON Button",
+      "x": 300.0,
+      "y": 125.0,
+      "width": 220.0,
+      "height": 60.0,
+      "enabled": true,
+      "visible": true
+    }
+  ]
 }
 ```
 
-Supported button style fields in the current iteration:
+Java:
 
-- `baseColor`
-- `textColor`
-- `strokeColor`
-- `strokeWeight`
-- `strokeWeightHover`
-- `cornerRadius`
-- `disabledAlpha`
-- `hoverBlendWithWhite`
-- `pressedBlendWithBlack`
+```java
+import com.cpz.processing.controls.controls.Control;
+import com.cpz.processing.controls.controls.button.Button;
+import com.cpz.processing.controls.controls.config.ControlConfigLoader;
 
-### 2. Checkbox style
+import java.util.Map;
 
-Example:
+ControlConfigLoader loader = new ControlConfigLoader(this);
+Map<String, Control> controls = loader.load("data/config/button-test.json");
+Button button = (Button) controls.get("btnJsonTest");
+```
+
+Multi-control document:
 
 ```json
-"style": {
-  "boxColor": "#3062DB",
-  "boxHoverColor": "#4A7AEA",
-  "boxPressedColor": "#224DB8",
-  "checkColor": "#FFFFFF",
-  "borderColor": "#FFFFFF",
-  "borderWidth": 2.0,
-  "borderWidthHover": 4.0,
-  "cornerRadius": 10.0,
-  "disabledAlpha": 90,
-  "checkInset": 0.20
+{
+  "controls": [
+    {
+      "type": "label",
+      "code": "lblTitle",
+      "text": "Configuration Title",
+      "x": 120.0,
+      "y": 50.0,
+      "width": 320.0,
+      "height": 60.0
+    },
+    {
+      "type": "button",
+      "code": "btnPrimary",
+      "text": "Run",
+      "x": 120.0,
+      "y": 140.0,
+      "width": 180.0,
+      "height": 56.0
+    }
+  ]
 }
 ```
 
-Supported checkbox style fields in the current iteration:
+The document defines structure only. Any listener wiring or binding still belongs to the sketch.
 
-- `checkedFillOverride`
-- `uncheckedFillOverride`
-- `hoverFillOverride`
-- `pressedFillOverride`
-- `checkOverride`
-- `strokeOverride`
-- `boxColor`
-- `boxHoverColor`
-- `boxPressedColor`
-- `checkColor`
-- `borderColor`
-- `borderWidth`
-- `borderWidthHover`
-- `cornerRadius`
-- `disabledAlpha`
-- `checkInset`
+Canonical example:
 
-### 3. Toggle style
+- `JsonMultiControlBindingTest`
+- `data/config/json-multicontrol-binding-test.json`
 
-Example:
+That example keeps the scope intentionally small:
 
-```json
-"style": {
-  "stateColors": ["#464646", "#E89B2C", "#20BCB0"],
-  "strokeColor": "#FFFFFF",
-  "strokeWidth": 2.0,
-  "strokeWidthHover": 4.0,
-  "hoverBlendWithWhite": 0.18,
-  "pressedBlendWithBlack": 0.20,
-  "disabledAlpha": 70
-}
-```
+- `Label` for title
+- `Label` for help text
+- `Slider`
+- `NumericField`
+- `Label` for the current value
+- `Label` for validity state
 
-Supported toggle style fields in the current iteration:
+It demonstrates:
 
-- `offFillOverride`
-- `onFillOverride`
-- `hoverFillOverride`
-- `pressedFillOverride`
-- `strokeOverride`
-- `stateColors`
-- `strokeColor`
-- `strokeWidth`
-- `strokeWidthHover`
-- `hoverBlendWithWhite`
-- `pressedBlendWithBlack`
-- `disabledAlpha`
+- loading multiple controls from one JSON document
+- retrieving them from `Map<String, Control>`
+- binding `Slider` and `NumericField` in the sketch
+- updating derived `Label` controls programmatically
+- keeping all visible text in `Label` instead of `text()`
 
-### 4. Slider style
+That example is intentionally explicit:
 
-Example:
-
-```json
-"style": {
-  "trackColor": "#3E4856",
-  "trackHoverColor": "#566274",
-  "trackPressedColor": "#2C3440",
-  "trackStrokeColor": "#DCDCDC",
-  "trackStrokeWeight": 1.5,
-  "trackStrokeWeightHover": 2.5,
-  "trackThickness": 10.0,
-  "activeTrackColor": "#389FE8",
-  "activeTrackHoverColor": "#62B8F4",
-  "activeTrackPressedColor": "#267CB8",
-  "thumbColor": "#FFFFFF",
-  "thumbHoverColor": "#C6EAFF",
-  "thumbPressedColor": "#AADCFF",
-  "thumbStrokeColor": "#204E78",
-  "thumbStrokeWeight": 2.0,
-  "thumbStrokeWeightHover": 3.0,
-  "thumbSize": 28.0,
-  "textColor": "#F5F5F5",
-  "disabledAlpha": 90,
-  "showValueText": true
-}
-```
-
-Supported slider style fields in the current iteration:
-
-- `trackOverride`
-- `trackHoverOverride`
-- `trackPressedOverride`
-- `progressOverride`
-- `progressHoverOverride`
-- `progressPressedOverride`
-- `thumbOverride`
-- `thumbHoverOverride`
-- `thumbPressedOverride`
-- `trackStrokeOverride`
-- `thumbStrokeOverride`
-- `textOverride`
-- `trackColor`
-- `trackHoverColor`
-- `trackPressedColor`
-- `trackStrokeColor`
-- `trackStrokeWeight`
-- `trackStrokeWeightHover`
-- `trackThickness`
-- `activeTrackColor`
-- `activeTrackHoverColor`
-- `activeTrackPressedColor`
-- `thumbColor`
-- `thumbHoverColor`
-- `thumbPressedColor`
-- `thumbStrokeColor`
-- `thumbStrokeWeight`
-- `thumbStrokeWeightHover`
-- `thumbSize`
-- `textColor`
-- `disabledAlpha`
-- `showValueText`
-- `svgColorMode`
-
-The style block only controls appearance. It does not define listeners, input routing, or business behavior.
-
-### 5. Label style
-
-Example:
-
-```json
-"style": {
-  "textSize": 24.0,
-  "textColor": "#D2E4FF",
-  "lineSpacingMultiplier": 1.2,
-  "alignX": "center",
-  "alignY": "center",
-  "disabledAlpha": 80
-}
-```
-
-Supported label style fields in the current iteration:
-
-- `textSize`
-- `textColor`
-- `lineSpacingMultiplier`
-- `alignX`
-- `alignY`
-- `disabledAlpha`
-
-### 6. RadioGroup style
-
-Example:
-
-```json
-"style": {
-  "textOverride": "#F5F5F5",
-  "indicatorOverride": "#FFFFFF",
-  "hoveredBackgroundOverride": "#2C384A",
-  "pressedBackgroundOverride": "#202A38",
-  "selectedDotOverride": "#389FE8",
-  "itemHeight": 34.0,
-  "itemSpacing": 10.0,
-  "indicatorOuterDiameter": 18.0,
-  "indicatorInnerDiameter": 8.0,
-  "strokeWeight": 1.8,
-  "textSize": 17.0,
-  "cornerRadius": 8.0,
-  "disabledAlpha": 85
-}
-```
-
-Supported radio group style fields in the current iteration:
-
-- `textOverride`
-- `indicatorOverride`
-- `backgroundOverride`
-- `hoveredBackgroundOverride`
-- `pressedBackgroundOverride`
-- `selectedDotOverride`
-- `itemHeight`
-- `itemSpacing`
-- `minimumItemHeight`
-- `indicatorOffsetX`
-- `textOffsetX`
-- `indicatorOuterDiameter`
-- `indicatorInnerDiameter`
-- `strokeWeight`
-- `textSize`
-- `cornerRadius`
-- `disabledAlpha`
-
-### 7. TextField style
-
-Example:
-
-```json
-"style": {
-  "backgroundColor": "#ECF2F8",
-  "borderColor": "#48749C",
-  "textColor": "#1C2C3E",
-  "cursorColor": "#2684D4",
-  "selectionColor": "#B6D9F8",
-  "selectionTextColor": "#1C2C3E",
-  "textSize": 16.0
-}
-```
-
-Supported text field style fields in the current iteration:
-
-- `backgroundColor`
-- `borderColor`
-- `textColor`
-- `cursorColor`
-- `selectionColor`
-- `selectionTextColor`
-- `textSize`
-
-### 8. NumericField style
-
-Example:
-
-```json
-"style": {
-  "backgroundColor": "#ECF2F8",
-  "borderColor": "#48749C",
-  "textColor": "#1C2C3E",
-  "cursorColor": "#2684D4",
-  "selectionColor": "#B6D9F8",
-  "selectionTextColor": "#1C2C3E",
-  "textSize": 16.0
-}
-```
-
-Supported numeric field style fields in the current iteration:
-
-- `backgroundColor`
-- `borderColor`
-- `textColor`
-- `cursorColor`
-- `selectionColor`
-- `selectionTextColor`
-- `textSize`
-
-### 9. DropDown style
-
-Example:
-
-```json
-"style": {
-  "baseFillOverride": "#ECF2F8",
-  "listFillOverride": "#F5F8FC",
-  "textOverride": "#1C2C3E",
-  "borderOverride": "#48749C",
-  "focusedBorderOverride": "#2684D4",
-  "hoverItemOverlayOverride": "#302684D4",
-  "selectedItemOverlayOverride": "#482684D4",
-  "textSize": 16.0,
-  "itemHeight": 38.0,
-  "maxVisibleItems": 5
-}
-```
-
-Supported drop down style fields in the current iteration:
-
-- `baseFillOverride`
-- `listFillOverride`
-- `textOverride`
-- `borderOverride`
-- `hoverItemOverlayOverride`
-- `selectedItemOverlayOverride`
-- `focusedBorderOverride`
-- `cornerRadius`
-- `listCornerRadius`
-- `strokeWeight`
-- `focusedStrokeWeight`
-- `textSize`
-- `itemHeight`
-- `textPadding`
-- `arrowPadding`
-- `maxVisibleItems`
-- `disabledAlpha`
+- JSON defines the controls, layout, style, and base text
+- the sketch performs the binding and derived-state updates
+- visible UI text is rendered through `Label`, not through `text()`
 
 ---
 
-## SVG renderer
+## Validation
 
-SVG support is configured through an optional `renderer` block inside `style`. The renderer configuration extends the style block without changing the control structure.
+The main loader fails fast with clear errors when:
 
-Example:
+- `controls` is missing
+- `controls` is not an array
+- an entry is not an object
+- `type` is missing
+- `code` is missing
+- a `code` is duplicated
+- `type` is unknown
+- a control-specific property is invalid
+- the JSON document cannot be loaded
+
+Examples of control-specific validation that remain delegated to the specific loaders:
+
+- `Slider`: range, step, value, orientation, and snap mode
+- `RadioGroup`: options and `selectedIndex`
+- `NumericField`: numeric text grammar
+- `DropDown`: items and `selectedIndex`
+
+There is no silent fallback and no implicit autocorrection.
+
+---
+
+## Control-Specific Loaders
+
+The framework still includes control-specific loaders such as:
+
+- `ButtonConfigLoader`
+- `CheckboxConfigLoader`
+- `ToggleConfigLoader`
+- `SliderConfigLoader`
+- `LabelConfigLoader`
+- `RadioGroupConfigLoader`
+- `TextFieldConfigLoader`
+- `NumericFieldConfigLoader`
+- `DropDownConfigLoader`
+
+They remain useful for simple single-control examples.
+
+Current behavior:
+
+- they accept the new wrapped document format when the document contains exactly one matching control entry
+- they keep accepting the historical single-root-object format as a legacy path
+- they are not the main public representation for multi-control loading
+
+Legacy note:
+
+- the historical single-root-object format is legacy
+- the recommended document format is the root `controls` array
+- the main `ControlConfigLoader` expects the new multi-control format
+
+---
+
+## Style Blocks
+
+Style remains nested under each control entry:
+
+```json
+{
+  "controls": [
+    {
+      "type": "slider",
+      "code": "sldJsonTest",
+      "min": 0.0,
+      "max": 1.0,
+      "step": 0.05,
+      "value": 0.35,
+      "x": 300.0,
+      "y": 130.0,
+      "width": 320.0,
+      "height": 72.0,
+      "style": {
+        "trackColor": "#3E4856",
+        "thumbColor": "#FFFFFF",
+        "showValueText": true
+      }
+    }
+  ]
+}
+```
+
+The style block still affects appearance only. It does not define behavior, listeners, input routing, or binding.
+
+SVG renderer configuration also remains local to the control style block:
 
 ```json
 "renderer": {
@@ -809,403 +279,51 @@ Example:
 }
 ```
 
-Notes:
+---
 
-- the block is optional
-- only `svg` is supported in this iteration
-- the factory creates the corresponding SVG rendering setup internally when this block is present
-- `Button` uses `SvgButtonRenderer`
-- `Checkbox` uses `SvgCheckboxRenderer`
-- `Toggle` uses `SvgShapeRenderer`
-- `Slider` uses the same internal `SliderStyle` and `SliderRenderer` path, with the SVG asset applied to the thumb
-- `Label` does not provide SVG support in the current iteration
-- `RadioGroup` does not provide SVG support in the current iteration
+## Binding Boundary
 
-This keeps the external JSON declarative while reusing the same rendering mechanism already used by the direct Java API.
+JSON does not define binding.
 
-For `Slider`, the optional `svgColorMode` field controls how the thumb SVG is colored:
+That boundary is intentional:
 
-- `use_render_style`
-- `use_svg_original`
+- JSON describes control structure and style
+- the sketch creates listeners and wiring
+- any binding between controls happens in Java code
+
+This keeps the configuration layer explicit and aligned with the closed facade model of the framework.
 
 ---
 
-## Full examples
+## Scope
 
-### 1. Normal slider from JSON
+The current JSON layer supports:
 
-JSON:
+- multiple controls in one document
+- strict validation
+- concrete public facade creation
+- type-based dispatch through a central registry
 
-```json
-{
-  "code": "sldJsonTest",
-  "min": 0.0,
-  "max": 1.0,
-  "step": 0.05,
-  "value": 0.35,
-  "x": 300.0,
-  "y": 130.0,
-  "width": 320.0,
-  "height": 72.0,
-  "orientation": "horizontal",
-  "snapMode": "always",
-  "enabled": true,
-  "visible": true,
-  "style": {
-    "trackColor": "#3E4856",
-    "trackHoverColor": "#566274",
-    "trackPressedColor": "#2C3440",
-    "trackStrokeColor": "#DCDCDC",
-    "trackStrokeWeight": 1.5,
-    "trackStrokeWeightHover": 2.5,
-    "trackThickness": 10.0,
-    "activeTrackColor": "#389FE8",
-    "activeTrackHoverColor": "#62B8F4",
-    "activeTrackPressedColor": "#267CB8",
-    "thumbColor": "#FFFFFF",
-    "thumbHoverColor": "#C6EAFF",
-    "thumbPressedColor": "#AADCFF",
-    "thumbStrokeColor": "#204E78",
-    "thumbStrokeWeight": 2.0,
-    "thumbStrokeWeightHover": 3.0,
-    "thumbSize": 28.0,
-    "textColor": "#F5F5F5",
-    "disabledAlpha": 90,
-    "showValueText": true
-  }
-}
-```
+It intentionally does not support:
 
-Java:
-
-```java
-import com.cpz.processing.controls.controls.slider.Slider;
-import com.cpz.processing.controls.controls.slider.SliderFactory;
-import com.cpz.processing.controls.controls.slider.config.SliderConfig;
-import com.cpz.processing.controls.controls.slider.config.SliderConfigLoader;
-import com.cpz.processing.controls.controls.slider.input.SliderInputLayer;
-import com.cpz.processing.controls.core.input.InputManager;
-import com.cpz.processing.controls.core.input.PointerEvent;
-import processing.core.PApplet;
-import processing.event.MouseEvent;
-
-import java.io.File;
-
-public class SliderJsonTest extends PApplet {
-    private static final String SLIDER_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "slider-test.json";
-
-    private InputManager inputManager;
-    private Slider slider;
-    private String currentValue;
-
-    public void settings() {
-        size(600, 340);
-        smooth(8);
-    }
-
-    public void setup() {
-        SliderConfigLoader loader = new SliderConfigLoader(this);
-        SliderConfig config = loader.load(SLIDER_CONFIG_PATH);
-        slider = SliderFactory.create(this, config);
-        slider.setChangeListener(value -> currentValue = slider.getFormattedValue());
-        currentValue = slider.getFormattedValue();
-        // input manager
-        inputManager = new InputManager();
-        inputManager.registerLayer(new SliderInputLayer(0, slider));
-        // text output
-        textAlign(CENTER, CENTER);
-    }
-
-    public void draw() {
-        background(28);
-        slider.draw();
-        text(slider.getCode() + " | value = " + currentValue, 300, 240);
-        text("config-driven slider using SliderConfigLoader and SliderFactory", 300, 275);
-    }
-
-    public void mouseMoved() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) mouseX, (float) mouseY, mouseButton));
-    }
-
-    public void mouseDragged() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, (float) mouseX, (float) mouseY, mouseButton));
-    }
-
-    public void mousePressed() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float) mouseX, (float) mouseY, mouseButton));
-    }
-
-    public void mouseReleased() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) mouseX, (float) mouseY, mouseButton));
-    }
-
-    public void mouseWheel(MouseEvent event) {
-        inputManager.dispatchPointer(new PointerEvent(
-                PointerEvent.Type.WHEEL,
-                (float) mouseX,
-                (float) mouseY,
-                mouseButton,
-                (float) event.getCount(),
-                event.isShiftDown(),
-                event.isControlDown()
-        ));
-    }
-}
-```
+- binding in JSON
+- declarative listeners in JSON
+- layout orchestration language
+- MVVM internals in the public result
 
 ---
 
-### 2. SVG slider from JSON
+## See Also
 
-JSON:
-
-```json
-{
-  "code": "sldSvgJsonTest",
-  "min": 0.0,
-  "max": 1.0,
-  "step": 0.05,
-  "value": 0.35,
-  "x": 300.0,
-  "y": 130.0,
-  "width": 320.0,
-  "height": 72.0,
-  "orientation": "horizontal",
-  "snapMode": "always",
-  "enabled": true,
-  "visible": true,
-  "style": {
-    "trackColor": "#3E4856",
-    "trackHoverColor": "#566274",
-    "trackPressedColor": "#2C3440",
-    "trackStrokeColor": "#DCDCDC",
-    "trackStrokeWeight": 1.5,
-    "trackStrokeWeightHover": 2.5,
-    "trackThickness": 10.0,
-    "activeTrackColor": "#389FE8",
-    "activeTrackHoverColor": "#62B8F4",
-    "activeTrackPressedColor": "#267CB8",
-    "thumbColor": "#FFFFFF",
-    "thumbHoverColor": "#C6EAFF",
-    "thumbPressedColor": "#AADCFF",
-    "thumbStrokeColor": "#204E78",
-    "thumbStrokeWeight": 2.0,
-    "thumbStrokeWeightHover": 3.0,
-    "thumbSize": 28.0,
-    "textColor": "#F5F5F5",
-    "disabledAlpha": 90,
-    "showValueText": true,
-    "svgColorMode": "use_render_style",
-    "renderer": {
-      "type": "svg",
-      "path": "data/img/test.svg"
-    }
-  }
-}
-```
-
----
-
-### 3. Label from JSON
-
-JSON:
-
-```json
-{
-  "code": "lblJsonTest",
-  "text": "Label facade\nJSON example",
-  "x": 120.0,
-  "y": 70.0,
-  "width": 360.0,
-  "height": 100.0,
-  "enabled": true,
-  "visible": true,
-  "style": {
-    "textSize": 24.0,
-    "textColor": "#D2E4FF",
-    "lineSpacingMultiplier": 1.2,
-    "alignX": "center",
-    "alignY": "center",
-    "disabledAlpha": 80
-  }
-}
-```
-
----
-
-### 4. RadioGroup from JSON
-
-JSON:
-
-```json
-{
-  "code": "rgJsonTest",
-  "options": ["Mercury", "Venus", "Earth", "Mars", "Jupiter"],
-  "selectedIndex": 2,
-  "x": 350.0,
-  "y": 140.0,
-  "width": 320.0,
-  "enabled": true,
-  "visible": true,
-  "style": {
-    "textOverride": "#F5F5F5",
-    "indicatorOverride": "#FFFFFF",
-    "hoveredBackgroundOverride": "#2C384A",
-    "pressedBackgroundOverride": "#202A38",
-    "selectedDotOverride": "#389FE8",
-    "itemHeight": 34.0,
-    "itemSpacing": 10.0,
-    "indicatorOuterDiameter": 18.0,
-    "indicatorInnerDiameter": 8.0,
-    "strokeWeight": 1.8,
-    "textSize": 17.0,
-    "cornerRadius": 8.0,
-    "disabledAlpha": 85
-  }
-}
-```
-
-Java:
-
-```java
-import com.cpz.processing.controls.controls.radiogroup.RadioGroup;
-import com.cpz.processing.controls.controls.radiogroup.RadioGroupFactory;
-import com.cpz.processing.controls.controls.radiogroup.config.RadioGroupConfig;
-import com.cpz.processing.controls.controls.radiogroup.config.RadioGroupConfigLoader;
-import com.cpz.processing.controls.controls.radiogroup.input.RadioGroupInputLayer;
-import com.cpz.processing.controls.core.input.InputManager;
-import com.cpz.processing.controls.core.input.PointerEvent;
-import com.cpz.processing.controls.input.KeyboardState;
-import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
-import processing.core.PApplet;
-
-import java.io.File;
-
-public class RadioGroupJsonTest extends PApplet {
-    private static final String RADIO_GROUP_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "radiogroup-test.json";
-
-    private InputManager inputManager;
-    private KeyboardState keyboardState;
-    private ProcessingKeyboardAdapter processingKeyboardAdapter;
-    private RadioGroup radioGroup;
-    private String currentSelection;
-
-    public void settings() {
-        size(700, 360);
-        smooth(8);
-    }
-
-    public void setup() {
-        RadioGroupConfigLoader loader = new RadioGroupConfigLoader(this);
-        RadioGroupConfig config = loader.load(RADIO_GROUP_CONFIG_PATH);
-        radioGroup = RadioGroupFactory.create(this, config);
-        radioGroup.setChangeListener(index -> currentSelection = radioGroup.getSelectedOption());
-        currentSelection = radioGroup.getSelectedOption();
-        // input manager
-        inputManager = new InputManager();
-        inputManager.registerLayer(new RadioGroupInputLayer(0, radioGroup));
-        keyboardState = new KeyboardState();
-        processingKeyboardAdapter = new ProcessingKeyboardAdapter(keyboardState, inputManager);
-        // text output
-        textAlign(CENTER, CENTER);
-    }
-
-    public void draw() {
-        background(28);
-        radioGroup.draw();
-        fill(180);
-        text(radioGroup.getCode() + " | selected = " + currentSelection, 350, 300);
-        text("config-driven radio group using RadioGroupConfigLoader and RadioGroupFactory", 350, 330);
-    }
-
-    public void mouseMoved() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) mouseX, (float) mouseY, mouseButton));
-    }
-
-    public void mouseDragged() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, (float) mouseX, (float) mouseY, mouseButton));
-    }
-
-    public void mousePressed() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float) mouseX, (float) mouseY, mouseButton));
-    }
-
-    public void mouseReleased() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) mouseX, (float) mouseY, mouseButton));
-    }
-
-    public void keyPressed() {
-        processingKeyboardAdapter.keyPressed(key, keyCode);
-    }
-
-    public void keyReleased() {
-        processingKeyboardAdapter.keyReleased(key, keyCode);
-    }
-
-    public void keyTyped() {
-        processingKeyboardAdapter.keyTyped(key, keyCode);
-    }
-}
-```
-
-Java:
-
-```java
-import com.cpz.processing.controls.controls.label.Label;
-import com.cpz.processing.controls.controls.label.LabelFactory;
-import com.cpz.processing.controls.controls.label.config.LabelConfig;
-import com.cpz.processing.controls.controls.label.config.LabelConfigLoader;
-import processing.core.PApplet;
-
-import java.io.File;
-
-public class LabelJsonTest extends PApplet {
-    private static final String LABEL_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "label-test.json";
-
-    private Label label;
-
-    public void settings() {
-        size(600, 260);
-        smooth(8);
-    }
-
-    public void setup() {
-        LabelConfigLoader loader = new LabelConfigLoader(this);
-        LabelConfig config = loader.load(LABEL_CONFIG_PATH);
-        label = LabelFactory.create(this, config);
-    }
-
-    public void draw() {
-        background(28);
-        label.draw();
-        fill(180);
-        textAlign(CENTER, CENTER);
-        text(label.getCode() + " | config-driven label", 300, 215);
-    }
-}
-```
-
----
-
-## Scope notes
-
-The config-driven layer remains intentionally small in this iteration:
-
-- one control per JSON file
-- no listeners in JSON
-- no binding in JSON
-- no multi-control document
-- no layout system in JSON
-- no generic cross-control factory
-
-This keeps the external layer explicit and aligned with the current public facade model.
-
----
-
-## See also
-
+- [Control](control.md)
+- [Architecture](architecture.md)
+- [README](../README.md)
 - [Button](button.md)
 - [Checkbox](checkbox.md)
 - [Toggle](toggle.md)
 - [Slider](slider.md)
-- [Slider (SVG)](slider-svg.md)
+- [Label](label.md)
+- [RadioGroup](radiogroup.md)
+- [TextField](textfield.md)
+- [NumericField](numericfield.md)
+- [Dropdown](dropdown.md)

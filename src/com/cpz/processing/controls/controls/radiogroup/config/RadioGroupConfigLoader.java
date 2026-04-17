@@ -21,11 +21,16 @@ public final class RadioGroupConfigLoader {
 
     public RadioGroupConfig load(String path) {
         Objects.requireNonNull(path, "path");
-        JSONObject root = this.sketch.loadJSONObject(path);
-        if (root == null) {
-            throw new IllegalArgumentException("Could not load radio group JSON config: " + path);
-        }
+        JSONObject root = JsonConfigSupport.unwrapSingleControlDocument(
+                JsonConfigSupport.loadRequiredObject(this.sketch, path, "radio group"),
+                path,
+                "radiogroup",
+                "radiogroup"
+        );
+        return this.loadFromJson(root, path);
+    }
 
+    public RadioGroupConfig loadFromJson(JSONObject root, String path) {
         float width = root.getFloat("width");
         JsonConfigSupport.validatePositiveDimension("width", width, path);
 

@@ -18,11 +18,16 @@ public final class NumericFieldConfigLoader {
 
     public NumericFieldConfig load(String path) {
         Objects.requireNonNull(path, "path");
-        JSONObject root = this.sketch.loadJSONObject(path);
-        if (root == null) {
-            throw new IllegalArgumentException("Could not load numeric field JSON config: " + path);
-        }
+        JSONObject root = JsonConfigSupport.unwrapSingleControlDocument(
+                JsonConfigSupport.loadRequiredObject(this.sketch, path, "numeric field"),
+                path,
+                "numericfield",
+                "numericfield"
+        );
+        return this.loadFromJson(root, path);
+    }
 
+    public NumericFieldConfig loadFromJson(JSONObject root, String path) {
         float width = root.getFloat("width");
         float height = root.getFloat("height");
         JsonConfigSupport.validatePositiveDimension("width", width, path);

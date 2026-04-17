@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.controls.label;
 
+import com.cpz.processing.controls.controls.Control;
 import com.cpz.processing.controls.controls.label.model.LabelModel;
 import com.cpz.processing.controls.controls.label.style.LabelStyle;
 import com.cpz.processing.controls.controls.label.view.LabelView;
@@ -12,7 +13,7 @@ import java.util.Objects;
 /**
  * Convenience facade for the label control.
  */
-public final class Label {
+public final class Label implements Control {
     private final LabelModel model;
     private final LabelViewModel viewModel;
     private final LabelView view;

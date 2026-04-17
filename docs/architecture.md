@@ -1,9 +1,29 @@
 # Architecture
 
+## Public Control Surface
+
+The framework exposes controls through closed public facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, and `DropDown`.
+
+Those facades share a minimal public interface, `Control`, that contains only the transversal facade surface:
+
+- `getCode()`
+- `draw()`
+- `isEnabled()` / `setEnabled(boolean)`
+- `isVisible()` / `setVisible(boolean)`
+- `setPosition(float, float)`
+
+This contract is intentionally small:
+
+- it allows host code to treat heterogeneous controls uniformly when needed
+- it does not expose `View`, `ViewModel`, or other MVVM internals
+- it does not replace the control-specific API of each concrete facade
+
+`Control` is distinct from `ControlView`. `Control` belongs to the public facade layer, while `ControlView` belongs to the internal MVVM view layer.
+
 ## Pipeline
 
 ```text
-Model -> ViewModel -> View -> ViewState -> Style -> RenderStyle -> Renderer
+Model → ViewModel → View → ViewState → Style → RenderStyle → Renderer
 ```
 
 ## Layer Responsibilities
@@ -52,23 +72,54 @@ This keeps behavior decisions out of the view, rendering decisions out of the mo
 ## Integration Flow
 
 ```text
-External Source -> Adapter -> InputManager -> InputLayer -> InputAdapter -> ViewModel
+External Source → Adapter → InputManager → InputLayer → InputAdapter → ViewModel
 ```
 
 This same flow applies whether the source is Processing or another host environment.
+
+## Public Facades And MVVM
+
+The public controls remain facade types over the internal MVVM pipeline.
+
+- sketches use concrete facades such as `Button` or `TextField`
+- shared host-side logic may depend on the minimal `Control` interface
+- MVVM internals remain behind the facade boundary
+
+This keeps the public API lightweight without flattening the specific behavior of each control into a broad shared hierarchy.
+
+## JSON Layer
+
+The JSON layer is an optional configuration boundary in front of the public facades.
+
+Primary flow:
+
+```text
+JSON → ControlConfigLoader → ControlFactoryRegistry → concrete factories → Map<String, Control>
+```
+
+Behavior:
+
+- JSON describes one or more controls through a root `controls` array
+- `ControlConfigLoader` returns a `Map<String, Control>`
+- factories still create the same closed public facades
+- MVVM internals remain hidden
+- binding is not part of JSON and remains the responsibility of the sketch
 
 ## Binding
 
 Binding is intentionally explicit.
 
-- `Binding.bind(...)` supports unidirectional propagation between ViewModels
-- the binding layer does not use reflection or control-specific contracts
-- advanced bidirectional synchronization can be composed outside the core API when needed
+- the sketch owns synchronization between public facades
+- `ControlConfigLoader` and `Map<String, Control>` support composition, not declarative behavior
+- JSON does not define binding
+- the framework does not provide a separate low-level binding utility as part of the current public model
 
 See [Binding](binding.md).
 
 ## Related Documents
 
+- [Control](control.md)
+- [JSON Configuration](json-configuration.md)
 - [README](../README.md)
 - [Input System](input-system.md)
 - [Binding](binding.md)

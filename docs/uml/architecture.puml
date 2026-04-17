@@ -42,6 +42,17 @@ package "MVVM" {
   class ViewState
 }
 
+package "Public Facades" {
+  interface Control
+  class ConcreteControlFacade
+}
+
+package "JSON Configuration" {
+  class JsonDocument
+  class ControlConfigLoader
+  class ControlFactoryRegistry
+}
+
 package "Rendering" {
   class Style
   class RenderStyle
@@ -63,11 +74,16 @@ ExternalAdapter --> PointerEvent : creates
 ExternalAdapter --> KeyboardEvent : creates
 ExternalAdapter --> KeyboardState : updates when needed
 ExternalAdapter --> InputManager : dispatches events
+JsonDocument --> ControlConfigLoader : loads
+ControlConfigLoader --> ControlFactoryRegistry : dispatches by type
+ControlFactoryRegistry --> ConcreteControlFacade : creates
 InputManager --> InputLayer : dispatches
 InputLayer --> InputAdapter : forwards
 InputAdapter --> ViewModel : updates interaction
 FocusManager --> ViewModel : manages focus
 
+ConcreteControlFacade ..|> Control
+ConcreteControlFacade --> ViewModel : delegates through closed facade
 ViewModel --> Model : updates
 View --> ViewModel : reads
 View --> ViewState : builds

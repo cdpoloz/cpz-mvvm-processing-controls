@@ -18,11 +18,16 @@ public final class TextFieldConfigLoader {
 
     public TextFieldConfig load(String path) {
         Objects.requireNonNull(path, "path");
-        JSONObject root = this.sketch.loadJSONObject(path);
-        if (root == null) {
-            throw new IllegalArgumentException("Could not load text field JSON config: " + path);
-        }
+        JSONObject root = JsonConfigSupport.unwrapSingleControlDocument(
+                JsonConfigSupport.loadRequiredObject(this.sketch, path, "text field"),
+                path,
+                "textfield",
+                "textfield"
+        );
+        return this.loadFromJson(root, path);
+    }
 
+    public TextFieldConfig loadFromJson(JSONObject root, String path) {
         float width = root.getFloat("width");
         float height = root.getFloat("height");
         JsonConfigSupport.validatePositiveDimension("width", width, path);

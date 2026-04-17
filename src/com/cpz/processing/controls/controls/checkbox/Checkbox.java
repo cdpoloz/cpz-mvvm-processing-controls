@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.checkbox;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
+import com.cpz.processing.controls.controls.Control;
 import com.cpz.processing.controls.controls.checkbox.input.CheckboxInputAdapter;
 import com.cpz.processing.controls.controls.checkbox.model.CheckboxModel;
 import com.cpz.processing.controls.controls.checkbox.style.CheckboxStyle;
@@ -15,7 +16,7 @@ import java.util.Objects;
 /**
  * Convenience facade for the checkbox control.
  */
-public final class Checkbox {
+public final class Checkbox implements Control {
     private final CheckboxModel model;
     private final CheckboxViewModel viewModel;
     private final CheckboxView view;

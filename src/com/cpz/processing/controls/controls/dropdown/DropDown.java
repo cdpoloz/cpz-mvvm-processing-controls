@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.dropdown;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
+import com.cpz.processing.controls.controls.Control;
 import com.cpz.processing.controls.controls.dropdown.input.DropDownInputAdapter;
 import com.cpz.processing.controls.controls.dropdown.model.DropDownModel;
 import com.cpz.processing.controls.controls.dropdown.style.DefaultDropDownStyle;
@@ -20,7 +21,7 @@ import java.util.Objects;
 /**
  * Convenience facade for the drop down control.
  */
-public final class DropDown {
+public final class DropDown implements Control {
     private static final int DEFAULT_OVERLAY_Z_INDEX = 100;
 
     private final DropDownModel model;

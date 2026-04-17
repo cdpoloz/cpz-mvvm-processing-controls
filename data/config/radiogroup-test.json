@@ -1,25 +1,30 @@
 {
-  "code": "rgJsonTest",
-  "options": ["Mercury", "Venus", "Earth", "Mars", "Jupiter"],
-  "selectedIndex": 2,
-  "x": 375.0,
-  "y": 40.0,
-  "width": 200.0,
-  "enabled": true,
-  "visible": true,
-  "style": {
-    "textOverride": "#F5F5F5",
-    "indicatorOverride": "#FFFFFF",
-    "hoveredBackgroundOverride": "#2C384A",
-    "pressedBackgroundOverride": "#202A38",
-    "selectedDotOverride": "#389FE8",
-    "itemHeight": 34.0,
-    "itemSpacing": 10.0,
-    "indicatorOuterDiameter": 18.0,
-    "indicatorInnerDiameter": 8.0,
-    "strokeWeight": 1.8,
-    "textSize": 17.0,
-    "cornerRadius": 8.0,
-    "disabledAlpha": 85
-  }
+  "controls": [
+    {
+      "type": "radiogroup",
+      "code": "rgJsonTest",
+      "options": ["Mercury", "Venus", "Earth", "Mars", "Jupiter"],
+      "selectedIndex": 2,
+      "x": 375.0,
+      "y": 40.0,
+      "width": 200.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "textOverride": "#F5F5F5",
+        "indicatorOverride": "#FFFFFF",
+        "hoveredBackgroundOverride": "#2C384A",
+        "pressedBackgroundOverride": "#202A38",
+        "selectedDotOverride": "#389FE8",
+        "itemHeight": 34.0,
+        "itemSpacing": 10.0,
+        "indicatorOuterDiameter": 18.0,
+        "indicatorInnerDiameter": 8.0,
+        "strokeWeight": 1.8,
+        "textSize": 17.0,
+        "cornerRadius": 8.0,
+        "disabledAlpha": 85
+      }
+    }
+  ]
 }
