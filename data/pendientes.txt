@@ -1,1 +1,4 @@
-Tutoriales de uso en .md detallados
+*** PENDIENETS ***
+
+- Tutoriales de uso en .md detallados
+- incluir Label en ejemplo de binding

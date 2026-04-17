@@ -2,9 +2,9 @@
 
 This document shows how to create controls from JSON configuration files.
 
-In the current iteration, the framework supports a single `Button`, a single `Checkbox`, a single `Toggle`, or a single `Slider` created from JSON, including optional SVG renderer setup configured through the style block.
+In the current iteration, the framework supports a single `Button`, a single `Checkbox`, a single `Toggle`, a single `Slider`, or a single `Label` created from JSON, including optional SVG renderer setup configured through the style block for the controls that already support it.
 
-JSON configuration is an additional layer on top of the existing public API. It does not replace direct control creation with `Button`, `Checkbox`, `Toggle`, or `Slider`, and it does not change the internal MVVM architecture of the framework.
+JSON configuration is an additional layer on top of the existing public API. It does not replace direct control creation with `Button`, `Checkbox`, `Toggle`, `Slider`, or `Label`, and it does not change the internal MVVM architecture of the framework.
 
 ---
 
@@ -36,14 +36,15 @@ JSON → ButtonConfigLoader → ButtonConfig → ButtonFactory → Button facade
 JSON → CheckboxConfigLoader → CheckboxConfig → CheckboxFactory → Checkbox facade → MVVM internals
 JSON → ToggleConfigLoader → ToggleConfig → ToggleFactory → Toggle facade → MVVM internals
 JSON → SliderConfigLoader → SliderConfig → SliderFactory → Slider facade → MVVM internals
+JSON → LabelConfigLoader → LabelConfig → LabelFactory → Label facade → MVVM internals
 ```
 
 Responsibilities:
 
-- `ButtonConfig`, `CheckboxConfig`, `ToggleConfig`, and `SliderConfig` store the parsed control data
-- `ButtonConfigLoader`, `CheckboxConfigLoader`, `ToggleConfigLoader`, and `SliderConfigLoader` read the JSON file and validate the supported fields
-- `ButtonFactory`, `CheckboxFactory`, `ToggleFactory`, and `SliderFactory` create the public facade and apply state and style
-- `Button`, `Checkbox`, `Toggle`, and `Slider` remain the public facades used by the sketch
+- `ButtonConfig`, `CheckboxConfig`, `ToggleConfig`, `SliderConfig`, and `LabelConfig` store the parsed control data
+- `ButtonConfigLoader`, `CheckboxConfigLoader`, `ToggleConfigLoader`, `SliderConfigLoader`, and `LabelConfigLoader` read the JSON file and validate the supported fields
+- `ButtonFactory`, `CheckboxFactory`, `ToggleFactory`, `SliderFactory`, and `LabelFactory` create the public facade and apply state and style
+- `Button`, `Checkbox`, `Toggle`, `Slider`, and `Label` remain the public facades used by the sketch
 
 This means the external setup becomes config-driven, but the runtime control pipeline remains the same.
 
@@ -213,6 +214,37 @@ public void setup() {
 }
 ```
 
+### 5. Label
+
+Minimal JSON:
+
+```json
+{
+  "code": "lblJsonTest",
+  "text": "Label facade\nJSON example",
+  "x": 120.0,
+  "y": 70.0,
+  "width": 360.0,
+  "height": 100.0,
+  "enabled": true,
+  "visible": true
+}
+```
+
+Minimal Java sketch flow:
+
+```java
+private static final String LABEL_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "label-test.json";
+
+private Label label;
+
+public void setup() {
+    LabelConfigLoader loader = new LabelConfigLoader(this);
+    LabelConfig config = loader.load(LABEL_CONFIG_PATH);
+    label = LabelFactory.create(this, config);
+}
+```
+
 The important part is unchanged from the regular control flow:
 
 - the sketch still assigns listeners in Java
@@ -233,6 +265,12 @@ For `Slider`, the JSON route also validates configuration strictly before the co
 - `step` must be greater than `0`
 - `value` must already be inside the configured range
 - `orientation`, `snapMode`, and `svgColorMode` only accept the documented values
+
+For `Label`, the JSON route validates the small supported surface directly:
+
+- `code` is required
+- `text` defaults to `""` when omitted
+- `width` and `height` must be greater than `0`
 
 ---
 
@@ -406,6 +444,30 @@ Supported slider style fields in the current iteration:
 
 The style block only controls appearance. It does not define listeners, input routing, or business behavior.
 
+### 5. Label style
+
+Example:
+
+```json
+"style": {
+  "textSize": 24.0,
+  "textColor": "#D2E4FF",
+  "lineSpacingMultiplier": 1.2,
+  "alignX": "center",
+  "alignY": "center",
+  "disabledAlpha": 80
+}
+```
+
+Supported label style fields in the current iteration:
+
+- `textSize`
+- `textColor`
+- `lineSpacingMultiplier`
+- `alignX`
+- `alignY`
+- `disabledAlpha`
+
 ---
 
 ## SVG renderer
@@ -430,6 +492,7 @@ Notes:
 - `Checkbox` uses `SvgCheckboxRenderer`
 - `Toggle` uses `SvgShapeRenderer`
 - `Slider` uses the same internal `SliderStyle` and `SliderRenderer` path, with the SVG asset applied to the thumb
+- `Label` does not provide SVG support in the current iteration
 
 This keeps the external JSON declarative while reusing the same rendering mechanism already used by the direct Java API.
 
@@ -614,79 +677,66 @@ JSON:
 }
 ```
 
+---
+
+### 3. Label from JSON
+
+JSON:
+
+```json
+{
+  "code": "lblJsonTest",
+  "text": "Label facade\nJSON example",
+  "x": 120.0,
+  "y": 70.0,
+  "width": 360.0,
+  "height": 100.0,
+  "enabled": true,
+  "visible": true,
+  "style": {
+    "textSize": 24.0,
+    "textColor": "#D2E4FF",
+    "lineSpacingMultiplier": 1.2,
+    "alignX": "center",
+    "alignY": "center",
+    "disabledAlpha": 80
+  }
+}
+```
+
 Java:
 
 ```java
-import com.cpz.processing.controls.controls.slider.Slider;
-import com.cpz.processing.controls.controls.slider.SliderFactory;
-import com.cpz.processing.controls.controls.slider.config.SliderConfig;
-import com.cpz.processing.controls.controls.slider.config.SliderConfigLoader;
-import com.cpz.processing.controls.controls.slider.input.SliderInputLayer;
-import com.cpz.processing.controls.core.input.InputManager;
-import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.controls.label.Label;
+import com.cpz.processing.controls.controls.label.LabelFactory;
+import com.cpz.processing.controls.controls.label.config.LabelConfig;
+import com.cpz.processing.controls.controls.label.config.LabelConfigLoader;
 import processing.core.PApplet;
-import processing.event.MouseEvent;
 
 import java.io.File;
 
-public class SliderSvgJsonTest extends PApplet {
-    private static final String SLIDER_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "slider-svg-test.json";
+public class LabelJsonTest extends PApplet {
+    private static final String LABEL_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "label-test.json";
 
-    private InputManager inputManager;
-    private Slider slider;
-    private String currentValue;
+    private Label label;
 
     public void settings() {
-        size(600, 340);
+        size(600, 260);
         smooth(8);
     }
 
     public void setup() {
-        SliderConfigLoader loader = new SliderConfigLoader(this);
-        SliderConfig config = loader.load(SLIDER_CONFIG_PATH);
-        slider = SliderFactory.create(this, config);
-        slider.setChangeListener(value -> currentValue = slider.getFormattedValue());
-        currentValue = slider.getFormattedValue();
-        // input manager
-        inputManager = new InputManager();
-        inputManager.registerLayer(new SliderInputLayer(0, slider));
-        // text output
-        textAlign(CENTER, CENTER);
+        LabelConfigLoader loader = new LabelConfigLoader(this);
+        LabelConfig config = loader.load(LABEL_CONFIG_PATH);
+        label = LabelFactory.create(this, config);
     }
 
     public void draw() {
         background(28);
-        slider.draw();
-        text(slider.getCode() + " | value = " + currentValue, 300, 240);
-        text("SVG thumb loaded from JSON through the same slider style path", 300, 275);
-    }
-
-    public void mouseMoved() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) mouseX, (float) mouseY, mouseButton));
-    }
-
-    public void mouseDragged() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, (float) mouseX, (float) mouseY, mouseButton));
-    }
-
-    public void mousePressed() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float) mouseX, (float) mouseY, mouseButton));
-    }
-
-    public void mouseReleased() {
-        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) mouseX, (float) mouseY, mouseButton));
-    }
-
-    public void mouseWheel(MouseEvent event) {
-        inputManager.dispatchPointer(new PointerEvent(
-                PointerEvent.Type.WHEEL,
-                (float) mouseX,
-                (float) mouseY,
-                mouseButton,
-                (float) event.getCount(),
-                event.isShiftDown(),
-                event.isControlDown()
-        ));
+        label.draw();
+        fill(180);
+        textAlign(CENTER, CENTER);
+        text(label.getCode() + " | config-driven label", 300, 215);
     }
 }
 ```

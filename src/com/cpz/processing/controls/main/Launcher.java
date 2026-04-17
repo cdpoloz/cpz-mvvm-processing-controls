@@ -3,6 +3,8 @@ package com.cpz.processing.controls.main;
 import java.util.Locale;
 
 import com.cpz.processing.controls.examples.*;
+import com.cpz.processing.controls.examples.button.*;
+import com.cpz.processing.controls.examples.slider.*;
 import processing.core.PApplet;
 
 /**
@@ -31,28 +33,32 @@ public class Launcher {
       Locale.setDefault(Locale.forLanguageTag("en-US"));
       // You can choose an example from the list below
 
-      // Button ****************************************
+      // Button *****************************************
       //PApplet.main(ButtonTest.class);
       //PApplet.main(ButtonSvgTest.class);
       //PApplet.main(ButtonJsonTest.class);
       //PApplet.main(ButtonSvgJsonTest.class);
 
-      // Checkbox **************************************
+      // Checkbox ***************************************
       //PApplet.main(CheckboxTest.class);
       //PApplet.main(CheckboxJsonTest.class);
       //PApplet.main(CheckboxSvgJsonTest.class);
 
-      //Toggle *****************************************
+      // Toggle *****************************************
       //PApplet.main(ToggleTest.class);
       //PApplet.main(ToggleSvgTest.class);
       //PApplet.main(ToggleJsonTest.class);
       //PApplet.main(ToggleSvgJsonTest.class);
 
-      //Slider *****************************************
+      // Slider *****************************************
       //PApplet.main(SliderTest.class);
       //PApplet.main(SliderSvgTest.class);
       //PApplet.main(SliderJsonTest.class);
       //PApplet.main(SliderSvgJsonTest.class);
+
+      // Label ******************************************
+      //PApplet.main(LabelTest.class);
+      //PApplet.main(LabelJsonTest.class);
 
       //PApplet.main(DropDownDevSketch.class);
       //PApplet.main(LabelDevSketch.class);

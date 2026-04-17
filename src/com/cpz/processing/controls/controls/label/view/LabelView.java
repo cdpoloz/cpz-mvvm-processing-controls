@@ -29,6 +29,8 @@ public final class LabelView implements ControlView {
    private final LabelViewModel viewModel;
    private float x;
    private float y;
+   private float width;
+   private float height;
    private LabelStyle style;
    private float cachedWidth;
    private float cachedHeight;
@@ -47,13 +49,19 @@ public final class LabelView implements ControlView {
     * - Initializes the public state required by this type.
     */
    public LabelView(PApplet var1, LabelViewModel var2, float var3, float var4) {
+      this(var1, var2, var3, var4, 0.0F, 0.0F);
+   }
+
+   public LabelView(PApplet var1, LabelViewModel var2, float var3, float var4, float var5, float var6) {
       this.sketch = var1;
       this.viewModel = var2;
       this.x = var3;
       this.y = var4;
+      this.width = Math.max(0.0F, var5);
+      this.height = Math.max(0.0F, var6);
       this.style = LabelDefaultStyles.defaultText();
-      String var5 = var2.getText();
-      this.lastMeasuredText = var5 == null ? "" : var5;
+      String var7 = var2.getText();
+      this.lastMeasuredText = var7 == null ? "" : var7;
    }
 
    /**
@@ -117,6 +125,10 @@ public final class LabelView implements ControlView {
     * - Returns the current value without applying side effects.
     */
    public float getWidth() {
+      if (this.width > 0.0F) {
+         return this.width;
+      }
+
       if (this.metricsDirty) {
          this.updateTextMetrics();
       }
@@ -133,6 +145,10 @@ public final class LabelView implements ControlView {
     * - Returns the current value without applying side effects.
     */
    public float getHeight() {
+      if (this.height > 0.0F) {
+         return this.height;
+      }
+
       if (this.metricsDirty) {
          this.updateTextMetrics();
       }
@@ -159,7 +175,7 @@ public final class LabelView implements ControlView {
    }
 
    private LabelViewState buildViewState() {
-      return new LabelViewState(this.x, this.y, this.viewModel.getText(), this.viewModel.isEnabled());
+      return new LabelViewState(this.x, this.y, this.width, this.height, this.viewModel.getText(), this.viewModel.isEnabled());
    }
 
    /**
@@ -190,6 +206,12 @@ public final class LabelView implements ControlView {
    public void setPosition(float var1, float var2) {
       this.x = var1;
       this.y = var2;
+      this.metricsDirty = true;
+   }
+
+   public void setSize(float var1, float var2) {
+      this.width = Math.max(0.0F, var1);
+      this.height = Math.max(0.0F, var2);
       this.metricsDirty = true;
    }
 

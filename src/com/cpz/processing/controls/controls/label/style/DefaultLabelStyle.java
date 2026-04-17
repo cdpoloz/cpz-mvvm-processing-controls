@@ -71,7 +71,7 @@ public final class DefaultLabelStyle implements LabelStyle {
       int var5 = this.config.textColor != null ? this.config.textColor : var4.onSurface;
       int var6 = this.config.disabledAlpha != null ? this.config.disabledAlpha : var4.disabledAlpha;
       LabelRenderStyle var7 = new LabelRenderStyle(var2.text(), InteractiveStyleHelper.applyDisabledAlpha(var5, var2.enabled(), var6), this.resolveTypography());
-      this.renderer.render(var1, var2.x(), var2.y(), 0.0F, 0.0F, var7);
+      this.renderer.render(var1, var2.x(), var2.y(), var2.width(), var2.height(), var7);
    }
 
    /**
