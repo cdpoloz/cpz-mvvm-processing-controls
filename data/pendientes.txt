@@ -1,4 +1,4 @@
-*** PENDIENETS ***
+*** PENDIENTES ***
 
 - Tutoriales de uso en .md detallados
-- incluir Label en ejemplo de binding
+- Falta ejemplo que reemplace a ThemeDevSketch
