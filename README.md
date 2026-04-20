@@ -174,7 +174,7 @@ Supporting infrastructure:
 - `InputLayer` defines capture boundaries and event ownership
 - `FocusManager` owns keyboard focus and restoration
 - `OverlayManager` coordinates overlay ordering
-- `ThemeManager` exposes cached `ThemeSnapshot` instances to styles
+- `ThemeManager` is owned by the host sketch and exposes cached `ThemeSnapshot` instances to styles
 
 Public API notes:
 
@@ -241,6 +241,7 @@ That template demonstrates how to connect Processing callbacks to the framework 
 - [Binding](docs/binding.md)
 - [Input System](docs/input-system.md)
 - [JSON Configuration](docs/json-configuration.md)
+- [Theme](docs/theme.md)
 - [Button](docs/button.md)
 - [Checkbox](docs/checkbox.md)
 - [Dropdown](docs/dropdown.md)
@@ -251,7 +252,7 @@ That template demonstrates how to connect Processing callbacks to the framework 
 - [TextField](docs/textfield.md)
 - [Toggle](docs/toggle.md)
 
-The JSON documentation includes the canonical multi-control binding progression: first unidirectional sketch synchronization, then controlled bidirectional synchronization, both loaded from the same structural JSON document.
+The JSON documentation includes the canonical multi-control binding progression: first unidirectional sketch synchronization, then controlled bidirectional synchronization, both loaded from the same structural JSON document. The theme documentation uses `ThemeFacadeSketch` as the public example for sketch-owned theming with closed facades.
 
 ---
 

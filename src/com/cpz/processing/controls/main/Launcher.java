@@ -2,16 +2,7 @@ package com.cpz.processing.controls.main;
 
 import java.util.Locale;
 
-import com.cpz.processing.controls.examples.button.*;
-import com.cpz.processing.controls.examples.checkbox.*;
-import com.cpz.processing.controls.examples.composition.*;
-import com.cpz.processing.controls.examples.dropdown.*;
-import com.cpz.processing.controls.examples.label.*;
-import com.cpz.processing.controls.examples.numericfield.*;
-import com.cpz.processing.controls.examples.radiogroup.*;
-import com.cpz.processing.controls.examples.slider.*;
-import com.cpz.processing.controls.examples.textfield.*;
-import com.cpz.processing.controls.examples.toggle.*;
+import com.cpz.processing.controls.examples.theme.ThemeFacadeSketch;
 import processing.core.PApplet;
 
 /**
@@ -86,9 +77,11 @@ public class Launcher {
         //PApplet.main(DropDownJsonTest.class);
 
         // Composition **********************************
-        PApplet.main(JsonMultiControlUnidirectionalBindingTest.class);
+        //PApplet.main(JsonMultiControlUnidirectionalBindingTest.class);
         //PApplet.main(JsonMultiControlBindingTest.class);
 
+        // Theme ****************************************
+        PApplet.main(ThemeFacadeSketch.class);
         //PApplet.main(ThemeDevSketch.class);
     }
 }

@@ -52,6 +52,7 @@ This keeps behavior decisions out of the view, rendering decisions out of the mo
 
 - `ThemeProvider` exposes a cached `ThemeSnapshot`
 - `ThemeManager` implements `ThemeProvider`
+- host sketches own their `ThemeManager`; the framework does not use a global theme singleton
 - `ThemeSnapshot` is rebuilt when the theme changes, not during every draw call
 - views read the snapshot once per draw or measurement pass
 - styles consume snapshot tokens directly and do not perform theme lookup of their own
@@ -121,6 +122,7 @@ See [Binding](binding.md).
 
 - [Control](control.md)
 - [JSON Configuration](json-configuration.md)
+- [Theme](theme.md)
 - [README](../README.md)
 - [Input System](input-system.md)
 - [Binding](binding.md)

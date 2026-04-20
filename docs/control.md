@@ -59,6 +59,8 @@ This surface is intentionally small:
 
 Each concrete control still owns its specific public API for text, value, selection, listeners, style, and any other domain-specific behavior.
 
+Facade styles can share a sketch-owned `ThemeManager`, which keeps theming on the public facade side without exposing MVVM internals.
+
 ---
 
 ## Not Part Of This Contract
@@ -94,4 +96,5 @@ They are intentionally separate:
 
 - [Architecture](architecture.md)
 - [JSON Configuration](json-configuration.md)
+- [Theme](theme.md)
 - [README](../README.md)
