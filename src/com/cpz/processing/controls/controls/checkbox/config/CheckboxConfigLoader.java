@@ -9,6 +9,8 @@ import java.util.Objects;
 
 /**
  * Loads a minimal checkbox config from a JSON file.
+ *
+ * @author CPZ
  */
 public final class CheckboxConfigLoader {
     private final PApplet sketch;

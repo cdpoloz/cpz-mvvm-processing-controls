@@ -22,6 +22,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the MVVM View layer.
+ *
+ * @author CPZ
  */
 public final class TextFieldView implements ControlView, PointerInteractable {
    private static final float HORIZONTAL_PADDING = 10.0F;
@@ -39,23 +41,23 @@ public final class TextFieldView implements ControlView, PointerInteractable {
    /**
     * Creates a text field view.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
-    * @param var6 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param viewModel parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
+    * @param height parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public TextFieldView(PApplet var1, TextFieldViewModel var2, float var3, float var4, float var5, float var6) {
-      this.sketch = var1;
-      this.viewModel = var2;
-      this.x = var3;
-      this.y = var4;
-      this.width = var5;
-      this.height = var6;
+   public TextFieldView(PApplet sketch, TextFieldViewModel viewModel, float x, float y, float width, float height) {
+      this.sketch = sketch;
+      this.viewModel = viewModel;
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
       this.style = TextFieldDefaultStyles.standard();
    }
 
@@ -67,50 +69,50 @@ public final class TextFieldView implements ControlView, PointerInteractable {
     */
    public void draw() {
       if (this.viewModel.isVisible()) {
-         ThemeSnapshot var1 = this.style.getThemeSnapshot();
-         this.style.render(this.sketch, this.buildViewState(var1), var1);
+         ThemeSnapshot snapshot = this.style.getThemeSnapshot();
+         this.style.render(this.sketch, this.buildViewState(snapshot), snapshot);
       }
    }
 
    /**
     * Updates position.
     *
-    * @param var1 new position
-    * @param var2 parameter used by this operation
+    * @param x new position
+    * @param y parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setPosition(float var1, float var2) {
-      this.x = var1;
-      this.y = var2;
+   public void setPosition(float x, float y) {
+      this.x = x;
+      this.y = y;
    }
 
    /**
     * Updates size.
     *
-    * @param var1 new size
-    * @param var2 parameter used by this operation
+    * @param width new size
+    * @param height parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSize(float var1, float var2) {
-      this.width = var1;
-      this.height = var2;
+   public void setSize(float width, float height) {
+      this.width = width;
+      this.height = height;
    }
 
    /**
     * Updates style.
     *
-    * @param var1 new style
+    * @param style new style
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setStyle(TextFieldStyle var1) {
-      if (var1 != null) {
-         this.style = var1;
+   public void setStyle(TextFieldStyle style) {
+      if (style != null) {
+         this.style = style;
       }
 
    }
@@ -118,46 +120,46 @@ public final class TextFieldView implements ControlView, PointerInteractable {
    /**
     * Performs contains.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public boolean contains(float var1, float var2) {
-      float var3 = this.width * 0.5F;
-      float var4 = this.height * 0.5F;
-      return var1 >= this.x - var3 && var1 <= this.x + var3 && var2 >= this.y - var4 && var2 <= this.y + var4;
+   public boolean contains(float x, float y) {
+      float relativeX = this.width * 0.5F;
+      float halfHeight = this.height * 0.5F;
+      return x >= this.x - relativeX && x <= this.x + relativeX && y >= this.y - halfHeight && y <= this.y + halfHeight;
    }
 
    /**
     * Performs position to cursor index.
     *
-    * @param var1 parameter used by this operation
+    * @param x parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public int positionToCursorIndex(float var1) {
-      String var2 = this.viewModel.getText();
-      float var3 = var1 - this.getTextStartX();
-      if (!(var3 <= 0.0F) && !var2.isEmpty()) {
-         float var4 = 0.0F;
-         ThemeSnapshot var8 = this.style.getThemeSnapshot();
+   public int positionToCursorIndex(float x) {
+      String text = this.viewModel.getText();
+      float relativeX = x - this.getTextStartX();
+      if (!(relativeX <= 0.0F) && !text.isEmpty()) {
+         float halfHeight = 0.0F;
+         ThemeSnapshot snapshot = this.style.getThemeSnapshot();
 
-         for(int var5 = 0; var5 < var2.length(); ++var5) {
-            float var6 = this.measureTextWidth(var2.substring(0, var5 + 1), var8);
-            float var7 = var4 + (var6 - var4) * 0.5F;
-            if (var3 < var7) {
-               return var5;
+         for(int index = 0; index < text.length(); ++index) {
+            float currentWidth = this.measureTextWidth(text.substring(0, index + 1), snapshot);
+            float midpoint = halfHeight + (currentWidth - halfHeight) * 0.5F;
+            if (relativeX < midpoint) {
+               return index;
             }
 
-            var4 = var6;
+            halfHeight = currentWidth;
          }
 
-         return var2.length();
+         return text.length();
       } else {
          return 0;
       }
@@ -166,26 +168,26 @@ public final class TextFieldView implements ControlView, PointerInteractable {
    /**
     * Handles mouse press.
     *
-    * @param var1 parameter used by this operation
+    * @param mouseX parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMousePress(float var1) {
-      int var2 = this.positionToCursorIndex(var1);
+   public void handleMousePress(float mouseX) {
+      int value = this.positionToCursorIndex(mouseX);
       this.updateClickCount();
       if (this.clickCount >= 3) {
          this.viewModel.selectAll();
          this.viewModel.setSelecting(false);
          this.clickCount = 0;
       } else if (this.clickCount == 2) {
-         this.selectWordAt(var2);
+         this.selectWordAt(value);
          this.viewModel.setSelecting(false);
       } else {
-         this.viewModel.setSelectionAnchor(var2);
-         this.viewModel.setCursorIndexWithoutSelectionReset(var2);
-         this.viewModel.setSelectionStart(var2);
-         this.viewModel.setSelectionEnd(var2);
+         this.viewModel.setSelectionAnchor(value);
+         this.viewModel.setCursorIndexWithoutSelectionReset(value);
+         this.viewModel.setSelectionStart(value);
+         this.viewModel.setSelectionEnd(value);
          this.viewModel.setSelecting(true);
       }
    }
@@ -193,16 +195,16 @@ public final class TextFieldView implements ControlView, PointerInteractable {
    /**
     * Handles mouse drag.
     *
-    * @param var1 parameter used by this operation
+    * @param mouseX parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMouseDrag(float var1) {
+   public void handleMouseDrag(float mouseX) {
       if (this.viewModel.isSelecting()) {
-         int var2 = this.positionToCursorIndex(var1);
-         this.viewModel.setSelectionEnd(var2);
-         this.viewModel.setCursorIndexWithoutSelectionReset(var2);
+         int value = this.positionToCursorIndex(mouseX);
+         this.viewModel.setSelectionEnd(value);
+         this.viewModel.setCursorIndexWithoutSelectionReset(value);
       }
    }
 
@@ -216,18 +218,18 @@ public final class TextFieldView implements ControlView, PointerInteractable {
       this.viewModel.setSelecting(false);
    }
 
-   private TextFieldViewState buildViewState(ThemeSnapshot var1) {
-      String var2 = this.viewModel.getText();
-      float var3 = this.getTextStartX();
-      int var4 = this.viewModel.getSelectionMin();
-      int var5 = this.viewModel.getSelectionMax();
-      String var6 = var2.substring(0, var4);
-      String var7 = var2.substring(var4, var5);
-      String var8 = var2.substring(var5);
-      float var9 = var3 + this.measureTextWidth(var6, var1);
-      float var10 = var9 + this.measureTextWidth(var7, var1);
-      float var11 = var3 + this.measureTextWidth(var2.substring(0, this.viewModel.getCursorIndex()), var1);
-      return new TextFieldViewState(this.x, this.y, this.width, this.height, var2, var6, var7, var8, this.viewModel.getCursorIndex(), this.viewModel.getSelectionStart(), this.viewModel.getSelectionEnd(), this.viewModel.isFocused(), this.viewModel.isShowCursor(), this.viewModel.isEnabled(), var3, var11, var9, var10);
+   private TextFieldViewState buildViewState(ThemeSnapshot snapshot) {
+      String text = this.viewModel.getText();
+      float value = this.getTextStartX();
+      int value2 = this.viewModel.getSelectionMin();
+      int value3 = this.viewModel.getSelectionMax();
+      String path = text.substring(0, value2);
+      String path2 = text.substring(value2, value3);
+      String path3 = text.substring(value3);
+      float value4 = value + this.measureTextWidth(path, snapshot);
+      float value5 = value4 + this.measureTextWidth(path2, snapshot);
+      float value6 = value + this.measureTextWidth(text.substring(0, this.viewModel.getCursorIndex()), snapshot);
+      return new TextFieldViewState(this.x, this.y, this.width, this.height, text, path, path2, path3, this.viewModel.getCursorIndex(), this.viewModel.getSelectionStart(), this.viewModel.getSelectionEnd(), this.viewModel.isFocused(), this.viewModel.isShowCursor(), this.viewModel.isEnabled(), value, value6, value4, value5);
    }
 
    private float getTextStartX() {
@@ -235,62 +237,62 @@ public final class TextFieldView implements ControlView, PointerInteractable {
    }
 
    private void updateClickCount() {
-      long var1 = System.currentTimeMillis();
-      if (var1 - this.lastClickTime < 250L) {
+      long clickTime = System.currentTimeMillis();
+      if (clickTime - this.lastClickTime < 250L) {
          ++this.clickCount;
       } else {
          this.clickCount = 1;
       }
 
-      this.lastClickTime = var1;
+      this.lastClickTime = clickTime;
    }
 
-   private void selectWordAt(int var1) {
-      String var2 = this.viewModel.getText();
-      if (var2.isEmpty()) {
-         byte var6 = 0;
-         this.viewModel.setSelectionAnchor(var6);
-         this.viewModel.setSelectionStart(var6);
-         this.viewModel.setSelectionEnd(var6);
-         this.viewModel.setCursorIndexWithoutSelectionReset(var6);
+   private void selectWordAt(int value) {
+      String text = this.viewModel.getText();
+      if (text.isEmpty()) {
+         int emptyIndex = 0;
+         this.viewModel.setSelectionAnchor(emptyIndex);
+         this.viewModel.setSelectionStart(emptyIndex);
+         this.viewModel.setSelectionEnd(emptyIndex);
+         this.viewModel.setCursorIndexWithoutSelectionReset(emptyIndex);
       } else {
-         int var3 = Math.max(0, Math.min(var1, var2.length() - 1));
-         int var4 = var3;
-         int var5 = var3 + 1;
-         if (!Character.isWhitespace(var2.charAt(var3))) {
-            while(var4 > 0 && !Character.isWhitespace(var2.charAt(var4 - 1))) {
-               --var4;
+         int value2 = Math.max(0, Math.min(value, text.length() - 1));
+         int value3 = value2;
+         int value4 = value2 + 1;
+         if (!Character.isWhitespace(text.charAt(value2))) {
+            while(value3 > 0 && !Character.isWhitespace(text.charAt(value3 - 1))) {
+               --value3;
             }
 
-            while(var5 < var2.length() && !Character.isWhitespace(var2.charAt(var5))) {
-               ++var5;
+            while(value4 < text.length() && !Character.isWhitespace(text.charAt(value4))) {
+               ++value4;
             }
          }
 
-         this.viewModel.setSelectionAnchor(var4);
-         this.viewModel.setSelectionStart(var4);
-         this.viewModel.setSelectionEnd(var5);
-         this.viewModel.setCursorIndexWithoutSelectionReset(var5);
+         this.viewModel.setSelectionAnchor(value3);
+         this.viewModel.setSelectionStart(value3);
+         this.viewModel.setSelectionEnd(value4);
+         this.viewModel.setCursorIndexWithoutSelectionReset(value4);
       }
    }
 
-   private float measureTextWidth(String var1, ThemeSnapshot var2) {
-      TextFieldRenderStyle var3 = this.style.resolveRenderStyle(this.buildMeasureState(), var2);
+   private float measureTextWidth(String text, ThemeSnapshot snapshot) {
+      TextFieldRenderStyle renderStyle = this.style.resolveRenderStyle(this.buildMeasureState(), snapshot);
       this.sketch.pushStyle();
-      if (var3.font() != null) {
-         this.sketch.textFont(var3.font(), var3.textSize());
+      if (renderStyle.font() != null) {
+         this.sketch.textFont(renderStyle.font(), renderStyle.textSize());
       } else {
-         this.sketch.textSize(var3.textSize());
+         this.sketch.textSize(renderStyle.textSize());
       }
 
       this.sketch.textAlign(37, 3);
-      float var4 = this.sketch.textWidth(var1 == null ? "" : var1);
+      float value = this.sketch.textWidth(text == null ? "" : text);
       this.sketch.popStyle();
-      return var4;
+      return value;
    }
 
    private TextFieldViewState buildMeasureState() {
-      float var2 = this.getTextStartX();
-      return new TextFieldViewState(this.x, this.y, this.width, this.height, this.viewModel.getText(), "", "", "", this.viewModel.getCursorIndex(), this.viewModel.getSelectionStart(), this.viewModel.getSelectionEnd(), this.viewModel.isFocused(), this.viewModel.isShowCursor(), this.viewModel.isEnabled(), var2, var2, var2, var2);
+      float value = this.getTextStartX();
+      return new TextFieldViewState(this.x, this.y, this.width, this.height, this.viewModel.getText(), "", "", "", this.viewModel.getCursorIndex(), this.viewModel.getSelectionStart(), this.viewModel.getSelectionEnd(), this.viewModel.isFocused(), this.viewModel.isShowCursor(), this.viewModel.isEnabled(), value, value, value, value);
    }
 }

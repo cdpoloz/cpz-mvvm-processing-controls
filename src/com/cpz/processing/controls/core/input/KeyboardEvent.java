@@ -12,6 +12,8 @@ package com.cpz.processing.controls.core.input;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class KeyboardEvent {
    private final Type type;
@@ -24,23 +26,23 @@ public final class KeyboardEvent {
    /**
     * Creates a keyboard event.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
-    * @param var6 parameter used by this operation
+    * @param type parameter used by this operation
+    * @param key parameter used by this operation
+    * @param keyCode parameter used by this operation
+    * @param shiftDown whether Shift is down
+    * @param controlDown whether Control is down
+    * @param altDown whether Alt is down
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public KeyboardEvent(Type var1, char var2, int var3, boolean var4, boolean var5, boolean var6) {
-      this.type = var1;
-      this.key = var2;
-      this.keyCode = var3;
-      this.shiftDown = var4;
-      this.controlDown = var5;
-      this.altDown = var6;
+   public KeyboardEvent(Type type, char key, int keyCode, boolean shiftDown, boolean controlDown, boolean altDown) {
+      this.type = type;
+      this.key = key;
+      this.keyCode = keyCode;
+      this.shiftDown = shiftDown;
+      this.controlDown = controlDown;
+      this.altDown = altDown;
    }
 
    /**

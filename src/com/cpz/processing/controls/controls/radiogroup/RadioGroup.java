@@ -19,6 +19,8 @@ import java.util.Objects;
 
 /**
  * Convenience facade for the radio group control.
+ *
+ * @author CPZ
  */
 public final class RadioGroup implements Control {
     private final RadioGroupModel model;

@@ -11,6 +11,8 @@ import java.util.Objects;
 
 /**
  * Loads a minimal radio group config from a JSON file.
+ *
+ * @author CPZ
  */
 public final class RadioGroupConfigLoader {
     private final PApplet sketch;

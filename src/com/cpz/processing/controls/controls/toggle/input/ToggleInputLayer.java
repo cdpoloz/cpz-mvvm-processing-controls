@@ -9,25 +9,27 @@ import java.util.Objects;
 
 /**
  * Reusable input layer for a single toggle instance.
+ *
+ * @author CPZ
  */
 public final class ToggleInputLayer extends DefaultInputLayer {
     private final Toggle toggle;
 
-    public ToggleInputLayer(int var1, Toggle var2) {
-        super(var1);
-        this.toggle = Objects.requireNonNull(var2, "toggle");
+    public ToggleInputLayer(int value, Toggle toggle) {
+        super(value);
+        this.toggle = Objects.requireNonNull(toggle, "toggle");
     }
 
-    public boolean handlePointerEvent(PointerEvent var1) {
-        if (var1 == null || var1.getType() == PointerEvent.Type.WHEEL) {
+    public boolean handlePointerEvent(PointerEvent event) {
+        if (event == null || event.getType() == PointerEvent.Type.WHEEL) {
             return false;
         } else {
-            this.toggle.handlePointerEvent(var1);
+            this.toggle.handlePointerEvent(event);
             return true;
         }
     }
 
-    public boolean handleKeyboardEvent(KeyboardEvent var1) {
+    public boolean handleKeyboardEvent(KeyboardEvent event) {
         return false;
     }
 }

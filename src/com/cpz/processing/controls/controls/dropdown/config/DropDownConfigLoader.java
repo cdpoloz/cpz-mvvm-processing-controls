@@ -11,6 +11,8 @@ import java.util.Objects;
 
 /**
  * Loads a minimal drop down config from a JSON file.
+ *
+ * @author CPZ
  */
 public final class DropDownConfigLoader {
     private final PApplet sketch;

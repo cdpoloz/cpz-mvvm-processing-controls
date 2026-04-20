@@ -13,6 +13,9 @@ import processing.core.PApplet;
 
 import java.io.File;
 
+/**
+ * @author CPZ
+ */
 public class RadioGroupJsonTest extends PApplet {
     private static final String RADIO_GROUP_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "radiogroup-test.json";
 

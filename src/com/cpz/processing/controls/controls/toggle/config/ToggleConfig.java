@@ -4,6 +4,8 @@ import java.util.Objects;
 
 /**
  * Minimal config DTO for a single toggle created from external data.
+ *
+ * @author CPZ
  */
 public final class ToggleConfig {
     private final String code;

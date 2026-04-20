@@ -15,7 +15,9 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public interface ToggleShapeRenderer {
-   void render(PApplet var1, float var2, float var3, float var4, float var5, ToggleRenderStyle var6);
+   void render(PApplet sketch, float x, float y, float width, float height, ToggleRenderStyle renderStyle);
 }

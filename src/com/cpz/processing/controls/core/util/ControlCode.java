@@ -5,6 +5,8 @@ import java.util.UUID;
 
 /**
  * Small helper for backward-compatible automatic control codes.
+ *
+ * @author CPZ
  */
 public final class ControlCode {
     private ControlCode() {

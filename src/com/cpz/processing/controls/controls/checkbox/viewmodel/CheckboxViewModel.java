@@ -15,18 +15,20 @@ import com.cpz.processing.controls.core.viewmodel.AbstractInteractiveControlView
  *
  * Notes:
  * - This type belongs to the MVVM ViewModel layer.
+ *
+ * @author CPZ
  */
 public final class CheckboxViewModel extends AbstractInteractiveControlViewModel {
    /**
     * Creates a checkbox view model.
     *
-    * @param var1 parameter used by this operation
+    * @param model parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public CheckboxViewModel(CheckboxModel var1) {
-      super(var1);
+   public CheckboxViewModel(CheckboxModel model) {
+      super(model);
    }
 
    /**
@@ -44,13 +46,13 @@ public final class CheckboxViewModel extends AbstractInteractiveControlViewModel
    /**
     * Updates checked.
     *
-    * @param var1 new checked
+    * @param enabled new checked
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setChecked(boolean var1) {
-      ((CheckboxModel)this.model).setChecked(var1);
+   public void setChecked(boolean enabled) {
+      ((CheckboxModel)this.model).setChecked(enabled);
    }
 
    protected void activate() {

@@ -20,6 +20,8 @@ import java.util.Optional;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public class OverlayManager {
    private final List<OverlayEntry> overlays = new ArrayList<>();
@@ -39,60 +41,60 @@ public class OverlayManager {
    /**
     * Creates a overlay manager.
     *
-    * @param var1 parameter used by this operation
+    * @param focusManager parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public OverlayManager(FocusManager var1) {
-      this.focusManager = var1;
+   public OverlayManager(FocusManager focusManager) {
+      this.focusManager = focusManager;
    }
 
    /**
     * Updates focus manager.
     *
-    * @param var1 new focus manager
+    * @param focusManager new focus manager
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setFocusManager(FocusManager var1) {
-      this.focusManager = var1;
+   public void setFocusManager(FocusManager focusManager) {
+      this.focusManager = focusManager;
    }
 
    /**
     * Performs register.
     *
-    * @param var1 parameter used by this operation
+    * @param overlayEntry parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void register(OverlayEntry var1) {
-      if (var1 != null && !this.overlays.contains(var1)) {
-         this.overlays.add(var1);
+   public void register(OverlayEntry overlayEntry) {
+      if (overlayEntry != null && !this.overlays.contains(overlayEntry)) {
+         this.overlays.add(overlayEntry);
          this.sort();
-         this.handleFocusOnRegister(var1);
+         this.handleFocusOnRegister(overlayEntry);
       }
    }
 
    /**
     * Performs unregister.
     *
-    * @param var1 parameter used by this operation
+    * @param overlayEntry parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void unregister(OverlayEntry var1) {
-      if (var1 != null) {
-         this.overlays.remove(var1);
-         this.handleFocusOnUnregister(var1);
+   public void unregister(OverlayEntry overlayEntry) {
+      if (overlayEntry != null) {
+         this.overlays.remove(overlayEntry);
+         this.handleFocusOnUnregister(overlayEntry);
       }
    }
 
    private void sort() {
-      this.overlays.sort((var0, var1) -> Integer.compare(var1.getZIndex(), var0.getZIndex()));
+      this.overlays.sort((left, right) -> Integer.compare(right.getZIndex(), left.getZIndex()));
    }
 
    /**
@@ -122,14 +124,14 @@ public class OverlayManager {
    /**
     * Returns whether top overlay.
     *
-    * @param var1 parameter used by this operation
+    * @param right parameter used by this operation
     * @return whether the current condition is satisfied
     *
     * Behavior:
     * - Returns the current value without applying side effects.
     */
-   public boolean isTopOverlay(OverlayEntry var1) {
-      return var1 != null && !this.overlays.isEmpty() && this.overlays.get(0) == var1;
+   public boolean isTopOverlay(OverlayEntry right) {
+      return right != null && !this.overlays.isEmpty() && this.overlays.get(0) == right;
    }
 
    /**
@@ -139,11 +141,11 @@ public class OverlayManager {
     * - Updates the public state or registration owned by this type.
     */
    public void clearAll() {
-      for(int var1 = this.focusManagedOverlays.size() - 1; var1 >= 0; --var1) {
-         OverlayEntry var2 = (OverlayEntry)this.focusManagedOverlays.get(var1);
-         FocusManager.FocusToken var3 = (FocusManager.FocusToken)this.focusTokens.remove(var2);
+      for(int color = this.focusManagedOverlays.size() - 1; color >= 0; --color) {
+         OverlayEntry overlayEntry = (OverlayEntry)this.focusManagedOverlays.get(color);
+         FocusManager.FocusToken token = (FocusManager.FocusToken)this.focusTokens.remove(overlayEntry);
          if (this.focusManager != null) {
-            this.focusManager.discardFocus(var3);
+            this.focusManager.discardFocus(token);
          }
       }
 
@@ -151,31 +153,31 @@ public class OverlayManager {
       this.overlays.clear();
    }
 
-   private void handleFocusOnRegister(OverlayEntry var1) {
-      if (this.focusManager != null && var1.getFocusTarget() != null) {
-         FocusManager.FocusToken var2 = this.focusManager.pushFocus();
-         this.focusTokens.put(var1, var2);
-         this.focusManagedOverlays.add(var1);
-         this.focusManager.requestFocus(var1.getFocusTarget());
+   private void handleFocusOnRegister(OverlayEntry overlayEntry) {
+      if (this.focusManager != null && overlayEntry.getFocusTarget() != null) {
+         FocusManager.FocusToken token = this.focusManager.pushFocus();
+         this.focusTokens.put(overlayEntry, token);
+         this.focusManagedOverlays.add(overlayEntry);
+         this.focusManager.requestFocus(overlayEntry.getFocusTarget());
       }
    }
 
-   private void handleFocusOnUnregister(OverlayEntry var1) {
-      FocusManager.FocusToken var2 = (FocusManager.FocusToken)this.focusTokens.remove(var1);
-      if (var2 == null) {
-         this.focusManagedOverlays.remove(var1);
+   private void handleFocusOnUnregister(OverlayEntry overlayEntry) {
+      FocusManager.FocusToken token = (FocusManager.FocusToken)this.focusTokens.remove(overlayEntry);
+      if (token == null) {
+         this.focusManagedOverlays.remove(overlayEntry);
       } else {
-         int var3 = this.focusManagedOverlays.lastIndexOf(var1);
-         boolean var4 = var3 == this.focusManagedOverlays.size() - 1;
-         if (var3 >= 0) {
-            this.focusManagedOverlays.remove(var3);
+         int index = this.focusManagedOverlays.lastIndexOf(overlayEntry);
+         boolean active = index == this.focusManagedOverlays.size() - 1;
+         if (index >= 0) {
+            this.focusManagedOverlays.remove(index);
          }
 
          if (this.focusManager != null) {
-            if (var4) {
-               this.focusManager.popFocus(var2);
+            if (active) {
+               this.focusManager.popFocus(token);
             } else {
-               this.focusManager.discardFocus(var2);
+               this.focusManager.discardFocus(token);
             }
 
          }

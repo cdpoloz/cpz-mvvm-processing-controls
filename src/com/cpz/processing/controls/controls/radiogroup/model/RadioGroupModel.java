@@ -19,6 +19,8 @@ import java.util.Objects;
  *
  * Notes:
  * - This type belongs to the MVVM Model layer.
+ *
+ * @author CPZ
  */
 public final class RadioGroupModel implements Enableable {
    private final String code;
@@ -29,37 +31,37 @@ public final class RadioGroupModel implements Enableable {
    /**
     * Creates a radio group model.
     *
-    * @param var1 parameter used by this operation
+    * @param list parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public RadioGroupModel(List<String> var1) {
-      this(ControlCode.auto("radiogroup"), var1, -1);
+   public RadioGroupModel(List<String> list) {
+      this(ControlCode.auto("radiogroup"), list, -1);
    }
 
    /**
     * Creates a radio group model.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param list parameter used by this operation
+    * @param value parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public RadioGroupModel(List<String> var1, int var2) {
-      this(ControlCode.auto("radiogroup"), var1, var2);
+   public RadioGroupModel(List<String> list, int value) {
+      this(ControlCode.auto("radiogroup"), list, value);
    }
 
-   public RadioGroupModel(String var1, List<String> var2) {
-      this(var1, var2, -1);
+   public RadioGroupModel(String text, List<String> list) {
+      this(text, list, -1);
    }
 
-   public RadioGroupModel(String var1, List<String> var2, int var3) {
-      this.code = Objects.requireNonNull(var1, "code");
+   public RadioGroupModel(String text, List<String> list, int value) {
+      this.code = Objects.requireNonNull(text, "code");
       this.enabled = true;
-      this.options = this.sanitizeOptions(var2);
-      this.selectedIndex = this.normalizeIndex(var3, this.options.size());
+      this.options = this.sanitizeOptions(list);
+      this.selectedIndex = this.normalizeIndex(value, this.options.size());
    }
 
    public String getCode() {
@@ -81,13 +83,13 @@ public final class RadioGroupModel implements Enableable {
    /**
     * Updates options.
     *
-    * @param var1 new options
+    * @param list new options
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setOptions(List<String> var1) {
-      this.options = this.sanitizeOptions(var1);
+   public void setOptions(List<String> list) {
+      this.options = this.sanitizeOptions(list);
       this.selectedIndex = this.normalizeIndex(this.selectedIndex, this.options.size());
    }
 
@@ -106,13 +108,13 @@ public final class RadioGroupModel implements Enableable {
    /**
     * Updates selected index.
     *
-    * @param var1 new selected index
+    * @param index new selected index
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSelectedIndex(int var1) {
-      this.selectedIndex = this.normalizeIndex(var1, this.options.size());
+   public void setSelectedIndex(int index) {
+      this.selectedIndex = this.normalizeIndex(index, this.options.size());
    }
 
    /**
@@ -130,34 +132,34 @@ public final class RadioGroupModel implements Enableable {
    /**
     * Updates enabled.
     *
-    * @param var1 new enabled
+    * @param enabled new enabled
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setEnabled(boolean var1) {
-      this.enabled = var1;
+   public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
    }
 
-   private List<String> sanitizeOptions(List<String> var1) {
-      if (var1 != null && !var1.isEmpty()) {
-         ArrayList<String> var2 = new ArrayList<>(var1.size());
+   private List<String> sanitizeOptions(List<String> list) {
+      if (list != null && !list.isEmpty()) {
+         ArrayList<String> arrayList = new ArrayList<>(list.size());
 
-         for(String var4 : var1) {
-            var2.add(var4 == null ? "" : var4);
+         for(String text : list) {
+            arrayList.add(text == null ? "" : text);
          }
 
-         return Collections.unmodifiableList(var2);
+         return Collections.unmodifiableList(arrayList);
       } else {
          return List.of();
       }
    }
 
-   private int normalizeIndex(int var1, int var2) {
-      if (var2 <= 0) {
+   private int normalizeIndex(int zIndex, int zIndex2) {
+      if (zIndex2 <= 0) {
          return -1;
       } else {
-         return var1 >= -1 && var1 < var2 ? var1 : -1;
+         return zIndex >= -1 && zIndex < zIndex2 ? zIndex : -1;
       }
    }
 }

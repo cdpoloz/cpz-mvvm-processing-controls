@@ -9,25 +9,27 @@ import java.util.Objects;
 
 /**
  * Reusable input layer for a single checkbox instance.
+ *
+ * @author CPZ
  */
 public final class CheckboxInputLayer extends DefaultInputLayer {
     private final Checkbox checkbox;
 
-    public CheckboxInputLayer(int var1, Checkbox var2) {
-        super(var1);
-        this.checkbox = Objects.requireNonNull(var2, "checkbox");
+    public CheckboxInputLayer(int value, Checkbox checkbox) {
+        super(value);
+        this.checkbox = Objects.requireNonNull(checkbox, "checkbox");
     }
 
-    public boolean handlePointerEvent(PointerEvent var1) {
-        if (var1 == null || var1.getType() == PointerEvent.Type.WHEEL) {
+    public boolean handlePointerEvent(PointerEvent event) {
+        if (event == null || event.getType() == PointerEvent.Type.WHEEL) {
             return false;
         } else {
-            this.checkbox.handlePointerEvent(var1);
+            this.checkbox.handlePointerEvent(event);
             return true;
         }
     }
 
-    public boolean handleKeyboardEvent(KeyboardEvent var1) {
+    public boolean handleKeyboardEvent(KeyboardEvent event) {
         return false;
     }
 }

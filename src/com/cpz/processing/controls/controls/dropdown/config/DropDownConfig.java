@@ -5,6 +5,8 @@ import java.util.Objects;
 
 /**
  * Minimal config DTO for a single drop down created from external data.
+ *
+ * @author CPZ
  */
 public final class DropDownConfig {
     private final String code;

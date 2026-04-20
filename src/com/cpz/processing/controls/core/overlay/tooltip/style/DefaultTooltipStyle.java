@@ -23,6 +23,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class DefaultTooltipStyle {
    private final TooltipStyleConfig config;
@@ -32,42 +34,42 @@ public final class DefaultTooltipStyle {
    /**
     * Creates a default tooltip style.
     *
-    * @param var1 parameter used by this operation
+    * @param config parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public DefaultTooltipStyle(TooltipStyleConfig var1) {
-      this(var1, new DefaultTooltipRenderer());
+   public DefaultTooltipStyle(TooltipStyleConfig config) {
+      this(config, new DefaultTooltipRenderer());
    }
 
    /**
     * Creates a default tooltip style.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param config parameter used by this operation
+    * @param renderer parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public DefaultTooltipStyle(TooltipStyleConfig var1, DefaultTooltipRenderer var2) {
-      this.config = var1 == null ? new TooltipStyleConfig() : var1;
-      this.renderer = var2 == null ? new DefaultTooltipRenderer() : var2;
+   public DefaultTooltipStyle(TooltipStyleConfig config, DefaultTooltipRenderer renderer) {
+      this.config = config == null ? new TooltipStyleConfig() : config;
+      this.renderer = renderer == null ? new DefaultTooltipRenderer() : renderer;
       this.themeProvider = this.config.themeProvider != null ? this.config.themeProvider : new ThemeManager();
    }
 
    /**
     * Renders the current frame.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param state parameter used by this operation
+    * @param snapshot parameter used by this operation
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
     */
-   public void render(PApplet var1, TooltipViewState var2, ThemeSnapshot var3) {
-      this.renderer.render(var1, var2, this.resolveRenderStyle(var3));
+   public void render(PApplet sketch, TooltipViewState state, ThemeSnapshot snapshot) {
+      this.renderer.render(sketch, state, this.resolveRenderStyle(snapshot));
    }
 
    /**
@@ -85,18 +87,18 @@ public final class DefaultTooltipStyle {
    /**
     * Resolves render style.
     *
-    * @param var1 parameter used by this operation
+    * @param snapshot parameter used by this operation
     * @return resolved render style
     *
     * Behavior:
     * - Produces the public result required by the surrounding pipeline.
     */
-   public TooltipRenderStyle resolveRenderStyle(ThemeSnapshot var1) {
-      ThemeTokens var2 = var1.tokens;
-      int var3 = this.config.backgroundOverride != null ? this.config.backgroundOverride : InteractiveStyleHelper.applyOverlay(var2.surfaceVariant, Colors.argb(220, 0, 0, 0));
-      int var4 = this.config.textOverride != null ? this.config.textOverride : var2.onSurface;
-      int var5 = this.config.borderOverride != null ? this.config.borderOverride : var2.border;
-      return new TooltipRenderStyle(var3, var4, var5, 1.0F, this.config.textSize, this.config.textPadding, this.config.cornerRadius, this.config.minHeight, this.config.font);
+   public TooltipRenderStyle resolveRenderStyle(ThemeSnapshot snapshot) {
+      ThemeTokens tokens = snapshot.tokens;
+      int backgroundColor = this.config.backgroundOverride != null ? this.config.backgroundOverride : InteractiveStyleHelper.applyOverlay(tokens.surfaceVariant, Colors.argb(220, 0, 0, 0));
+      int index = this.config.textOverride != null ? this.config.textOverride : tokens.onSurface;
+      int color = this.config.borderOverride != null ? this.config.borderOverride : tokens.border;
+      return new TooltipRenderStyle(backgroundColor, index, color, 1.0F, this.config.textSize, this.config.textPadding, this.config.cornerRadius, this.config.minHeight, this.config.font);
    }
 
    /**

@@ -9,6 +9,8 @@ import java.util.Objects;
 
 /**
  * Loads a minimal toggle config from a JSON file.
+ *
+ * @author CPZ
  */
 public final class ToggleConfigLoader {
     private final PApplet sketch;

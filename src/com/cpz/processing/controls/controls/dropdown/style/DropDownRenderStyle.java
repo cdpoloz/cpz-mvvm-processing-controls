@@ -14,6 +14,8 @@ import processing.core.PFont;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public record DropDownRenderStyle(int baseFillColor, int listFillColor, int itemHoverColor, int itemSelectedColor, int strokeColor, float strokeWeight, int textColor, int arrowColor, float cornerRadius, float listCornerRadius, float textSize, float itemHeight, float textPadding, float arrowPadding, int maxVisibleItems, PFont font) {
 }

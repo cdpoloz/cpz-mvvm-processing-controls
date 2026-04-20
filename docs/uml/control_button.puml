@@ -1,19 +1,35 @@
 @startuml
-title Button Control Structure
+title Button Public Facade Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
+interface Control
+class Button
+class ButtonModel
+class ButtonViewModel
 class ButtonView
+class ButtonInputAdapter
 class ButtonViewState
 class DefaultButtonStyle
 class ButtonRenderStyle
 class DefaultButtonRenderer
+interface ThemeProvider
 class ThemeSnapshot
 
-ButtonView --> ButtonViewState
-ButtonView --> ThemeSnapshot
-DefaultButtonStyle --> ButtonViewState
-DefaultButtonStyle --> ThemeSnapshot
-DefaultButtonStyle --> ButtonRenderStyle
-DefaultButtonRenderer --> ButtonRenderStyle
+Button ..|> Control
+Button --> ButtonModel : owns
+Button --> ButtonViewModel : owns
+Button --> ButtonView : owns
+Button --> ButtonInputAdapter : delegates input
+ButtonInputAdapter --> ButtonView : geometry / hit testing
+ButtonInputAdapter --> ButtonViewModel : interaction updates
+ButtonViewModel --> ButtonModel : updates
+ButtonView --> ButtonViewModel : reads
+ButtonView --> ButtonViewState : builds
+ButtonView --> DefaultButtonStyle : renders with
+DefaultButtonStyle --> ThemeProvider : reads snapshot
+ThemeProvider --> ThemeSnapshot
+DefaultButtonStyle --> ButtonViewState : resolves
+DefaultButtonStyle --> ButtonRenderStyle : creates
+DefaultButtonRenderer --> ButtonRenderStyle : draws
 @enduml

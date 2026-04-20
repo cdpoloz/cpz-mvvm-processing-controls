@@ -1,19 +1,35 @@
 @startuml
-title Checkbox Control Structure
+title Checkbox Public Facade Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
+interface Control
+class Checkbox
+class CheckboxModel
+class CheckboxViewModel
 class CheckboxView
+class CheckboxInputAdapter
 class CheckboxViewState
 class DefaultCheckboxStyle
 class CheckboxRenderStyle
 class DefaultCheckboxRenderer
+interface ThemeProvider
 class ThemeSnapshot
 
-CheckboxView --> CheckboxViewState
-CheckboxView --> ThemeSnapshot
-DefaultCheckboxStyle --> CheckboxViewState
-DefaultCheckboxStyle --> ThemeSnapshot
-DefaultCheckboxStyle --> CheckboxRenderStyle
-DefaultCheckboxRenderer --> CheckboxRenderStyle
+Checkbox ..|> Control
+Checkbox --> CheckboxModel : owns
+Checkbox --> CheckboxViewModel : owns
+Checkbox --> CheckboxView : owns
+Checkbox --> CheckboxInputAdapter : delegates input
+CheckboxInputAdapter --> CheckboxView : geometry / hit testing
+CheckboxInputAdapter --> CheckboxViewModel : interaction updates
+CheckboxViewModel --> CheckboxModel : updates
+CheckboxView --> CheckboxViewModel : reads
+CheckboxView --> CheckboxViewState : builds
+CheckboxView --> DefaultCheckboxStyle : renders with
+DefaultCheckboxStyle --> ThemeProvider : reads snapshot
+ThemeProvider --> ThemeSnapshot
+DefaultCheckboxStyle --> CheckboxViewState : resolves
+DefaultCheckboxStyle --> CheckboxRenderStyle : creates
+DefaultCheckboxRenderer --> CheckboxRenderStyle : draws
 @enduml

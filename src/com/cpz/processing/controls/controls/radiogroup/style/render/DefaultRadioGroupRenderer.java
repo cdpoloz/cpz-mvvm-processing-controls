@@ -18,57 +18,59 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class DefaultRadioGroupRenderer {
    /**
     * Renders the current frame.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param state parameter used by this operation
+    * @param renderStyle parameter used by this operation
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
     */
-   public void render(PApplet var1, RadioGroupViewState var2, RadioGroupRenderStyle var3) {
-      var1.pushStyle();
-      if (var3.font() != null) {
-         var1.textFont(var3.font(), var3.textSize());
+   public void render(PApplet sketch, RadioGroupViewState state, RadioGroupRenderStyle renderStyle) {
+      sketch.pushStyle();
+      if (renderStyle.font() != null) {
+         sketch.textFont(renderStyle.font(), renderStyle.textSize());
       } else {
-         var1.textSize(var3.textSize());
+         sketch.textSize(renderStyle.textSize());
       }
 
-      var1.textAlign(37, 3);
+      sketch.textAlign(37, 3);
 
-      for(int var4 = 0; var4 < var2.items().size(); ++var4) {
-         RadioGroupItemViewState var5 = (RadioGroupItemViewState)var2.items().get(var4);
-         RadioGroupItemRenderStyle var6 = (RadioGroupItemRenderStyle)var3.itemStyles().get(var4);
-         this.drawItem(var1, var5, var6, var3);
+      for(int value = 0; value < state.items().size(); ++value) {
+         RadioGroupItemViewState state2 = (RadioGroupItemViewState)state.items().get(value);
+         RadioGroupItemRenderStyle renderStyle2 = (RadioGroupItemRenderStyle)renderStyle.itemStyles().get(value);
+         this.drawItem(sketch, state2, renderStyle2, renderStyle);
       }
 
-      var1.popStyle();
+      sketch.popStyle();
    }
 
-   private void drawItem(PApplet var1, RadioGroupItemViewState var2, RadioGroupItemRenderStyle var3, RadioGroupRenderStyle var4) {
-      float var5 = var2.x() - var2.width() * 0.5F;
-      float var6 = var2.y() - var2.height() * 0.5F;
-      if ((var3.backgroundColor() >>> 24 & 255) > 0) {
-         var1.noStroke();
-         var1.fill(var3.backgroundColor());
-         var1.rect(var5, var6, var2.width(), var2.height(), var4.cornerRadius());
+   private void drawItem(PApplet sketch, RadioGroupItemViewState state, RadioGroupItemRenderStyle renderStyle, RadioGroupRenderStyle renderStyle2) {
+      float value = state.x() - state.width() * 0.5F;
+      float value2 = state.y() - state.height() * 0.5F;
+      if ((renderStyle.backgroundColor() >>> 24 & 255) > 0) {
+         sketch.noStroke();
+         sketch.fill(renderStyle.backgroundColor());
+         sketch.rect(value, value2, state.width(), state.height(), renderStyle2.cornerRadius());
       }
 
-      var1.stroke(var3.indicatorStrokeColor());
-      var1.strokeWeight(var4.strokeWeight());
-      var1.fill(var3.indicatorFillColor());
-      var1.circle(var2.indicatorCenterX(), var2.indicatorCenterY(), var4.indicatorOuterDiameter());
-      if (var2.selected()) {
-         var1.noStroke();
-         var1.fill(var3.indicatorDotColor());
-         var1.circle(var2.indicatorCenterX(), var2.indicatorCenterY(), var4.indicatorInnerDiameter());
+      sketch.stroke(renderStyle.indicatorStrokeColor());
+      sketch.strokeWeight(renderStyle2.strokeWeight());
+      sketch.fill(renderStyle.indicatorFillColor());
+      sketch.circle(state.indicatorCenterX(), state.indicatorCenterY(), renderStyle2.indicatorOuterDiameter());
+      if (state.selected()) {
+         sketch.noStroke();
+         sketch.fill(renderStyle.indicatorDotColor());
+         sketch.circle(state.indicatorCenterX(), state.indicatorCenterY(), renderStyle2.indicatorInnerDiameter());
       }
 
-      var1.fill(var3.textColor());
-      var1.text(var2.text(), var2.textX(), var2.y());
+      sketch.fill(renderStyle.textColor());
+      sketch.text(state.text(), state.textX(), state.y());
    }
 }

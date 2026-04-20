@@ -8,6 +8,8 @@ import com.cpz.processing.controls.core.input.PointerEvent;
 
 /**
  * Input component for drop down input adapter.
+ *
+ * @author CPZ
  */
 public final class DropDownInputAdapter {
     private final DropDownView view;

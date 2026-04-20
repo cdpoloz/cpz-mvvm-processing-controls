@@ -14,6 +14,8 @@ import com.cpz.processing.controls.controls.slider.model.SliderOrientation;
  *
  * Notes:
  * - This type belongs to the MVVM View layer.
+ *
+ * @author CPZ
  */
 public final class SliderGeometry {
    private final float x;
@@ -28,59 +30,59 @@ public final class SliderGeometry {
    /**
     * Creates a slider geometry.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
-    * @param var6 parameter used by this operation
-    * @param var7 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
+    * @param height parameter used by this operation
+    * @param sliderOrientation parameter used by this operation
+    * @param radius parameter used by this operation
+    * @param value parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public SliderGeometry(float var1, float var2, float var3, float var4, SliderOrientation var5, float var6, float var7) {
-      this.x = var1;
-      this.y = var2;
-      this.width = var3;
-      this.height = var4;
-      this.orientation = var5 == null ? SliderOrientation.HORIZONTAL : var5;
-      float var8 = Math.min(var6, var7);
-      float var9 = Math.max(var6, var7);
-      this.trackStart = var8;
-      this.trackEnd = var9;
-      this.trackLength = Math.max(0.0F, var9 - var8);
+   public SliderGeometry(float x, float y, float width, float height, SliderOrientation sliderOrientation, float radius, float value) {
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
+      this.orientation = sliderOrientation == null ? SliderOrientation.HORIZONTAL : sliderOrientation;
+      float value2 = Math.min(radius, value);
+      float value3 = Math.max(radius, value);
+      this.trackStart = value2;
+      this.trackEnd = value3;
+      this.trackLength = Math.max(0.0F, value3 - value2);
    }
 
    /**
     * Performs normalized to position.
     *
-    * @param var1 parameter used by this operation
+    * @param normalizedValue parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public float normalizedToPosition(float var1) {
-      float var2 = clamp(var1, 0.0F, 1.0F);
-      return this.trackStart + this.trackLength * var2;
+   public float normalizedToPosition(float normalizedValue) {
+      float value4 = clamp(normalizedValue, 0.0F, 1.0F);
+      return this.trackStart + this.trackLength * value4;
    }
 
    /**
     * Performs position to normalized.
     *
-    * @param var1 parameter used by this operation
+    * @param normalizedValue parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public float positionToNormalized(float var1) {
+   public float positionToNormalized(float normalizedValue) {
       if (this.trackLength <= 0.0F) {
          return 0.0F;
       } else {
-         float var2 = clamp(var1, this.trackStart, this.trackEnd);
-         return (var2 - this.trackStart) / this.trackLength;
+         float value4 = clamp(normalizedValue, this.trackStart, this.trackEnd);
+         return (value4 - this.trackStart) / this.trackLength;
       }
    }
 
@@ -231,30 +233,30 @@ public final class SliderGeometry {
    /**
     * Performs thumb x.
     *
-    * @param var1 parameter used by this operation
+    * @param normalizedValue parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public float thumbX(float var1) {
-      return this.orientation == SliderOrientation.HORIZONTAL ? this.normalizedToPosition(var1) : this.x;
+   public float thumbX(float normalizedValue) {
+      return this.orientation == SliderOrientation.HORIZONTAL ? this.normalizedToPosition(normalizedValue) : this.x;
    }
 
    /**
     * Performs thumb y.
     *
-    * @param var1 parameter used by this operation
+    * @param normalizedValue parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public float thumbY(float var1) {
-      return this.orientation == SliderOrientation.VERTICAL ? this.y + this.height * 0.5F - this.normalizedToPosition(var1) : this.y;
+   public float thumbY(float normalizedValue) {
+      return this.orientation == SliderOrientation.VERTICAL ? this.y + this.height * 0.5F - this.normalizedToPosition(normalizedValue) : this.y;
    }
 
-   private static float clamp(float var0, float var1, float var2) {
-      return Math.max(var1, Math.min(var2, var0));
+   private static float clamp(float x, float y, float width) {
+      return Math.max(y, Math.min(width, x));
    }
 }

@@ -9,6 +9,9 @@ import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.util.Colors;
 import processing.core.PApplet;
 
+/**
+ * @author CPZ
+ */
 public class CheckboxTest extends PApplet {
     private InputManager inputManager;
     private Checkbox checkbox;

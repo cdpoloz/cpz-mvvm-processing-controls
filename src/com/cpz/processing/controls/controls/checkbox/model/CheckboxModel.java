@@ -17,6 +17,8 @@ import java.util.Objects;
  *
  * Notes:
  * - This type belongs to the MVVM Model layer.
+ *
+ * @author CPZ
  */
 public final class CheckboxModel implements Enableable {
    private final String code;
@@ -36,18 +38,18 @@ public final class CheckboxModel implements Enableable {
    /**
     * Creates a checkbox model.
     *
-    * @param var1 parameter used by this operation
+    * @param enabled parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public CheckboxModel(boolean var1) {
-      this(ControlCode.auto("checkbox"), var1);
+   public CheckboxModel(boolean enabled) {
+      this(ControlCode.auto("checkbox"), enabled);
    }
 
-   public CheckboxModel(String var1, boolean var2) {
-      this.code = Objects.requireNonNull(var1, "code");
-      this.checked = var2;
+   public CheckboxModel(String text, boolean enabled) {
+      this.code = Objects.requireNonNull(text, "code");
+      this.checked = enabled;
    }
 
    public String getCode() {
@@ -69,13 +71,13 @@ public final class CheckboxModel implements Enableable {
    /**
     * Updates checked.
     *
-    * @param var1 new checked
+    * @param enabled new checked
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setChecked(boolean var1) {
-      this.checked = var1;
+   public void setChecked(boolean enabled) {
+      this.checked = enabled;
    }
 
    /**
@@ -93,12 +95,12 @@ public final class CheckboxModel implements Enableable {
    /**
     * Updates enabled.
     *
-    * @param var1 new enabled
+    * @param enabled new enabled
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setEnabled(boolean var1) {
-      this.enabled = var1;
+   public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
    }
 }

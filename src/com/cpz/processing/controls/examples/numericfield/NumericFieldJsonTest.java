@@ -14,6 +14,9 @@ import processing.core.PApplet;
 import java.io.File;
 import java.math.BigDecimal;
 
+/**
+ * @author CPZ
+ */
 public class NumericFieldJsonTest extends PApplet {
     private static final String NUMERIC_FIELD_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "numericfield-test.json";
 

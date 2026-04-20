@@ -9,6 +9,8 @@ import java.util.Objects;
 
 /**
  * Reusable input layer for a single text field instance.
+ *
+ * @author CPZ
  */
 public final class TextFieldInputLayer extends DefaultInputLayer {
     private final TextField textField;

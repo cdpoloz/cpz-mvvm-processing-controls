@@ -1,56 +1,44 @@
 package com.cpz.processing.controls.core.theme;
 
 /**
- * Theme component for theme.
+ * Immutable theme definition backed by rendering tokens.
  *
- * Responsibilities:
- * - Represent theme data or theme access for the rendering pipeline.
- * - Keep theme concerns explicit and reusable.
+ * <p>A theme is value-like: it copies tokens on construction and returns copies
+ * to callers. {@link ThemeManager} owns the active theme for a sketch and turns
+ * it into a cached {@link ThemeSnapshot} for styles.</p>
  *
- * Behavior:
- * - Keeps the public role isolated from unrelated concerns.
- *
- * Notes:
- * - This type is part of the public project surface.
+ * @author CPZ
  */
 public class Theme {
    private final ThemeTokens tokens;
 
    /**
-    * Creates a theme.
+    * Creates a theme from the supplied token set.
     *
-    * @param var1 parameter used by this operation
-    *
-    * Behavior:
-    * - Initializes the public state required by this type.
+    * @param tokens source tokens
+    * @throws IllegalArgumentException when {@code tokens} is {@code null}
     */
-   public Theme(ThemeTokens var1) {
-      if (var1 == null) {
+   public Theme(ThemeTokens tokens) {
+      if (tokens == null) {
          throw new IllegalArgumentException("tokens must not be null");
       } else {
-         this.tokens = var1.copy();
+         this.tokens = tokens.copy();
       }
    }
 
    /**
-    * Performs tokens.
+    * Returns a defensive copy of this theme's tokens.
     *
-    * @return result of this operation
-    *
-    * Behavior:
-    * - Executes the public operation exposed by this type.
+    * @return copied token set
     */
    public ThemeTokens tokens() {
       return this.tokens.copy();
    }
 
    /**
-    * Returns a copy of state.
+    * Returns a copy of this theme.
     *
-    * @return copied value
-    *
-    * Behavior:
-    * - Produces the public result required by the surrounding pipeline.
+    * @return copied theme
     */
    public Theme copy() {
       return new Theme(this.tokens);

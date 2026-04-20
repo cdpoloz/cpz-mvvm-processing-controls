@@ -21,6 +21,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class ParametricToggleStyle implements ToggleStyle {
    private final ToggleStyleConfig cfg;
@@ -29,64 +31,64 @@ public final class ParametricToggleStyle implements ToggleStyle {
    /**
     * Creates a parametric toggle style.
     *
-    * @param var1 parameter used by this operation
+    * @param config parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public ParametricToggleStyle(ToggleStyleConfig var1) {
-      if (var1 == null) {
+   public ParametricToggleStyle(ToggleStyleConfig config) {
+      if (config == null) {
          throw new IllegalArgumentException("Config null");
-      } else if (var1.shape == null) {
+      } else if (config.shape == null) {
          throw new IllegalArgumentException("ToggleShapeRenderer requerido");
       } else {
-         this.cfg = var1;
-         this.themeProvider = var1.themeProvider != null ? var1.themeProvider : new ThemeManager();
+         this.cfg = config;
+         this.themeProvider = config.themeProvider != null ? config.themeProvider : new ThemeManager();
       }
    }
 
    /**
     * Renders the current frame.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param state parameter used by this operation
+    * @param snapshot parameter used by this operation
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
     */
-   public void render(PApplet var1, ToggleViewState var2, ThemeSnapshot var3) {
-      ThemeTokens var4 = var3.tokens;
-      int var5 = Math.max(0, var2.stateIndex());
-      int var6 = var5 == 0 ? this.resolveStateColor(var4.surfaceVariant, this.cfg.offFillOverride, 0) : this.resolveStateColor(var4.primary, this.cfg.onFillOverride, var5);
-      int var7 = InteractiveStyleHelper.resolveFillColor(var6, this.resolveInteractiveColor(var6, var4.hoverOverlay, this.cfg.hoverFillOverride, this.cfg.hoverBlendWithWhite, var1, true), this.resolveInteractiveColor(var6, var4.pressedOverlay, this.cfg.pressedFillOverride, this.cfg.pressedBlendWithBlack, var1, false), var2.hovered(), var2.pressed());
-      int var8 = this.cfg.disabledAlpha != null ? this.cfg.disabledAlpha : var4.disabledAlpha;
-      int var9 = this.resolveColorOverride(var4.border, this.cfg.strokeOverride, this.cfg.strokeColor);
-      ToggleRenderStyle var10 = new ToggleRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(var7, var2.enabled(), var8), InteractiveStyleHelper.resolveStrokeColor(var9, var2.enabled(), var8), InteractiveStyleHelper.resolveStrokeWeight(this.cfg.strokeWidth, this.cfg.strokeWidthHover, var2.hovered()));
-      this.cfg.shape.render(var1, var2.x(), var2.y(), var2.width(), var2.height(), var10);
+   public void render(PApplet sketch, ToggleViewState state, ThemeSnapshot snapshot) {
+      ThemeTokens tokens = snapshot.tokens;
+      int value = Math.max(0, state.stateIndex());
+      int color = value == 0 ? this.resolveStateColor(tokens.surfaceVariant, this.cfg.offFillOverride, 0) : this.resolveStateColor(tokens.primary, this.cfg.onFillOverride, value);
+      int color2 = InteractiveStyleHelper.resolveFillColor(color, this.resolveInteractiveColor(color, tokens.hoverOverlay, this.cfg.hoverFillOverride, this.cfg.hoverBlendWithWhite, sketch, true), this.resolveInteractiveColor(color, tokens.pressedOverlay, this.cfg.pressedFillOverride, this.cfg.pressedBlendWithBlack, sketch, false), state.hovered(), state.pressed());
+      int disabledAlpha = this.cfg.disabledAlpha != null ? this.cfg.disabledAlpha : tokens.disabledAlpha;
+      int color3 = this.resolveColorOverride(tokens.border, this.cfg.strokeOverride, this.cfg.strokeColor);
+      ToggleRenderStyle renderStyle = new ToggleRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(color2, state.enabled(), disabledAlpha), InteractiveStyleHelper.resolveStrokeColor(color3, state.enabled(), disabledAlpha), InteractiveStyleHelper.resolveStrokeWeight(this.cfg.strokeWidth, this.cfg.strokeWidthHover, state.hovered()));
+      this.cfg.shape.render(sketch, state.x(), state.y(), state.width(), state.height(), renderStyle);
    }
 
-   private int resolveStateColor(int var1, Integer var2, int var3) {
-      if (this.cfg.stateColors != null && var3 < this.cfg.stateColors.length && this.cfg.stateColors[var3] != null) {
-         return this.cfg.stateColors[var3];
+   private int resolveStateColor(int color, Integer color2, int color3) {
+      if (this.cfg.stateColors != null && color3 < this.cfg.stateColors.length && this.cfg.stateColors[color3] != null) {
+         return this.cfg.stateColors[color3];
       } else {
-         return var2 != null ? var2 : var1;
+         return color2 != null ? color2 : color;
       }
    }
 
-   private int resolveInteractiveColor(int var1, int var2, Integer var3, Float var4, PApplet var5, boolean var6) {
-      if (var3 != null) {
-         return var3;
+   private int resolveInteractiveColor(int color, int color2, Integer color3, Float value, PApplet sketch, boolean enabled) {
+      if (color3 != null) {
+         return color3;
       } else {
-         return var4 != null ? var5.lerpColor(var1, var5.color(var6 ? 255 : 0), var4) : InteractiveStyleHelper.applyOverlay(var1, var2);
+         return value != null ? sketch.lerpColor(color, sketch.color(enabled ? 255 : 0), value) : InteractiveStyleHelper.applyOverlay(color, color2);
       }
    }
 
-   private int resolveColorOverride(int var1, Integer var2, Integer var3) {
-      if (var2 != null) {
-         return var2;
+   private int resolveColorOverride(int color, Integer color2, Integer color3) {
+      if (color2 != null) {
+         return color2;
       } else {
-         return var3 != null ? var3 : var1;
+         return color3 != null ? color3 : color;
       }
    }
 

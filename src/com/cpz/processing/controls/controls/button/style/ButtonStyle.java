@@ -16,9 +16,11 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public interface ButtonStyle {
-   void render(PApplet var1, ButtonViewState var2, ThemeSnapshot var3);
+   void render(PApplet sketch, ButtonViewState state, ThemeSnapshot snapshot);
 
    ThemeSnapshot getThemeSnapshot();
 }

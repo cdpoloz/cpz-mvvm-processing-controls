@@ -15,26 +15,28 @@ import com.cpz.processing.controls.core.view.Visible;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public interface PointerInputTarget extends Visible, Enableable {
    /**
     * Updates hover state.
     *
-    * @param var1 {@code true} when the pointer is currently inside the control
+    * @param inside {@code true} when the pointer is currently inside the control
     */
-   void onPointerMove(boolean var1);
+   void onPointerMove(boolean inside);
 
    /**
     * Updates press state.
     *
-    * @param var1 {@code true} when the pointer press happened inside the control
+    * @param enabled {@code true} when the pointer press happened inside the control
     */
-   void onPointerPress(boolean var1);
+   void onPointerPress(boolean enabled);
 
    /**
     * Updates release state.
     *
-    * @param var1 {@code true} when the pointer release happened inside the control
+    * @param inside {@code true} when the pointer release happened inside the control
     */
-   void onPointerRelease(boolean var1);
+   void onPointerRelease(boolean inside);
 }

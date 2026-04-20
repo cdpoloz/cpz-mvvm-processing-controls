@@ -23,6 +23,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the MVVM View layer.
+ *
+ * @author CPZ
  */
 public final class RadioGroupView implements ControlView, PointerInteractable {
    private final PApplet sketch;
@@ -39,21 +41,21 @@ public final class RadioGroupView implements ControlView, PointerInteractable {
    /**
     * Creates a radio group view.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param viewModel parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public RadioGroupView(PApplet var1, RadioGroupViewModel var2, float var3, float var4, float var5) {
-      this.sketch = var1;
-      this.viewModel = var2;
-      this.x = var3;
-      this.y = var4;
-      this.width = var5;
+   public RadioGroupView(PApplet sketch, RadioGroupViewModel viewModel, float x, float y, float width) {
+      this.sketch = sketch;
+      this.viewModel = viewModel;
+      this.x = x;
+      this.y = y;
+      this.width = width;
       this.style = RadioGroupDefaultStyles.standard();
       this.applyConfiguredLayoutDefaults();
    }
@@ -66,74 +68,74 @@ public final class RadioGroupView implements ControlView, PointerInteractable {
     */
    public void draw() {
       if (this.viewModel.isVisible()) {
-         ThemeSnapshot var1 = this.style.getThemeSnapshot();
-         this.style.render(this.sketch, this.buildViewState(), var1);
+         ThemeSnapshot snapshot = this.style.getThemeSnapshot();
+         this.style.render(this.sketch, this.buildViewState(), snapshot);
       }
    }
 
    /**
     * Updates position.
     *
-    * @param var1 new position
-    * @param var2 parameter used by this operation
+    * @param x new position
+    * @param y parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setPosition(float var1, float var2) {
-      this.x = var1;
-      this.y = var2;
+   public void setPosition(float x, float y) {
+      this.x = x;
+      this.y = y;
    }
 
    /**
     * Updates width.
     *
-    * @param var1 new width
+    * @param x new width
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setWidth(float var1) {
-      this.width = var1;
+   public void setWidth(float x) {
+      this.width = x;
    }
 
    /**
     * Updates item height.
     *
-    * @param var1 new item height
+    * @param x new item height
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setItemHeight(float var1) {
-      this.itemHeight = Math.max(this.style.getMinimumItemHeight(), var1);
+   public void setItemHeight(float x) {
+      this.itemHeight = Math.max(this.style.getMinimumItemHeight(), x);
       this.customItemHeight = true;
    }
 
    /**
     * Updates item spacing.
     *
-    * @param var1 new item spacing
+    * @param x new item spacing
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setItemSpacing(float var1) {
-      this.itemSpacing = Math.max(0.0F, var1);
+   public void setItemSpacing(float x) {
+      this.itemSpacing = Math.max(0.0F, x);
       this.customItemSpacing = true;
    }
 
    /**
     * Updates style.
     *
-    * @param var1 new style
+    * @param style new style
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setStyle(RadioGroupStyle var1) {
-      if (var1 != null) {
-         this.style = var1;
+   public void setStyle(RadioGroupStyle style) {
+      if (style != null) {
+         this.style = style;
          this.applyConfiguredLayoutDefaults();
       }
 
@@ -142,35 +144,35 @@ public final class RadioGroupView implements ControlView, PointerInteractable {
    /**
     * Performs contains.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public boolean contains(float var1, float var2) {
-      return this.getOptionIndexAt(var1, var2) >= 0;
+   public boolean contains(float x, float y) {
+      return this.getOptionIndexAt(x, y) >= 0;
    }
 
    /**
     * Returns option index at.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
     * @return current option index at
     *
     * Behavior:
     * - Returns the current value without applying side effects.
     */
-   public int getOptionIndexAt(float var1, float var2) {
-      float var3 = this.x - this.width * 0.5F;
-      float var4 = this.y - this.itemHeight * 0.5F;
-      if (!(var1 < var3) && !(var1 > var3 + this.width)) {
-         for(int var5 = 0; var5 < this.viewModel.getOptions().size(); ++var5) {
-            float var6 = var4 + (float)var5 * (this.itemHeight + this.itemSpacing);
-            if (var2 >= var6 && var2 <= var6 + this.itemHeight) {
-               return var5;
+   public int getOptionIndexAt(float x, float y) {
+      float halfWidth = this.x - this.width * 0.5F;
+      float midpoint = this.y - this.itemHeight * 0.5F;
+      if (!(x < halfWidth) && !(x > halfWidth + this.width)) {
+         for(int index2 = 0; index2 < this.viewModel.getOptions().size(); ++index2) {
+            float midpoint2 = midpoint + (float)index2 * (this.itemHeight + this.itemSpacing);
+            if (y >= midpoint2 && y <= midpoint2 + this.itemHeight) {
+               return index2;
             }
          }
 
@@ -193,19 +195,19 @@ public final class RadioGroupView implements ControlView, PointerInteractable {
    }
 
    private RadioGroupViewState buildViewState() {
-      ArrayList var2 = new ArrayList();
-      float var3 = this.y - this.itemHeight * 0.5F;
-      float var4 = this.x - this.width * 0.5F;
-      float var5 = this.style.getIndicatorOffsetX();
-      float var6 = this.style.getTextOffsetX();
+      ArrayList arrayList = new ArrayList();
+      float value = this.y - this.itemHeight * 0.5F;
+      float left = this.x - this.width * 0.5F;
+      float value2 = this.style.getIndicatorOffsetX();
+      float value3 = this.style.getTextOffsetX();
 
-      for(int var7 = 0; var7 < this.viewModel.getOptions().size(); ++var7) {
-         float var8 = var3 + (float)var7 * (this.itemHeight + this.itemSpacing);
-         float var9 = var8 + this.itemHeight * 0.5F;
-         var2.add(new RadioGroupItemViewState(var7, (String)this.viewModel.getOptions().get(var7), this.viewModel.getSelectedIndex() == var7, this.viewModel.getHoveredIndex() == var7, this.viewModel.getPressedIndex() == var7, this.viewModel.isFocused() && this.viewModel.getActiveIndex() == var7, this.x, var9, this.width, this.itemHeight, var4 + var5, var9, var4 + var6));
+      for(int value4 = 0; value4 < this.viewModel.getOptions().size(); ++value4) {
+         float value5 = value + (float)value4 * (this.itemHeight + this.itemSpacing);
+         float value6 = value5 + this.itemHeight * 0.5F;
+         arrayList.add(new RadioGroupItemViewState(value4, (String)this.viewModel.getOptions().get(value4), this.viewModel.getSelectedIndex() == value4, this.viewModel.getHoveredIndex() == value4, this.viewModel.getPressedIndex() == value4, this.viewModel.isFocused() && this.viewModel.getActiveIndex() == value4, this.x, value6, this.width, this.itemHeight, left + value2, value6, left + value3));
       }
 
-      return new RadioGroupViewState(this.x, this.y, this.width, this.getHeight(), var2.size(), this.viewModel.isEnabled(), var2);
+      return new RadioGroupViewState(this.x, this.y, this.width, this.getHeight(), arrayList.size(), this.viewModel.isEnabled(), arrayList);
    }
 
    private void applyConfiguredLayoutDefaults() {

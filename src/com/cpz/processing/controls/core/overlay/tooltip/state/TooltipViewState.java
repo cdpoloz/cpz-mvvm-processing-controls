@@ -12,6 +12,8 @@ package com.cpz.processing.controls.core.overlay.tooltip.state;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public record TooltipViewState(float x, float y, float width, float height, String text, boolean enabled, float textPadding, float cornerRadius) {
 }

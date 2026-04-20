@@ -13,6 +13,8 @@ import java.util.Objects;
 
 /**
  * Loads a minimal slider config from a JSON file.
+ *
+ * @author CPZ
  */
 public final class SliderConfigLoader {
     private final PApplet sketch;

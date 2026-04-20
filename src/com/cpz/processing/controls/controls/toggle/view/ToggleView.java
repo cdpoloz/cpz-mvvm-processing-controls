@@ -23,6 +23,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the MVVM View layer.
+ *
+ * @author CPZ
  */
 public final class ToggleView implements ControlView, PointerInteractable {
    private final PApplet sketch;
@@ -37,42 +39,42 @@ public final class ToggleView implements ControlView, PointerInteractable {
    /**
     * Creates a toggle view.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param viewModel parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public ToggleView(PApplet var1, ToggleViewModel var2, float var3, float var4, float var5) {
-      this(var1, var2, var3, var4, var5, var5);
+   public ToggleView(PApplet sketch, ToggleViewModel viewModel, float x, float y, float width) {
+      this(sketch, viewModel, x, y, width, width);
    }
 
    /**
     * Creates a toggle view.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
-    * @param var6 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param viewModel parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
+    * @param height parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public ToggleView(PApplet var1, ToggleViewModel var2, float var3, float var4, float var5, float var6) {
-      this.sketch = var1;
-      this.viewModel = var2;
-      this.x = var3;
-      this.y = var4;
-      this.width = var5;
-      this.height = var6;
+   public ToggleView(PApplet sketch, ToggleViewModel viewModel, float x, float y, float width, float height) {
+      this.sketch = sketch;
+      this.viewModel = viewModel;
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
       this.style = ToggleDefaultStyles.circular();
-      float var7 = Math.min(var5, var6);
-      this.hitTest = new CircleHitTest(var3, var4, var7 * 0.5F);
+      float value = Math.min(width, height);
+      this.hitTest = new CircleHitTest(x, y, value * 0.5F);
    }
 
    /**
@@ -83,8 +85,8 @@ public final class ToggleView implements ControlView, PointerInteractable {
     */
    public void draw() {
       if (this.viewModel.isVisible()) {
-         ThemeSnapshot var1 = this.style.getThemeSnapshot();
-         this.style.render(this.sketch, this.buildViewState(), var1);
+         ThemeSnapshot snapshot = this.style.getThemeSnapshot();
+         this.style.render(this.sketch, this.buildViewState(), snapshot);
       }
    }
 
@@ -95,71 +97,71 @@ public final class ToggleView implements ControlView, PointerInteractable {
    /**
     * Performs contains.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public boolean contains(float var1, float var2) {
-      return this.hitTest.contains(var1, var2);
+   public boolean contains(float x, float y) {
+      return this.hitTest.contains(x, y);
    }
 
    /**
     * Updates hit test.
     *
-    * @param var1 new hit test
+    * @param hitTest new hit test
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setHitTest(HitTest var1) {
-      this.hitTest = var1;
+   public void setHitTest(HitTest hitTest) {
+      this.hitTest = hitTest;
       this.hitTest.onLayout(this.x, this.y, this.width, this.height);
    }
 
    /**
     * Updates position.
     *
-    * @param var1 new position
-    * @param var2 parameter used by this operation
+    * @param x new position
+    * @param y parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setPosition(float var1, float var2) {
-      this.x = var1;
-      this.y = var2;
+   public void setPosition(float x, float y) {
+      this.x = x;
+      this.y = y;
       this.notifyLayoutChanged();
    }
 
    /**
     * Updates size.
     *
-    * @param var1 new size
+    * @param width new size
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSize(float var1) {
-      this.width = var1;
-      this.height = var1;
+   public void setSize(float width) {
+      this.width = width;
+      this.height = width;
       this.notifyLayoutChanged();
    }
 
    /**
     * Updates size.
     *
-    * @param var1 new size
-    * @param var2 parameter used by this operation
+    * @param width new size
+    * @param height parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSize(float var1, float var2) {
-      this.width = var1;
-      this.height = var2;
+   public void setSize(float width, float height) {
+      this.width = width;
+      this.height = height;
       this.notifyLayoutChanged();
    }
 
@@ -170,12 +172,12 @@ public final class ToggleView implements ControlView, PointerInteractable {
    /**
     * Updates style.
     *
-    * @param var1 new style
+    * @param style new style
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setStyle(ToggleStyle var1) {
-      this.style = var1;
+   public void setStyle(ToggleStyle style) {
+      this.style = style;
    }
 }

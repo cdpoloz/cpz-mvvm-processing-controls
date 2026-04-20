@@ -23,6 +23,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class DefaultDropDownStyle {
    private final DropDownStyleConfig config;
@@ -32,46 +34,46 @@ public final class DefaultDropDownStyle {
    /**
     * Creates a default drop down style.
     *
-    * @param var1 parameter used by this operation
+    * @param config parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public DefaultDropDownStyle(DropDownStyleConfig var1) {
-      this(var1, new DefaultDropDownRenderer());
+   public DefaultDropDownStyle(DropDownStyleConfig config) {
+      this(config, new DefaultDropDownRenderer());
    }
 
    /**
     * Creates a default drop down style.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param config parameter used by this operation
+    * @param renderer parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public DefaultDropDownStyle(DropDownStyleConfig var1, DefaultDropDownRenderer var2) {
-      if (var1 == null) {
+   public DefaultDropDownStyle(DropDownStyleConfig config, DefaultDropDownRenderer renderer) {
+      if (config == null) {
          throw new IllegalArgumentException("config must not be null");
       } else {
-         this.config = var1;
-         this.renderer = var2 == null ? new DefaultDropDownRenderer() : var2;
-         this.themeProvider = var1.themeProvider != null ? var1.themeProvider : new ThemeManager();
+         this.config = config;
+         this.renderer = renderer == null ? new DefaultDropDownRenderer() : renderer;
+         this.themeProvider = config.themeProvider != null ? config.themeProvider : new ThemeManager();
       }
    }
 
    /**
     * Renders the current frame.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param state parameter used by this operation
+    * @param snapshot parameter used by this operation
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
     */
-   public void render(PApplet var1, DropDownViewState var2, ThemeSnapshot var3) {
-      this.renderer.render(var1, var2, this.resolveRenderStyle(var2, var3));
+   public void render(PApplet sketch, DropDownViewState state, ThemeSnapshot snapshot) {
+      this.renderer.render(sketch, state, this.resolveRenderStyle(state, snapshot));
    }
 
    /**
@@ -173,50 +175,50 @@ public final class DefaultDropDownStyle {
    /**
     * Resolves render style.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param state parameter used by this operation
+    * @param snapshot parameter used by this operation
     * @return resolved render style
     *
     * Behavior:
     * - Produces the public result required by the surrounding pipeline.
     */
-   public DropDownRenderStyle resolveRenderStyle(DropDownViewState var1, ThemeSnapshot var2) {
-      ThemeTokens var3 = var2.tokens;
-      int var4 = this.resolveColor(var3.surface, this.config.baseFillOverride);
-      int var5 = this.resolveColor(var3.surfaceVariant, this.config.listFillOverride);
-      int var6 = this.resolveColor(var3.onSurface, this.config.textOverride);
-      int var7 = this.resolveColor(var3.border, this.config.borderOverride);
-      int var8 = this.resolveColor(var3.primary, this.config.focusedBorderOverride);
-      int var9 = this.resolveColor(var3.hoverOverlay, this.config.hoverItemOverlayOverride);
-      int var10 = this.resolveColor(Colors.alpha(36, var3.primary), this.config.selectedItemOverlayOverride);
-      int var11 = this.resolveBaseFill(var4, var9, var3.pressedOverlay, var1);
-      int var12 = var1.focused() ? this.blend(var7, var8, 0.35F) : var7;
-      float var13 = !var1.hovered() && !var1.focused() ? this.config.strokeWeight : this.config.focusedStrokeWeight;
-      int var14 = InteractiveStyleHelper.applyOverlay(var5, var9);
-      int var15 = InteractiveStyleHelper.applyOverlay(var5, var10);
-      int var16 = this.config.disabledAlpha != null ? this.config.disabledAlpha : var3.disabledAlpha;
-      return new DropDownRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(var11, var1.enabled(), var16), InteractiveStyleHelper.applyDisabledAlpha(var5, var1.enabled(), var16), InteractiveStyleHelper.applyDisabledAlpha(var14, var1.enabled(), var16), InteractiveStyleHelper.applyDisabledAlpha(var15, var1.enabled(), var16), InteractiveStyleHelper.applyDisabledAlpha(var12, var1.enabled(), var16), var13, InteractiveStyleHelper.applyDisabledAlpha(var6, var1.enabled(), var16), InteractiveStyleHelper.applyDisabledAlpha(var6, var1.enabled(), var16), var1.cornerRadius(), var1.listCornerRadius(), this.config.textSize, var1.itemHeight(), var1.textPadding(), var1.arrowPadding(), Math.max(1, var1.maxVisibleItems()), this.config.font);
+   public DropDownRenderStyle resolveRenderStyle(DropDownViewState state, ThemeSnapshot snapshot) {
+      ThemeTokens tokens = snapshot.tokens;
+      int color3 = this.resolveColor(tokens.surface, this.config.baseFillOverride);
+      int color4 = this.resolveColor(tokens.surfaceVariant, this.config.listFillOverride);
+      int color5 = this.resolveColor(tokens.onSurface, this.config.textOverride);
+      int borderColor = this.resolveColor(tokens.border, this.config.borderOverride);
+      int color6 = this.resolveColor(tokens.primary, this.config.focusedBorderOverride);
+      int color7 = this.resolveColor(tokens.hoverOverlay, this.config.hoverItemOverlayOverride);
+      int color8 = this.resolveColor(Colors.alpha(36, tokens.primary), this.config.selectedItemOverlayOverride);
+      int index = this.resolveBaseFill(color3, color7, tokens.pressedOverlay, state);
+      int index2 = state.focused() ? this.blend(borderColor, color6, 0.35F) : borderColor;
+      float value8 = !state.hovered() && !state.focused() ? this.config.strokeWeight : this.config.focusedStrokeWeight;
+      int color9 = InteractiveStyleHelper.applyOverlay(color4, color7);
+      int color10 = InteractiveStyleHelper.applyOverlay(color4, color8);
+      int disabledAlpha = this.config.disabledAlpha != null ? this.config.disabledAlpha : tokens.disabledAlpha;
+      return new DropDownRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(index, state.enabled(), disabledAlpha), InteractiveStyleHelper.applyDisabledAlpha(color4, state.enabled(), disabledAlpha), InteractiveStyleHelper.applyDisabledAlpha(color9, state.enabled(), disabledAlpha), InteractiveStyleHelper.applyDisabledAlpha(color10, state.enabled(), disabledAlpha), InteractiveStyleHelper.applyDisabledAlpha(index2, state.enabled(), disabledAlpha), value8, InteractiveStyleHelper.applyDisabledAlpha(color5, state.enabled(), disabledAlpha), InteractiveStyleHelper.applyDisabledAlpha(color5, state.enabled(), disabledAlpha), state.cornerRadius(), state.listCornerRadius(), this.config.textSize, state.itemHeight(), state.textPadding(), state.arrowPadding(), Math.max(1, state.maxVisibleItems()), this.config.font);
    }
 
-   private int resolveBaseFill(int var1, int var2, int var3, DropDownViewState var4) {
-      return InteractiveStyleHelper.resolveFillColorWithOverlays(var1, var2, var3, var4.hovered(), var4.pressed());
+   private int resolveBaseFill(int value, int value2, int value3, DropDownViewState state) {
+      return InteractiveStyleHelper.resolveFillColorWithOverlays(value, value2, value3, state.hovered(), state.pressed());
    }
 
-   private int resolveColor(int var1, Integer var2) {
-      return var2 != null ? var2 : var1;
+   private int resolveColor(int color, Integer color2) {
+      return color2 != null ? color2 : color;
    }
 
-   private int blend(int var1, int var2, float var3) {
-      float var4 = Math.max(0.0F, Math.min(1.0F, var3));
-      int var5 = this.blendChannel(var1 >>> 24 & 255, var2 >>> 24 & 255, var4);
-      int var6 = this.blendChannel(var1 >>> 16 & 255, var2 >>> 16 & 255, var4);
-      int var7 = this.blendChannel(var1 >>> 8 & 255, var2 >>> 8 & 255, var4);
-      int var8 = this.blendChannel(var1 & 255, var2 & 255, var4);
-      return Colors.argb(var5, var6, var7, var8);
+   private int blend(int value, int value2, float x) {
+      float value3 = Math.max(0.0F, Math.min(1.0F, x));
+      int value4 = this.blendChannel(value >>> 24 & 255, value2 >>> 24 & 255, value3);
+      int value5 = this.blendChannel(value >>> 16 & 255, value2 >>> 16 & 255, value3);
+      int value6 = this.blendChannel(value >>> 8 & 255, value2 >>> 8 & 255, value3);
+      int value7 = this.blendChannel(value & 255, value2 & 255, value3);
+      return Colors.argb(value4, value5, value6, value7);
    }
 
-   private int blendChannel(int var1, int var2, float var3) {
-      return Math.round((float)var1 + (float)(var2 - var1) * var3);
+   private int blendChannel(int value, int value2, float x) {
+      return Math.round((float)value + (float)(value2 - value) * x);
    }
 
    /**

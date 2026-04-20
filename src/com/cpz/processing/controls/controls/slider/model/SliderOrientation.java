@@ -12,6 +12,8 @@ package com.cpz.processing.controls.controls.slider.model;
  *
  * Notes:
  * - This type belongs to the MVVM Model layer.
+ *
+ * @author CPZ
  */
 public enum SliderOrientation {
    HORIZONTAL,

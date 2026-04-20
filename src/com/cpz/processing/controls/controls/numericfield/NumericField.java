@@ -19,6 +19,8 @@ import java.util.Objects;
 
 /**
  * Convenience facade for the numeric field control.
+ *
+ * @author CPZ
  */
 public final class NumericField implements Control {
     private static final BigDecimal DEFAULT_MIN = null;

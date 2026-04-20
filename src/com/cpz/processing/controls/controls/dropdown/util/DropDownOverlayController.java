@@ -26,6 +26,8 @@ import java.util.Objects;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class DropDownOverlayController {
    private static final List<DropDownOverlayController> CONTROLLERS = new ArrayList<>();
@@ -42,26 +44,26 @@ public final class DropDownOverlayController {
    /**
     * Creates a drop down overlay controller.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
-    * @param var6 parameter used by this operation
+    * @param view parameter used by this operation
+    * @param viewModel parameter used by this operation
+    * @param focusManager parameter used by this operation
+    * @param overlayManager parameter used by this operation
+    * @param inputManager parameter used by this operation
+    * @param zIndex parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public DropDownOverlayController(DropDownView var1, DropDownViewModel var2, FocusManager var3, OverlayManager var4, InputManager var5, int var6) {
-      this.view = var1;
-      this.viewModel = var2;
-      this.focusManager = var3;
-      this.overlayManager = var4;
-      this.inputManager = var5;
-      this.zIndex = var6;
-      this.inputLayer = new OverlayInputLayer(var6);
-      Objects.requireNonNull(var1);
-      this.overlayEntry = new OverlayEntry(var6, var1::draw, this.inputLayer, this::closeOverlay);
+   public DropDownOverlayController(DropDownView view, DropDownViewModel viewModel, FocusManager focusManager, OverlayManager overlayManager, InputManager inputManager, int zIndex) {
+      this.view = view;
+      this.viewModel = viewModel;
+      this.focusManager = focusManager;
+      this.overlayManager = overlayManager;
+      this.inputManager = inputManager;
+      this.zIndex = zIndex;
+      this.inputLayer = new OverlayInputLayer(zIndex);
+      Objects.requireNonNull(view);
+      this.overlayEntry = new OverlayEntry(zIndex, view::draw, this.inputLayer, this::closeOverlay);
       CONTROLLERS.add(this);
    }
 
@@ -122,11 +124,11 @@ public final class DropDownOverlayController {
       }
    }
 
-   private boolean routePressToSibling(PointerEvent var1) {
-      for(DropDownOverlayController var3 : CONTROLLERS) {
-         if (var3 != this && var3.viewModel.isVisible() && var3.viewModel.isEnabled() && var3.view.contains(var1.getX(), var1.getY())) {
+   private boolean routePressToSibling(PointerEvent event) {
+      for(DropDownOverlayController dropDownOverlayController : CONTROLLERS) {
+         if (dropDownOverlayController != this && dropDownOverlayController.viewModel.isVisible() && dropDownOverlayController.viewModel.isEnabled() && dropDownOverlayController.view.contains(event.getX(), event.getY())) {
             this.closeOverlay();
-            var3.handleTransferredPress(var1.getX(), var1.getY());
+            dropDownOverlayController.handleTransferredPress(event.getX(), event.getY());
             return true;
          }
       }
@@ -134,15 +136,15 @@ public final class DropDownOverlayController {
       return false;
    }
 
-   private void handleTransferredPress(float var1, float var2) {
-      this.view.handleMousePress(var1, var2, this.focusManager);
+   private void handleTransferredPress(float x, float y) {
+      this.view.handleMousePress(x, y, this.focusManager);
       this.syncRegistration();
    }
 
    private final class OverlayInputLayer extends DefaultInputLayer {
-      private OverlayInputLayer(int var2) {
+      private OverlayInputLayer(int zIndex) {
          Objects.requireNonNull(DropDownOverlayController.this);
-         super(var2);
+         super(zIndex);
       }
 
       /**
@@ -172,28 +174,28 @@ public final class DropDownOverlayController {
       /**
        * Handles pointer event.
        *
-       * @param var1 parameter used by this operation
+       * @param event parameter used by this operation
        * @return result of this operation
        *
        * Behavior:
        * - Applies the public interaction flow exposed by this type.
        */
-      public boolean handlePointerEvent(PointerEvent var1) {
-         boolean var2 = DropDownOverlayController.this.viewModel.isExpanded();
-         if (!var2) {
+      public boolean handlePointerEvent(PointerEvent event) {
+         boolean active = DropDownOverlayController.this.viewModel.isExpanded();
+         if (!active) {
             return false;
          } else {
-            switch (var1.getType()) {
+            switch (event.getType()) {
                case MOVE:
-                  DropDownOverlayController.this.view.handleMouseMove(var1.getX(), var1.getY());
+                  DropDownOverlayController.this.view.handleMouseMove(event.getX(), event.getY());
                   return true;
                case PRESS:
-                  if (DropDownOverlayController.this.routePressToSibling(var1)) {
+                  if (DropDownOverlayController.this.routePressToSibling(event)) {
                      return true;
                   }
 
-                  boolean var3 = DropDownOverlayController.this.view.handleMousePress(var1.getX(), var1.getY(), DropDownOverlayController.this.focusManager);
-                  if (!var3) {
+                  boolean inside = DropDownOverlayController.this.view.handleMousePress(event.getX(), event.getY(), DropDownOverlayController.this.focusManager);
+                  if (!inside) {
                      DropDownOverlayController.this.closeOverlay();
                      return true;
                   }
@@ -205,7 +207,7 @@ public final class DropDownOverlayController {
                   DropDownOverlayController.this.syncRegistration();
                   return true;
                case RELEASE:
-                  DropDownOverlayController.this.view.handleMouseRelease(var1.getX(), var1.getY());
+                  DropDownOverlayController.this.view.handleMouseRelease(event.getX(), event.getY());
                   return true;
                default:
                   return false;
@@ -216,13 +218,13 @@ public final class DropDownOverlayController {
       /**
        * Handles keyboard event.
        *
-       * @param var1 parameter used by this operation
+       * @param event parameter used by this operation
        * @return result of this operation
        *
        * Behavior:
        * - Applies the public interaction flow exposed by this type.
        */
-      public boolean handleKeyboardEvent(KeyboardEvent var1) {
+      public boolean handleKeyboardEvent(KeyboardEvent event) {
          return false;
       }
    }

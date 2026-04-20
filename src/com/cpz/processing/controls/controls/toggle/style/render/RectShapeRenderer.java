@@ -15,6 +15,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class RectShapeRenderer implements ToggleShapeRenderer {
    private final float cornerRadius;
@@ -32,38 +34,38 @@ public final class RectShapeRenderer implements ToggleShapeRenderer {
    /**
     * Creates a rect shape renderer.
     *
-    * @param var1 parameter used by this operation
+    * @param x parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public RectShapeRenderer(float var1) {
-      this.cornerRadius = var1;
+   public RectShapeRenderer(float x) {
+      this.cornerRadius = x;
    }
 
    /**
     * Renders the current frame.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
-    * @param var6 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
+    * @param height parameter used by this operation
+    * @param renderStyle parameter used by this operation
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
     */
-   public void render(PApplet var1, float var2, float var3, float var4, float var5, ToggleRenderStyle var6) {
-      float var7 = var4 * 0.5F;
-      float var8 = var5 * 0.5F;
-      float var9 = var2 - var7;
-      float var10 = var3 - var8;
-      var1.pushStyle();
-      var1.stroke(var6.strokeColor());
-      var1.strokeWeight(var6.strokeWeight());
-      var1.fill(var6.fillColor());
-      var1.rect(var9, var10, var4, var5, this.cornerRadius);
-      var1.popStyle();
+   public void render(PApplet sketch, float x, float y, float width, float height, ToggleRenderStyle renderStyle) {
+      float value = width * 0.5F;
+      float value2 = height * 0.5F;
+      float value3 = x - value;
+      float value4 = y - value2;
+      sketch.pushStyle();
+      sketch.stroke(renderStyle.strokeColor());
+      sketch.strokeWeight(renderStyle.strokeWeight());
+      sketch.fill(renderStyle.fillColor());
+      sketch.rect(value3, value4, width, height, this.cornerRadius);
+      sketch.popStyle();
    }
 }

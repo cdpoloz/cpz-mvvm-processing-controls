@@ -18,6 +18,8 @@ import java.util.function.Consumer;
  *
  * Notes:
  * - This type belongs to the MVVM ViewModel layer.
+ *
+ * @author CPZ
  */
 public final class DropDownViewModel extends AbstractControlViewModel implements Focusable {
    private boolean hovered;
@@ -29,13 +31,13 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
    /**
     * Creates a drop down view model.
     *
-    * @param var1 parameter used by this operation
+    * @param model parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public DropDownViewModel(DropDownModel var1) {
-      super(var1);
+   public DropDownViewModel(DropDownModel model) {
+      super(model);
    }
 
    /**
@@ -53,19 +55,19 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
    /**
     * Updates items.
     *
-    * @param var1 new items
+    * @param list new items
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setItems(List<String> var1) {
-      int var2 = ((DropDownModel)this.model).getSelectedIndex();
-      ((DropDownModel)this.model).setItems(var1);
+   public void setItems(List<String> list) {
+      int value = ((DropDownModel)this.model).getSelectedIndex();
+      ((DropDownModel)this.model).setItems(list);
       if (((DropDownModel)this.model).getItems().isEmpty()) {
          this.close();
       }
 
-      this.notifySelectionIfChanged(var2);
+      this.notifySelectionIfChanged(value);
    }
 
    /**
@@ -89,9 +91,9 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
     * - Returns the current value without applying side effects.
     */
    public String getSelectedText() {
-      int var1 = ((DropDownModel)this.model).getSelectedIndex();
-      List var2 = ((DropDownModel)this.model).getItems();
-      return var1 >= 0 && var1 < var2.size() ? (String)var2.get(var1) : "";
+      int index2 = ((DropDownModel)this.model).getSelectedIndex();
+      List list2 = ((DropDownModel)this.model).getItems();
+      return index2 >= 0 && index2 < list2.size() ? (String)list2.get(index2) : "";
    }
 
    /**
@@ -109,13 +111,13 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
    /**
     * Updates hovered.
     *
-    * @param var1 new hovered
+    * @param inside new hovered
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setHovered(boolean var1) {
-      this.hovered = var1 && this.isInteractive();
+   public void setHovered(boolean inside) {
+      this.hovered = inside && this.isInteractive();
    }
 
    /**
@@ -133,13 +135,13 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
    /**
     * Updates pressed.
     *
-    * @param var1 new pressed
+    * @param pressed new pressed
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setPressed(boolean var1) {
-      this.pressed = var1 && this.isInteractive();
+   public void setPressed(boolean pressed) {
+      this.pressed = pressed && this.isInteractive();
    }
 
    /**
@@ -157,13 +159,13 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
    /**
     * Updates focused.
     *
-    * @param var1 new focused
+    * @param focused new focused
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setFocused(boolean var1) {
-      this.focused = var1 && this.isInteractive();
+   public void setFocused(boolean focused) {
+      this.focused = focused && this.isInteractive();
       if (!this.focused) {
          this.close();
       }
@@ -218,19 +220,19 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
    /**
     * Performs select index.
     *
-    * @param var1 parameter used by this operation
+    * @param index parameter used by this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public void selectIndex(int var1) {
-      int var2 = ((DropDownModel)this.model).getSelectedIndex();
-      ((DropDownModel)this.model).setSelectedIndex(var1);
-      this.notifySelectionIfChanged(var2);
+   public void selectIndex(int index) {
+      int value = ((DropDownModel)this.model).getSelectedIndex();
+      ((DropDownModel)this.model).setSelectedIndex(index);
+      this.notifySelectionIfChanged(value);
    }
 
-   public void setOnSelectionChanged(Consumer<Integer> var1) {
-      this.onSelectionChanged = var1;
+   public void setOnSelectionChanged(Consumer<Integer> consumer) {
+      this.onSelectionChanged = consumer;
    }
 
    /**
@@ -268,10 +270,10 @@ public final class DropDownViewModel extends AbstractControlViewModel implements
       return this.isVisible() && this.isEnabled();
    }
 
-   private void notifySelectionIfChanged(int var1) {
-      int var2 = ((DropDownModel)this.model).getSelectedIndex();
-      if (var1 != var2 && this.onSelectionChanged != null) {
-         this.onSelectionChanged.accept(var2);
+   private void notifySelectionIfChanged(int value) {
+      int value2 = ((DropDownModel)this.model).getSelectedIndex();
+      if (value != value2 && this.onSelectionChanged != null) {
+         this.onSelectionChanged.accept(value2);
       }
    }
 }

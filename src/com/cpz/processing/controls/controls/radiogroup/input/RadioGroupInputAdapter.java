@@ -18,6 +18,8 @@ import com.cpz.processing.controls.core.input.PointerInputAdapter;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class RadioGroupInputAdapter {
    private final RadioGroupView view;
@@ -28,50 +30,50 @@ public final class RadioGroupInputAdapter {
    /**
     * Creates a radio group input adapter.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param view parameter used by this operation
+    * @param viewModel parameter used by this operation
+    * @param focusManager parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public RadioGroupInputAdapter(RadioGroupView var1, RadioGroupViewModel var2, FocusManager var3) {
-      this.view = var1;
-      this.viewModel = var2;
-      this.focusManager = var3;
-      this.delegate = new PointerInputAdapter(var1, var2);
-      this.focusManager.register(var2);
+   public RadioGroupInputAdapter(RadioGroupView view, RadioGroupViewModel viewModel, FocusManager focusManager) {
+      this.view = view;
+      this.viewModel = viewModel;
+      this.focusManager = focusManager;
+      this.delegate = new PointerInputAdapter(view, viewModel);
+      this.focusManager.register(viewModel);
    }
 
    /**
     * Handles mouse move.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMouseMove(float var1, float var2) {
-      this.delegate.handleMouseMove(var1, var2);
-      this.viewModel.setHoveredIndex(this.view.getOptionIndexAt(var1, var2));
+   public void handleMouseMove(float mouseX, float mouseY) {
+      this.delegate.handleMouseMove(mouseX, mouseY);
+      this.viewModel.setHoveredIndex(this.view.getOptionIndexAt(mouseX, mouseY));
    }
 
    /**
     * Handles mouse press.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMousePress(float var1, float var2) {
-      this.delegate.handleMousePress(var1, var2);
-      int var3 = this.view.getOptionIndexAt(var1, var2);
-      this.viewModel.onOptionPressed(var3);
-      this.viewModel.setHoveredIndex(var3);
-      if (var3 >= 0) {
+   public void handleMousePress(float mouseX, float mouseY) {
+      this.delegate.handleMousePress(mouseX, mouseY);
+      int value = this.view.getOptionIndexAt(mouseX, mouseY);
+      this.viewModel.onOptionPressed(value);
+      this.viewModel.setHoveredIndex(value);
+      if (value >= 0) {
          this.focusManager.requestFocus(this.viewModel);
       }
 
@@ -80,39 +82,39 @@ public final class RadioGroupInputAdapter {
    /**
     * Handles mouse release.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMouseRelease(float var1, float var2) {
-      this.delegate.handleMouseRelease(var1, var2);
-      int var3 = this.view.getOptionIndexAt(var1, var2);
-      this.viewModel.onOptionReleased(var3);
-      this.viewModel.setHoveredIndex(var3);
+   public void handleMouseRelease(float mouseX, float mouseY) {
+      this.delegate.handleMouseRelease(mouseX, mouseY);
+      int value = this.view.getOptionIndexAt(mouseX, mouseY);
+      this.viewModel.onOptionReleased(value);
+      this.viewModel.setHoveredIndex(value);
    }
 
    /**
     * Handles pointer event.
     *
-    * @param var1 parameter used by this operation
+    * @param event parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handlePointerEvent(PointerEvent var1) {
-      if (var1 != null) {
-         switch (var1.getType()) {
+   public void handlePointerEvent(PointerEvent event) {
+      if (event != null) {
+         switch (event.getType()) {
             case MOVE:
             case DRAG:
-               this.handleMouseMove(var1.getX(), var1.getY());
+               this.handleMouseMove(event.getX(), event.getY());
                break;
             case PRESS:
-               this.handleMousePress(var1.getX(), var1.getY());
+               this.handleMousePress(event.getX(), event.getY());
                break;
             case RELEASE:
-               this.handleMouseRelease(var1.getX(), var1.getY());
+               this.handleMouseRelease(event.getX(), event.getY());
          }
       }
    }

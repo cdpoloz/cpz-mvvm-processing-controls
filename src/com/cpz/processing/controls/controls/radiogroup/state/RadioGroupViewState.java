@@ -14,6 +14,8 @@ import java.util.List;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public record RadioGroupViewState(float x, float y, float width, float height, int totalOptions, boolean enabled, List<RadioGroupItemViewState> items) {
 }

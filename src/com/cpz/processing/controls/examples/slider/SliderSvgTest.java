@@ -16,6 +16,9 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+/**
+ * @author CPZ
+ */
 public class SliderSvgTest extends PApplet {
     private InputManager inputManager;
     private Slider slider;

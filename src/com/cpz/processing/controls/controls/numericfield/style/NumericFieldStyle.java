@@ -21,6 +21,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class NumericFieldStyle {
    private final NumericFieldStyleConfig config;
@@ -30,92 +32,92 @@ public final class NumericFieldStyle {
    /**
     * Creates a numeric field style.
     *
-    * @param var1 parameter used by this operation
+    * @param config parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public NumericFieldStyle(NumericFieldStyleConfig var1) {
-      this(var1, new DefaultNumericFieldRenderer());
+   public NumericFieldStyle(NumericFieldStyleConfig config) {
+      this(config, new DefaultNumericFieldRenderer());
    }
 
    /**
     * Creates a numeric field style.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param config parameter used by this operation
+    * @param renderer parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public NumericFieldStyle(NumericFieldStyleConfig var1, DefaultNumericFieldRenderer var2) {
-      this.config = var1 == null ? new NumericFieldStyleConfig() : var1;
-      this.renderer = var2 == null ? new DefaultNumericFieldRenderer() : var2;
+   public NumericFieldStyle(NumericFieldStyleConfig config, DefaultNumericFieldRenderer renderer) {
+      this.config = config == null ? new NumericFieldStyleConfig() : config;
+      this.renderer = renderer == null ? new DefaultNumericFieldRenderer() : renderer;
       this.themeProvider = this.config.themeProvider != null ? this.config.themeProvider : new ThemeManager();
    }
 
    /**
     * Renders the current frame.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param state parameter used by this operation
+    * @param snapshot parameter used by this operation
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
     */
-   public void render(PApplet var1, NumericFieldViewState var2, ThemeSnapshot var3) {
-      this.renderer.render(var1, var2, this.resolveRenderStyle(var2, var3));
+   public void render(PApplet sketch, NumericFieldViewState state, ThemeSnapshot snapshot) {
+      this.renderer.render(sketch, state, this.resolveRenderStyle(state, snapshot));
    }
 
    /**
     * Resolves render style.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param state parameter used by this operation
+    * @param snapshot parameter used by this operation
     * @return resolved render style
     *
     * Behavior:
     * - Produces the public result required by the surrounding pipeline.
     */
-   public NumericFieldRenderStyle resolveRenderStyle(NumericFieldViewState var1, ThemeSnapshot var2) {
-      ThemeTokens var3 = var2.tokens;
-      int var4 = this.resolveColorOverride(var3.surface, this.config.backgroundOverride, this.config.backgroundColor);
-      int var5 = this.resolveColorOverride(var3.border, this.config.borderOverride, this.config.borderColor);
-      int var6 = this.resolveColorOverride(var3.onSurface, this.config.textOverride, this.config.textColor);
-      int var7 = this.resolveColorOverride(var3.cursor, this.config.cursorOverride, this.config.cursorColor);
-      int var8 = this.resolveColorOverride(var3.selection, this.config.selectionOverride, this.config.selectionColor);
-      int var9 = this.resolveSelectionTextColor(var3.onSurface);
-      return new NumericFieldRenderStyle(var4, var1.focused() ? this.blend(var5, var7, 0.35F) : var5, var6, var1.focused() ? var7 : var5, var8, var9, this.config.textSize, this.config.font);
+   public NumericFieldRenderStyle resolveRenderStyle(NumericFieldViewState state, ThemeSnapshot snapshot) {
+      ThemeTokens tokens = snapshot.tokens;
+      int color4 = this.resolveColorOverride(tokens.surface, this.config.backgroundOverride, this.config.backgroundColor);
+      int borderColor2 = this.resolveColorOverride(tokens.border, this.config.borderOverride, this.config.borderColor);
+      int color5 = this.resolveColorOverride(tokens.onSurface, this.config.textOverride, this.config.textColor);
+      int color6 = this.resolveColorOverride(tokens.cursor, this.config.cursorOverride, this.config.cursorColor);
+      int color7 = this.resolveColorOverride(tokens.selection, this.config.selectionOverride, this.config.selectionColor);
+      int color8 = this.resolveSelectionTextColor(tokens.onSurface);
+      return new NumericFieldRenderStyle(color4, state.focused() ? this.blend(borderColor2, color6, 0.35F) : borderColor2, color5, state.focused() ? color6 : borderColor2, color7, color8, this.config.textSize, this.config.font);
    }
 
-   private int resolveSelectionTextColor(int var1) {
+   private int resolveSelectionTextColor(int color) {
       if (this.config.selectionTextOverride != null) {
          return this.config.selectionTextOverride;
       } else {
-         return this.config.selectionTextColor != null ? this.config.selectionTextColor : var1;
+         return this.config.selectionTextColor != null ? this.config.selectionTextColor : color;
       }
    }
 
-   private int resolveColorOverride(int var1, Integer var2, Integer var3) {
-      if (var2 != null) {
-         return var2;
+   private int resolveColorOverride(int color, Integer color2, Integer color3) {
+      if (color2 != null) {
+         return color2;
       } else {
-         return var3 != null ? var3 : var1;
+         return color3 != null ? color3 : color;
       }
    }
 
-   private int blend(int var1, int var2, float var3) {
-      float var4 = Math.max(0.0F, Math.min(1.0F, var3));
-      int var5 = this.blendChannel(var1 >>> 24 & 255, var2 >>> 24 & 255, var4);
-      int var6 = this.blendChannel(var1 >>> 16 & 255, var2 >>> 16 & 255, var4);
-      int var7 = this.blendChannel(var1 >>> 8 & 255, var2 >>> 8 & 255, var4);
-      int var8 = this.blendChannel(var1 & 255, var2 & 255, var4);
-      return (var5 & 255) << 24 | (var6 & 255) << 16 | (var7 & 255) << 8 | var8 & 255;
+   private int blend(int value, int value2, float x) {
+      float value3 = Math.max(0.0F, Math.min(1.0F, x));
+      int value4 = this.blendChannel(value >>> 24 & 255, value2 >>> 24 & 255, value3);
+      int value5 = this.blendChannel(value >>> 16 & 255, value2 >>> 16 & 255, value3);
+      int value6 = this.blendChannel(value >>> 8 & 255, value2 >>> 8 & 255, value3);
+      int value7 = this.blendChannel(value & 255, value2 & 255, value3);
+      return (value4 & 255) << 24 | (value5 & 255) << 16 | (value6 & 255) << 8 | value7 & 255;
    }
 
-   private int blendChannel(int var1, int var2, float var3) {
-      return Math.round((float)var1 + (float)(var2 - var1) * var3);
+   private int blendChannel(int value, int value2, float x) {
+      return Math.round((float)value + (float)(value2 - value) * x);
    }
 
    /**

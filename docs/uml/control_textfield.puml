@@ -1,25 +1,35 @@
 @startuml
-title TextField Control Structure
+title TextField Public Facade Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-class PointerEvent
-class TextFieldInputAdapter
+interface Control
+class TextField
+class TextFieldModel
 class TextFieldViewModel
 class TextFieldView
+class TextFieldInputAdapter
 class TextFieldViewState
 class DefaultTextFieldStyle
 class TextFieldRenderStyle
 class DefaultTextFieldRenderer
+interface ThemeProvider
 class ThemeSnapshot
 
-PointerEvent --> TextFieldInputAdapter : handled directly
-TextFieldInputAdapter --> TextFieldView : hit test / cursor geometry
-TextFieldInputAdapter --> TextFieldViewModel : focus / selection updates
-TextFieldView --> TextFieldViewState
-TextFieldView --> ThemeSnapshot
-DefaultTextFieldStyle --> TextFieldViewState
-DefaultTextFieldStyle --> ThemeSnapshot
-DefaultTextFieldStyle --> TextFieldRenderStyle
-DefaultTextFieldRenderer --> TextFieldRenderStyle
+TextField ..|> Control
+TextField --> TextFieldModel : owns
+TextField --> TextFieldViewModel : owns
+TextField --> TextFieldView : owns
+TextField --> TextFieldInputAdapter : delegates input
+TextFieldInputAdapter --> TextFieldView : geometry / hit testing
+TextFieldInputAdapter --> TextFieldViewModel : interaction updates
+TextFieldViewModel --> TextFieldModel : updates
+TextFieldView --> TextFieldViewModel : reads
+TextFieldView --> TextFieldViewState : builds
+TextFieldView --> DefaultTextFieldStyle : renders with
+DefaultTextFieldStyle --> ThemeProvider : reads snapshot
+ThemeProvider --> ThemeSnapshot
+DefaultTextFieldStyle --> TextFieldViewState : resolves
+DefaultTextFieldStyle --> TextFieldRenderStyle : creates
+DefaultTextFieldRenderer --> TextFieldRenderStyle : draws
 @enduml

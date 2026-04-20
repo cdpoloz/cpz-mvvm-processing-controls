@@ -15,6 +15,8 @@ import com.cpz.processing.controls.core.theme.ThemeProvider;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class CheckboxDefaultStyles {
    private CheckboxDefaultStyles() {
@@ -35,19 +37,19 @@ public final class CheckboxDefaultStyles {
    /**
     * Performs standard.
     *
-    * @param var0 parameter used by this operation
+    * @param themeProvider parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static CheckboxStyle standard(ThemeProvider var0) {
-      CheckboxStyleConfig var1 = new CheckboxStyleConfig();
-      var1.borderWidth = 2.0F;
-      var1.borderWidthHover = 3.0F;
-      var1.cornerRadius = 5.0F;
-      var1.checkInset = 0.24F;
-      var1.themeProvider = var0;
-      return new DefaultCheckboxStyle(var1);
+   public static CheckboxStyle standard(ThemeProvider themeProvider) {
+      CheckboxStyleConfig config = new CheckboxStyleConfig();
+      config.borderWidth = 2.0F;
+      config.borderWidthHover = 3.0F;
+      config.cornerRadius = 5.0F;
+      config.checkInset = 0.24F;
+      config.themeProvider = themeProvider;
+      return new DefaultCheckboxStyle(config);
    }
 }

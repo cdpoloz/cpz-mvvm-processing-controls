@@ -4,6 +4,8 @@ import java.util.Objects;
 
 /**
  * Minimal config DTO for a single text field created from external data.
+ *
+ * @author CPZ
  */
 public final class TextFieldConfig {
     private final String code;

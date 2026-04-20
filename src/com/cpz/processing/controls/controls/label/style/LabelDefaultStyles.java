@@ -15,6 +15,8 @@ import com.cpz.processing.controls.core.theme.ThemeProvider;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class LabelDefaultStyles {
    private LabelDefaultStyles() {
@@ -35,22 +37,22 @@ public final class LabelDefaultStyles {
    /**
     * Performs default text.
     *
-    * @param var0 parameter used by this operation
+    * @param themeProvider parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static LabelStyle defaultText(ThemeProvider var0) {
-      LabelStyleConfig var1 = new LabelStyleConfig();
-      var1.font = null;
-      var1.textSize = 12.0F;
-      var1.textColor = null;
-      var1.lineSpacingMultiplier = 1.0F;
-      var1.alignX = HorizontalAlign.START;
-      var1.alignY = VerticalAlign.BASELINE;
-      var1.disabledAlpha = null;
-      var1.themeProvider = var0;
-      return new DefaultLabelStyle(var1);
+   public static LabelStyle defaultText(ThemeProvider themeProvider) {
+      LabelStyleConfig config = new LabelStyleConfig();
+      config.font = null;
+      config.textSize = 12.0F;
+      config.textColor = null;
+      config.lineSpacingMultiplier = 1.0F;
+      config.alignX = HorizontalAlign.START;
+      config.alignY = VerticalAlign.BASELINE;
+      config.disabledAlpha = null;
+      config.themeProvider = themeProvider;
+      return new DefaultLabelStyle(config);
    }
 }

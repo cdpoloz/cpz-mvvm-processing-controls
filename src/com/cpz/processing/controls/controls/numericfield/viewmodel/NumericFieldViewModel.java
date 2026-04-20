@@ -21,6 +21,8 @@ import java.util.function.Consumer;
  *
  * Notes:
  * - This type belongs to the MVVM ViewModel layer.
+ *
+ * @author CPZ
  */
 public final class NumericFieldViewModel extends AbstractInteractiveControlViewModel implements KeyboardInputTarget {
    private final ClipboardService clipboardService = new ClipboardService();
@@ -39,19 +41,19 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    /**
     * Creates a numeric field view model.
     *
-    * @param var1 parameter used by this operation
+    * @param model parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public NumericFieldViewModel(NumericFieldModel var1) {
-      super(var1);
-      this.textBuffer = this.formatValue(var1.getValue());
+   public NumericFieldViewModel(NumericFieldModel model) {
+      super(model);
+      this.textBuffer = this.formatValue(model.getValue());
       this.cursorPosition = this.textBuffer.length();
       this.selectionStart = this.cursorPosition;
       this.selectionEnd = this.cursorPosition;
       this.selectionAnchor = this.cursorPosition;
-      this.lastSyncedValue = var1.getValue();
+      this.lastSyncedValue = model.getValue();
    }
 
    /**
@@ -132,26 +134,26 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    /**
     * Updates cursor position.
     *
-    * @param var1 new cursor position
+    * @param value new cursor position
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setCursorPosition(int var1) {
-      this.cursorPosition = this.clampIndex(var1);
+   public void setCursorPosition(int value) {
+      this.cursorPosition = this.clampIndex(value);
       this.clearSelection();
    }
 
    /**
     * Updates cursor position without selection reset.
     *
-    * @param var1 new cursor position without selection reset
+    * @param value new cursor position without selection reset
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setCursorPositionWithoutSelectionReset(int var1) {
-      this.cursorPosition = this.clampIndex(var1);
+   public void setCursorPositionWithoutSelectionReset(int value) {
+      this.cursorPosition = this.clampIndex(value);
    }
 
    /**
@@ -170,13 +172,13 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    /**
     * Updates selection start.
     *
-    * @param var1 new selection start
+    * @param value new selection start
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSelectionStart(int var1) {
-      this.selectionStart = this.clampIndex(var1);
+   public void setSelectionStart(int value) {
+      this.selectionStart = this.clampIndex(value);
    }
 
    /**
@@ -195,25 +197,25 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    /**
     * Updates selection end.
     *
-    * @param var1 new selection end
+    * @param value new selection end
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSelectionEnd(int var1) {
-      this.selectionEnd = this.clampIndex(var1);
+   public void setSelectionEnd(int value) {
+      this.selectionEnd = this.clampIndex(value);
    }
 
    /**
     * Updates selection anchor.
     *
-    * @param var1 new selection anchor
+    * @param value new selection anchor
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSelectionAnchor(int var1) {
-      this.selectionAnchor = this.clampIndex(var1);
+   public void setSelectionAnchor(int value) {
+      this.selectionAnchor = this.clampIndex(value);
    }
 
    /**
@@ -231,13 +233,13 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    /**
     * Updates selecting.
     *
-    * @param var1 new selecting
+    * @param enabled new selecting
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSelecting(boolean var1) {
-      this.selecting = var1 && this.focused && this.isEnabled() && this.isVisible();
+   public void setSelecting(boolean enabled) {
+      this.selecting = enabled && this.focused && this.isEnabled() && this.isVisible();
    }
 
    /**
@@ -291,13 +293,13 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    /**
     * Updates focused.
     *
-    * @param var1 new focused
+    * @param focused new focused
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setFocused(boolean var1) {
-      this.focused = var1 && this.isEditableContext();
+   public void setFocused(boolean focused) {
+      this.focused = focused && this.isEditableContext();
       if (!this.focused) {
          this.commitValue();
          this.selecting = false;
@@ -320,25 +322,25 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    /**
     * Updates on value changed.
     *
-    * @param var1 new on value changed
+    * @param consumer new on value changed
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setOnValueChanged(Consumer<BigDecimal> var1) {
-      this.onValueChanged = var1;
+   public void setOnValueChanged(Consumer<BigDecimal> consumer) {
+      this.onValueChanged = consumer;
    }
 
    /**
     * Updates on text changed.
     *
-    * @param var1 new on text changed
+    * @param consumer new on text changed
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setOnTextChanged(Consumer<String> var1) {
-      this.onTextChanged = var1;
+   public void setOnTextChanged(Consumer<String> consumer) {
+      this.onTextChanged = consumer;
    }
 
    /**
@@ -368,18 +370,18 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    /**
     * Updates text.
     *
-    * @param var1 new text
+    * @param text new text
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setText(String var1) {
-      if (var1 == null) {
+   public void setText(String text) {
+      if (text == null) {
          throw new IllegalArgumentException("text must not be null");
-      } else if (!this.isCandidateTextAllowed(var1)) {
-         throw new IllegalArgumentException("text must use only digits, an optional leading '-', and a single optional '.': " + var1);
+      } else if (!this.isCandidateTextAllowed(text)) {
+         throw new IllegalArgumentException("text must use only digits, an optional leading '-', and a single optional '.': " + text);
       } else {
-         this.textBuffer = var1;
+         this.textBuffer = text;
          this.cursorPosition = this.textBuffer.length();
          this.clearSelection();
          this.editing = true;
@@ -391,14 +393,14 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    /**
     * Handles key typed.
     *
-    * @param var1 parameter used by this operation
+    * @param key parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onKeyTyped(char var1) {
-      if (!Character.isISOControl(var1)) {
-         this.insertText(String.valueOf(var1));
+   public void onKeyTyped(char key) {
+      if (!Character.isISOControl(key)) {
+         this.insertText(String.valueOf(key));
       }
 
    }
@@ -406,22 +408,22 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    /**
     * Performs insert text.
     *
-    * @param var1 parameter used by this operation
+    * @param text parameter used by this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public void insertText(String var1) {
-      if (this.canEdit() && var1 != null && !var1.isEmpty()) {
-         if (this.isInsertAllowed(var1)) {
+   public void insertText(String text) {
+      if (this.canEdit() && text != null && !text.isEmpty()) {
+         if (this.isInsertAllowed(text)) {
             if (this.hasSelection()) {
                this.deleteSelectionInternal();
             }
 
-            String var2 = this.textBuffer.substring(0, this.cursorPosition) + var1 + this.textBuffer.substring(this.cursorPosition);
-            if (this.isCandidateTextAllowed(var2)) {
-               this.textBuffer = var2;
-               this.cursorPosition += var1.length();
+            String text2 = this.textBuffer.substring(0, this.cursorPosition) + text + this.textBuffer.substring(this.cursorPosition);
+            if (this.isCandidateTextAllowed(text2)) {
+               this.textBuffer = text2;
+               this.cursorPosition += text.length();
                this.clearSelection();
                this.editing = true;
                this.updateModelFromBufferIfParsable();
@@ -442,8 +444,8 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
          if (this.hasSelection()) {
             this.deleteSelection();
          } else if (this.cursorPosition != 0) {
-            String var10001 = this.textBuffer.substring(0, this.cursorPosition - 1);
-            this.textBuffer = var10001 + this.textBuffer.substring(this.cursorPosition);
+            String path = this.textBuffer.substring(0, this.cursorPosition - 1);
+            this.textBuffer = path + this.textBuffer.substring(this.cursorPosition);
             --this.cursorPosition;
             this.clearSelection();
             this.editing = true;
@@ -464,8 +466,8 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
          if (this.hasSelection()) {
             this.deleteSelection();
          } else if (this.cursorPosition < this.textBuffer.length()) {
-            String var10001 = this.textBuffer.substring(0, this.cursorPosition);
-            this.textBuffer = var10001 + this.textBuffer.substring(this.cursorPosition + 1);
+            String path = this.textBuffer.substring(0, this.cursorPosition);
+            this.textBuffer = path + this.textBuffer.substring(this.cursorPosition + 1);
             this.clearSelection();
             this.editing = true;
             this.updateModelFromBufferIfParsable();
@@ -634,15 +636,15 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    /**
     * Updates value.
     *
-    * @param var1 new value
+    * @param bigDecimal new value
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setValue(BigDecimal var1) {
-      BigDecimal var2 = ((NumericFieldModel)this.model).getValue();
-      ((NumericFieldModel)this.model).setValue(this.clampAndNormalize(var1 == null ? this.fallbackForEmptyCommit() : var1));
-      this.notifyValueChangedIfNeeded(var2, ((NumericFieldModel)this.model).getValue());
+   public void setValue(BigDecimal bigDecimal) {
+      BigDecimal bigDecimal2 = ((NumericFieldModel)this.model).getValue();
+      ((NumericFieldModel)this.model).setValue(this.clampAndNormalize(bigDecimal == null ? this.fallbackForEmptyCommit() : bigDecimal));
+      this.notifyValueChangedIfNeeded(bigDecimal2, ((NumericFieldModel)this.model).getValue());
       this.textBuffer = this.formatValue(((NumericFieldModel)this.model).getValue());
       this.editing = false;
       this.lastSyncedValue = ((NumericFieldModel)this.model).getValue();
@@ -654,38 +656,38 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    protected void activate() {
    }
 
-   private void setCommittedValue(BigDecimal var1) {
-      BigDecimal var2 = ((NumericFieldModel)this.model).getValue();
-      String var4 = this.textBuffer;
-      BigDecimal var3 = this.clampAndNormalize(var1 == null ? this.fallbackForEmptyCommit() : var1);
-      ((NumericFieldModel)this.model).setValue(var3);
-      this.notifyValueChangedIfNeeded(var2, ((NumericFieldModel)this.model).getValue());
+   private void setCommittedValue(BigDecimal bigDecimal) {
+      BigDecimal bigDecimal2 = ((NumericFieldModel)this.model).getValue();
+      String text = this.textBuffer;
+      BigDecimal bigDecimal3 = this.clampAndNormalize(bigDecimal == null ? this.fallbackForEmptyCommit() : bigDecimal);
+      ((NumericFieldModel)this.model).setValue(bigDecimal3);
+      this.notifyValueChangedIfNeeded(bigDecimal2, ((NumericFieldModel)this.model).getValue());
       this.textBuffer = this.formatValue(((NumericFieldModel)this.model).getValue());
       this.editing = false;
       this.lastSyncedValue = ((NumericFieldModel)this.model).getValue();
       this.cursorPosition = this.textBuffer.length();
       this.clearSelection();
-      if (!Objects.equals(var4, this.textBuffer)) {
+      if (!Objects.equals(text, this.textBuffer)) {
          this.notifyTextChanged();
       }
    }
 
    private void updateModelFromBufferIfParsable() {
       if (!this.isIntermediateValidState(this.textBuffer)) {
-         BigDecimal var1 = this.tryParse(this.textBuffer);
-         if (var1 != null) {
-            BigDecimal var2 = ((NumericFieldModel)this.model).getValue();
-            ((NumericFieldModel)this.model).setValue(this.clamp(var1));
+         BigDecimal bigDecimal = this.tryParse(this.textBuffer);
+         if (bigDecimal != null) {
+            BigDecimal bigDecimal2 = ((NumericFieldModel)this.model).getValue();
+            ((NumericFieldModel)this.model).setValue(this.clamp(bigDecimal));
             this.lastSyncedValue = ((NumericFieldModel)this.model).getValue();
-            this.notifyValueChangedIfNeeded(var2, ((NumericFieldModel)this.model).getValue());
+            this.notifyValueChangedIfNeeded(bigDecimal2, ((NumericFieldModel)this.model).getValue());
          }
       }
    }
 
    private void syncFromModelIfNotEditing() {
       if (!this.editing) {
-         String var1 = this.formatValue(((NumericFieldModel)this.model).getValue());
-         this.textBuffer = var1;
+         String text = this.formatValue(((NumericFieldModel)this.model).getValue());
+         this.textBuffer = text;
          if (this.lastSyncedValue == null || ((NumericFieldModel)this.model).getValue().compareTo(this.lastSyncedValue) != 0) {
             this.lastSyncedValue = ((NumericFieldModel)this.model).getValue();
             this.cursorPosition = Math.min(this.cursorPosition, this.textBuffer.length());
@@ -695,58 +697,58 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       }
    }
 
-   private boolean isInsertAllowed(String var1) {
-      int var2 = this.cursorPosition;
-      String var3 = this.hasSelection() ? this.textBuffer.substring(0, this.getSelectionMin()) + this.textBuffer.substring(this.getSelectionMax()) : this.textBuffer;
+   private boolean isInsertAllowed(String text) {
+      int value = this.cursorPosition;
+      String text2 = this.hasSelection() ? this.textBuffer.substring(0, this.getSelectionMin()) + this.textBuffer.substring(this.getSelectionMax()) : this.textBuffer;
       if (this.hasSelection()) {
-         var2 = this.getSelectionMin();
+         value = this.getSelectionMin();
       }
 
-      for(int var4 = 0; var4 < var1.length(); ++var4) {
-         char var5 = var1.charAt(var4);
-         if (!this.isValidInsertion(var5, var2, var3)) {
+      for(int value2 = 0; value2 < text.length(); ++value2) {
+         char key = text.charAt(value2);
+         if (!this.isValidInsertion(key, value, text2)) {
             return false;
          }
 
-         var3 = var3.substring(0, var2) + var5 + var3.substring(var2);
-         ++var2;
+         text2 = text2.substring(0, value) + key + text2.substring(value);
+         ++value;
       }
 
       return true;
    }
 
-   private boolean isCharacterAllowed(char var1) {
-      if (Character.isDigit(var1)) {
+   private boolean isCharacterAllowed(char key) {
+      if (Character.isDigit(key)) {
          return true;
-      } else if (var1 == '-' && ((NumericFieldModel)this.model).isAllowNegative()) {
+      } else if (key == '-' && ((NumericFieldModel)this.model).isAllowNegative()) {
          return true;
       } else {
-         return var1 == '.' && ((NumericFieldModel)this.model).isAllowDecimal();
+         return key == '.' && ((NumericFieldModel)this.model).isAllowDecimal();
       }
    }
 
-   private boolean isCandidateTextAllowed(String var1) {
-      if (var1 == null) {
+   private boolean isCandidateTextAllowed(String text) {
+      if (text == null) {
          return false;
       } else {
-         int var2 = 0;
-         int var3 = 0;
+         int value = 0;
+         int value2 = 0;
 
-         for(int var4 = 0; var4 < var1.length(); ++var4) {
-            char var5 = var1.charAt(var4);
-            if (!Character.isDigit(var5)) {
-               if (var5 == '.') {
-                  ++var2;
-                  if (!((NumericFieldModel)this.model).isAllowDecimal() || var2 > 1) {
+         for(int value3 = 0; value3 < text.length(); ++value3) {
+            char key = text.charAt(value3);
+            if (!Character.isDigit(key)) {
+               if (key == '.') {
+                  ++value;
+                  if (!((NumericFieldModel)this.model).isAllowDecimal() || value > 1) {
                      return false;
                   }
                } else {
-                  if (var5 != '-') {
+                  if (key != '-') {
                      return false;
                   }
 
-                  ++var3;
-                  if (!((NumericFieldModel)this.model).isAllowNegative() || var3 > 1 || var4 != 0) {
+                  ++value2;
+                  if (!((NumericFieldModel)this.model).isAllowNegative() || value2 > 1 || value3 != 0) {
                      return false;
                   }
                }
@@ -757,26 +759,26 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       }
    }
 
-   private boolean isIntermediateValidState(String var1) {
-      return Objects.equals(var1, "") || Objects.equals(var1, "-") || Objects.equals(var1, ".") || Objects.equals(var1, "-.") || Objects.equals(var1, "0.") || Objects.equals(var1, "-0.");
+   private boolean isIntermediateValidState(String text) {
+      return Objects.equals(text, "") || Objects.equals(text, "-") || Objects.equals(text, ".") || Objects.equals(text, "-.") || Objects.equals(text, "0.") || Objects.equals(text, "-0.");
    }
 
-   private BigDecimal tryParse(String var1) {
-      if (var1 == null) {
+   private BigDecimal tryParse(String text) {
+      if (text == null) {
          return null;
       } else {
-         String var2 = var1.trim();
-         if (this.isIntermediateValidState(var2)) {
+         String text2 = text.trim();
+         if (this.isIntermediateValidState(text2)) {
             return null;
          } else {
             try {
-               BigDecimal var3 = new BigDecimal(var2);
+               BigDecimal bigDecimal = new BigDecimal(text2);
                if (!((NumericFieldModel)this.model).isAllowDecimal()) {
-                  var3 = var3.setScale(0, RoundingMode.DOWN);
+                  bigDecimal = bigDecimal.setScale(0, RoundingMode.DOWN);
                }
 
-               return var3;
-            } catch (NumberFormatException var4) {
+               return bigDecimal;
+            } catch (NumberFormatException numberFormatException) {
                return null;
             }
          }
@@ -792,60 +794,60 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    }
 
    private void commitValue() {
-      String var1 = this.textBuffer == null ? "" : this.textBuffer.trim();
-      BigDecimal var2;
-      if (var1.isEmpty()) {
-         var2 = this.fallbackForEmptyCommit();
-      } else if (!"-".equals(var1) && !".".equals(var1) && !"-.".equals(var1)) {
-         BigDecimal var3 = this.tryParse(var1);
-         var2 = var3 == null ? this.fallbackForInvalidIntermediateCommit() : var3;
+      String text = this.textBuffer == null ? "" : this.textBuffer.trim();
+      BigDecimal bigDecimal;
+      if (text.isEmpty()) {
+         bigDecimal = this.fallbackForEmptyCommit();
+      } else if (!"-".equals(text) && !".".equals(text) && !"-.".equals(text)) {
+         BigDecimal bigDecimal2 = this.tryParse(text);
+         bigDecimal = bigDecimal2 == null ? this.fallbackForInvalidIntermediateCommit() : bigDecimal2;
       } else {
-         var2 = this.fallbackForInvalidIntermediateCommit();
+         bigDecimal = this.fallbackForInvalidIntermediateCommit();
       }
 
-      this.setCommittedValue(var2);
+      this.setCommittedValue(bigDecimal);
    }
 
-   private BigDecimal clampAndNormalize(BigDecimal var1) {
-      return this.clamp(var1).setScale(((NumericFieldModel)this.model).getScale(), RoundingMode.HALF_UP);
+   private BigDecimal clampAndNormalize(BigDecimal bigDecimal) {
+      return this.clamp(bigDecimal).setScale(((NumericFieldModel)this.model).getScale(), RoundingMode.HALF_UP);
    }
 
-   private BigDecimal clamp(BigDecimal var1) {
-      BigDecimal var2 = var1;
-      if (((NumericFieldModel)this.model).getMin() != null && var1.compareTo(((NumericFieldModel)this.model).getMin()) < 0) {
-         var2 = ((NumericFieldModel)this.model).getMin();
+   private BigDecimal clamp(BigDecimal bigDecimal) {
+      BigDecimal bigDecimal2 = bigDecimal;
+      if (((NumericFieldModel)this.model).getMin() != null && bigDecimal.compareTo(((NumericFieldModel)this.model).getMin()) < 0) {
+         bigDecimal2 = ((NumericFieldModel)this.model).getMin();
       }
 
-      if (((NumericFieldModel)this.model).getMax() != null && var2.compareTo(((NumericFieldModel)this.model).getMax()) > 0) {
-         var2 = ((NumericFieldModel)this.model).getMax();
+      if (((NumericFieldModel)this.model).getMax() != null && bigDecimal2.compareTo(((NumericFieldModel)this.model).getMax()) > 0) {
+         bigDecimal2 = ((NumericFieldModel)this.model).getMax();
       }
 
-      return var2;
+      return bigDecimal2;
    }
 
-   private String formatValue(BigDecimal var1) {
-      return var1.setScale(((NumericFieldModel)this.model).getScale(), RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
+   private String formatValue(BigDecimal bigDecimal) {
+      return bigDecimal.setScale(((NumericFieldModel)this.model).getScale(), RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
    }
 
-   private boolean isValidInsertion(char var1, int var2, String var3) {
-      if (!this.isCharacterAllowed(var1)) {
+   private boolean isValidInsertion(char key, int value, String text) {
+      if (!this.isCharacterAllowed(key)) {
          return false;
-      } else if (var1 != '-') {
-         if (var1 == '.') {
-            return var3.indexOf(46) < 0;
+      } else if (key != '-') {
+         if (key == '.') {
+            return text.indexOf(46) < 0;
          } else {
             return true;
          }
       } else {
-         return var2 == 0 && var3.indexOf(45) < 0;
+         return value == 0 && text.indexOf(45) < 0;
       }
    }
 
-   private void notifyValueChangedIfNeeded(BigDecimal var1, BigDecimal var2) {
-      if (var1 != null && var2 != null) {
-         if (var1.compareTo(var2) != 0) {
+   private void notifyValueChangedIfNeeded(BigDecimal bigDecimal, BigDecimal bigDecimal2) {
+      if (bigDecimal != null && bigDecimal2 != null) {
+         if (bigDecimal.compareTo(bigDecimal2) != 0) {
             if (this.onValueChanged != null) {
-               this.onValueChanged.accept(var2);
+               this.onValueChanged.accept(bigDecimal2);
             }
 
          }
@@ -864,11 +866,11 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
    }
 
    private void deleteSelectionInternal() {
-      int var1 = this.getSelectionMin();
-      int var2 = this.getSelectionMax();
-      String var10001 = this.textBuffer.substring(0, var1);
-      this.textBuffer = var10001 + this.textBuffer.substring(var2);
-      this.cursorPosition = var1;
+      int value = this.getSelectionMin();
+      int value2 = this.getSelectionMax();
+      String path = this.textBuffer.substring(0, value);
+      this.textBuffer = path + this.textBuffer.substring(value2);
+      this.cursorPosition = value;
       this.clearSelection();
    }
 
@@ -897,8 +899,8 @@ public final class NumericFieldViewModel extends AbstractInteractiveControlViewM
       this.selectionAnchor = this.clampIndex(this.selectionAnchor);
    }
 
-   private int clampIndex(int var1) {
-      return Math.max(0, Math.min(this.textBuffer.length(), var1));
+   private int clampIndex(int index) {
+      return Math.max(0, Math.min(this.textBuffer.length(), index));
    }
 
    private boolean canEdit() {

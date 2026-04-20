@@ -12,6 +12,8 @@ package com.cpz.processing.controls.controls.label.state;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public record LabelViewState(float x, float y, float width, float height, String text, boolean enabled) {
 }

@@ -9,6 +9,8 @@ import java.util.Objects;
 
 /**
  * Reusable input layer for a single radio group instance.
+ *
+ * @author CPZ
  */
 public final class RadioGroupInputLayer extends DefaultInputLayer {
     private final RadioGroup radioGroup;

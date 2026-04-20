@@ -16,6 +16,8 @@ import com.cpz.processing.controls.core.theme.ThemeProvider;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class ToggleDefaultStyles {
    private ToggleDefaultStyles() {
@@ -36,18 +38,18 @@ public final class ToggleDefaultStyles {
    /**
     * Performs circular.
     *
-    * @param var0 parameter used by this operation
+    * @param themeProvider parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static ToggleStyle circular(ThemeProvider var0) {
-      ToggleStyleConfig var1 = new ToggleStyleConfig();
-      var1.shape = new CircleShapeRenderer();
-      var1.strokeWidth = 2.0F;
-      var1.strokeWidthHover = 3.0F;
-      var1.themeProvider = var0;
-      return new ParametricToggleStyle(var1);
+   public static ToggleStyle circular(ThemeProvider themeProvider) {
+      ToggleStyleConfig config = new ToggleStyleConfig();
+      config.shape = new CircleShapeRenderer();
+      config.strokeWidth = 2.0F;
+      config.strokeWidthHover = 3.0F;
+      config.themeProvider = themeProvider;
+      return new ParametricToggleStyle(config);
    }
 }

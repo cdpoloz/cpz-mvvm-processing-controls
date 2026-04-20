@@ -16,6 +16,8 @@ import processing.core.PShape;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class SvgShapeRenderer implements ToggleShapeRenderer {
    private final PShape shape;
@@ -23,14 +25,14 @@ public final class SvgShapeRenderer implements ToggleShapeRenderer {
    /**
     * Creates a svg shape renderer.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param path parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public SvgShapeRenderer(PApplet var1, String var2) {
-      this.shape = loadShape(var1, var2);
+   public SvgShapeRenderer(PApplet sketch, String path) {
+      this.shape = loadShape(sketch, path);
       if (this.shape != null) {
          this.shape.disableStyle();
       }
@@ -40,36 +42,36 @@ public final class SvgShapeRenderer implements ToggleShapeRenderer {
    /**
     * Renders the current frame.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
-    * @param var6 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
+    * @param height parameter used by this operation
+    * @param renderStyle parameter used by this operation
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
     */
-   public void render(PApplet var1, float var2, float var3, float var4, float var5, ToggleRenderStyle var6) {
+   public void render(PApplet sketch, float x, float y, float width, float height, ToggleRenderStyle renderStyle) {
       if (this.shape != null) {
-         var1.pushStyle();
-         var1.shapeMode(3);
-         var1.fill(var6.fillColor());
-         var1.stroke(var6.strokeColor());
-         var1.strokeWeight(var6.strokeWeight());
-         var1.shape(this.shape, var2, var3, var4, var5);
-         var1.popStyle();
+         sketch.pushStyle();
+         sketch.shapeMode(3);
+         sketch.fill(renderStyle.fillColor());
+         sketch.stroke(renderStyle.strokeColor());
+         sketch.strokeWeight(renderStyle.strokeWeight());
+         sketch.shape(this.shape, x, y, width, height);
+         sketch.popStyle();
       }
    }
 
-   private static PShape loadShape(PApplet var0, String var1) {
-      if (var0 != null && var1 != null && !var1.isEmpty()) {
-         PShape var2 = var0.loadShape(var1);
-         if (var2 == null && var1.startsWith("data/")) {
-            var2 = var0.loadShape(var1.substring("data/".length()));
+   private static PShape loadShape(PApplet sketch, String path) {
+      if (sketch != null && path != null && !path.isEmpty()) {
+         PShape shape = sketch.loadShape(path);
+         if (shape == null && path.startsWith("data/")) {
+            shape = sketch.loadShape(path.substring("data/".length()));
          }
 
-         return var2;
+         return shape;
       } else {
          return null;
       }

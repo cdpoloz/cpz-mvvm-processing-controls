@@ -17,6 +17,8 @@ import com.cpz.processing.controls.core.input.PointerInteractable;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class SliderInputAdapter {
    private final PointerInteractable view;
@@ -26,44 +28,44 @@ public final class SliderInputAdapter {
    /**
     * Creates a slider input adapter.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param view parameter used by this operation
+    * @param viewModel parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public SliderInputAdapter(SliderView var1, SliderViewModel var2) {
-      this.view = var1;
-      this.sliderView = var1;
-      this.viewModel = var2;
+   public SliderInputAdapter(SliderView view, SliderViewModel viewModel) {
+      this.view = view;
+      this.sliderView = view;
+      this.viewModel = viewModel;
    }
 
    /**
     * Handles mouse move.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param wheelDelta mouse wheel delta
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMouseMove(float var1, float var2) {
-      this.viewModel.onPointerMoved(this.viewModel.isVisible() && this.view.contains(var1, var2));
+   public void handleMouseMove(float mouseX, float mouseY) {
+      this.viewModel.onPointerMoved(this.viewModel.isVisible() && this.view.contains(mouseX, mouseY));
    }
 
    /**
     * Handles mouse press.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param wheelDelta mouse wheel delta
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMousePress(float var1, float var2) {
+   public void handleMousePress(float mouseX, float mouseY) {
       if (this.viewModel.isVisible() && this.viewModel.isEnabled()) {
-         if (this.view.contains(var1, var2)) {
-            this.viewModel.onPointerPressed(this.sliderView.toNormalizedValue(var1, var2));
+         if (this.view.contains(mouseX, mouseY)) {
+            this.viewModel.onPointerPressed(this.sliderView.toNormalizedValue(mouseX, mouseY));
          } else {
             this.viewModel.onPointerMoved(false);
          }
@@ -76,72 +78,72 @@ public final class SliderInputAdapter {
    /**
     * Handles mouse drag.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param wheelDelta mouse wheel delta
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMouseDrag(float var1, float var2) {
+   public void handleMouseDrag(float mouseX, float mouseY) {
       if (this.viewModel.isVisible()) {
-         this.viewModel.onPointerMoved(this.view.contains(var1, var2));
-         this.viewModel.onPointerDragged(this.sliderView.toNormalizedValue(var1, var2));
+         this.viewModel.onPointerMoved(this.view.contains(mouseX, mouseY));
+         this.viewModel.onPointerDragged(this.sliderView.toNormalizedValue(mouseX, mouseY));
       }
    }
 
    /**
     * Handles mouse release.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param wheelDelta mouse wheel delta
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMouseRelease(float var1, float var2) {
+   public void handleMouseRelease(float mouseX, float mouseY) {
       this.viewModel.onPointerReleased();
-      this.handleMouseMove(var1, var2);
+      this.handleMouseMove(mouseX, mouseY);
    }
 
    /**
     * Handles mouse wheel.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param wheelDelta mouse wheel delta
+    * @param coarseStep coarse-step modifier
+    * @param fineStep fine-step modifier
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMouseWheel(float var1, boolean var2, boolean var3) {
-      this.viewModel.onMouseWheel(var1, var2, var3);
+   public void handleMouseWheel(float wheelDelta, boolean coarseStep, boolean fineStep) {
+      this.viewModel.onMouseWheel(wheelDelta, coarseStep, fineStep);
    }
 
    /**
     * Handles pointer event.
     *
-    * @param var1 parameter used by this operation
+    * @param event parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handlePointerEvent(PointerEvent var1) {
-      if (var1 != null) {
-         switch (var1.getType()) {
+   public void handlePointerEvent(PointerEvent event) {
+      if (event != null) {
+         switch (event.getType()) {
             case MOVE:
-               this.handleMouseMove(var1.getX(), var1.getY());
+               this.handleMouseMove(event.getX(), event.getY());
                break;
             case PRESS:
-               this.handleMousePress(var1.getX(), var1.getY());
+               this.handleMousePress(event.getX(), event.getY());
                break;
             case DRAG:
-               this.handleMouseDrag(var1.getX(), var1.getY());
+               this.handleMouseDrag(event.getX(), event.getY());
                break;
             case RELEASE:
-               this.handleMouseRelease(var1.getX(), var1.getY());
+               this.handleMouseRelease(event.getX(), event.getY());
                break;
             case WHEEL:
-               this.handleMouseWheel(var1.getWheelDelta(), var1.isShiftDown(), var1.isControlDown());
+               this.handleMouseWheel(event.getWheelDelta(), event.isShiftDown(), event.isControlDown());
          }
       }
    }

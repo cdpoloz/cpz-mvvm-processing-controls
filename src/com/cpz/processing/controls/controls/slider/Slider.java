@@ -19,6 +19,8 @@ import java.util.function.Function;
 
 /**
  * Convenience facade for the slider control.
+ *
+ * @author CPZ
  */
 public final class Slider implements Control {
     private final SliderModel model;

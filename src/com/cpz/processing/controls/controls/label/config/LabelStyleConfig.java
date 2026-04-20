@@ -18,6 +18,8 @@ import processing.core.PFont;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public class LabelStyleConfig {
    public PFont font;
@@ -43,39 +45,39 @@ public class LabelStyleConfig {
    /**
     * Updates align.
     *
-    * @param var1 new align
-    * @param var2 parameter used by this operation
+    * @param horizontalAlign new align
+    * @param verticalAlign parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setAlign(HorizontalAlign var1, VerticalAlign var2) {
-      this.alignX = var1 == null ? HorizontalAlign.START : var1;
-      this.alignY = var2 == null ? VerticalAlign.BASELINE : var2;
+   public void setAlign(HorizontalAlign horizontalAlign, VerticalAlign verticalAlign) {
+      this.alignX = horizontalAlign == null ? HorizontalAlign.START : horizontalAlign;
+      this.alignY = verticalAlign == null ? VerticalAlign.BASELINE : verticalAlign;
    }
 
    /**
     * Updates align.
     *
-    * @param var1 new align
-    * @param var2 parameter used by this operation
+    * @param horizontalAlign Processing horizontal alignment
+    * @param verticalAlign Processing vertical alignment
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setAlign(int var1, int var2) {
-      this.setAlign(LabelAlignMapper.fromProcessingHorizontal(var1), LabelAlignMapper.fromProcessingVertical(var2));
+   public void setAlign(int horizontalAlign, int verticalAlign) {
+      this.setAlign(LabelAlignMapper.fromProcessingHorizontal(horizontalAlign), LabelAlignMapper.fromProcessingVertical(verticalAlign));
    }
 
    /**
     * Updates theme provider.
     *
-    * @param var1 new theme provider
+    * @param themeProvider new theme provider
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setThemeProvider(ThemeProvider var1) {
-      this.themeProvider = var1;
+   public void setThemeProvider(ThemeProvider themeProvider) {
+      this.themeProvider = themeProvider;
    }
 }

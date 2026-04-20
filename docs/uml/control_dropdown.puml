@@ -1,27 +1,41 @@
 @startuml
-title DropDown Control Structure
+title DropDown Public Facade Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-class PointerEvent
-class InputLayer
-class DropDownOverlayController
+interface Control
+class DropDown
+class DropDownModel
 class DropDownViewModel
 class DropDownView
+class DropDownInputAdapter
+class DropDownOverlayController
 class DropDownViewState
 class DefaultDropDownStyle
 class DropDownRenderStyle
 class DefaultDropDownRenderer
+class OverlayManager
+class InputManager
+interface ThemeProvider
 class ThemeSnapshot
 
-PointerEvent --> InputLayer : dispatched
-InputLayer --> DropDownOverlayController : overlay capture
-DropDownOverlayController --> DropDownView : forwards pointer state
-DropDownOverlayController --> DropDownViewModel : updates expansion / selection
-DropDownView --> DropDownViewState
-DropDownView --> ThemeSnapshot
-DefaultDropDownStyle --> DropDownViewState
-DefaultDropDownStyle --> ThemeSnapshot
-DefaultDropDownStyle --> DropDownRenderStyle
-DefaultDropDownRenderer --> DropDownRenderStyle
+DropDown ..|> Control
+DropDown --> DropDownModel : owns
+DropDown --> DropDownViewModel : owns
+DropDown --> DropDownView : owns
+DropDown --> DropDownInputAdapter : delegates input
+DropDown --> DropDownOverlayController : owns overlay lifecycle
+DropDownOverlayController --> OverlayManager : registers overlay
+DropDownOverlayController --> InputManager : registers overlay input
+DropDownInputAdapter --> DropDownView : geometry / hit testing
+DropDownInputAdapter --> DropDownViewModel : expansion / selection updates
+DropDownViewModel --> DropDownModel : updates
+DropDownView --> DropDownViewModel : reads
+DropDownView --> DropDownViewState : builds
+DropDownView --> DefaultDropDownStyle : renders with
+DefaultDropDownStyle --> ThemeProvider : reads snapshot
+ThemeProvider --> ThemeSnapshot
+DefaultDropDownStyle --> DropDownViewState : resolves
+DefaultDropDownStyle --> DropDownRenderStyle : creates
+DefaultDropDownRenderer --> DropDownRenderStyle : draws
 @enduml

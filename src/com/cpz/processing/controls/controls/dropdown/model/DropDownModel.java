@@ -19,6 +19,8 @@ import java.util.Objects;
  *
  * Notes:
  * - This type belongs to the MVVM Model layer.
+ *
+ * @author CPZ
  */
 public final class DropDownModel implements Enableable {
    private final String code;
@@ -29,36 +31,36 @@ public final class DropDownModel implements Enableable {
    /**
     * Creates a drop down model.
     *
-    * @param var1 parameter used by this operation
+    * @param list parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public DropDownModel(List<String> var1) {
-      this(ControlCode.auto("dropdown"), var1, -1);
+   public DropDownModel(List<String> list) {
+      this(ControlCode.auto("dropdown"), list, -1);
    }
 
    /**
     * Creates a drop down model.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param list parameter used by this operation
+    * @param value parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public DropDownModel(List<String> var1, int var2) {
-      this(ControlCode.auto("dropdown"), var1, var2);
+   public DropDownModel(List<String> list, int value) {
+      this(ControlCode.auto("dropdown"), list, value);
    }
 
-   public DropDownModel(String var1, List<String> var2) {
-      this(var1, var2, -1);
+   public DropDownModel(String text, List<String> list) {
+      this(text, list, -1);
    }
 
-   public DropDownModel(String var1, List<String> var2, int var3) {
-      this.code = Objects.requireNonNull(var1, "code");
-      this.items = sanitizeItems(var2);
-      this.selectedIndex = normalizeSelectedIndex(var3, this.items.size());
+   public DropDownModel(String text, List<String> list, int value) {
+      this.code = Objects.requireNonNull(text, "code");
+      this.items = sanitizeItems(list);
+      this.selectedIndex = normalizeSelectedIndex(value, this.items.size());
       this.enabled = true;
    }
 
@@ -81,13 +83,13 @@ public final class DropDownModel implements Enableable {
    /**
     * Updates items.
     *
-    * @param var1 new items
+    * @param list new items
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setItems(List<String> var1) {
-      this.items = sanitizeItems(var1);
+   public void setItems(List<String> list) {
+      this.items = sanitizeItems(list);
       this.selectedIndex = normalizeSelectedIndex(this.selectedIndex, this.items.size());
    }
 
@@ -106,13 +108,13 @@ public final class DropDownModel implements Enableable {
    /**
     * Updates selected index.
     *
-    * @param var1 new selected index
+    * @param index new selected index
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSelectedIndex(int var1) {
-      this.selectedIndex = normalizeSelectedIndex(var1, this.items.size());
+   public void setSelectedIndex(int index) {
+      this.selectedIndex = normalizeSelectedIndex(index, this.items.size());
    }
 
    /**
@@ -130,34 +132,34 @@ public final class DropDownModel implements Enableable {
    /**
     * Updates enabled.
     *
-    * @param var1 new enabled
+    * @param enabled new enabled
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setEnabled(boolean var1) {
-      this.enabled = var1;
+   public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
    }
 
-   private static List<String> sanitizeItems(List<String> var0) {
-      if (var0 != null && !var0.isEmpty()) {
-         ArrayList<String> var1 = new ArrayList<>(var0.size());
+   private static List<String> sanitizeItems(List<String> list) {
+      if (list != null && !list.isEmpty()) {
+         ArrayList<String> arrayList = new ArrayList<>(list.size());
 
-         for(String var3 : var0) {
-            var1.add(var3 == null ? "" : var3);
+         for(String text : list) {
+            arrayList.add(text == null ? "" : text);
          }
 
-         return Collections.unmodifiableList(var1);
+         return Collections.unmodifiableList(arrayList);
       } else {
          return List.of();
       }
    }
 
-   private static int normalizeSelectedIndex(int var0, int var1) {
-      if (var1 <= 0) {
+   private static int normalizeSelectedIndex(int zIndex, int zIndex2) {
+      if (zIndex2 <= 0) {
          return -1;
       } else {
-         return var0 < 0 ? -1 : Math.min(var0, var1 - 1);
+         return zIndex < 0 ? -1 : Math.min(zIndex, zIndex2 - 1);
       }
    }
 }

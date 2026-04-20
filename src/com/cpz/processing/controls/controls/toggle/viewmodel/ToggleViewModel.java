@@ -15,19 +15,21 @@ import com.cpz.processing.controls.core.viewmodel.AbstractInteractiveControlView
  *
  * Notes:
  * - This type belongs to the MVVM ViewModel layer.
+ *
+ * @author CPZ
  */
 public class ToggleViewModel extends AbstractInteractiveControlViewModel {
    /**
     * Creates a toggle view model.
     *
-    * @param var1 parameter used by this operation
+    * @param model parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public ToggleViewModel(ToggleModel var1) {
-      super(var1);
-      this.setTotalStates(var1.getTotalStates());
+   public ToggleViewModel(ToggleModel model) {
+      super(model);
+      this.setTotalStates(model.getTotalStates());
    }
 
    /**
@@ -81,15 +83,15 @@ public class ToggleViewModel extends AbstractInteractiveControlViewModel {
    /**
     * Updates total states.
     *
-    * @param var1 new total states
+    * @param value new total states
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setTotalStates(int var1) {
-      int var2 = Math.max(1, var1);
-      ((ToggleModel)this.model).setTotalStates(var2);
-      this.clampState(var2);
+   public void setTotalStates(int value) {
+      int value2 = Math.max(1, value);
+      ((ToggleModel)this.model).setTotalStates(value2);
+      this.clampState(value2);
    }
 
    /**
@@ -105,16 +107,16 @@ public class ToggleViewModel extends AbstractInteractiveControlViewModel {
    }
 
    protected void activate() {
-      int var1 = Math.max(1, ((ToggleModel)this.model).getTotalStates());
-      int var2 = ((ToggleModel)this.model).getState();
-      ((ToggleModel)this.model).setPrevState(var2);
-      ((ToggleModel)this.model).setState((var2 + 1) % var1);
+      int value = Math.max(1, ((ToggleModel)this.model).getTotalStates());
+      int value2 = ((ToggleModel)this.model).getState();
+      ((ToggleModel)this.model).setPrevState(value2);
+      ((ToggleModel)this.model).setState((value2 + 1) % value);
    }
 
-   private void clampState(int var1) {
-      if (((ToggleModel)this.model).getState() >= var1) {
+   private void clampState(int value) {
+      if (((ToggleModel)this.model).getState() >= value) {
          ((ToggleModel)this.model).setPrevState(((ToggleModel)this.model).getState());
-         ((ToggleModel)this.model).setState(var1 - 1);
+         ((ToggleModel)this.model).setState(value - 1);
       }
 
    }

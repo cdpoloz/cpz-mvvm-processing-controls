@@ -15,6 +15,8 @@ import com.cpz.processing.controls.core.view.Visible;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public interface Focusable extends Visible, Enableable {
    /**
@@ -27,9 +29,9 @@ public interface Focusable extends Visible, Enableable {
    /**
     * Updates the focus flag.
     *
-    * @param var1 new focus state
+    * @param focused new focus state
     */
-   void setFocused(boolean var1);
+   void setFocused(boolean focused);
 
    /**
     * Hook invoked when focus is granted.

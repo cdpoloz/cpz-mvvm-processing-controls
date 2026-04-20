@@ -9,6 +9,8 @@ import java.util.Objects;
 
 /**
  * Reusable input layer for a single slider instance.
+ *
+ * @author CPZ
  */
 public final class SliderInputLayer extends DefaultInputLayer {
     private final Slider slider;

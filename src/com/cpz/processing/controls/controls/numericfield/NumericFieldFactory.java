@@ -9,6 +9,8 @@ import java.util.Objects;
 
 /**
  * Factory for creating the public numeric field facade from external config.
+ *
+ * @author CPZ
  */
 public final class NumericFieldFactory {
     public static NumericField create(PApplet sketch, NumericFieldConfig config) {

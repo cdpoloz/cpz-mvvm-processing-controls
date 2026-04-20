@@ -12,6 +12,8 @@ package com.cpz.processing.controls.controls.button.state;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public record ButtonViewState(float x, float y, float width, float height, String text, boolean showText, boolean enabled, boolean hovered, boolean pressed) {
 }

@@ -30,9 +30,21 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Internal registry that maps JSON {@code type} values to public facade factories.
+ *
+ * <p>The registry is used only by {@link ControlConfigLoader}. It centralizes
+ * supported control types while keeping the public JSON result at
+ * {@code Map<String, Control>}.</p>
+ *
+ * @author CPZ
+ */
 final class ControlFactoryRegistry {
     private final Map<String, ControlEntryFactory> factories;
 
+    /**
+     * Creates a registry with the currently supported control types.
+     */
     ControlFactoryRegistry(PApplet sketch, OverlayManager overlayManager, InputManager inputManager) {
         Objects.requireNonNull(sketch, "sketch");
 
@@ -67,6 +79,14 @@ final class ControlFactoryRegistry {
         this.factories = Collections.unmodifiableMap(entries);
     }
 
+    /**
+     * Creates a control facade for one normalized JSON entry.
+     *
+     * @param type JSON control type
+     * @param json JSON object for the control entry
+     * @param path diagnostic path used in validation errors
+     * @return public control facade
+     */
     Control create(String type, JSONObject json, String path) {
         String normalizedType = JsonConfigSupport.normalizeControlType(type);
         ControlEntryFactory factory = this.factories.get(normalizedType);

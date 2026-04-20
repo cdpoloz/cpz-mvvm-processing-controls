@@ -11,6 +11,8 @@ import java.util.Objects;
 
 /**
  * Factory for creating the public toggle facade from external config.
+ *
+ * @author CPZ
  */
 public final class ToggleFactory {
     public static Toggle create(PApplet sketch, ToggleConfig config) {

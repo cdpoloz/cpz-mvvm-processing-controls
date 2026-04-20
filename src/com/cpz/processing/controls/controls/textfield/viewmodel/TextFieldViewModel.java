@@ -19,6 +19,8 @@ import java.util.function.Consumer;
  *
  * Notes:
  * - This type belongs to the MVVM ViewModel layer.
+ *
+ * @author CPZ
  */
 public final class TextFieldViewModel extends AbstractControlViewModel implements KeyboardInputTarget {
    private final ClipboardService clipboardService = new ClipboardService();
@@ -33,14 +35,14 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    /**
     * Creates a text field view model.
     *
-    * @param var1 parameter used by this operation
+    * @param model parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public TextFieldViewModel(TextFieldModel var1) {
-      super(var1);
-      this.cursorIndex = var1.getText().length();
+   public TextFieldViewModel(TextFieldModel model) {
+      super(model);
+      this.cursorIndex = model.getText().length();
       this.selectionStart = this.cursorIndex;
       this.selectionEnd = this.cursorIndex;
       this.selectionAnchor = this.cursorIndex;
@@ -61,13 +63,13 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    /**
     * Updates text.
     *
-    * @param var1 new text
+    * @param text new text
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setText(String var1) {
-      ((TextFieldModel)this.model).setText(var1);
+   public void setText(String text) {
+      ((TextFieldModel)this.model).setText(text);
       this.cursorIndex = this.clampIndex(this.cursorIndex);
       this.clearSelection();
       this.notifyTextChanged();
@@ -88,26 +90,26 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    /**
     * Updates cursor index.
     *
-    * @param var1 new cursor index
+    * @param index new cursor index
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setCursorIndex(int var1) {
-      this.cursorIndex = this.clampIndex(var1);
+   public void setCursorIndex(int index) {
+      this.cursorIndex = this.clampIndex(index);
       this.clearSelection();
    }
 
    /**
     * Updates cursor index without selection reset.
     *
-    * @param var1 new cursor index without selection reset
+    * @param index new cursor index without selection reset
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setCursorIndexWithoutSelectionReset(int var1) {
-      this.cursorIndex = this.clampIndex(var1);
+   public void setCursorIndexWithoutSelectionReset(int index) {
+      this.cursorIndex = this.clampIndex(index);
    }
 
    /**
@@ -125,13 +127,13 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    /**
     * Updates selection start.
     *
-    * @param var1 new selection start
+    * @param value new selection start
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSelectionStart(int var1) {
-      this.selectionStart = this.clampIndex(var1);
+   public void setSelectionStart(int value) {
+      this.selectionStart = this.clampIndex(value);
    }
 
    /**
@@ -149,25 +151,25 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    /**
     * Updates selection end.
     *
-    * @param var1 new selection end
+    * @param value new selection end
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSelectionEnd(int var1) {
-      this.selectionEnd = this.clampIndex(var1);
+   public void setSelectionEnd(int value) {
+      this.selectionEnd = this.clampIndex(value);
    }
 
    /**
     * Updates selection anchor.
     *
-    * @param var1 new selection anchor
+    * @param value new selection anchor
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSelectionAnchor(int var1) {
-      this.selectionAnchor = this.clampIndex(var1);
+   public void setSelectionAnchor(int value) {
+      this.selectionAnchor = this.clampIndex(value);
    }
 
    /**
@@ -185,13 +187,13 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    /**
     * Updates selecting.
     *
-    * @param var1 new selecting
+    * @param enabled new selecting
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSelecting(boolean var1) {
-      this.selecting = var1 && this.focused && this.isEnabled() && this.isVisible();
+   public void setSelecting(boolean enabled) {
+      this.selecting = enabled && this.focused && this.isEnabled() && this.isVisible();
    }
 
    /**
@@ -245,13 +247,13 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    /**
     * Updates focused.
     *
-    * @param var1 new focused
+    * @param focused new focused
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setFocused(boolean var1) {
-      this.focused = var1 && this.isEnabled() && this.isVisible();
+   public void setFocused(boolean focused) {
+      this.focused = focused && this.isEnabled() && this.isVisible();
       if (!this.focused) {
          this.cursorIndex = this.clampIndex(this.cursorIndex);
          this.clearSelection();
@@ -301,14 +303,14 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    /**
     * Handles key typed.
     *
-    * @param var1 parameter used by this operation
+    * @param key parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onKeyTyped(char var1) {
-      if (!Character.isISOControl(var1)) {
-         this.insertText(String.valueOf(var1));
+   public void onKeyTyped(char key) {
+      if (!Character.isISOControl(key)) {
+         this.insertText(String.valueOf(key));
       }
 
    }
@@ -316,21 +318,21 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    /**
     * Performs insert text.
     *
-    * @param var1 parameter used by this operation
+    * @param text parameter used by this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public void insertText(String var1) {
-      if (this.canEdit() && var1 != null && !var1.isEmpty()) {
+   public void insertText(String text) {
+      if (this.canEdit() && text != null && !text.isEmpty()) {
          if (this.hasSelection()) {
             this.deleteSelectionInternal();
          }
 
-         String var2 = ((TextFieldModel)this.model).getText();
-         String var3 = var2.substring(0, this.cursorIndex) + var1 + var2.substring(this.cursorIndex);
-         ((TextFieldModel)this.model).setText(var3);
-         this.cursorIndex += var1.length();
+         String text2 = ((TextFieldModel)this.model).getText();
+         String text3 = text2.substring(0, this.cursorIndex) + text + text2.substring(this.cursorIndex);
+         ((TextFieldModel)this.model).setText(text3);
+         this.cursorIndex += text.length();
          this.clearSelection();
          this.notifyTextChanged();
       }
@@ -347,10 +349,10 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
          if (this.hasSelection()) {
             this.deleteSelection();
          } else if (this.cursorIndex != 0) {
-            String var1 = ((TextFieldModel)this.model).getText();
-            String var10000 = var1.substring(0, this.cursorIndex - 1);
-            String var2 = var10000 + var1.substring(this.cursorIndex);
-            ((TextFieldModel)this.model).setText(var2);
+            String text = ((TextFieldModel)this.model).getText();
+            String path = text.substring(0, this.cursorIndex - 1);
+            String path2 = path + text.substring(this.cursorIndex);
+            ((TextFieldModel)this.model).setText(path2);
             --this.cursorIndex;
             this.clearSelection();
             this.notifyTextChanged();
@@ -369,11 +371,11 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
          if (this.hasSelection()) {
             this.deleteSelection();
          } else {
-            String var1 = ((TextFieldModel)this.model).getText();
-            if (this.cursorIndex < var1.length()) {
-               String var10000 = var1.substring(0, this.cursorIndex);
-               String var2 = var10000 + var1.substring(this.cursorIndex + 1);
-               ((TextFieldModel)this.model).setText(var2);
+            String text = ((TextFieldModel)this.model).getText();
+            if (this.cursorIndex < text.length()) {
+               String path = text.substring(0, this.cursorIndex);
+               String path2 = path + text.substring(this.cursorIndex + 1);
+               ((TextFieldModel)this.model).setText(path2);
                this.clearSelection();
                this.notifyTextChanged();
             }
@@ -501,8 +503,8 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
       if (!this.hasSelection()) {
          return "";
       } else {
-         String var1 = ((TextFieldModel)this.model).getText();
-         return var1.substring(this.getSelectionMin(), this.getSelectionMax());
+         String text4 = ((TextFieldModel)this.model).getText();
+         return text4.substring(this.getSelectionMin(), this.getSelectionMax());
       }
    }
 
@@ -544,13 +546,13 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    /**
     * Updates on text changed.
     *
-    * @param var1 new on text changed
+    * @param consumer new on text changed
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setOnTextChanged(Consumer<String> var1) {
-      this.onTextChanged = var1;
+   public void setOnTextChanged(Consumer<String> consumer) {
+      this.onTextChanged = consumer;
    }
 
    protected void onAvailabilityChanged() {
@@ -570,13 +572,13 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    }
 
    private void deleteSelectionInternal() {
-      int var1 = this.getSelectionMin();
-      int var2 = this.getSelectionMax();
-      String var3 = ((TextFieldModel)this.model).getText();
-      TextFieldModel var10000 = (TextFieldModel)this.model;
-      String var10001 = var3.substring(0, var1);
-      var10000.setText(var10001 + var3.substring(var2));
-      this.cursorIndex = var1;
+      int value = this.getSelectionMin();
+      int value2 = this.getSelectionMax();
+      String text = ((TextFieldModel)this.model).getText();
+      TextFieldModel model = (TextFieldModel)this.model;
+      String path = text.substring(0, value);
+      model.setText(path + text.substring(value2));
+      this.cursorIndex = value;
       this.clearSelection();
    }
 
@@ -602,8 +604,8 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
       return this.focused && this.isEnabled() && this.isVisible();
    }
 
-   private int clampIndex(int var1) {
-      return Math.max(0, Math.min(((TextFieldModel)this.model).getText().length(), var1));
+   private int clampIndex(int index) {
+      return Math.max(0, Math.min(((TextFieldModel)this.model).getText().length(), index));
    }
 
    private void notifyTextChanged() {

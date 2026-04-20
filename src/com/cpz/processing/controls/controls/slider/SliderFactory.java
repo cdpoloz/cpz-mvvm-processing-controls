@@ -10,6 +10,8 @@ import java.util.Objects;
 
 /**
  * Factory for creating the public slider facade from external config.
+ *
+ * @author CPZ
  */
 public final class SliderFactory {
     public static Slider create(PApplet sketch, SliderConfig config) {

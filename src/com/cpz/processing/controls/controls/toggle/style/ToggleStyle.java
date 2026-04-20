@@ -16,9 +16,11 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public interface ToggleStyle {
-   void render(PApplet var1, ToggleViewState var2, ThemeSnapshot var3);
+   void render(PApplet sketch, ToggleViewState state, ThemeSnapshot snapshot);
 
    ThemeSnapshot getThemeSnapshot();
 }

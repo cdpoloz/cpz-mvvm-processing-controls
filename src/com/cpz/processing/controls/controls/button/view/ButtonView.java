@@ -25,6 +25,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the MVVM View layer.
+ *
+ * @author CPZ
  */
 public final class ButtonView implements ControlView, PointerInteractable {
    private final PApplet sketch;
@@ -40,26 +42,26 @@ public final class ButtonView implements ControlView, PointerInteractable {
    /**
     * Creates a button view.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
-    * @param var6 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param viewModel parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
+    * @param height parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public ButtonView(PApplet var1, ButtonViewModel var2, float var3, float var4, float var5, float var6) {
-      this.sketch = var1;
-      this.viewModel = var2;
-      this.x = var3;
-      this.y = var4;
-      this.width = var5;
-      this.height = var6;
+   public ButtonView(PApplet sketch, ButtonViewModel viewModel, float x, float y, float width, float height) {
+      this.sketch = sketch;
+      this.viewModel = viewModel;
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
       this.style = ButtonDefaultStyles.primary();
       this.hitTest = new RectHitTest();
-      this.hitTest.onLayout(var3, var4, var5, var6);
+      this.hitTest.onLayout(x, y, width, height);
    }
 
    /**
@@ -71,65 +73,65 @@ public final class ButtonView implements ControlView, PointerInteractable {
    public void draw() {
       if (this.viewModel.isVisible()) {
          this.applyLayoutIfNeeded();
-         ThemeSnapshot var1 = this.style.getThemeSnapshot();
-         this.style.render(this.sketch, this.buildViewState(), var1);
+         ThemeSnapshot snapshot = this.style.getThemeSnapshot();
+         this.style.render(this.sketch, this.buildViewState(), snapshot);
       }
    }
 
    /**
     * Updates position.
     *
-    * @param var1 new position
-    * @param var2 parameter used by this operation
+    * @param x new position
+    * @param y parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setPosition(float var1, float var2) {
-      this.x = var1;
-      this.y = var2;
+   public void setPosition(float x, float y) {
+      this.x = x;
+      this.y = y;
       this.notifyLayoutChanged();
    }
 
    /**
     * Updates layout config.
     *
-    * @param var1 new layout config
+    * @param layout new layout config
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setLayoutConfig(LayoutConfig var1) {
-      this.layoutConfig = var1;
+   public void setLayoutConfig(LayoutConfig layout) {
+      this.layoutConfig = layout;
       this.applyLayoutIfNeeded();
    }
 
    /**
     * Updates size.
     *
-    * @param var1 new size
-    * @param var2 parameter used by this operation
+    * @param width new size
+    * @param height parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSize(float var1, float var2) {
-      this.width = var1;
-      this.height = var2;
+   public void setSize(float width, float height) {
+      this.width = width;
+      this.height = height;
       this.notifyLayoutChanged();
    }
 
    /**
     * Updates style.
     *
-    * @param var1 new style
+    * @param style new style
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setStyle(ButtonStyle var1) {
-      if (var1 != null) {
-         this.style = var1;
+   public void setStyle(ButtonStyle style) {
+      if (style != null) {
+         this.style = style;
       }
 
    }
@@ -137,14 +139,14 @@ public final class ButtonView implements ControlView, PointerInteractable {
    /**
     * Updates hit test.
     *
-    * @param var1 new hit test
+    * @param hitTest new hit test
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setHitTest(HitTest var1) {
-      if (var1 != null) {
-         this.hitTest = var1;
+   public void setHitTest(HitTest hitTest) {
+      if (hitTest != null) {
+         this.hitTest = hitTest;
          this.hitTest.onLayout(this.x, this.y, this.width, this.height);
       }
    }
@@ -152,16 +154,16 @@ public final class ButtonView implements ControlView, PointerInteractable {
    /**
     * Performs contains.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public boolean contains(float var1, float var2) {
+   public boolean contains(float x, float y) {
       this.applyLayoutIfNeeded();
-      return this.hitTest.contains(var1, var2);
+      return this.hitTest.contains(x, y);
    }
 
    /**
@@ -222,10 +224,10 @@ public final class ButtonView implements ControlView, PointerInteractable {
 
    private void applyLayoutIfNeeded() {
       if (this.layoutConfig != null) {
-         float var1 = LayoutResolver.resolveX(this.layoutConfig, this.width, (float)this.sketch.width);
-         float var2 = LayoutResolver.resolveY(this.layoutConfig, this.height, (float)this.sketch.height);
-         this.x = var1 + this.width * 0.5F;
-         this.y = var2 + this.height * 0.5F;
+         float value = LayoutResolver.resolveX(this.layoutConfig, this.width, (float)this.sketch.width);
+         float value2 = LayoutResolver.resolveY(this.layoutConfig, this.height, (float)this.sketch.height);
+         this.x = value + this.width * 0.5F;
+         this.y = value2 + this.height * 0.5F;
          this.notifyLayoutChanged();
       }
    }

@@ -12,6 +12,8 @@ package com.cpz.processing.controls.core.input;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class PointerEvent {
    private final Type type;
@@ -27,76 +29,76 @@ public final class PointerEvent {
    /**
     * Creates a pointer event.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param type parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public PointerEvent(Type var1, float var2, float var3) {
-      this(var1, var2, var3, defaultPressed(var1), 0, 0.0F, false, false, false);
+   public PointerEvent(Type type, float mouseX, float mouseY) {
+      this(type, mouseX, mouseY, defaultPressed(type), 0, 0.0F, false, false, false);
    }
 
    /**
     * Creates a pointer event.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
+    * @param type parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
+    * @param button pointer button
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public PointerEvent(Type var1, float var2, float var3, int var4) {
-      this(var1, var2, var3, defaultPressed(var1), var4, 0.0F, false, false, false);
+   public PointerEvent(Type type, float mouseX, float mouseY, int value) {
+      this(type, mouseX, mouseY, defaultPressed(type), value, 0.0F, false, false, false);
    }
 
    /**
     * Creates a pointer event.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
-    * @param var6 parameter used by this operation
-    * @param var7 parameter used by this operation
+    * @param type parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
+    * @param button pointer button
+    * @param wheelDelta wheel delta
+    * @param pressed whether the pointer is pressed
+    * @param shiftDown whether Shift is down
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public PointerEvent(Type var1, float var2, float var3, int var4, float var5, boolean var6, boolean var7) {
-      this(var1, var2, var3, defaultPressed(var1), var4, var5, var6, var7, false);
+   public PointerEvent(Type type, float mouseX, float mouseY, int button, float wheelDelta, boolean shiftDown, boolean controlDown) {
+      this(type, mouseX, mouseY, defaultPressed(type), button, wheelDelta, shiftDown, controlDown, false);
    }
 
    /**
     * Creates a pointer event.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
-    * @param var6 parameter used by this operation
-    * @param var7 parameter used by this operation
-    * @param var8 parameter used by this operation
-    * @param var9 parameter used by this operation
+    * @param type parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
+    * @param pressed whether the pointer is pressed
+    * @param button pointer button
+    * @param wheelDelta wheel delta
+    * @param shiftDown whether Shift is down
+    * @param controlDown whether Control is down
+    * @param altDown whether Alt is down
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public PointerEvent(Type var1, float var2, float var3, boolean var4, int var5, float var6, boolean var7, boolean var8, boolean var9) {
-      this.type = var1;
-      this.x = var2;
-      this.y = var3;
-      this.pressed = var4;
-      this.button = var5;
-      this.wheelDelta = var6;
-      this.shiftDown = var7;
-      this.controlDown = var8;
-      this.altDown = var9;
+   public PointerEvent(Type type, float mouseX, float mouseY, boolean pressed, int button, float wheelDelta, boolean shiftDown, boolean controlDown, boolean altDown) {
+      this.type = type;
+      this.x = mouseX;
+      this.y = mouseY;
+      this.pressed = pressed;
+      this.button = button;
+      this.wheelDelta = wheelDelta;
+      this.shiftDown = shiftDown;
+      this.controlDown = controlDown;
+      this.altDown = altDown;
    }
 
    /**
@@ -207,8 +209,8 @@ public final class PointerEvent {
       return this.altDown;
    }
 
-   private static boolean defaultPressed(Type var0) {
-      return var0 == Type.PRESS || var0 == Type.DRAG;
+   private static boolean defaultPressed(Type type) {
+      return type == Type.PRESS || type == Type.DRAG;
    }
 
    /**

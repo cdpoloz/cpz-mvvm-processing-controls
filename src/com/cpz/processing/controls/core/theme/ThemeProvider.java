@@ -1,18 +1,18 @@
 package com.cpz.processing.controls.core.theme;
 
 /**
- * Theme component for theme provider.
+ * Provider contract used by styles to obtain the current theme snapshot.
  *
- * Responsibilities:
- * - Represent theme data or theme access for the rendering pipeline.
- * - Keep theme concerns explicit and reusable.
+ * <p>The interface allows sketches to pass a {@link ThemeManager} or another
+ * explicit provider into styles without introducing global theme state.</p>
  *
- * Behavior:
- * - Declares the contract without prescribing implementation details.
- *
- * Notes:
- * - This type is part of the public project surface.
+ * @author CPZ
  */
 public interface ThemeProvider {
+   /**
+    * Returns the current snapshot for visual resolution.
+    *
+    * @return theme snapshot
+    */
    ThemeSnapshot getSnapshot();
 }

@@ -14,6 +14,8 @@ import com.cpz.processing.controls.core.focus.FocusManager;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class KeyboardInputAdapter {
    private final FocusManager focusManager;
@@ -22,30 +24,30 @@ public final class KeyboardInputAdapter {
    /**
     * Creates a keyboard input adapter.
     *
-    * @param var1 parameter used by this operation
+    * @param focusManager parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public KeyboardInputAdapter(FocusManager var1) {
-      this.focusManager = var1;
+   public KeyboardInputAdapter(FocusManager focusManager) {
+      this.focusManager = focusManager;
    }
 
    /**
     * Handles key typed.
     *
-    * @param var1 parameter used by this operation
+    * @param key parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onKeyTyped(char var1) {
+   public void onKeyTyped(char key) {
       if (this.suppressTypedOnce) {
          this.suppressTypedOnce = false;
       } else {
-         KeyboardInputTarget var2 = this.focusManager.getFocusedKeyboardTarget();
-         if (var2 != null && var2.isVisible() && var2.isEnabled()) {
-            var2.onKeyTyped(var1);
+         KeyboardInputTarget target = this.focusManager.getFocusedKeyboardTarget();
+         if (target != null && target.isVisible() && target.isEnabled()) {
+            target.onKeyTyped(key);
          }
       }
    }
@@ -53,94 +55,94 @@ public final class KeyboardInputAdapter {
    /**
     * Handles key pressed.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param event parameter used by this operation
+    * @param param parameter used by this operation
+    * @param param parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleKeyboardEvent(KeyboardEvent var1) {
-      if (var1 != null) {
-         switch (var1.getType()) {
+   public void handleKeyboardEvent(KeyboardEvent event) {
+      if (event != null) {
+         switch (event.getType()) {
             case PRESS:
-               this.handlePressed(var1.getKeyCode(), var1.isShiftDown(), var1.isControlDown(), var1.getKeyCode());
+               this.handlePressed(event.getKeyCode(), event.isShiftDown(), event.isControlDown(), event.getKeyCode());
                return;
             case TYPE:
-               this.onKeyTyped(var1.getKey());
+               this.onKeyTyped(event.getKey());
                return;
             default:
          }
       }
    }
 
-   private void handlePressed(int var1, boolean var2, boolean var3, int var4) {
-      if (var1 == 9) {
+   private void handlePressed(int value, boolean pressed, boolean pressed2, int value2) {
+      if (value == 9) {
          this.suppressTypedOnce = true;
-         if (var2) {
+         if (pressed) {
             this.focusManager.focusPrevious();
          } else {
             this.focusManager.focusNext();
          }
 
       } else {
-         KeyboardInputTarget var5 = this.focusManager.getFocusedKeyboardTarget();
-         if (var5 != null && var5.isVisible() && var5.isEnabled()) {
-            if (var3) {
-               switch (var4) {
+         KeyboardInputTarget target = this.focusManager.getFocusedKeyboardTarget();
+         if (target != null && target.isVisible() && target.isEnabled()) {
+            if (pressed2) {
+               switch (value2) {
                   case 65:
                      this.suppressTypedOnce = true;
-                     var5.selectAll();
+                     target.selectAll();
                      return;
                   case 67:
                      this.suppressTypedOnce = true;
-                     var5.copySelection();
+                     target.copySelection();
                      return;
                   case 86:
                      this.suppressTypedOnce = true;
-                     var5.pasteFromClipboard();
+                     target.pasteFromClipboard();
                      return;
                   case 88:
                      this.suppressTypedOnce = true;
-                     var5.cutSelection();
+                     target.cutSelection();
                      return;
                }
             }
 
-            if (var1 == 8) {
-               var5.backspace();
-            } else if (var1 == 127) {
-               var5.deleteForward();
-            } else if (var1 == 36) {
+            if (value == 8) {
+               target.backspace();
+            } else if (value == 127) {
+               target.deleteForward();
+            } else if (value == 36) {
                this.suppressTypedOnce = true;
-               var5.moveCursorHome();
-            } else if (var1 == 35) {
+               target.moveCursorHome();
+            } else if (value == 35) {
                this.suppressTypedOnce = true;
-               var5.moveCursorEnd();
-            } else if (var1 == 37) {
-               if (var2) {
-                  var5.moveCursorLeftWithSelection();
+               target.moveCursorEnd();
+            } else if (value == 37) {
+               if (pressed) {
+                  target.moveCursorLeftWithSelection();
                } else {
-                  var5.moveCursorLeft();
+                  target.moveCursorLeft();
                }
 
-            } else if (var1 == 39) {
-               if (var2) {
-                  var5.moveCursorRightWithSelection();
+            } else if (value == 39) {
+               if (pressed) {
+                  target.moveCursorRightWithSelection();
                } else {
-                  var5.moveCursorRight();
+                  target.moveCursorRight();
                }
 
-            } else if (var1 == 38) {
+            } else if (value == 38) {
                this.suppressTypedOnce = true;
-               var5.increment(var2, var3);
-            } else if (var1 == 40) {
+               target.increment(pressed, pressed2);
+            } else if (value == 40) {
                this.suppressTypedOnce = true;
-               var5.decrement(var2, var3);
+               target.decrement(pressed, pressed2);
             } else {
-               if (var1 == 10 || var1 == 13) {
+               if (value == 10 || value == 13) {
                   this.suppressTypedOnce = true;
-                  var5.commit();
+                  target.commit();
                }
 
             }

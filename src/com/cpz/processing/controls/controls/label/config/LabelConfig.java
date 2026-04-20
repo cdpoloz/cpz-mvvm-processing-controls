@@ -7,6 +7,8 @@ import java.util.Objects;
 
 /**
  * Minimal config DTO for a single label created from external data.
+ *
+ * @author CPZ
  */
 public final class LabelConfig {
     private final String code;

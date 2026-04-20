@@ -15,6 +15,8 @@ import processing.core.PFont;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class TextFieldStyleConfig {
    public Integer backgroundOverride;
@@ -36,12 +38,12 @@ public final class TextFieldStyleConfig {
    /**
     * Updates theme provider.
     *
-    * @param var1 new theme provider
+    * @param themeProvider new theme provider
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setThemeProvider(ThemeProvider var1) {
-      this.themeProvider = var1;
+   public void setThemeProvider(ThemeProvider themeProvider) {
+      this.themeProvider = themeProvider;
    }
 }

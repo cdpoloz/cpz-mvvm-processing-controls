@@ -17,6 +17,8 @@ import java.util.Objects;
  *
  * Notes:
  * - This type belongs to the MVVM ViewModel layer.
+ *
+ * @author CPZ
  */
 public final class ButtonViewModel extends AbstractInteractiveControlViewModel {
    private ButtonListener clickListener;
@@ -25,25 +27,25 @@ public final class ButtonViewModel extends AbstractInteractiveControlViewModel {
    /**
     * Creates a button view model.
     *
-    * @param var1 parameter used by this operation
+    * @param model parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public ButtonViewModel(ButtonModel var1) {
-      super(var1);
+   public ButtonViewModel(ButtonModel model) {
+      super(model);
    }
 
    /**
     * Updates click listener.
     *
-    * @param var1 new click listener
+    * @param listener new click listener
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setClickListener(ButtonListener var1) {
-      this.clickListener = var1;
+   public void setClickListener(ButtonListener listener) {
+      this.clickListener = listener;
    }
 
    /**
@@ -61,13 +63,13 @@ public final class ButtonViewModel extends AbstractInteractiveControlViewModel {
    /**
     * Updates text.
     *
-    * @param var1 new text
+    * @param text new text
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setText(String var1) {
-      ((ButtonModel)this.model).setText(var1);
+   public void setText(String text) {
+      ((ButtonModel)this.model).setText(text);
    }
 
    /**
@@ -85,31 +87,31 @@ public final class ButtonViewModel extends AbstractInteractiveControlViewModel {
    /**
     * Updates show text.
     *
-    * @param var1 new show text
+    * @param enabled new show text
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setShowText(boolean var1) {
-      this.showText = var1;
+   public void setShowText(boolean enabled) {
+      this.showText = enabled;
    }
 
    /** @deprecated */
    /**
     * Updates on click.
     *
-    * @param var1 new on click
+    * @param callback new on click
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
    @Deprecated
-   public void setOnClick(Runnable var1) {
-      if (var1 == null) {
+   public void setOnClick(Runnable callback) {
+      if (callback == null) {
          this.clickListener = null;
       } else {
-         Objects.requireNonNull(var1);
-         this.clickListener = var1::run;
+         Objects.requireNonNull(callback);
+         this.clickListener = callback::run;
       }
 
    }

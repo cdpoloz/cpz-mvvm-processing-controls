@@ -17,6 +17,8 @@ import java.util.Objects;
  *
  * Notes:
  * - This type belongs to the MVVM Model layer.
+ *
+ * @author CPZ
  */
 public final class LabelModel implements Enableable {
    private final String code;
@@ -27,8 +29,8 @@ public final class LabelModel implements Enableable {
       this(ControlCode.auto("label"));
    }
 
-   public LabelModel(String var1) {
-      this.code = Objects.requireNonNull(var1, "code");
+   public LabelModel(String text) {
+      this.code = Objects.requireNonNull(text, "code");
    }
 
    public String getCode() {
@@ -38,13 +40,13 @@ public final class LabelModel implements Enableable {
    /**
     * Updates text.
     *
-    * @param var1 new text
+    * @param text new text
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setText(String var1) {
-      this.text = var1 != null ? var1 : "";
+   public void setText(String text) {
+      this.text = text != null ? text : "";
    }
 
    /**
@@ -74,12 +76,12 @@ public final class LabelModel implements Enableable {
    /**
     * Updates enabled.
     *
-    * @param var1 new enabled
+    * @param enabled new enabled
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setEnabled(boolean var1) {
-      this.enabled = var1;
+   public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
    }
 }

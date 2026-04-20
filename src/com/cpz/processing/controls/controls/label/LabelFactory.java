@@ -11,6 +11,8 @@ import java.util.Objects;
 
 /**
  * Factory for creating the public label facade from external config.
+ *
+ * @author CPZ
  */
 public final class LabelFactory {
     public static Label create(PApplet sketch, LabelConfig config) {

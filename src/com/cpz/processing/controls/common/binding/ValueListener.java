@@ -14,11 +14,14 @@ package com.cpz.processing.controls.common.binding;
  * - The binding API remains explicit and control-agnostic.
  */
 @FunctionalInterface
+/**
+ * @author CPZ
+ */
 public interface ValueListener<T> {
    /**
     * Handles a source value change.
     *
-    * @param var1 new source value
+    * @param t new source value
     */
-   void onChange(T var1);
+   void onChange(T t);
 }

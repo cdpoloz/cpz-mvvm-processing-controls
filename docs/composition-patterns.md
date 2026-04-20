@@ -46,9 +46,9 @@ The sketch owns:
 
 ```text
 JSON → ControlConfigLoader → Map<String, Control>
-                          ↓
+                          |
                       Sketch
-                          ↓
+                          |
                 listeners + synchronization
 ```
 
@@ -63,8 +63,8 @@ JSON → ControlConfigLoader → Map<String, Control>
 It has one source of truth and one or more destinations.
 
 ```text
-Slider → NumericField
-Slider → Label
+Slider -> NumericField
+Slider -> Label
 ```
 
 In this pattern:
@@ -235,13 +235,13 @@ JSON provides the initial structure and base text, but it does not run synchroni
 ## Pattern Summary
 
 - Start simple, extend only when needed
-- Unidirectional → base pattern
-- Bidirectional → controlled extension
-- Derived state → explicit
-- Validation → localized
-- Anti-loop → only when synchronization can flow both ways
-- JSON → structure only
-- Sketch → behavior
+- Unidirectional -> base pattern
+- Bidirectional -> controlled extension
+- Derived state -> explicit
+- Validation -> localized
+- Anti-loop -> only when synchronization can flow both ways
+- JSON -> structure only
+- Sketch -> behavior
 
 ---
 

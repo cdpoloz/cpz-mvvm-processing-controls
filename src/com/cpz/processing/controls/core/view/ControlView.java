@@ -14,6 +14,8 @@ import com.cpz.processing.controls.core.layout.LayoutConfig;
  *
  * Notes:
  * - This type belongs to the MVVM View layer.
+ *
+ * @author CPZ
  */
 public interface ControlView {
    /**
@@ -27,16 +29,16 @@ public interface ControlView {
    /**
     * Updates the view position.
     *
-    * @param var1 horizontal anchor position in sketch coordinates
-    * @param var2 vertical anchor position in sketch coordinates
+    * @param x horizontal anchor position in sketch coordinates
+    * @param y vertical anchor position in sketch coordinates
     */
-   void setPosition(float var1, float var2);
+   void setPosition(float x, float y);
 
    /**
     * Applies a layout configuration when a view supports layout-driven placement.
     *
-    * @param var1 layout configuration to apply
+    * @param layout layout configuration to apply
     */
-   default void setLayoutConfig(LayoutConfig var1) {
+   default void setLayoutConfig(LayoutConfig layout) {
    }
 }

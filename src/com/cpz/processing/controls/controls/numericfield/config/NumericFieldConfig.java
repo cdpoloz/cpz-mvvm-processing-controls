@@ -4,6 +4,8 @@ import java.util.Objects;
 
 /**
  * Minimal config DTO for a single numeric field created from external data.
+ *
+ * @author CPZ
  */
 public final class NumericFieldConfig {
     private final String code;

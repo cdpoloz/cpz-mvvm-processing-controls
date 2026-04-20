@@ -9,6 +9,8 @@ import java.util.Objects;
 
 /**
  * Factory for creating the public radio group facade from external config.
+ *
+ * @author CPZ
  */
 public final class RadioGroupFactory {
     public static RadioGroup create(PApplet sketch, RadioGroupConfig config) {

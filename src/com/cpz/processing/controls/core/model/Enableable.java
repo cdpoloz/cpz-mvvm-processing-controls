@@ -12,6 +12,8 @@ package com.cpz.processing.controls.core.model;
  *
  * Notes:
  * - This type belongs to the MVVM Model layer.
+ *
+ * @author CPZ
  */
 public interface Enableable {
    /**
@@ -24,7 +26,7 @@ public interface Enableable {
    /**
     * Updates enabled state.
     *
-    * @param var1 new enabled flag
+    * @param enabled new enabled flag
     */
-   void setEnabled(boolean var1);
+   void setEnabled(boolean enabled);
 }

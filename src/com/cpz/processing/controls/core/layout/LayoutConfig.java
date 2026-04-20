@@ -12,6 +12,8 @@ package com.cpz.processing.controls.core.layout;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public class LayoutConfig {
    private float normalizedX;
@@ -21,16 +23,16 @@ public class LayoutConfig {
    /**
     * Creates a layout config.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public LayoutConfig(float var1, float var2) {
+   public LayoutConfig(float x, float y) {
       this.anchor = Anchor.TOP_LEFT;
-      this.normalizedX = var1;
-      this.normalizedY = var2;
+      this.normalizedX = x;
+      this.normalizedY = y;
    }
 
    /**
@@ -72,12 +74,12 @@ public class LayoutConfig {
    /**
     * Updates anchor.
     *
-    * @param var1 new anchor
+    * @param anchor new anchor
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setAnchor(Anchor var1) {
-      this.anchor = var1 == null ? Anchor.TOP_LEFT : var1;
+   public void setAnchor(Anchor anchor) {
+      this.anchor = anchor == null ? Anchor.TOP_LEFT : anchor;
    }
 }

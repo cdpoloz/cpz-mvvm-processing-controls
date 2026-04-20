@@ -8,6 +8,9 @@ import processing.core.PApplet;
 
 import java.io.File;
 
+/**
+ * @author CPZ
+ */
 public class LabelJsonTest extends PApplet {
     private static final String LABEL_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "label-test.json";
 

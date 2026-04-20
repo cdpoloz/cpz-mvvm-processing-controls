@@ -15,6 +15,8 @@ import java.util.Objects;
 
 /**
  * Convenience facade for the toggle control.
+ *
+ * @author CPZ
  */
 public final class Toggle implements Control {
     private final ToggleModel model;

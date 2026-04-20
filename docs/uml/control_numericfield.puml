@@ -1,25 +1,35 @@
 @startuml
-title NumericField Control Structure
+title NumericField Public Facade Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-class PointerEvent
-class NumericFieldInputAdapter
+interface Control
+class NumericField
+class NumericFieldModel
 class NumericFieldViewModel
 class NumericFieldView
+class NumericFieldInputAdapter
 class NumericFieldViewState
 class NumericFieldStyle
 class NumericFieldRenderStyle
 class DefaultNumericFieldRenderer
+interface ThemeProvider
 class ThemeSnapshot
 
-PointerEvent --> NumericFieldInputAdapter : handled directly
-NumericFieldInputAdapter --> NumericFieldView : hit test / cursor geometry
-NumericFieldInputAdapter --> NumericFieldViewModel : move/press/drag/release/wheel
-NumericFieldView --> NumericFieldViewState
-NumericFieldView --> ThemeSnapshot
-NumericFieldStyle --> NumericFieldViewState
-NumericFieldStyle --> ThemeSnapshot
-NumericFieldStyle --> NumericFieldRenderStyle
-DefaultNumericFieldRenderer --> NumericFieldRenderStyle
+NumericField ..|> Control
+NumericField --> NumericFieldModel : owns
+NumericField --> NumericFieldViewModel : owns
+NumericField --> NumericFieldView : owns
+NumericField --> NumericFieldInputAdapter : delegates input
+NumericFieldInputAdapter --> NumericFieldView : geometry / hit testing
+NumericFieldInputAdapter --> NumericFieldViewModel : interaction updates
+NumericFieldViewModel --> NumericFieldModel : updates
+NumericFieldView --> NumericFieldViewModel : reads
+NumericFieldView --> NumericFieldViewState : builds
+NumericFieldView --> NumericFieldStyle : renders with
+NumericFieldStyle --> ThemeProvider : reads snapshot
+ThemeProvider --> ThemeSnapshot
+NumericFieldStyle --> NumericFieldViewState : resolves
+NumericFieldStyle --> NumericFieldRenderStyle : creates
+DefaultNumericFieldRenderer --> NumericFieldRenderStyle : draws
 @enduml

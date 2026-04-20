@@ -12,6 +12,8 @@ import java.util.Objects;
 
 /**
  * Convenience facade for the label control.
+ *
+ * @author CPZ
  */
 public final class Label implements Control {
     private final LabelModel model;

@@ -15,6 +15,8 @@ import processing.core.PFont;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public record RadioGroupRenderStyle(List itemStyles, float indicatorOuterDiameter, float indicatorInnerDiameter, float strokeWeight, float textSize, float cornerRadius, PFont font) {
 }

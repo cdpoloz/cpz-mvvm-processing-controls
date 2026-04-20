@@ -18,6 +18,8 @@ import java.util.Objects;
  *
  * Notes:
  * - This type belongs to the MVVM Model layer.
+ *
+ * @author CPZ
  */
 public final class SliderModel implements Enableable {
    private static final BigDecimal DEFAULT_MIN;
@@ -42,8 +44,8 @@ public final class SliderModel implements Enableable {
       this(ControlCode.auto("slider"));
    }
 
-   public SliderModel(String var1) {
-      this.code = Objects.requireNonNull(var1, "code");
+   public SliderModel(String text) {
+      this.code = Objects.requireNonNull(text, "code");
       this.min = DEFAULT_MIN;
       this.max = DEFAULT_MAX;
       this.step = DEFAULT_STEP;
@@ -53,23 +55,23 @@ public final class SliderModel implements Enableable {
       this.setValue(DEFAULT_VALUE);
    }
 
-   public SliderModel(String var1, BigDecimal var2, BigDecimal var3, BigDecimal var4, BigDecimal var5, SnapMode var6) {
-      this.code = Objects.requireNonNull(var1, "code");
-      BigDecimal var7 = requireNonNull(var2, "min");
-      BigDecimal var8 = requireNonNull(var3, "max");
-      BigDecimal var9 = requireNonNull(var4, "step");
-      BigDecimal var10 = requireNonNull(var5, "value");
-      if (var7.compareTo(var8) >= 0) {
+   public SliderModel(String text, BigDecimal bigDecimal, BigDecimal bigDecimal2, BigDecimal bigDecimal3, BigDecimal bigDecimal4, SnapMode snapMode) {
+      this.code = Objects.requireNonNull(text, "code");
+      BigDecimal bigDecimal5 = requireNonNull(bigDecimal, "min");
+      BigDecimal bigDecimal6 = requireNonNull(bigDecimal2, "max");
+      BigDecimal bigDecimal7 = requireNonNull(bigDecimal3, "step");
+      BigDecimal bigDecimal8 = requireNonNull(bigDecimal4, "value");
+      if (bigDecimal5.compareTo(bigDecimal6) >= 0) {
          throw new IllegalArgumentException("min must be < max");
-      } else if (var9.compareTo(BigDecimal.ZERO) <= 0) {
+      } else if (bigDecimal7.compareTo(BigDecimal.ZERO) <= 0) {
          throw new IllegalArgumentException("step must be > 0");
       } else {
-         this.min = var7;
-         this.max = var8;
-         this.step = var9;
-         this.snapMode = var6 == null ? SnapMode.ALWAYS : var6;
+         this.min = bigDecimal5;
+         this.max = bigDecimal6;
+         this.step = bigDecimal7;
+         this.snapMode = snapMode == null ? SnapMode.ALWAYS : snapMode;
          this.enabled = true;
-         this.value = this.normalizeValue(var10, this.shouldSnapImmediately());
+         this.value = this.normalizeValue(bigDecimal8, this.shouldSnapImmediately());
       }
    }
 
@@ -92,17 +94,17 @@ public final class SliderModel implements Enableable {
    /**
     * Updates min.
     *
-    * @param var1 new min
+    * @param bigDecimal new min
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setMin(BigDecimal var1) {
-      BigDecimal var2 = requireNonNull(var1, "min");
-      if (var2.compareTo(this.max) >= 0) {
+   public void setMin(BigDecimal bigDecimal) {
+      BigDecimal bigDecimal2 = requireNonNull(bigDecimal, "min");
+      if (bigDecimal2.compareTo(this.max) >= 0) {
          throw new IllegalArgumentException("min must be < max");
       } else {
-         this.min = var2;
+         this.min = bigDecimal2;
          this.value = this.clampValue(this.value);
       }
    }
@@ -122,17 +124,17 @@ public final class SliderModel implements Enableable {
    /**
     * Updates max.
     *
-    * @param var1 new max
+    * @param bigDecimal new max
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setMax(BigDecimal var1) {
-      BigDecimal var2 = requireNonNull(var1, "max");
-      if (var2.compareTo(this.min) <= 0) {
+   public void setMax(BigDecimal bigDecimal) {
+      BigDecimal bigDecimal2 = requireNonNull(bigDecimal, "max");
+      if (bigDecimal2.compareTo(this.min) <= 0) {
          throw new IllegalArgumentException("max must be > min");
       } else {
-         this.max = var2;
+         this.max = bigDecimal2;
          this.value = this.clampValue(this.value);
       }
    }
@@ -152,17 +154,17 @@ public final class SliderModel implements Enableable {
    /**
     * Updates step.
     *
-    * @param var1 new step
+    * @param bigDecimal new step
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setStep(BigDecimal var1) {
-      BigDecimal var2 = requireNonNull(var1, "step");
-      if (var2.compareTo(BigDecimal.ZERO) <= 0) {
+   public void setStep(BigDecimal bigDecimal) {
+      BigDecimal bigDecimal2 = requireNonNull(bigDecimal, "step");
+      if (bigDecimal2.compareTo(BigDecimal.ZERO) <= 0) {
          throw new IllegalArgumentException("step must be > 0");
       } else {
-         this.step = var2;
+         this.step = bigDecimal2;
          this.value = this.clampAndSnap(this.value);
       }
    }
@@ -182,28 +184,28 @@ public final class SliderModel implements Enableable {
    /**
     * Updates value.
     *
-    * @param var1 new value
+    * @param bigDecimal new value
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setValue(BigDecimal var1) {
-      this.value = this.normalizeValue(requireNonNull(var1, "value"), this.shouldSnapImmediately());
+   public void setValue(BigDecimal bigDecimal) {
+      this.value = this.normalizeValue(requireNonNull(bigDecimal, "value"), this.shouldSnapImmediately());
    }
 
    /**
     * Performs normalize value.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param value parameter used by this operation
+    * @param snap parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public BigDecimal normalizeValue(BigDecimal var1, boolean var2) {
-      BigDecimal var3 = requireNonNull(var1, "value");
-      return var2 ? this.clampAndSnap(var3) : this.clampValue(var3);
+   public BigDecimal normalizeValue(BigDecimal value, boolean snap) {
+      BigDecimal decimal = requireNonNull(value, "value");
+      return snap ? this.clampAndSnap(decimal) : this.clampValue(decimal);
    }
 
    /**
@@ -221,13 +223,13 @@ public final class SliderModel implements Enableable {
    /**
     * Updates snap mode.
     *
-    * @param var1 new snap mode
+    * @param snapMode new snap mode
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSnapMode(SnapMode var1) {
-      this.snapMode = var1 == null ? SnapMode.ALWAYS : var1;
+   public void setSnapMode(SnapMode snapMode) {
+      this.snapMode = snapMode == null ? SnapMode.ALWAYS : snapMode;
       this.value = this.normalizeValue(this.value, this.shouldSnapImmediately());
    }
 
@@ -246,36 +248,36 @@ public final class SliderModel implements Enableable {
    /**
     * Updates enabled.
     *
-    * @param var1 new enabled
+    * @param enabled new enabled
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setEnabled(boolean var1) {
-      this.enabled = var1;
+   public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
    }
 
-   private BigDecimal clampAndSnap(BigDecimal var1) {
-      BigDecimal var2 = this.clampValue(var1);
-      BigDecimal var3 = var2.subtract(this.min);
-      BigDecimal var4 = var3.divide(this.step, 0, RoundingMode.HALF_UP);
-      BigDecimal var5 = this.min.add(var4.multiply(this.step));
-      return var5.max(this.min).min(this.max);
+   private BigDecimal clampAndSnap(BigDecimal bigDecimal) {
+      BigDecimal bigDecimal2 = this.clampValue(bigDecimal);
+      BigDecimal bigDecimal3 = bigDecimal2.subtract(this.min);
+      BigDecimal bigDecimal4 = bigDecimal3.divide(this.step, 0, RoundingMode.HALF_UP);
+      BigDecimal bigDecimal5 = this.min.add(bigDecimal4.multiply(this.step));
+      return bigDecimal5.max(this.min).min(this.max);
    }
 
-   private BigDecimal clampValue(BigDecimal var1) {
-      return var1.max(this.min).min(this.max);
+   private BigDecimal clampValue(BigDecimal bigDecimal) {
+      return bigDecimal.max(this.min).min(this.max);
    }
 
    private boolean shouldSnapImmediately() {
       return this.snapMode == SnapMode.ALWAYS;
    }
 
-   private static BigDecimal requireNonNull(BigDecimal var0, String var1) {
-      if (var0 == null) {
-         throw new IllegalArgumentException(var1 + " must not be null");
+   private static BigDecimal requireNonNull(BigDecimal bigDecimal, String text) {
+      if (bigDecimal == null) {
+         throw new IllegalArgumentException(text + " must not be null");
       } else {
-         return var0;
+         return bigDecimal;
       }
    }
 

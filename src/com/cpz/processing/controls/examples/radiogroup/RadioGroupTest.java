@@ -13,6 +13,9 @@ import processing.core.PApplet;
 
 import java.util.List;
 
+/**
+ * @author CPZ
+ */
 public class RadioGroupTest extends PApplet {
     private InputManager inputManager;
     private KeyboardState keyboardState;

@@ -14,6 +14,9 @@ package com.cpz.processing.controls.controls.button.util;
  * - This type is part of the public project surface.
  */
 @FunctionalInterface
+/**
+ * @author CPZ
+ */
 public interface ButtonListener {
    void onClick();
 }

@@ -17,21 +17,23 @@ import java.awt.datatransfer.StringSelection;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class ClipboardService {
    /**
     * Performs copy.
     *
-    * @param var1 parameter used by this operation
+    * @param text parameter used by this operation
     *
     * Behavior:
     * - Produces the public result required by the surrounding pipeline.
     */
-   public void copy(String var1) {
+   public void copy(String text) {
       try {
-         String var2 = var1 == null ? "" : var1;
-         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(var2), (ClipboardOwner)null);
-      } catch (Exception var3) {
+         String text2 = text == null ? "" : text;
+         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text2), (ClipboardOwner)null);
+      } catch (Exception exception) {
       }
 
    }
@@ -46,9 +48,9 @@ public final class ClipboardService {
     */
    public String paste() {
       try {
-         Object var1 = Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
-         return var1 instanceof String ? (String)var1 : "";
-      } catch (Exception var2) {
+         Object data = Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+         return data instanceof String ? (String)data : "";
+      } catch (Exception exception2) {
          return "";
       }
    }

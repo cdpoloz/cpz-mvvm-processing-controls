@@ -19,6 +19,8 @@ import java.util.UUID;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class FocusManager {
    private final List focusables = new ArrayList();
@@ -30,14 +32,14 @@ public final class FocusManager {
    /**
     * Performs register.
     *
-    * @param var1 parameter used by this operation
+    * @param focusable parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void register(Focusable var1) {
-      if (var1 != null && !this.focusables.contains(var1)) {
-         this.focusables.add(var1);
+   public void register(Focusable focusable) {
+      if (focusable != null && !this.focusables.contains(focusable)) {
+         this.focusables.add(focusable);
       }
 
    }
@@ -45,20 +47,20 @@ public final class FocusManager {
    /**
     * Performs request focus.
     *
-    * @param var1 parameter used by this operation
+    * @param focusable parameter used by this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public void requestFocus(Focusable var1) {
-      if (var1 != null && var1.isVisible() && var1.isEnabled()) {
-         this.register(var1);
-         if (this.focused == var1) {
-            var1.setFocused(true);
+   public void requestFocus(Focusable focusable) {
+      if (focusable != null && focusable.isVisible() && focusable.isEnabled()) {
+         this.register(focusable);
+         if (this.focused == focusable) {
+            focusable.setFocused(true);
          } else {
             this.clearCurrentFocus();
-            this.focused = var1;
-            this.focusedIndex = this.focusables.indexOf(var1);
+            this.focused = focusable;
+            this.focusedIndex = this.focusables.indexOf(focusable);
             this.focused.setFocused(true);
             this.focused.onFocusGained();
          }
@@ -82,14 +84,14 @@ public final class FocusManager {
    /**
     * Returns whether focused.
     *
-    * @param var1 parameter used by this operation
+    * @param focusable parameter used by this operation
     * @return whether the current condition is satisfied
     *
     * Behavior:
     * - Returns the current value without applying side effects.
     */
-   public boolean isFocused(Focusable var1) {
-      return this.focused == var1 && var1 != null && var1.isFocused();
+   public boolean isFocused(Focusable focusable) {
+      return this.focused == focusable && focusable != null && focusable.isFocused();
    }
 
    /**
@@ -101,34 +103,34 @@ public final class FocusManager {
     * - Executes the public operation exposed by this type.
     */
    public FocusToken pushFocus() {
-      FocusToken var1 = new FocusToken();
-      this.snapshots.put(var1, new FocusSnapshot(this.focused, this.focusedIndex));
-      this.focusHistory.add(var1);
-      return var1;
+      FocusToken focusable = new FocusToken();
+      this.snapshots.put(focusable, new FocusSnapshot(this.focused, this.focusedIndex));
+      this.focusHistory.add(focusable);
+      return focusable;
    }
 
    /**
     * Performs pop focus.
     *
-    * @param var1 parameter used by this operation
+    * @param token parameter used by this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public void popFocus(FocusToken var1) {
-      this.releaseFocusToken(var1, true);
+   public void popFocus(FocusToken token) {
+      this.releaseFocusToken(token, true);
    }
 
    /**
     * Performs discard focus.
     *
-    * @param var1 parameter used by this operation
+    * @param token parameter used by this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public void discardFocus(FocusToken var1) {
-      this.releaseFocusToken(var1, false);
+   public void discardFocus(FocusToken token) {
+      this.releaseFocusToken(token, false);
    }
 
    /**
@@ -141,13 +143,13 @@ public final class FocusManager {
       if (this.focusables.isEmpty()) {
          this.clearFocus();
       } else {
-         int var1 = this.focusedIndex >= 0 ? this.focusedIndex : -1;
+         int value = this.focusedIndex >= 0 ? this.focusedIndex : -1;
 
-         for(int var2 = 1; var2 <= this.focusables.size(); ++var2) {
-            int var3 = Math.floorMod(var1 + var2, this.focusables.size());
-            Focusable var4 = (Focusable)this.focusables.get(var3);
-            if (var4.isVisible() && var4.isEnabled()) {
-               this.requestFocus(var4);
+         for(int value2 = 1; value2 <= this.focusables.size(); ++value2) {
+            int candidateIndex = Math.floorMod(value + value2, this.focusables.size());
+            Focusable candidate = (Focusable)this.focusables.get(candidateIndex);
+            if (candidate.isVisible() && candidate.isEnabled()) {
+               this.requestFocus(candidate);
                return;
             }
          }
@@ -166,13 +168,13 @@ public final class FocusManager {
       if (this.focusables.isEmpty()) {
          this.clearFocus();
       } else {
-         int var1 = this.focusedIndex >= 0 ? this.focusedIndex : 0;
+         int value = this.focusedIndex >= 0 ? this.focusedIndex : 0;
 
-         for(int var2 = 1; var2 <= this.focusables.size(); ++var2) {
-            int var3 = Math.floorMod(var1 - var2, this.focusables.size());
-            Focusable var4 = (Focusable)this.focusables.get(var3);
-            if (var4.isVisible() && var4.isEnabled()) {
-               this.requestFocus(var4);
+         for(int value2 = 1; value2 <= this.focusables.size(); ++value2) {
+            int candidateIndex = Math.floorMod(value - value2, this.focusables.size());
+            Focusable candidate = (Focusable)this.focusables.get(candidateIndex);
+            if (candidate.isVisible() && candidate.isEnabled()) {
+               this.requestFocus(candidate);
                return;
             }
          }
@@ -213,28 +215,28 @@ public final class FocusManager {
 
    }
 
-   private void releaseFocusToken(FocusToken var1, boolean var2) {
-      if (var1 != null) {
-         int var3 = this.focusHistory.lastIndexOf(var1);
-         if (var3 < 0) {
-            this.snapshots.remove(var1);
+   private void releaseFocusToken(FocusToken token, boolean focused) {
+      if (token != null) {
+         int index = this.focusHistory.lastIndexOf(token);
+         if (index < 0) {
+            this.snapshots.remove(token);
          } else {
-            boolean var4 = var3 == this.focusHistory.size() - 1;
-            this.focusHistory.remove(var3);
-            FocusSnapshot var5 = (FocusSnapshot)this.snapshots.remove(var1);
-            if (var2 && var4 && var5 != null) {
-               this.restoreSnapshot(var5);
+            boolean active = index == this.focusHistory.size() - 1;
+            this.focusHistory.remove(index);
+            FocusSnapshot snapshot = (FocusSnapshot)this.snapshots.remove(token);
+            if (focused && active && snapshot != null) {
+               this.restoreSnapshot(snapshot);
             }
          }
       }
    }
 
-   private void restoreSnapshot(FocusSnapshot var1) {
-      if (var1.target == null) {
+   private void restoreSnapshot(FocusSnapshot snapshot) {
+      if (snapshot.target == null) {
          this.clearFocus();
-      } else if (var1.target.isVisible() && var1.target.isEnabled()) {
-         this.requestFocus(var1.target);
-         this.focusedIndex = var1.index >= 0 ? var1.index : this.focusables.indexOf(var1.target);
+      } else if (snapshot.target.isVisible() && snapshot.target.isEnabled()) {
+         this.requestFocus(snapshot.target);
+         this.focusedIndex = snapshot.index >= 0 ? snapshot.index : this.focusables.indexOf(snapshot.target);
       } else {
          this.clearFocus();
       }
@@ -261,9 +263,9 @@ public final class FocusManager {
       private final Focusable target;
       private final int index;
 
-      private FocusSnapshot(Focusable var1, int var2) {
-         this.target = var1;
-         this.index = var2;
+      private FocusSnapshot(Focusable focusable, int value) {
+         this.target = focusable;
+         this.index = value;
       }
    }
 }

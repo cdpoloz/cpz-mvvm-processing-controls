@@ -17,6 +17,8 @@ import java.util.Objects;
  *
  * Notes:
  * - This type belongs to the MVVM Model layer.
+ *
+ * @author CPZ
  */
 public final class TextFieldModel implements Enableable {
    private final String code;
@@ -27,8 +29,8 @@ public final class TextFieldModel implements Enableable {
       this(ControlCode.auto("textfield"));
    }
 
-   public TextFieldModel(String var1) {
-      this.code = Objects.requireNonNull(var1, "code");
+   public TextFieldModel(String text) {
+      this.code = Objects.requireNonNull(text, "code");
    }
 
    public String getCode() {
@@ -50,16 +52,16 @@ public final class TextFieldModel implements Enableable {
    /**
     * Updates text.
     *
-    * @param var1 new text
+    * @param text new text
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setText(String var1) {
-      if (var1 == null) {
+   public void setText(String text) {
+      if (text == null) {
          throw new IllegalArgumentException("text must not be null");
       } else {
-         this.text = var1;
+         this.text = text;
       }
    }
 
@@ -78,12 +80,12 @@ public final class TextFieldModel implements Enableable {
    /**
     * Updates enabled.
     *
-    * @param var1 new enabled
+    * @param enabled new enabled
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setEnabled(boolean var1) {
-      this.enabled = var1;
+   public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
    }
 }

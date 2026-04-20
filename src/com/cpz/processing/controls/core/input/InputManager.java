@@ -4,63 +4,51 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Input component for input manager.
+ * Dispatches normalized input events through ordered input layers.
  *
- * Responsibilities:
- * - Translate public input flow into control operations.
- * - Keep raw event handling outside business state.
+ * <p>The manager is source-agnostic. Host adapters create {@link PointerEvent}
+ * and {@link KeyboardEvent} instances and pass them here; layers decide whether
+ * to consume each event and forward it to concrete facade methods, overlays, or
+ * sketch-level shortcuts.</p>
  *
- * Behavior:
- * - Keeps the public role isolated from unrelated concerns.
- *
- * Notes:
- * - This type is part of the public project surface.
+ * @author CPZ
  */
 public class InputManager {
    private final List<InputLayer> layers = new ArrayList<>();
 
    /**
-    * Registers layer.
+    * Registers a layer and keeps dispatch order sorted by descending priority.
     *
-    * @param var1 parameter used by this operation
-    *
-    * Behavior:
-    * - Updates the public state or registration owned by this type.
+    * @param layer layer to register
     */
-   public void registerLayer(InputLayer var1) {
-      if (var1 != null && !this.layers.contains(var1)) {
-         this.layers.add(var1);
+   public void registerLayer(InputLayer layer) {
+      if (layer != null && !this.layers.contains(layer)) {
+         this.layers.add(layer);
          this.sortLayers();
       }
    }
 
    /**
-    * Unregisters layer.
+    * Removes a previously registered layer.
     *
-    * @param var1 parameter used by this operation
-    *
-    * Behavior:
-    * - Updates the public state or registration owned by this type.
+    * @param layer layer to remove
     */
-   public void unregisterLayer(InputLayer var1) {
-      this.layers.remove(var1);
+   public void unregisterLayer(InputLayer layer) {
+      this.layers.remove(layer);
    }
 
    private void sortLayers() {
-      this.layers.sort((var0, var1) -> Integer.compare(var1.getPriority(), var0.getPriority()));
+      this.layers.sort((left, right) -> Integer.compare(right.getPriority(), left.getPriority()));
    }
 
    /**
-    * Performs dispatch pointer.
+    * Dispatches a pointer event until an active pointer-capturing layer consumes it.
     *
-    * @param var1 parameter used by this operation
-    *
-    * Behavior:
-    * - Executes the public operation exposed by this type.
+    * @param event normalized pointer event
     */
-   public void dispatchPointer(PointerEvent var1) {
-      for(InputLayer var3 : this.layers) {
-         if (var3.isActive() && var3.isPointerCaptureEnabled() && var3.handlePointerEvent(var1)) {
+   public void dispatchPointer(PointerEvent event) {
+      for(InputLayer layer : this.layers) {
+         if (layer.isActive() && layer.isPointerCaptureEnabled() && layer.handlePointerEvent(event)) {
             break;
          }
       }
@@ -68,16 +56,13 @@ public class InputManager {
    }
 
    /**
-    * Performs dispatch keyboard.
+    * Dispatches a keyboard event until an active keyboard-capturing layer consumes it.
     *
-    * @param var1 parameter used by this operation
-    *
-    * Behavior:
-    * - Executes the public operation exposed by this type.
+    * @param event normalized keyboard event
     */
-   public void dispatchKeyboard(KeyboardEvent var1) {
-      for(InputLayer var3 : this.layers) {
-         if (var3.isActive() && var3.isKeyboardCaptureEnabled() && var3.handleKeyboardEvent(var1)) {
+   public void dispatchKeyboard(KeyboardEvent event) {
+      for(InputLayer layer : this.layers) {
+         if (layer.isActive() && layer.isKeyboardCaptureEnabled() && layer.handleKeyboardEvent(event)) {
             break;
          }
       }

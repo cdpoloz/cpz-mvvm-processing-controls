@@ -15,6 +15,8 @@ import com.cpz.processing.controls.core.theme.ThemeProvider;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class RadioGroupDefaultStyles {
    private RadioGroupDefaultStyles() {
@@ -35,15 +37,15 @@ public final class RadioGroupDefaultStyles {
    /**
     * Performs standard.
     *
-    * @param var0 parameter used by this operation
+    * @param themeProvider parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static RadioGroupStyle standard(ThemeProvider var0) {
-      RadioGroupStyleConfig var1 = new RadioGroupStyleConfig();
-      var1.themeProvider = var0;
-      return new RadioGroupStyle(var1);
+   public static RadioGroupStyle standard(ThemeProvider themeProvider) {
+      RadioGroupStyleConfig config = new RadioGroupStyleConfig();
+      config.themeProvider = themeProvider;
+      return new RadioGroupStyle(config);
    }
 }

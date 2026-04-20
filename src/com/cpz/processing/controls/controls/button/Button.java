@@ -27,6 +27,8 @@ import processing.core.PApplet;
  * <p>
  * Notes:
  * - This type is a facade over the existing MVVM architecture, not a replacement for it.
+ *
+ * @author CPZ
  */
 public final class Button implements Control {
     private final ButtonModel model;
@@ -37,22 +39,22 @@ public final class Button implements Control {
     /**
      * Creates a button with the default internal MVVM composition.
      *
-     * @param var1 sketch used by the view
-     * @param var2 initial text
-     * @param var3 x position
-     * @param var4 y position
-     * @param var5 width
-     * @param var6 height
+     * @param sketch sketch used by the view
+     * @param code initial text
+     * @param x x position
+     * @param y y position
+     * @param width width
+     * @param height height
      */
-    public Button(PApplet var1, String var2, float var3, float var4, float var5, float var6) {
-        this(var1, ControlCode.auto("button"), var2, var3, var4, var5, var6);
+    public Button(PApplet sketch, String code, float x, float y, float width, float height) {
+        this(sketch, ControlCode.auto("button"), code, x, y, width, height);
     }
 
-    public Button(PApplet var1, String var2, String var3, float var4, float var5, float var6, float var7) {
-        Objects.requireNonNull(var1, "sketch");
-        this.model = new ButtonModel(var2, var3);
+    public Button(PApplet sketch, String code, String text, float x, float y, float width, float height) {
+        Objects.requireNonNull(sketch, "sketch");
+        this.model = new ButtonModel(code, text);
         this.viewModel = new ButtonViewModel(this.model);
-        this.view = new ButtonView(var1, this.viewModel, var4, var5, var6, var7);
+        this.view = new ButtonView(sketch, this.viewModel, x, y, width, height);
         this.inputAdapter = new ButtonInputAdapter(this.view, this.viewModel);
     }
 
@@ -66,20 +68,20 @@ public final class Button implements Control {
     /**
      * Handles a normalized pointer event.
      *
-     * @param var1 pointer event to route into the button input adapter
+     * @param event pointer event to route into the button input adapter
      */
-    public void handlePointerEvent(PointerEvent var1) {
-        if (var1 != null) {
-            switch (var1.getType()) {
+    public void handlePointerEvent(PointerEvent event) {
+        if (event != null) {
+            switch (event.getType()) {
                 case MOVE:
                 case DRAG:
-                    this.inputAdapter.handleMouseMove(var1.getX(), var1.getY());
+                    this.inputAdapter.handleMouseMove(event.getX(), event.getY());
                     break;
                 case PRESS:
-                    this.inputAdapter.handleMousePress(var1.getX(), var1.getY());
+                    this.inputAdapter.handleMousePress(event.getX(), event.getY());
                     break;
                 case RELEASE:
-                    this.inputAdapter.handleMouseRelease(var1.getX(), var1.getY());
+                    this.inputAdapter.handleMouseRelease(event.getX(), event.getY());
             }
         }
     }
@@ -93,40 +95,40 @@ public final class Button implements Control {
         return this.viewModel.getText();
     }
 
-    public void setText(String var1) {
-        this.viewModel.setText(var1);
+    public void setText(String text) {
+        this.viewModel.setText(text);
     }
 
-    public void setClickListener(ButtonListener var1) {
-        this.viewModel.setClickListener(var1);
+    public void setClickListener(ButtonListener listener) {
+        this.viewModel.setClickListener(listener);
     }
 
     public boolean isEnabled() {
         return this.viewModel.isEnabled();
     }
 
-    public void setEnabled(boolean var1) {
-        this.viewModel.setEnabled(var1);
+    public void setEnabled(boolean enabled) {
+        this.viewModel.setEnabled(enabled);
     }
 
     public boolean isVisible() {
         return this.viewModel.isVisible();
     }
 
-    public void setVisible(boolean var1) {
-        this.viewModel.setVisible(var1);
+    public void setVisible(boolean visible) {
+        this.viewModel.setVisible(visible);
     }
 
-    public void setStyle(ButtonStyle var1) {
-        this.view.setStyle(var1);
+    public void setStyle(ButtonStyle style) {
+        this.view.setStyle(style);
     }
 
-    public void setPosition(float var1, float var2) {
-        this.view.setPosition(var1, var2);
+    public void setPosition(float x, float y) {
+        this.view.setPosition(x, y);
     }
 
-    public void setSize(float var1, float var2) {
-        this.view.setSize(var1, var2);
+    public void setSize(float width, float height) {
+        this.view.setSize(width, height);
     }
     // </editor-fold>
 }

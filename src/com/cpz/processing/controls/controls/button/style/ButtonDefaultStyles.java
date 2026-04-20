@@ -15,6 +15,8 @@ import com.cpz.processing.controls.core.theme.ThemeProvider;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class ButtonDefaultStyles {
    private ButtonDefaultStyles() {
@@ -35,18 +37,18 @@ public final class ButtonDefaultStyles {
    /**
     * Performs primary.
     *
-    * @param var0 parameter used by this operation
+    * @param themeProvider parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static ButtonStyle primary(ThemeProvider var0) {
-      ButtonStyleConfig var1 = new ButtonStyleConfig();
-      var1.strokeWeight = 2.0F;
-      var1.strokeWeightHover = 3.0F;
-      var1.cornerRadius = 10.0F;
-      var1.themeProvider = var0;
-      return new DefaultButtonStyle(var1);
+   public static ButtonStyle primary(ThemeProvider themeProvider) {
+      ButtonStyleConfig config = new ButtonStyleConfig();
+      config.strokeWeight = 2.0F;
+      config.strokeWeightHover = 3.0F;
+      config.cornerRadius = 10.0F;
+      config.themeProvider = themeProvider;
+      return new DefaultButtonStyle(config);
    }
 }

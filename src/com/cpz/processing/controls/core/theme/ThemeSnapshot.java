@@ -1,34 +1,28 @@
 package com.cpz.processing.controls.core.theme;
 
 /**
- * Theme component for theme snapshot.
+ * Immutable rendering snapshot of a theme.
  *
- * Responsibilities:
- * - Represent theme data or theme access for the rendering pipeline.
- * - Keep theme concerns explicit and reusable.
+ * <p>Styles consume snapshots instead of resolving theme objects during every
+ * render operation. {@link ThemeManager} rebuilds this snapshot only when its
+ * current theme changes.</p>
  *
- * Behavior:
- * - Keeps the public role isolated from unrelated concerns.
- *
- * Notes:
- * - This type is part of the public project surface.
+ * @author CPZ
  */
 public final class ThemeSnapshot {
    public final ThemeTokens tokens;
 
    /**
-    * Creates a theme snapshot.
+    * Captures the tokens of the supplied theme.
     *
-    * @param var1 parameter used by this operation
-    *
-    * Behavior:
-    * - Initializes the public state required by this type.
+    * @param theme source theme
+    * @throws IllegalArgumentException when {@code theme} is {@code null}
     */
-   public ThemeSnapshot(Theme var1) {
-      if (var1 == null) {
+   public ThemeSnapshot(Theme theme) {
+      if (theme == null) {
          throw new IllegalArgumentException("theme must not be null");
       } else {
-         this.tokens = var1.tokens();
+         this.tokens = theme.tokens();
       }
    }
 }

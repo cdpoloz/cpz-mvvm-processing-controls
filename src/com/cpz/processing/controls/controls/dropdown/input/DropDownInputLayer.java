@@ -9,6 +9,8 @@ import java.util.Objects;
 
 /**
  * Reusable input layer for a single drop down instance.
+ *
+ * @author CPZ
  */
 public final class DropDownInputLayer extends DefaultInputLayer {
     private final DropDown dropDown;

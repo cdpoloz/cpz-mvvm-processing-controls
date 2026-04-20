@@ -16,16 +16,18 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public interface LabelStyle {
    /**
     * Renders the label with the provided state and theme snapshot.
     *
-    * @param var1 Processing sketch
-    * @param var2 immutable label state
-    * @param var3 cached theme snapshot
+    * @param sketch Processing sketch
+    * @param state immutable label state
+    * @param snapshot cached theme snapshot
     */
-   void render(PApplet var1, LabelViewState var2, ThemeSnapshot var3);
+   void render(PApplet sketch, LabelViewState state, ThemeSnapshot snapshot);
 
    /**
     * Resolves typography for measurement and rendering.

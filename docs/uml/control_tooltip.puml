@@ -1,19 +1,31 @@
 @startuml
-title Tooltip Control Structure
+title Tooltip Overlay Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
+class TooltipOverlayController
+class TooltipModel
+class TooltipViewModel
 class TooltipView
 class TooltipViewState
 class DefaultTooltipStyle
 class TooltipRenderStyle
 class DefaultTooltipRenderer
+class OverlayManager
+interface ThemeProvider
 class ThemeSnapshot
 
-TooltipView --> TooltipViewState
-TooltipView --> ThemeSnapshot
-DefaultTooltipStyle --> TooltipViewState
-DefaultTooltipStyle --> ThemeSnapshot
-DefaultTooltipStyle --> TooltipRenderStyle
-DefaultTooltipRenderer --> TooltipRenderStyle
+TooltipOverlayController --> TooltipModel : owns
+TooltipOverlayController --> TooltipViewModel : owns
+TooltipOverlayController --> TooltipView : owns
+TooltipOverlayController --> OverlayManager : registers overlay
+TooltipViewModel --> TooltipModel : reads / updates
+TooltipView --> TooltipViewModel : reads
+TooltipView --> TooltipViewState : builds
+TooltipView --> DefaultTooltipStyle : renders with
+DefaultTooltipStyle --> ThemeProvider : reads snapshot
+ThemeProvider --> ThemeSnapshot
+DefaultTooltipStyle --> TooltipViewState : resolves
+DefaultTooltipStyle --> TooltipRenderStyle : creates
+DefaultTooltipRenderer --> TooltipRenderStyle : draws
 @enduml

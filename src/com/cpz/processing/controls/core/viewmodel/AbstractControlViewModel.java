@@ -13,6 +13,8 @@ import com.cpz.processing.controls.core.view.Visible;
  * Behavior:
  * - Does not contain layout or rendering logic.
  * - Does not own pointer-specific interaction state.
+ *
+ * @author CPZ
  */
 public abstract class AbstractControlViewModel implements Visible, Enableable {
    protected final Enableable model;
@@ -21,10 +23,10 @@ public abstract class AbstractControlViewModel implements Visible, Enableable {
    /**
     * Creates a ViewModel around the provided model.
     *
-    * @param var1 backing model that stores enabled state
+    * @param enableable backing model that stores enabled state
     */
-   protected AbstractControlViewModel(Enableable var1) {
-      this.model = var1;
+   protected AbstractControlViewModel(Enableable enableable) {
+      this.model = enableable;
    }
 
    /**
@@ -42,13 +44,13 @@ public abstract class AbstractControlViewModel implements Visible, Enableable {
    /**
     * Updates visible.
     *
-    * @param var1 new visible
+    * @param visible new visible
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public final void setVisible(boolean var1) {
-      this.visible = var1;
+   public final void setVisible(boolean visible) {
+      this.visible = visible;
       this.onAvailabilityChanged();
    }
 
@@ -67,13 +69,13 @@ public abstract class AbstractControlViewModel implements Visible, Enableable {
    /**
     * Updates enabled.
     *
-    * @param var1 new enabled
+    * @param enabled new enabled
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setEnabled(boolean var1) {
-      this.model.setEnabled(var1);
+   public void setEnabled(boolean enabled) {
+      this.model.setEnabled(enabled);
       this.onAvailabilityChanged();
    }
 

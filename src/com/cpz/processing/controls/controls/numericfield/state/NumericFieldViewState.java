@@ -12,6 +12,8 @@ package com.cpz.processing.controls.controls.numericfield.state;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public record NumericFieldViewState(float x, float y, float width, float height, String text, String textBeforeSelection, String selectedText, String textAfterSelection, int cursorPosition, int selectionStart, int selectionEnd, boolean focused, boolean hovered, boolean pressed, boolean editing, boolean showCursor, boolean enabled, float textX, float cursorX, float selectionStartX, float selectionEndX) {
 }

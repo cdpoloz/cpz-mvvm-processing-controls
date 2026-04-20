@@ -12,14 +12,16 @@ package com.cpz.processing.controls.core.input;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public interface PointerInteractable {
    /**
     * Tests whether the given sketch-space point is inside the view bounds.
     *
-    * @param var1 x coordinate in sketch space
-    * @param var2 y coordinate in sketch space
+    * @param x x coordinate in sketch space
+    * @param y y coordinate in sketch space
     * @return {@code true} when the point intersects the control
     */
-   boolean contains(float var1, float var2);
+   boolean contains(float x, float y);
 }

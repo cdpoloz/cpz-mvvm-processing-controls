@@ -12,6 +12,8 @@ package com.cpz.processing.controls.core.view;
  *
  * Notes:
  * - This type belongs to the MVVM View layer.
+ *
+ * @author CPZ
  */
 public interface Visible {
    /**
@@ -24,7 +26,7 @@ public interface Visible {
    /**
     * Updates visibility.
     *
-    * @param var1 new visibility flag
+    * @param visible new visibility flag
     */
-   void setVisible(boolean var1);
+   void setVisible(boolean visible);
 }

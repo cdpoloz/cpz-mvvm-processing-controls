@@ -17,6 +17,8 @@ import java.util.Objects;
  *
  * Notes:
  * - This type belongs to the MVVM Model layer.
+ *
+ * @author CPZ
  */
 public final class ButtonModel implements Enableable {
    private final String code;
@@ -27,18 +29,18 @@ public final class ButtonModel implements Enableable {
    /**
     * Creates a button model.
     *
-    * @param var1 parameter used by this operation
+    * @param text parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public ButtonModel(String var1) {
-      this(ControlCode.auto("button"), var1);
+   public ButtonModel(String text) {
+      this(ControlCode.auto("button"), text);
    }
 
-   public ButtonModel(String var1, String var2) {
-      this.code = Objects.requireNonNull(var1, "code");
-      this.text = this.normalizeText(var2);
+   public ButtonModel(String text, String text2) {
+      this.code = Objects.requireNonNull(text, "code");
+      this.text = this.normalizeText(text2);
       this.enabled = true;
    }
 
@@ -61,13 +63,13 @@ public final class ButtonModel implements Enableable {
    /**
     * Updates text.
     *
-    * @param var1 new text
+    * @param text new text
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setText(String var1) {
-      this.text = this.normalizeText(var1);
+   public void setText(String text) {
+      this.text = this.normalizeText(text);
    }
 
    /**
@@ -85,16 +87,16 @@ public final class ButtonModel implements Enableable {
    /**
     * Updates enabled.
     *
-    * @param var1 new enabled
+    * @param enabled new enabled
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setEnabled(boolean var1) {
-      this.enabled = var1;
+   public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
    }
 
-   private String normalizeText(String var1) {
-      return var1 == null ? "" : var1;
+   private String normalizeText(String text) {
+      return text == null ? "" : text;
    }
 }

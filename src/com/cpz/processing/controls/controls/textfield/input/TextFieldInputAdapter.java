@@ -17,6 +17,8 @@ import com.cpz.processing.controls.core.input.PointerEvent;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class TextFieldInputAdapter {
    private final TextFieldView view;
@@ -26,37 +28,37 @@ public final class TextFieldInputAdapter {
    /**
     * Creates a text field input adapter.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param view parameter used by this operation
+    * @param viewModel parameter used by this operation
+    * @param focusManager parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public TextFieldInputAdapter(TextFieldView var1, TextFieldViewModel var2, FocusManager var3) {
-      this.view = var1;
-      this.viewModel = var2;
-      this.focusManager = var3;
-      this.focusManager.register(var2);
+   public TextFieldInputAdapter(TextFieldView view, TextFieldViewModel viewModel, FocusManager focusManager) {
+      this.view = view;
+      this.viewModel = viewModel;
+      this.focusManager = focusManager;
+      this.focusManager.register(viewModel);
    }
 
    /**
     * Handles mouse press.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public boolean handleMousePress(float var1, float var2) {
+   public boolean handleMousePress(float x, float y) {
       if (this.viewModel.isVisible() && this.viewModel.isEnabled()) {
-         if (!this.view.contains(var1, var2)) {
+         if (!this.view.contains(x, y)) {
             return false;
          } else {
             this.focusManager.requestFocus(this.viewModel);
-            this.view.handleMousePress(var1);
+            this.view.handleMousePress(x);
             return true;
          }
       } else {
@@ -67,15 +69,15 @@ public final class TextFieldInputAdapter {
    /**
     * Handles mouse drag.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMouseDrag(float var1, float var2) {
+   public void handleMouseDrag(float mouseX, float mouseY) {
       if (this.viewModel.isVisible() && this.viewModel.isEnabled()) {
-         this.view.handleMouseDrag(var1);
+         this.view.handleMouseDrag(mouseX);
       }
    }
 
@@ -92,19 +94,19 @@ public final class TextFieldInputAdapter {
    /**
     * Handles pointer event.
     *
-    * @param var1 parameter used by this operation
+    * @param event parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handlePointerEvent(PointerEvent var1) {
-      if (var1 != null) {
-         switch (var1.getType()) {
+   public void handlePointerEvent(PointerEvent event) {
+      if (event != null) {
+         switch (event.getType()) {
             case PRESS:
-               this.handleMousePress(var1.getX(), var1.getY());
+               this.handleMousePress(event.getX(), event.getY());
                break;
             case DRAG:
-               this.handleMouseDrag(var1.getX(), var1.getY());
+               this.handleMouseDrag(event.getX(), event.getY());
                break;
             case RELEASE:
                this.handleMouseRelease();

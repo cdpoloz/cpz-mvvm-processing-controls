@@ -1,25 +1,35 @@
 @startuml
-title Slider Control Structure
+title Slider Public Facade Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-class PointerEvent
-class SliderInputAdapter
+interface Control
+class Slider
+class SliderModel
 class SliderViewModel
 class SliderView
+class SliderInputAdapter
 class SliderViewState
 class SliderStyle
 class SliderRenderStyle
 class SliderRenderer
+interface ThemeProvider
 class ThemeSnapshot
 
-PointerEvent --> SliderInputAdapter : handled directly
-SliderInputAdapter --> SliderView : hit test / normalize
-SliderInputAdapter --> SliderViewModel : move/press/drag/release/wheel
-SliderView --> SliderViewState
-SliderView --> ThemeSnapshot
-SliderStyle --> SliderViewState
-SliderStyle --> ThemeSnapshot
-SliderStyle --> SliderRenderStyle
-SliderRenderer --> SliderRenderStyle
+Slider ..|> Control
+Slider --> SliderModel : owns
+Slider --> SliderViewModel : owns
+Slider --> SliderView : owns
+Slider --> SliderInputAdapter : delegates input
+SliderInputAdapter --> SliderView : geometry / hit testing
+SliderInputAdapter --> SliderViewModel : interaction updates
+SliderViewModel --> SliderModel : updates
+SliderView --> SliderViewModel : reads
+SliderView --> SliderViewState : builds
+SliderView --> SliderStyle : renders with
+SliderStyle --> ThemeProvider : reads snapshot
+ThemeProvider --> ThemeSnapshot
+SliderStyle --> SliderViewState : resolves
+SliderStyle --> SliderRenderStyle : creates
+SliderRenderer --> SliderRenderStyle : draws
 @enduml

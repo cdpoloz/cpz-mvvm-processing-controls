@@ -12,6 +12,8 @@ package com.cpz.processing.controls.core.input;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class PointerInputAdapter {
    private final PointerInteractable view;
@@ -20,46 +22,46 @@ public final class PointerInputAdapter {
    /**
     * Creates a pointer input adapter.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param interactable parameter used by this operation
+    * @param target parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public PointerInputAdapter(PointerInteractable var1, PointerInputTarget var2) {
-      this.view = var1;
-      this.viewModel = var2;
+   public PointerInputAdapter(PointerInteractable interactable, PointerInputTarget target) {
+      this.view = interactable;
+      this.viewModel = target;
    }
 
    /**
     * Handles mouse move.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMouseMove(float var1, float var2) {
+   public void handleMouseMove(float mouseX, float mouseY) {
       if (!this.viewModel.isVisible()) {
          this.viewModel.onPointerMove(false);
       } else {
-         this.viewModel.onPointerMove(this.view.contains(var1, var2));
+         this.viewModel.onPointerMove(this.view.contains(mouseX, mouseY));
       }
    }
 
    /**
     * Handles mouse press.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMousePress(float var1, float var2) {
+   public void handleMousePress(float mouseX, float mouseY) {
       if (this.viewModel.isVisible() && this.viewModel.isEnabled()) {
-         this.viewModel.onPointerPress(this.view.contains(var1, var2));
+         this.viewModel.onPointerPress(this.view.contains(mouseX, mouseY));
       } else {
          this.viewModel.onPointerPress(false);
       }
@@ -68,40 +70,40 @@ public final class PointerInputAdapter {
    /**
     * Handles mouse release.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMouseRelease(float var1, float var2) {
+   public void handleMouseRelease(float mouseX, float mouseY) {
       if (!this.viewModel.isVisible()) {
          this.viewModel.onPointerRelease(false);
       } else {
-         this.viewModel.onPointerRelease(this.view.contains(var1, var2));
+         this.viewModel.onPointerRelease(this.view.contains(mouseX, mouseY));
       }
    }
 
    /**
     * Handles pointer event.
     *
-    * @param var1 parameter used by this operation
+    * @param event parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handlePointerEvent(PointerEvent var1) {
-      if (var1 != null) {
-         switch (var1.getType()) {
+   public void handlePointerEvent(PointerEvent event) {
+      if (event != null) {
+         switch (event.getType()) {
             case MOVE:
             case DRAG:
-               this.handleMouseMove(var1.getX(), var1.getY());
+               this.handleMouseMove(event.getX(), event.getY());
                break;
             case PRESS:
-               this.handleMousePress(var1.getX(), var1.getY());
+               this.handleMousePress(event.getX(), event.getY());
                break;
             case RELEASE:
-               this.handleMouseRelease(var1.getX(), var1.getY());
+               this.handleMouseRelease(event.getX(), event.getY());
          }
       }
    }

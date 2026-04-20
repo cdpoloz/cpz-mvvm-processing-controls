@@ -12,6 +12,8 @@ package com.cpz.processing.controls.controls.label.style;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public enum VerticalAlign {
    TOP,

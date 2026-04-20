@@ -1,19 +1,35 @@
 @startuml
-title RadioGroup Control Structure
+title RadioGroup Public Facade Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
+interface Control
+class RadioGroup
+class RadioGroupModel
+class RadioGroupViewModel
 class RadioGroupView
+class RadioGroupInputAdapter
 class RadioGroupViewState
 class RadioGroupStyle
 class RadioGroupRenderStyle
 class DefaultRadioGroupRenderer
+interface ThemeProvider
 class ThemeSnapshot
 
-RadioGroupView --> RadioGroupViewState
-RadioGroupView --> ThemeSnapshot
-RadioGroupStyle --> RadioGroupViewState
-RadioGroupStyle --> ThemeSnapshot
-RadioGroupStyle --> RadioGroupRenderStyle
-DefaultRadioGroupRenderer --> RadioGroupRenderStyle
+RadioGroup ..|> Control
+RadioGroup --> RadioGroupModel : owns
+RadioGroup --> RadioGroupViewModel : owns
+RadioGroup --> RadioGroupView : owns
+RadioGroup --> RadioGroupInputAdapter : delegates input
+RadioGroupInputAdapter --> RadioGroupView : geometry / hit testing
+RadioGroupInputAdapter --> RadioGroupViewModel : interaction updates
+RadioGroupViewModel --> RadioGroupModel : updates
+RadioGroupView --> RadioGroupViewModel : reads
+RadioGroupView --> RadioGroupViewState : builds
+RadioGroupView --> RadioGroupStyle : renders with
+RadioGroupStyle --> ThemeProvider : reads snapshot
+ThemeProvider --> ThemeSnapshot
+RadioGroupStyle --> RadioGroupViewState : resolves
+RadioGroupStyle --> RadioGroupRenderStyle : creates
+DefaultRadioGroupRenderer --> RadioGroupRenderStyle : draws
 @enduml

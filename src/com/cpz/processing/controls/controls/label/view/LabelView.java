@@ -23,6 +23,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the MVVM View layer.
+ *
+ * @author CPZ
  */
 public final class LabelView implements ControlView {
    private final PApplet sketch;
@@ -40,28 +42,28 @@ public final class LabelView implements ControlView {
    /**
     * Creates a label view.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param viewModel parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public LabelView(PApplet var1, LabelViewModel var2, float var3, float var4) {
-      this(var1, var2, var3, var4, 0.0F, 0.0F);
+   public LabelView(PApplet sketch, LabelViewModel viewModel, float x, float y) {
+      this(sketch, viewModel, x, y, 0.0F, 0.0F);
    }
 
-   public LabelView(PApplet var1, LabelViewModel var2, float var3, float var4, float var5, float var6) {
-      this.sketch = var1;
-      this.viewModel = var2;
-      this.x = var3;
-      this.y = var4;
-      this.width = Math.max(0.0F, var5);
-      this.height = Math.max(0.0F, var6);
+   public LabelView(PApplet sketch, LabelViewModel viewModel, float x, float y, float width, float height) {
+      this.sketch = sketch;
+      this.viewModel = viewModel;
+      this.x = x;
+      this.y = y;
+      this.width = Math.max(0.0F, width);
+      this.height = Math.max(0.0F, height);
       this.style = LabelDefaultStyles.defaultText();
-      String var7 = var2.getText();
-      this.lastMeasuredText = var7 == null ? "" : var7;
+      String text = viewModel.getText();
+      this.lastMeasuredText = text == null ? "" : text;
    }
 
    /**
@@ -72,46 +74,46 @@ public final class LabelView implements ControlView {
     */
    public void draw() {
       if (this.viewModel.isVisible()) {
-         ThemeSnapshot var1 = this.style.getThemeSnapshot();
-         this.style.render(this.sketch, this.buildViewState(), var1);
+         ThemeSnapshot snapshot = this.style.getThemeSnapshot();
+         this.style.render(this.sketch, this.buildViewState(), snapshot);
       }
    }
 
    private void updateTextMetrics() {
-      String var1 = this.viewModel.getText();
-      if (!Objects.equals(var1, this.lastMeasuredText)) {
+      String text = this.viewModel.getText();
+      if (!Objects.equals(text, this.lastMeasuredText)) {
          this.metricsDirty = true;
       }
 
       if (this.metricsDirty) {
-         String var2 = var1;
-         if (var1 == null) {
-            var2 = "";
+         String text2 = text;
+         if (text == null) {
+            text2 = "";
          }
 
          this.sketch.pushStyle();
-         LabelTypography var3 = this.style.resolveTypography();
-         if (var3.font() != null) {
-            this.sketch.textFont(var3.font());
+         LabelTypography labelTypography = this.style.resolveTypography();
+         if (labelTypography.font() != null) {
+            this.sketch.textFont(labelTypography.font());
          }
 
-         this.sketch.textSize(var3.textSize());
-         this.sketch.textAlign(LabelAlignMapper.mapHorizontal(var3.textAlignHorizontal()), LabelAlignMapper.mapVertical(var3.textAlignVertical()));
-         String[] var4 = var2.split("\n", -1);
-         float var5 = 0.0F;
-         float var6 = (this.sketch.textAscent() + this.sketch.textDescent()) * var3.lineSpacingMultiplier();
+         this.sketch.textSize(labelTypography.textSize());
+         this.sketch.textAlign(LabelAlignMapper.mapHorizontal(labelTypography.textAlignHorizontal()), LabelAlignMapper.mapVertical(labelTypography.textAlignVertical()));
+         String[] text3 = text2.split("\n", -1);
+         float value = 0.0F;
+         float value2 = (this.sketch.textAscent() + this.sketch.textDescent()) * labelTypography.lineSpacingMultiplier();
 
-         for(String var10 : var4) {
-            float var11 = this.sketch.textWidth(var10);
-            if (var11 > var5) {
-               var5 = var11;
+         for(String text4 : text3) {
+            float value3 = this.sketch.textWidth(text4);
+            if (value3 > value) {
+               value = value3;
             }
          }
 
-         this.cachedWidth = var5;
-         this.cachedHeight = (float)var4.length * var6;
+         this.cachedWidth = value;
+         this.cachedHeight = (float)text3.length * value2;
          this.sketch.popStyle();
-         this.lastMeasuredText = var1;
+         this.lastMeasuredText = text;
          this.metricsDirty = false;
       }
    }
@@ -159,19 +161,19 @@ public final class LabelView implements ControlView {
    /**
     * Performs center block around.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public void centerBlockAround(float var1, float var2) {
+   public void centerBlockAround(float x, float y) {
       if (this.metricsDirty) {
          this.updateTextMetrics();
       }
 
-      this.x = var1 - this.cachedWidth * 0.5F;
-      this.y = var2 - this.cachedHeight * 0.5F;
+      this.x = x - this.cachedWidth * 0.5F;
+      this.y = y - this.cachedHeight * 0.5F;
    }
 
    private LabelViewState buildViewState() {
@@ -181,14 +183,14 @@ public final class LabelView implements ControlView {
    /**
     * Updates style.
     *
-    * @param var1 new style
+    * @param style new style
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setStyle(LabelStyle var1) {
-      if (var1 != null) {
-         this.style = var1;
+   public void setStyle(LabelStyle style) {
+      if (style != null) {
+         this.style = style;
          this.metricsDirty = true;
       }
 
@@ -197,21 +199,21 @@ public final class LabelView implements ControlView {
    /**
     * Updates position.
     *
-    * @param var1 new position
-    * @param var2 parameter used by this operation
+    * @param x new position
+    * @param y parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setPosition(float var1, float var2) {
-      this.x = var1;
-      this.y = var2;
+   public void setPosition(float x, float y) {
+      this.x = x;
+      this.y = y;
       this.metricsDirty = true;
    }
 
-   public void setSize(float var1, float var2) {
-      this.width = Math.max(0.0F, var1);
-      this.height = Math.max(0.0F, var2);
+   public void setSize(float width, float height) {
+      this.width = Math.max(0.0F, width);
+      this.height = Math.max(0.0F, height);
       this.metricsDirty = true;
    }
 

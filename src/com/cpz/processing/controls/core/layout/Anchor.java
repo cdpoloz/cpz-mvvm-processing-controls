@@ -12,6 +12,8 @@ package com.cpz.processing.controls.core.layout;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public enum Anchor {
    TOP_LEFT,

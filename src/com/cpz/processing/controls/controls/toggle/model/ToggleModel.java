@@ -17,6 +17,8 @@ import java.util.Objects;
  *
  * Notes:
  * - This type belongs to the MVVM Model layer.
+ *
+ * @author CPZ
  */
 public final class ToggleModel implements Enableable {
    private final String code;
@@ -29,8 +31,8 @@ public final class ToggleModel implements Enableable {
       this(ControlCode.auto("toggle"));
    }
 
-   public ToggleModel(String var1) {
-      this.code = Objects.requireNonNull(var1, "code");
+   public ToggleModel(String text) {
+      this.code = Objects.requireNonNull(text, "code");
    }
 
    public String getCode() {
@@ -40,13 +42,13 @@ public final class ToggleModel implements Enableable {
    /**
     * Updates total states.
     *
-    * @param var1 new total states
+    * @param value new total states
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setTotalStates(int var1) {
-      this.totalStates = var1;
+   public void setTotalStates(int value) {
+      this.totalStates = value;
    }
 
    /**
@@ -64,13 +66,13 @@ public final class ToggleModel implements Enableable {
    /**
     * Updates state.
     *
-    * @param var1 new state
+    * @param value new state
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setState(int var1) {
-      this.state = var1;
+   public void setState(int value) {
+      this.state = value;
    }
 
    /**
@@ -88,13 +90,13 @@ public final class ToggleModel implements Enableable {
    /**
     * Updates prev state.
     *
-    * @param var1 new prev state
+    * @param value new prev state
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setPrevState(int var1) {
-      this.prevState = var1;
+   public void setPrevState(int value) {
+      this.prevState = value;
    }
 
    /**
@@ -124,12 +126,12 @@ public final class ToggleModel implements Enableable {
    /**
     * Updates enabled.
     *
-    * @param var1 new enabled
+    * @param enabled new enabled
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setEnabled(boolean var1) {
-      this.enabled = var1;
+   public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
    }
 }

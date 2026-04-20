@@ -16,92 +16,94 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class DefaultDropDownRenderer {
    /**
     * Renders the current frame.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param state parameter used by this operation
+    * @param renderStyle parameter used by this operation
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
     */
-   public void render(PApplet var1, DropDownViewState var2, DropDownRenderStyle var3) {
-      float var4 = var2.x() - var2.width() * 0.5F;
-      float var5 = var2.y() - var2.height() * 0.5F;
-      float var6 = var4 + var2.width();
-      var1.pushStyle();
-      var1.rectMode(0);
-      this.applyTypography(var1, var3);
-      var1.stroke(var3.strokeColor());
-      var1.strokeWeight(var3.strokeWeight());
-      var1.fill(var3.baseFillColor());
-      var1.rect(var4, var5, var2.width(), var2.height(), var3.cornerRadius());
-      var1.fill(var3.textColor());
-      var1.textAlign(37, 3);
-      var1.text(var2.selectedText(), var4 + var3.textPadding(), var2.y());
-      this.drawArrow(var1, var6 - var3.arrowPadding(), var2.y(), var3.arrowColor(), var2.expanded());
-      if (var2.expanded()) {
-         this.drawExpandedList(var1, var2, var3, var4, var5);
+   public void render(PApplet sketch, DropDownViewState state, DropDownRenderStyle renderStyle) {
+      float value = state.x() - state.width() * 0.5F;
+      float value2 = state.y() - state.height() * 0.5F;
+      float value3 = value + state.width();
+      sketch.pushStyle();
+      sketch.rectMode(0);
+      this.applyTypography(sketch, renderStyle);
+      sketch.stroke(renderStyle.strokeColor());
+      sketch.strokeWeight(renderStyle.strokeWeight());
+      sketch.fill(renderStyle.baseFillColor());
+      sketch.rect(value, value2, state.width(), state.height(), renderStyle.cornerRadius());
+      sketch.fill(renderStyle.textColor());
+      sketch.textAlign(37, 3);
+      sketch.text(state.selectedText(), value + renderStyle.textPadding(), state.y());
+      this.drawArrow(sketch, value3 - renderStyle.arrowPadding(), state.y(), renderStyle.arrowColor(), state.expanded());
+      if (state.expanded()) {
+         this.drawExpandedList(sketch, state, renderStyle, value, value2);
       }
 
-      var1.popStyle();
+      sketch.popStyle();
    }
 
-   private void drawExpandedList(PApplet var1, DropDownViewState var2, DropDownRenderStyle var3, float var4, float var5) {
-      int var6 = Math.min(var2.items().size(), var3.maxVisibleItems());
-      if (var6 > 0) {
-         float var7 = var5 + var2.height();
-         float var8 = (float)var6 * var3.itemHeight();
-         var1.stroke(var3.strokeColor());
-         var1.strokeWeight(var3.strokeWeight());
-         var1.fill(var3.listFillColor());
-         var1.rect(var4, var7, var2.width(), var8, var3.listCornerRadius());
-         var1.textAlign(37, 3);
+   private void drawExpandedList(PApplet sketch, DropDownViewState state, DropDownRenderStyle renderStyle, float x, float y) {
+      int value = Math.min(state.items().size(), renderStyle.maxVisibleItems());
+      if (value > 0) {
+         float value2 = y + state.height();
+         float value3 = (float)value * renderStyle.itemHeight();
+         sketch.stroke(renderStyle.strokeColor());
+         sketch.strokeWeight(renderStyle.strokeWeight());
+         sketch.fill(renderStyle.listFillColor());
+         sketch.rect(x, value2, state.width(), value3, renderStyle.listCornerRadius());
+         sketch.textAlign(37, 3);
 
-         for(int var9 = 0; var9 < var6; ++var9) {
-            float var10 = var7 + (float)var9 * var3.itemHeight();
-            boolean var11 = var9 == var2.hoveredIndex();
-            boolean var12 = var9 == var2.selectedIndex();
-            if (var12 || var11) {
-               var1.noStroke();
-               var1.fill(var12 ? var3.itemSelectedColor() : var3.itemHoverColor());
-               var1.rect(var4 + 1.0F, var10 + 1.0F, var2.width() - 2.0F, var3.itemHeight() - 2.0F, 4.0F);
+         for(int value4 = 0; value4 < value; ++value4) {
+            float value5 = value2 + (float)value4 * renderStyle.itemHeight();
+            boolean active = value4 == state.hoveredIndex();
+            boolean active2 = value4 == state.selectedIndex();
+            if (active2 || active) {
+               sketch.noStroke();
+               sketch.fill(active2 ? renderStyle.itemSelectedColor() : renderStyle.itemHoverColor());
+               sketch.rect(x + 1.0F, value5 + 1.0F, state.width() - 2.0F, renderStyle.itemHeight() - 2.0F, 4.0F);
             }
 
-            var1.fill(var3.textColor());
-            var1.text((String)var2.items().get(var9), var4 + var3.textPadding(), var10 + var3.itemHeight() * 0.5F);
+            sketch.fill(renderStyle.textColor());
+            sketch.text((String)state.items().get(value4), x + renderStyle.textPadding(), value5 + renderStyle.itemHeight() * 0.5F);
          }
 
       }
    }
 
-   private void drawArrow(PApplet var1, float var2, float var3, int var4, boolean var5) {
-      float var6 = 10.0F;
-      float var7 = 6.0F;
-      var1.noStroke();
-      var1.fill(var4);
-      var1.beginShape();
-      if (var5) {
-         var1.vertex(var2 - var6 * 0.5F, var3 + var7 * 0.5F);
-         var1.vertex(var2 + var6 * 0.5F, var3 + var7 * 0.5F);
-         var1.vertex(var2, var3 - var7 * 0.5F);
+   private void drawArrow(PApplet sketch, float x, float y, int value, boolean enabled) {
+      float value2 = 10.0F;
+      float value3 = 6.0F;
+      sketch.noStroke();
+      sketch.fill(value);
+      sketch.beginShape();
+      if (enabled) {
+         sketch.vertex(x - value2 * 0.5F, y + value3 * 0.5F);
+         sketch.vertex(x + value2 * 0.5F, y + value3 * 0.5F);
+         sketch.vertex(x, y - value3 * 0.5F);
       } else {
-         var1.vertex(var2 - var6 * 0.5F, var3 - var7 * 0.5F);
-         var1.vertex(var2 + var6 * 0.5F, var3 - var7 * 0.5F);
-         var1.vertex(var2, var3 + var7 * 0.5F);
+         sketch.vertex(x - value2 * 0.5F, y - value3 * 0.5F);
+         sketch.vertex(x + value2 * 0.5F, y - value3 * 0.5F);
+         sketch.vertex(x, y + value3 * 0.5F);
       }
 
-      var1.endShape(2);
+      sketch.endShape(2);
    }
 
-   private void applyTypography(PApplet var1, DropDownRenderStyle var2) {
-      if (var2.font() != null) {
-         var1.textFont(var2.font(), var2.textSize());
+   private void applyTypography(PApplet sketch, DropDownRenderStyle renderStyle) {
+      if (renderStyle.font() != null) {
+         sketch.textFont(renderStyle.font(), renderStyle.textSize());
       } else {
-         var1.textSize(var2.textSize());
+         sketch.textSize(renderStyle.textSize());
       }
 
    }

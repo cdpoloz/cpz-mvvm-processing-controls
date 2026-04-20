@@ -15,6 +15,8 @@ import com.cpz.processing.controls.core.theme.ThemeProvider;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class SliderDefaultStyles {
    private SliderDefaultStyles() {
@@ -35,23 +37,23 @@ public final class SliderDefaultStyles {
    /**
     * Performs standard.
     *
-    * @param var0 parameter used by this operation
+    * @param themeProvider parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static SliderStyle standard(ThemeProvider var0) {
-      SliderStyleConfig var1 = new SliderStyleConfig();
-      var1.trackStrokeWeight = 1.5F;
-      var1.trackStrokeWeightHover = 2.5F;
-      var1.trackThickness = 8.0F;
-      var1.thumbStrokeWeight = 2.0F;
-      var1.thumbStrokeWeightHover = 3.0F;
-      var1.thumbSize = 24.0F;
-      var1.showValueText = true;
-      var1.svgColorMode = SvgColorMode.USE_RENDER_STYLE;
-      var1.themeProvider = var0;
-      return new SliderStyle(var1);
+   public static SliderStyle standard(ThemeProvider themeProvider) {
+      SliderStyleConfig config = new SliderStyleConfig();
+      config.trackStrokeWeight = 1.5F;
+      config.trackStrokeWeightHover = 2.5F;
+      config.trackThickness = 8.0F;
+      config.thumbStrokeWeight = 2.0F;
+      config.thumbStrokeWeightHover = 3.0F;
+      config.thumbSize = 24.0F;
+      config.showValueText = true;
+      config.svgColorMode = SvgColorMode.USE_RENDER_STYLE;
+      config.themeProvider = themeProvider;
+      return new SliderStyle(config);
    }
 }

@@ -11,6 +11,9 @@ import processing.core.PApplet;
 
 import java.io.File;
 
+/**
+ * @author CPZ
+ */
 public class ToggleSvgJsonTest extends PApplet {
     private static final String TOGGLE_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "toggle-svg-test.json";
 

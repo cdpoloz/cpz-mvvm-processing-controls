@@ -14,6 +14,8 @@ import processing.core.PFont;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public record LabelTypography(PFont font, float textSize, float lineSpacingMultiplier, HorizontalAlign textAlignHorizontal, VerticalAlign textAlignVertical) {
 }

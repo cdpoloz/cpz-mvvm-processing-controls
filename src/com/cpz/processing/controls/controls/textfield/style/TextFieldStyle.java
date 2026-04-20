@@ -16,25 +16,27 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public interface TextFieldStyle {
    /**
     * Renders the text field frame.
     *
-    * @param var1 Processing sketch
-    * @param var2 immutable text field state
-    * @param var3 cached theme snapshot
+    * @param sketch Processing sketch
+    * @param state immutable text field state
+    * @param snapshot cached theme snapshot
     */
-   void render(PApplet var1, TextFieldViewState var2, ThemeSnapshot var3);
+   void render(PApplet sketch, TextFieldViewState state, ThemeSnapshot snapshot);
 
    /**
     * Resolves visual values for a text field frame.
     *
-    * @param var1 immutable text field state
-    * @param var2 cached theme snapshot
+    * @param state immutable text field state
+    * @param snapshot cached theme snapshot
     * @return resolved render style
     */
-   TextFieldRenderStyle resolveRenderStyle(TextFieldViewState var1, ThemeSnapshot var2);
+   TextFieldRenderStyle resolveRenderStyle(TextFieldViewState state, ThemeSnapshot snapshot);
 
    /**
     * Returns the theme snapshot used by this style.

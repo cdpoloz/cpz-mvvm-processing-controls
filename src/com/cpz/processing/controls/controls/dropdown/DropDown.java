@@ -20,6 +20,8 @@ import java.util.Objects;
 
 /**
  * Convenience facade for the drop down control.
+ *
+ * @author CPZ
  */
 public final class DropDown implements Control {
     private static final int DEFAULT_OVERLAY_Z_INDEX = 100;

@@ -12,6 +12,8 @@ package com.cpz.processing.controls.controls.slider.style;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public enum SvgColorMode {
    USE_RENDER_STYLE,

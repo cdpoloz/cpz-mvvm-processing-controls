@@ -10,6 +10,9 @@ import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.util.Colors;
 import processing.core.PApplet;
 
+/**
+ * @author CPZ
+ */
 public class ToggleTest extends PApplet {
     private InputManager inputManager;
     private Toggle toggle;

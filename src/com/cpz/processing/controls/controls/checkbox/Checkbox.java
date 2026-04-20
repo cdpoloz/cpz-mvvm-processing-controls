@@ -15,6 +15,8 @@ import java.util.Objects;
 
 /**
  * Convenience facade for the checkbox control.
+ *
+ * @author CPZ
  */
 public final class Checkbox implements Control {
     private final CheckboxModel model;

@@ -10,6 +10,8 @@ import java.util.Objects;
 
 /**
  * Factory for creating the public button facade from external config.
+ *
+ * @author CPZ
  */
 public final class ButtonFactory {
     public static Button create(PApplet sketch, ButtonConfig config) {

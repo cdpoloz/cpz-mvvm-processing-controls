@@ -15,6 +15,8 @@ import com.cpz.processing.controls.controls.label.style.VerticalAlign;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class LabelAlignMapper {
    private LabelAlignMapper() {
@@ -23,15 +25,15 @@ public final class LabelAlignMapper {
    /**
     * Performs map horizontal.
     *
-    * @param var0 parameter used by this operation
+    * @param align parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static int mapHorizontal(HorizontalAlign var0) {
-      HorizontalAlign var1 = var0 == null ? HorizontalAlign.START : var0;
-      switch (var1) {
+   public static int mapHorizontal(HorizontalAlign align) {
+      HorizontalAlign resolvedAlign = align == null ? HorizontalAlign.START : align;
+      switch (resolvedAlign) {
          case CENTER:
             return 3;
          case END:
@@ -45,15 +47,15 @@ public final class LabelAlignMapper {
    /**
     * Performs map vertical.
     *
-    * @param var0 parameter used by this operation
+    * @param align parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static int mapVertical(VerticalAlign var0) {
-      VerticalAlign var1 = var0 == null ? VerticalAlign.BASELINE : var0;
-      switch (var1) {
+   public static int mapVertical(VerticalAlign align) {
+      VerticalAlign resolvedAlign = align == null ? VerticalAlign.BASELINE : align;
+      switch (resolvedAlign) {
          case TOP:
             return 101;
          case CENTER:
@@ -69,14 +71,14 @@ public final class LabelAlignMapper {
    /**
     * Performs from processing horizontal.
     *
-    * @param var0 parameter used by this operation
+    * @param align parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static HorizontalAlign fromProcessingHorizontal(int var0) {
-      switch (var0) {
+   public static HorizontalAlign fromProcessingHorizontal(int align) {
+      switch (align) {
          case 3:
             return HorizontalAlign.CENTER;
          case 37:
@@ -90,14 +92,14 @@ public final class LabelAlignMapper {
    /**
     * Performs from processing vertical.
     *
-    * @param var0 parameter used by this operation
+    * @param align parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static VerticalAlign fromProcessingVertical(int var0) {
-      switch (var0) {
+   public static VerticalAlign fromProcessingVertical(int align) {
+      switch (align) {
          case 0:
          default:
             return VerticalAlign.BASELINE;

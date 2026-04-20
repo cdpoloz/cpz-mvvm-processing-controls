@@ -1,19 +1,31 @@
 @startuml
-title Label Control Structure
+title Label Public Facade Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
+interface Control
+class Label
+class LabelModel
+class LabelViewModel
 class LabelView
 class LabelViewState
 class DefaultLabelStyle
 class LabelRenderStyle
 class DefaultTextRenderer
+interface ThemeProvider
 class ThemeSnapshot
 
-LabelView --> LabelViewState
-LabelView --> ThemeSnapshot
-DefaultLabelStyle --> LabelViewState
-DefaultLabelStyle --> ThemeSnapshot
-DefaultLabelStyle --> LabelRenderStyle
-DefaultTextRenderer --> LabelRenderStyle
+Label ..|> Control
+Label --> LabelModel : owns
+Label --> LabelViewModel : owns
+Label --> LabelView : owns
+LabelViewModel --> LabelModel : updates
+LabelView --> LabelViewModel : reads
+LabelView --> LabelViewState : builds
+LabelView --> DefaultLabelStyle : renders with
+DefaultLabelStyle --> ThemeProvider : reads snapshot
+ThemeProvider --> ThemeSnapshot
+DefaultLabelStyle --> LabelViewState : resolves
+DefaultLabelStyle --> LabelRenderStyle : creates
+DefaultTextRenderer --> LabelRenderStyle : draws
 @enduml

@@ -8,6 +8,8 @@ import java.util.Objects;
 
 /**
  * Loads a minimal numeric field config from a JSON file.
+ *
+ * @author CPZ
  */
 public final class NumericFieldConfigLoader {
     private final PApplet sketch;

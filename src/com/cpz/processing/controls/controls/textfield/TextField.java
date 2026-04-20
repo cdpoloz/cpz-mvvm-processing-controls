@@ -18,6 +18,8 @@ import java.util.Objects;
 
 /**
  * Convenience facade for the text field control.
+ *
+ * @author CPZ
  */
 public final class TextField implements Control {
     private final TextFieldModel model;

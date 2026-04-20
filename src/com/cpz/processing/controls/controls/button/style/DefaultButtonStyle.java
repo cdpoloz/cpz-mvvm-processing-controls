@@ -23,6 +23,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class DefaultButtonStyle implements ButtonStyle {
    private final ButtonStyleConfig config;
@@ -32,63 +34,63 @@ public final class DefaultButtonStyle implements ButtonStyle {
    /**
     * Creates a default button style.
     *
-    * @param var1 parameter used by this operation
+    * @param config parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public DefaultButtonStyle(ButtonStyleConfig var1) {
-      this(var1, (ButtonRenderer)(var1 != null && var1.renderer != null ? var1.renderer : new DefaultButtonRenderer()));
+   public DefaultButtonStyle(ButtonStyleConfig config) {
+      this(config, (ButtonRenderer)(config != null && config.renderer != null ? config.renderer : new DefaultButtonRenderer()));
    }
 
    /**
     * Creates a default button style.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param config parameter used by this operation
+    * @param renderer parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public DefaultButtonStyle(ButtonStyleConfig var1, ButtonRenderer var2) {
-      this.config = var1;
-      this.renderer = var2;
-      this.themeProvider = var1 != null && var1.themeProvider != null ? var1.themeProvider : new ThemeManager();
+   public DefaultButtonStyle(ButtonStyleConfig config, ButtonRenderer renderer) {
+      this.config = config;
+      this.renderer = renderer;
+      this.themeProvider = config != null && config.themeProvider != null ? config.themeProvider : new ThemeManager();
    }
 
    /**
     * Renders the current frame.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param state parameter used by this operation
+    * @param snapshot parameter used by this operation
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
     */
-   public void render(PApplet var1, ButtonViewState var2, ThemeSnapshot var3) {
-      ThemeTokens var4 = var3.tokens;
-      int var5 = this.resolveColorOverride(var4.primary, this.config.fillOverride, this.config.baseColor);
-      int var6 = this.resolveInteractiveOverride(var5, var4.hoverOverlay, this.config.hoverBlendWithWhite != null ? var1.lerpColor(var5, var1.color(255), this.config.hoverBlendWithWhite) : null);
-      int var7 = this.resolveInteractiveOverride(var5, var4.pressedOverlay, this.config.pressedBlendWithBlack != null ? var1.lerpColor(var5, var1.color(0), this.config.pressedBlendWithBlack) : null);
-      int var8 = InteractiveStyleHelper.resolveFillColor(var5, var6, var7, var2.hovered(), var2.pressed());
-      int var9 = this.config.disabledAlpha != null ? this.config.disabledAlpha : var4.disabledAlpha;
-      int var10 = this.resolveColorOverride(var4.border, this.config.strokeOverride, this.config.strokeColor);
-      int var11 = this.resolveColorOverride(var4.onPrimary, this.config.textOverride, this.config.textColor);
-      ButtonRenderStyle var12 = new ButtonRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(var8, var2.enabled(), var9), InteractiveStyleHelper.resolveStrokeColor(var10, var2.enabled(), var9), InteractiveStyleHelper.resolveStrokeWeight(this.config.strokeWeight, this.config.strokeWeightHover, var2.hovered()), InteractiveStyleHelper.applyDisabledAlpha(var11, var2.enabled(), var9), this.config.cornerRadius, var2.showText(), var2.text());
-      this.renderer.render(var1, var2.x(), var2.y(), var2.width(), var2.height(), var12);
+   public void render(PApplet sketch, ButtonViewState state, ThemeSnapshot snapshot) {
+      ThemeTokens tokens = snapshot.tokens;
+      int color = this.resolveColorOverride(tokens.primary, this.config.fillOverride, this.config.baseColor);
+      int value = this.resolveInteractiveOverride(color, tokens.hoverOverlay, this.config.hoverBlendWithWhite != null ? sketch.lerpColor(color, sketch.color(255), this.config.hoverBlendWithWhite) : null);
+      int value2 = this.resolveInteractiveOverride(color, tokens.pressedOverlay, this.config.pressedBlendWithBlack != null ? sketch.lerpColor(color, sketch.color(0), this.config.pressedBlendWithBlack) : null);
+      int color2 = InteractiveStyleHelper.resolveFillColor(color, value, value2, state.hovered(), state.pressed());
+      int disabledAlpha = this.config.disabledAlpha != null ? this.config.disabledAlpha : tokens.disabledAlpha;
+      int color3 = this.resolveColorOverride(tokens.border, this.config.strokeOverride, this.config.strokeColor);
+      int color4 = this.resolveColorOverride(tokens.onPrimary, this.config.textOverride, this.config.textColor);
+      ButtonRenderStyle renderStyle = new ButtonRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(color2, state.enabled(), disabledAlpha), InteractiveStyleHelper.resolveStrokeColor(color3, state.enabled(), disabledAlpha), InteractiveStyleHelper.resolveStrokeWeight(this.config.strokeWeight, this.config.strokeWeightHover, state.hovered()), InteractiveStyleHelper.applyDisabledAlpha(color4, state.enabled(), disabledAlpha), this.config.cornerRadius, state.showText(), state.text());
+      this.renderer.render(sketch, state.x(), state.y(), state.width(), state.height(), renderStyle);
    }
 
-   private int resolveColorOverride(int var1, Integer var2, Integer var3) {
-      if (var2 != null) {
-         return var2;
+   private int resolveColorOverride(int color, Integer color2, Integer color3) {
+      if (color2 != null) {
+         return color2;
       } else {
-         return var3 != null ? var3 : var1;
+         return color3 != null ? color3 : color;
       }
    }
 
-   private int resolveInteractiveOverride(int var1, int var2, Integer var3) {
-      return var3 != null ? var3 : InteractiveStyleHelper.applyOverlay(var1, var2);
+   private int resolveInteractiveOverride(int value, int value2, Integer value3) {
+      return value3 != null ? value3 : InteractiveStyleHelper.applyOverlay(value, value2);
    }
 
    /**

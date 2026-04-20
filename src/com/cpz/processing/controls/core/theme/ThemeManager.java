@@ -1,69 +1,55 @@
 package com.cpz.processing.controls.core.theme;
 
 /**
- * Theme component for theme manager.
+ * Sketch-owned theme provider used by styles during rendering.
  *
- * Responsibilities:
- * - Represent theme data or theme access for the rendering pipeline.
- * - Keep theme concerns explicit and reusable.
+ * <p>The manager is not a singleton and does not own any global state. Host
+ * sketches create the manager they need and pass it to public styles. Calling
+ * {@link #setTheme(Theme)} replaces the current theme and rebuilds the cached
+ * {@link ThemeSnapshot}; styles read that snapshot during rendering.</p>
  *
- * Behavior:
- * - Keeps the public role isolated from unrelated concerns.
- *
- * Notes:
- * - This type is part of the public project surface.
+ * @author CPZ
  */
 public final class ThemeManager implements ThemeProvider {
    private Theme currentTheme;
    private ThemeSnapshot snapshot;
 
    /**
-    * Creates a theme manager.
-    *
-    * Behavior:
-    * - Initializes the public state required by this type.
+    * Creates a manager initialized with {@link LightTheme}.
     */
    public ThemeManager() {
       this(new LightTheme());
    }
 
    /**
-    * Creates a theme manager.
+    * Creates a manager initialized with the supplied theme.
     *
-    * @param var1 parameter used by this operation
-    *
-    * Behavior:
-    * - Initializes the public state required by this type.
+    * @param theme initial theme; {@code null} falls back to {@link LightTheme}
     */
-   public ThemeManager(Theme var1) {
-      this.setTheme(var1 == null ? new LightTheme() : var1);
+   public ThemeManager(Theme theme) {
+      this.setTheme(theme == null ? new LightTheme() : theme);
    }
 
    /**
-    * Returns snapshot.
+    * Returns the cached immutable snapshot consumed by styles.
     *
     * @return current snapshot
-    *
-    * Behavior:
-    * - Returns the current value without applying side effects.
     */
    public ThemeSnapshot getSnapshot() {
       return this.snapshot;
    }
 
    /**
-    * Updates theme.
+    * Replaces the current theme and rebuilds the cached snapshot.
     *
-    * @param var1 new theme
-    *
-    * Behavior:
-    * - Updates the public state or registration owned by this type.
+    * @param theme new theme, never {@code null}
+    * @throws IllegalArgumentException when {@code theme} is {@code null}
     */
-   public void setTheme(Theme var1) {
-      if (var1 == null) {
-         throw new IllegalArgumentException("Theme null");
+   public void setTheme(Theme theme) {
+      if (theme == null) {
+         throw new IllegalArgumentException("theme must not be null");
       } else {
-         this.currentTheme = var1.copy();
+         this.currentTheme = theme.copy();
          this.snapshot = new ThemeSnapshot(this.currentTheme);
       }
    }

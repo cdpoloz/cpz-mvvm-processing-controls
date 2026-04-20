@@ -14,6 +14,8 @@ import processing.core.PFont;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public record TooltipRenderStyle(int backgroundColor, int textColor, int strokeColor, float strokeWeight, float textSize, float textPadding, float cornerRadius, float minHeight, PFont font) {
 }

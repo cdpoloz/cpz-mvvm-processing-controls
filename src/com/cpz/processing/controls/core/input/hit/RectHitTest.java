@@ -14,6 +14,8 @@ import com.cpz.processing.controls.core.input.hit.interfaces.HitTest;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public class RectHitTest implements HitTest {
    private float x;
@@ -33,50 +35,50 @@ public class RectHitTest implements HitTest {
    /**
     * Creates a rect hit test.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
+    * @param height parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public RectHitTest(float var1, float var2, float var3, float var4) {
-      this.w = var3;
-      this.h = var4;
-      this.x = var1 - var3 * 0.5F;
-      this.y = var2 - var4 * 0.5F;
+   public RectHitTest(float x, float y, float width, float height) {
+      this.w = width;
+      this.h = height;
+      this.x = x - width * 0.5F;
+      this.y = y - height * 0.5F;
    }
 
    /**
     * Handles layout.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
+    * @param height parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onLayout(float var1, float var2, float var3, float var4) {
-      this.w = var3;
-      this.h = var4;
-      this.x = var1 - var3 * 0.5F;
-      this.y = var2 - var4 * 0.5F;
+   public void onLayout(float x, float y, float width, float height) {
+      this.w = width;
+      this.h = height;
+      this.x = x - width * 0.5F;
+      this.y = y - height * 0.5F;
    }
 
    /**
     * Performs contains.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public boolean contains(float var1, float var2) {
-      return var1 >= this.x && var1 <= this.x + this.w && var2 >= this.y && var2 <= this.y + this.h;
+   public boolean contains(float x, float y) {
+      return x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h;
    }
 }

@@ -15,6 +15,8 @@ import com.cpz.processing.controls.core.theme.ThemeProvider;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class TextFieldDefaultStyles {
    private TextFieldDefaultStyles() {
@@ -35,17 +37,17 @@ public final class TextFieldDefaultStyles {
    /**
     * Performs standard.
     *
-    * @param var0 parameter used by this operation
+    * @param themeProvider parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static DefaultTextFieldStyle standard(ThemeProvider var0) {
-      TextFieldStyleConfig var1 = new TextFieldStyleConfig();
-      var1.textSize = 16.0F;
-      var1.font = null;
-      var1.themeProvider = var0;
-      return new DefaultTextFieldStyle(var1);
+   public static DefaultTextFieldStyle standard(ThemeProvider themeProvider) {
+      TextFieldStyleConfig config = new TextFieldStyleConfig();
+      config.textSize = 16.0F;
+      config.font = null;
+      config.themeProvider = themeProvider;
+      return new DefaultTextFieldStyle(config);
    }
 }

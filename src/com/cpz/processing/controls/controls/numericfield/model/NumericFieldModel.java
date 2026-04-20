@@ -19,6 +19,8 @@ import java.util.Objects;
  * - This type belongs to the MVVM Model layer.
  * - Internal fields such as min/max/step and parsing flags support the closed control
  *   implementation and are not exposed through the current NumericField facade.
+ *
+ * @author CPZ
  */
 public final class NumericFieldModel implements Enableable {
    private final String code;
@@ -34,36 +36,36 @@ public final class NumericFieldModel implements Enableable {
    /**
     * Creates a numeric field model.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
-    * @param var6 parameter used by this operation
-    * @param var7 parameter used by this operation
+    * @param value initial numeric value
+    * @param min minimum allowed value
+    * @param max maximum allowed value
+    * @param step increment step
+    * @param allowNegative whether negative values are allowed
+    * @param allowDecimal whether decimal values are allowed
+    * @param scale decimal scale
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public NumericFieldModel(BigDecimal var1, BigDecimal var2, BigDecimal var3, BigDecimal var4, boolean var5, boolean var6, int var7) {
-      this(ControlCode.auto("numericfield"), var1, var2, var3, var4, var5, var6, var7);
+   public NumericFieldModel(BigDecimal value, BigDecimal min, BigDecimal max, BigDecimal step, boolean allowNegative, boolean allowDecimal, int scale) {
+      this(ControlCode.auto("numericfield"), value, min, max, step, allowNegative, allowDecimal, scale);
    }
 
-   public NumericFieldModel(String var1, BigDecimal var2, BigDecimal var3, BigDecimal var4, BigDecimal var5, boolean var6, boolean var7, int var8) {
-      this.code = Objects.requireNonNull(var1, "code");
-      this.min = var3;
-      this.max = var4;
+   public NumericFieldModel(String text, BigDecimal value, BigDecimal min, BigDecimal max, BigDecimal step, boolean allowNegative, boolean allowDecimal, int scale) {
+      this.code = Objects.requireNonNull(text, "code");
+      this.min = min;
+      this.max = max;
       if (this.min != null && this.max != null && this.max.compareTo(this.min) < 0) {
-         BigDecimal var9 = this.min;
+         BigDecimal originalMin = this.min;
          this.min = this.max;
-         this.max = var9;
+         this.max = originalMin;
       }
 
-      this.setScale(var8);
-      this.setStep(var5);
-      this.allowNegative = var6;
-      this.allowDecimal = var7;
-      this.setValue(var2 == null ? BigDecimal.ZERO : var2);
+      this.setScale(scale);
+      this.setStep(step);
+      this.allowNegative = allowNegative;
+      this.allowDecimal = allowDecimal;
+      this.setValue(value == null ? BigDecimal.ZERO : value);
    }
 
    public String getCode() {
@@ -85,13 +87,13 @@ public final class NumericFieldModel implements Enableable {
    /**
     * Updates value.
     *
-    * @param var1 new value
+    * @param bigDecimal new value
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setValue(BigDecimal var1) {
-      this.value = this.clamp(var1 == null ? BigDecimal.ZERO : var1);
+   public void setValue(BigDecimal bigDecimal) {
+      this.value = this.clamp(bigDecimal == null ? BigDecimal.ZERO : bigDecimal);
    }
 
    /**
@@ -109,13 +111,13 @@ public final class NumericFieldModel implements Enableable {
    /**
     * Updates min.
     *
-    * @param var1 new min
+    * @param bigDecimal new min
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setMin(BigDecimal var1) {
-      this.min = var1;
+   public void setMin(BigDecimal bigDecimal) {
+      this.min = bigDecimal;
       if (this.min != null && this.max != null && this.max.compareTo(this.min) < 0) {
          this.max = this.min;
       }
@@ -138,13 +140,13 @@ public final class NumericFieldModel implements Enableable {
    /**
     * Updates max.
     *
-    * @param var1 new max
+    * @param bigDecimal new max
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setMax(BigDecimal var1) {
-      this.max = var1;
+   public void setMax(BigDecimal bigDecimal) {
+      this.max = bigDecimal;
       if (this.min != null && this.max != null && this.max.compareTo(this.min) < 0) {
          this.max = this.min;
       }
@@ -167,14 +169,14 @@ public final class NumericFieldModel implements Enableable {
    /**
     * Updates step.
     *
-    * @param var1 new step
+    * @param bigDecimal new step
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setStep(BigDecimal var1) {
-      if (var1 != null && var1.compareTo(BigDecimal.ZERO) > 0) {
-         this.step = var1;
+   public void setStep(BigDecimal bigDecimal) {
+      if (bigDecimal != null && bigDecimal.compareTo(BigDecimal.ZERO) > 0) {
+         this.step = bigDecimal;
       } else {
          this.step = BigDecimal.ONE;
       }
@@ -195,13 +197,13 @@ public final class NumericFieldModel implements Enableable {
    /**
     * Updates allow negative.
     *
-    * @param var1 new allow negative
+    * @param enabled new allow negative
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setAllowNegative(boolean var1) {
-      this.allowNegative = var1;
+   public void setAllowNegative(boolean enabled) {
+      this.allowNegative = allowNegative;
    }
 
    /**
@@ -219,13 +221,13 @@ public final class NumericFieldModel implements Enableable {
    /**
     * Updates allow decimal.
     *
-    * @param var1 new allow decimal
+    * @param enabled new allow decimal
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setAllowDecimal(boolean var1) {
-      this.allowDecimal = var1;
+   public void setAllowDecimal(boolean enabled) {
+      this.allowDecimal = enabled;
    }
 
    /**
@@ -243,13 +245,13 @@ public final class NumericFieldModel implements Enableable {
    /**
     * Updates scale.
     *
-    * @param var1 new scale
+    * @param value new scale
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setScale(int var1) {
-      this.scale = Math.max(0, var1);
+   public void setScale(int value) {
+      this.scale = Math.max(0, scale);
    }
 
    /**
@@ -267,20 +269,20 @@ public final class NumericFieldModel implements Enableable {
    /**
     * Updates enabled.
     *
-    * @param var1 new enabled
+    * @param enabled new enabled
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setEnabled(boolean var1) {
-      this.enabled = var1;
+   public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
    }
 
-   private BigDecimal clamp(BigDecimal var1) {
-      if (this.min != null && var1.compareTo(this.min) < 0) {
+   private BigDecimal clamp(BigDecimal bigDecimal) {
+      if (this.min != null && bigDecimal.compareTo(this.min) < 0) {
          return this.min;
       } else {
-         return this.max != null && var1.compareTo(this.max) > 0 ? this.max : var1;
+         return this.max != null && bigDecimal.compareTo(this.max) > 0 ? this.max : bigDecimal;
       }
    }
 }

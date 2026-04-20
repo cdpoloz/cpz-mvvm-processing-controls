@@ -25,6 +25,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the MVVM View layer.
+ *
+ * @author CPZ
  */
 public final class DropDownView implements ControlView, PointerInteractable {
    private final PApplet sketch;
@@ -40,23 +42,23 @@ public final class DropDownView implements ControlView, PointerInteractable {
    /**
     * Creates a drop down view.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
-    * @param var6 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param viewModel parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
+    * @param height parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public DropDownView(PApplet var1, DropDownViewModel var2, float var3, float var4, float var5, float var6) {
-      this.sketch = var1;
-      this.viewModel = var2;
-      this.x = var3;
-      this.y = var4;
-      this.width = var5;
-      this.height = var6;
+   public DropDownView(PApplet sketch, DropDownViewModel viewModel, float x, float y, float width, float height) {
+      this.sketch = sketch;
+      this.viewModel = viewModel;
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
       this.style = new DefaultDropDownStyle(new DropDownStyleConfig());
    }
 
@@ -69,63 +71,63 @@ public final class DropDownView implements ControlView, PointerInteractable {
    public void draw() {
       if (this.viewModel.isVisible()) {
          this.applyLayoutIfNeeded();
-         ThemeSnapshot var1 = this.style.getThemeSnapshot();
-         this.style.render(this.sketch, this.buildViewState(), var1);
+         ThemeSnapshot snapshot = this.style.getThemeSnapshot();
+         this.style.render(this.sketch, this.buildViewState(), snapshot);
       }
    }
 
    /**
     * Updates position.
     *
-    * @param var1 new position
-    * @param var2 parameter used by this operation
+    * @param x new position
+    * @param y parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setPosition(float var1, float var2) {
-      this.x = var1;
-      this.y = var2;
+   public void setPosition(float x, float y) {
+      this.x = x;
+      this.y = y;
    }
 
    /**
     * Updates layout config.
     *
-    * @param var1 new layout config
+    * @param layout new layout config
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setLayoutConfig(LayoutConfig var1) {
-      this.layoutConfig = var1;
+   public void setLayoutConfig(LayoutConfig layout) {
+      this.layoutConfig = layout;
       this.applyLayoutIfNeeded();
    }
 
    /**
     * Updates size.
     *
-    * @param var1 new size
-    * @param var2 parameter used by this operation
+    * @param width new size
+    * @param height parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSize(float var1, float var2) {
-      this.width = var1;
-      this.height = var2;
+   public void setSize(float width, float height) {
+      this.width = width;
+      this.height = height;
    }
 
    /**
     * Updates style.
     *
-    * @param var1 new style
+    * @param style new style
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setStyle(DefaultDropDownStyle var1) {
-      if (var1 != null) {
-         this.style = var1;
+   public void setStyle(DefaultDropDownStyle style) {
+      if (style != null) {
+         this.style = style;
       }
 
    }
@@ -133,34 +135,34 @@ public final class DropDownView implements ControlView, PointerInteractable {
    /**
     * Performs contains.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public boolean contains(float var1, float var2) {
+   public boolean contains(float x, float y) {
       this.applyLayoutIfNeeded();
-      return this.containsBase(var1, var2) || this.containsExpandedList(var1, var2);
+      return this.containsBase(x, y) || this.containsExpandedList(x, y);
    }
 
-   public boolean containsBaseBounds(float var1, float var2) {
+   public boolean containsBaseBounds(float x, float y) {
       this.applyLayoutIfNeeded();
-      return this.containsBase(var1, var2);
+      return this.containsBase(x, y);
    }
 
    /**
     * Handles mouse move.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public boolean handleMouseMove(float var1, float var2) {
+   public boolean handleMouseMove(float x, float y) {
       this.applyLayoutIfNeeded();
       if (!this.isInteractive()) {
          this.hoveredIndex = -1;
@@ -168,24 +170,24 @@ public final class DropDownView implements ControlView, PointerInteractable {
          this.viewModel.setPressed(false);
          return false;
       } else {
-         this.hoveredIndex = this.resolveHoveredIndex(var1, var2);
-         this.viewModel.setHovered(this.contains(var1, var2));
-         return this.contains(var1, var2);
+         this.hoveredIndex = this.resolveHoveredIndex(x, y);
+         this.viewModel.setHovered(this.contains(x, y));
+         return this.contains(x, y);
       }
    }
 
    /**
     * Handles mouse press.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param focusManager parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public boolean handleMousePress(float var1, float var2, FocusManager var3) {
+   public boolean handleMousePress(float x, float y, FocusManager focusManager) {
       this.applyLayoutIfNeeded();
       if (!this.isInteractive()) {
          this.hoveredIndex = -1;
@@ -193,24 +195,24 @@ public final class DropDownView implements ControlView, PointerInteractable {
          this.viewModel.setHovered(false);
          this.viewModel.setPressed(false);
          return false;
-      } else if (this.containsBase(var1, var2)) {
-         if (var3 != null) {
-            var3.requestFocus(this.viewModel);
+      } else if (this.containsBase(x, y)) {
+         if (focusManager != null) {
+            focusManager.requestFocus(this.viewModel);
          }
 
          this.viewModel.setPressed(true);
          this.viewModel.toggleExpanded();
-         this.hoveredIndex = this.resolveHoveredIndex(var1, var2);
+         this.hoveredIndex = this.resolveHoveredIndex(x, y);
          this.viewModel.setHovered(true);
          return true;
       } else {
-         int var4 = this.resolveHoveredIndex(var1, var2);
-         if (var4 >= 0) {
-            if (var3 != null) {
-               var3.requestFocus(this.viewModel);
+         int index2 = this.resolveHoveredIndex(x, y);
+         if (index2 >= 0) {
+            if (focusManager != null) {
+               focusManager.requestFocus(this.viewModel);
             }
 
-            this.viewModel.selectIndex(var4);
+            this.viewModel.selectIndex(index2);
             this.viewModel.close();
             this.viewModel.setPressed(false);
             this.viewModel.setHovered(true);
@@ -229,16 +231,16 @@ public final class DropDownView implements ControlView, PointerInteractable {
    /**
     * Handles mouse release.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMouseRelease(float var1, float var2) {
+   public void handleMouseRelease(float mouseX, float mouseY) {
       this.applyLayoutIfNeeded();
       this.viewModel.setPressed(false);
-      this.viewModel.setHovered(this.contains(var1, var2));
+      this.viewModel.setHovered(this.contains(mouseX, mouseY));
    }
 
    /**
@@ -325,44 +327,44 @@ public final class DropDownView implements ControlView, PointerInteractable {
       return new DropDownViewState(this.x, this.y, this.width, this.height, this.viewModel.isExpanded(), this.viewModel.getSelectedText(), this.viewModel.getItems(), this.viewModel.getSelectedIndex(), this.hoveredIndex, this.viewModel.isHovered(), this.viewModel.isPressed(), this.viewModel.isFocused(), this.viewModel.isEnabled(), this.style.getItemHeight(), this.style.getMaxVisibleItems(), this.style.getTextPadding(), this.style.getArrowPadding(), this.style.getCornerRadius(), this.style.getListCornerRadius(), !this.viewModel.isHovered() && !this.viewModel.isFocused() ? this.style.getStrokeWeight() : this.style.getFocusedStrokeWeight());
    }
 
-   private boolean containsBase(float var1, float var2) {
-      float var3 = this.width * 0.5F;
-      float var4 = this.height * 0.5F;
-      return var1 >= this.x - var3 && var1 <= this.x + var3 && var2 >= this.y - var4 && var2 <= this.y + var4;
+   private boolean containsBase(float x, float y) {
+      float value = this.width * 0.5F;
+      float value2 = this.height * 0.5F;
+      return x >= this.x - value && x <= this.x + value && y >= this.y - value2 && y <= this.y + value2;
    }
 
-   private boolean containsExpandedList(float var1, float var2) {
+   private boolean containsExpandedList(float x, float y) {
       if (!this.viewModel.isExpanded()) {
          return false;
       } else {
-         List var3 = this.viewModel.getItems();
-         int var4 = Math.min(var3.size(), this.style.getMaxVisibleItems());
-         if (var4 <= 0) {
+         List list = this.viewModel.getItems();
+         int value = Math.min(list.size(), this.style.getMaxVisibleItems());
+         if (value <= 0) {
             return false;
          } else {
-            float var5 = this.x - this.width * 0.5F;
-            float var6 = this.y + this.height * 0.5F;
-            float var7 = (float)var4 * this.style.getItemHeight();
-            return var1 >= var5 && var1 <= var5 + this.width && var2 >= var6 && var2 <= var6 + var7;
+            float left = this.x - this.width * 0.5F;
+            float value2 = this.y + this.height * 0.5F;
+            float value3 = (float)value * this.style.getItemHeight();
+            return x >= left && x <= left + this.width && y >= value2 && y <= value2 + value3;
          }
       }
    }
 
-   private int resolveHoveredIndex(float var1, float var2) {
+   private int resolveHoveredIndex(float x, float y) {
       if (!this.viewModel.isExpanded()) {
          return -1;
       } else {
-         List var3 = this.viewModel.getItems();
-         int var4 = Math.min(var3.size(), this.style.getMaxVisibleItems());
-         if (var4 <= 0) {
+         List list = this.viewModel.getItems();
+         int value = Math.min(list.size(), this.style.getMaxVisibleItems());
+         if (value <= 0) {
             return -1;
          } else {
-            float var5 = this.x - this.width * 0.5F;
-            float var6 = this.y + this.height * 0.5F;
-            float var7 = this.style.getItemHeight();
-            if (!(var1 < var5) && !(var1 > var5 + this.width) && !(var2 < var6) && !(var2 > var6 + (float)var4 * var7)) {
-               int var8 = (int)((var2 - var6) / var7);
-               return var8 >= 0 && var8 < var4 ? var8 : -1;
+            float left = this.x - this.width * 0.5F;
+            float value2 = this.y + this.height * 0.5F;
+            float value3 = this.style.getItemHeight();
+            if (!(x < left) && !(x > left + this.width) && !(y < value2) && !(y > value2 + (float)value * value3)) {
+               int value4 = (int)((y - value2) / value3);
+               return value4 >= 0 && value4 < value ? value4 : -1;
             } else {
                return -1;
             }
@@ -376,10 +378,10 @@ public final class DropDownView implements ControlView, PointerInteractable {
 
    private void applyLayoutIfNeeded() {
       if (this.layoutConfig != null) {
-         float var1 = LayoutResolver.resolveX(this.layoutConfig, this.width, (float)this.sketch.width);
-         float var2 = LayoutResolver.resolveY(this.layoutConfig, this.height, (float)this.sketch.height);
-         this.x = var1 + this.width * 0.5F;
-         this.y = var2 + this.height * 0.5F;
+         float value = LayoutResolver.resolveX(this.layoutConfig, this.width, (float)this.sketch.width);
+         float value2 = LayoutResolver.resolveY(this.layoutConfig, this.height, (float)this.sketch.height);
+         this.x = value + this.width * 0.5F;
+         this.y = value2 + this.height * 0.5F;
       }
    }
 }

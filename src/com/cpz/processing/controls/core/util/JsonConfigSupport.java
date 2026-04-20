@@ -9,6 +9,8 @@ import java.util.Objects;
 
 /**
  * Small shared helpers for config-driven JSON loading.
+ *
+ * @author CPZ
  */
 public final class JsonConfigSupport {
     private JsonConfigSupport() {

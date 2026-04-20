@@ -19,6 +19,8 @@ import java.util.function.Consumer;
  *
  * Notes:
  * - This type belongs to the MVVM ViewModel layer.
+ *
+ * @author CPZ
  */
 public final class RadioGroupViewModel extends AbstractControlViewModel implements PointerInputTarget, KeyboardInputTarget {
    private int hoveredIndex = -1;
@@ -30,13 +32,13 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    /**
     * Creates a radio group view model.
     *
-    * @param var1 parameter used by this operation
+    * @param model parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public RadioGroupViewModel(RadioGroupModel var1) {
-      super(var1);
+   public RadioGroupViewModel(RadioGroupModel model) {
+      super(model);
       this.syncActiveIndex();
    }
 
@@ -67,27 +69,27 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    /**
     * Updates selected index.
     *
-    * @param var1 new selected index
+    * @param index new selected index
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSelectedIndex(int var1) {
-      int var2 = ((RadioGroupModel)this.model).getSelectedIndex();
-      ((RadioGroupModel)this.model).setSelectedIndex(var1);
+   public void setSelectedIndex(int index) {
+      int value = ((RadioGroupModel)this.model).getSelectedIndex();
+      ((RadioGroupModel)this.model).setSelectedIndex(index);
       this.syncActiveIndex();
       this.hoveredIndex = this.normalizeOptionIndex(this.hoveredIndex);
       this.pressedIndex = this.normalizeOptionIndex(this.pressedIndex);
-      this.notifySelectionIfChanged(var2);
+      this.notifySelectionIfChanged(value);
    }
 
-   public void setOptions(List<String> var1) {
-      int var2 = ((RadioGroupModel)this.model).getSelectedIndex();
-      ((RadioGroupModel)this.model).setOptions(var1);
+   public void setOptions(List<String> list) {
+      int value = ((RadioGroupModel)this.model).getSelectedIndex();
+      ((RadioGroupModel)this.model).setOptions(list);
       this.syncActiveIndex();
       this.hoveredIndex = this.normalizeOptionIndex(this.hoveredIndex);
       this.pressedIndex = this.normalizeOptionIndex(this.pressedIndex);
-      this.notifySelectionIfChanged(var2);
+      this.notifySelectionIfChanged(value);
    }
 
    /**
@@ -105,13 +107,13 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    /**
     * Updates hovered index.
     *
-    * @param var1 new hovered index
+    * @param index new hovered index
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setHoveredIndex(int var1) {
-      this.hoveredIndex = this.isInteractive() ? this.normalizeOptionIndex(var1) : -1;
+   public void setHoveredIndex(int index) {
+      this.hoveredIndex = this.isInteractive() ? this.normalizeOptionIndex(index) : -1;
    }
 
    /**
@@ -129,46 +131,46 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    /**
     * Updates pressed index.
     *
-    * @param var1 new pressed index
+    * @param index new pressed index
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setPressedIndex(int var1) {
-      this.pressedIndex = this.isInteractive() ? this.normalizeOptionIndex(var1) : -1;
+   public void setPressedIndex(int index) {
+      this.pressedIndex = this.isInteractive() ? this.normalizeOptionIndex(index) : -1;
    }
 
    /**
     * Handles option pressed.
     *
-    * @param var1 parameter used by this operation
+    * @param value parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onOptionPressed(int var1) {
+   public void onOptionPressed(int value) {
       if (!this.isInteractive()) {
          this.pressedIndex = -1;
       } else {
-         this.pressedIndex = this.normalizeOptionIndex(var1);
+         this.pressedIndex = this.normalizeOptionIndex(value);
       }
    }
 
    /**
     * Handles option released.
     *
-    * @param var1 parameter used by this operation
+    * @param value parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onOptionReleased(int var1) {
+   public void onOptionReleased(int value) {
       if (!this.isInteractive()) {
          this.pressedIndex = -1;
       } else {
-         int var2 = this.normalizeOptionIndex(var1);
-         if (var2 >= 0 && var2 == this.pressedIndex) {
-            this.setSelectedIndex(var2);
+         int value2 = this.normalizeOptionIndex(value);
+         if (value2 >= 0 && value2 == this.pressedIndex) {
+            this.setSelectedIndex(value2);
          }
 
          this.pressedIndex = -1;
@@ -178,13 +180,13 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    /**
     * Updates on option selected.
     *
-    * @param var1 new on option selected
+    * @param consumer new on option selected
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setOnOptionSelected(Consumer<Integer> var1) {
-      this.onOptionSelected = var1;
+   public void setOnOptionSelected(Consumer<Integer> consumer) {
+      this.onOptionSelected = consumer;
    }
 
    /**
@@ -214,13 +216,13 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    /**
     * Updates focused.
     *
-    * @param var1 new focused
+    * @param focused new focused
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setFocused(boolean var1) {
-      this.focused = var1 && this.isInteractive();
+   public void setFocused(boolean focused) {
+      this.focused = focused && this.isInteractive();
       if (!this.focused) {
          this.pressedIndex = -1;
       } else {
@@ -254,16 +256,16 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    /**
     * Handles pointer move.
     *
-    * @param var1 parameter used by this operation
+    * @param inside parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onPointerMove(boolean var1) {
+   public void onPointerMove(boolean inside) {
       if (!this.isInteractive()) {
          this.resetInteractionState();
       } else {
-         if (!var1) {
+         if (!inside) {
             this.hoveredIndex = -1;
          }
 
@@ -273,16 +275,16 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    /**
     * Handles pointer press.
     *
-    * @param var1 parameter used by this operation
+    * @param coarseStep coarse navigation modifier
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onPointerPress(boolean var1) {
+   public void onPointerPress(boolean enabled) {
       if (!this.isInteractive()) {
          this.resetInteractionState();
       } else {
-         if (!var1) {
+         if (!enabled) {
             this.pressedIndex = -1;
          }
 
@@ -292,16 +294,16 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    /**
     * Handles pointer release.
     *
-    * @param var1 parameter used by this operation
+    * @param inside parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onPointerRelease(boolean var1) {
+   public void onPointerRelease(boolean inside) {
       if (!this.isInteractive()) {
          this.resetInteractionState();
       } else {
-         if (!var1) {
+         if (!inside) {
             this.pressedIndex = -1;
          }
 
@@ -360,13 +362,13 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    /**
     * Handles key typed.
     *
-    * @param var1 parameter used by this operation
+    * @param key parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onKeyTyped(char var1) {
-      if (var1 == ' ') {
+   public void onKeyTyped(char key) {
+      if (key == ' ') {
          this.selectCurrentOption();
       }
 
@@ -375,12 +377,12 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    /**
     * Performs insert text.
     *
-    * @param var1 parameter used by this operation
+    * @param text parameter used by this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public void insertText(String var1) {
+   public void insertText(String text) {
    }
 
    /**
@@ -468,8 +470,8 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
     * - Returns the current value without applying side effects.
     */
    public String getSelectedText() {
-      int var1 = ((RadioGroupModel)this.model).getSelectedIndex();
-      return var1 >= 0 && var1 < ((RadioGroupModel)this.model).getOptions().size() ? (String)((RadioGroupModel)this.model).getOptions().get(var1) : "";
+      int index2 = ((RadioGroupModel)this.model).getSelectedIndex();
+      return index2 >= 0 && index2 < ((RadioGroupModel)this.model).getOptions().size() ? (String)((RadioGroupModel)this.model).getOptions().get(index2) : "";
    }
 
    /**
@@ -512,26 +514,26 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    /**
     * Performs increment.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param coarseStep coarse navigation modifier
+    * @param fineStep fine navigation modifier
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public void increment(boolean var1, boolean var2) {
+   public void increment(boolean coarseStep, boolean fineStep) {
       this.navigatePrevious();
    }
 
    /**
     * Performs decrement.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param coarseStep coarse navigation modifier
+    * @param fineStep fine navigation modifier
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public void decrement(boolean var1, boolean var2) {
+   public void decrement(boolean coarseStep, boolean fineStep) {
       this.navigateNext();
    }
 
@@ -546,9 +548,9 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    }
 
    private void syncActiveIndex() {
-      int var1 = ((RadioGroupModel)this.model).getSelectedIndex();
-      if (var1 >= 0) {
-         this.activeIndex = var1;
+      int value = ((RadioGroupModel)this.model).getSelectedIndex();
+      if (value >= 0) {
+         this.activeIndex = value;
       } else {
          this.activeIndex = ((RadioGroupModel)this.model).getOptions().isEmpty() ? -1 : 0;
       }
@@ -559,18 +561,18 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
       this.pressedIndex = -1;
    }
 
-   private int normalizeOptionIndex(int var1) {
-      return var1 >= 0 && var1 < ((RadioGroupModel)this.model).getOptions().size() ? var1 : -1;
+   private int normalizeOptionIndex(int zIndex) {
+      return zIndex >= 0 && zIndex < ((RadioGroupModel)this.model).getOptions().size() ? zIndex : -1;
    }
 
    private boolean isInteractive() {
       return this.isEnabled() && this.isVisible();
    }
 
-   private void notifySelectionIfChanged(int var1) {
-      int var2 = ((RadioGroupModel)this.model).getSelectedIndex();
-      if (var1 != var2 && this.onOptionSelected != null) {
-         this.onOptionSelected.accept(var2);
+   private void notifySelectionIfChanged(int value) {
+      int value2 = ((RadioGroupModel)this.model).getSelectedIndex();
+      if (value != value2 && this.onOptionSelected != null) {
+         this.onOptionSelected.accept(value2);
       }
    }
 }

@@ -11,6 +11,8 @@ import java.util.Objects;
 
 /**
  * Loads a minimal label config from a JSON file.
+ *
+ * @author CPZ
  */
 public final class LabelConfigLoader {
     private final PApplet sketch;

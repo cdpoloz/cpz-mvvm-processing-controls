@@ -11,6 +11,9 @@ import com.cpz.processing.controls.input.KeyboardState;
 import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
 import processing.core.PApplet;
 
+/**
+ * @author CPZ
+ */
 public class TextFieldTest extends PApplet {
     private InputManager inputManager;
     private KeyboardState keyboardState;

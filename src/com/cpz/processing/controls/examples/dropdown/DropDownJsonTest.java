@@ -13,6 +13,9 @@ import processing.core.PApplet;
 
 import java.io.File;
 
+/**
+ * @author CPZ
+ */
 public class DropDownJsonTest extends PApplet {
     private static final String DROP_DOWN_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "dropdown-test.json";
 

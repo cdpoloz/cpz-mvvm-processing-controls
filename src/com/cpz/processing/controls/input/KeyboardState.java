@@ -3,6 +3,9 @@ package com.cpz.processing.controls.input;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author CPZ
+ */
 public final class KeyboardState {
    private static final int SHIFT_KEY_CODE = 16;
    private static final int CTRL_KEY_CODE = 17;
@@ -12,18 +15,18 @@ public final class KeyboardState {
    private boolean ctrlDown;
    private boolean altDown;
 
-   public void keyPressed(int var1) {
-      this.pressedKeys.add(var1);
-      this.updateModifiers(var1, true);
+   public void keyPressed(int keyCode) {
+      this.pressedKeys.add(keyCode);
+      this.updateModifiers(keyCode, true);
    }
 
-   public void keyReleased(int var1) {
-      this.pressedKeys.remove(var1);
-      this.updateModifiers(var1, false);
+   public void keyReleased(int keyCode) {
+      this.pressedKeys.remove(keyCode);
+      this.updateModifiers(keyCode, false);
    }
 
-   public boolean isPressed(int var1) {
-      return this.pressedKeys.contains(var1);
+   public boolean isPressed(int value) {
+      return this.pressedKeys.contains(value);
    }
 
    public boolean isShiftDown() {
@@ -38,13 +41,13 @@ public final class KeyboardState {
       return this.altDown;
    }
 
-   private void updateModifiers(int var1, boolean var2) {
-      if (var1 == SHIFT_KEY_CODE) {
-         this.shiftDown = var2;
-      } else if (var1 == CTRL_KEY_CODE) {
-         this.ctrlDown = var2;
-      } else if (var1 == ALT_KEY_CODE) {
-         this.altDown = var2;
+   private void updateModifiers(int value, boolean enabled) {
+      if (value == SHIFT_KEY_CODE) {
+         this.shiftDown = enabled;
+      } else if (value == CTRL_KEY_CODE) {
+         this.ctrlDown = enabled;
+      } else if (value == ALT_KEY_CODE) {
+         this.altDown = enabled;
       }
    }
 }

@@ -23,6 +23,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class DefaultCheckboxStyle implements CheckboxStyle {
    private final CheckboxStyleConfig config;
@@ -32,72 +34,72 @@ public final class DefaultCheckboxStyle implements CheckboxStyle {
    /**
     * Creates a default checkbox style.
     *
-    * @param var1 parameter used by this operation
+    * @param config parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public DefaultCheckboxStyle(CheckboxStyleConfig var1) {
-      this(var1, (CheckboxRenderer)(var1 != null && var1.renderer != null ? var1.renderer : new DefaultCheckboxRenderer()));
+   public DefaultCheckboxStyle(CheckboxStyleConfig config) {
+      this(config, (CheckboxRenderer)(config != null && config.renderer != null ? config.renderer : new DefaultCheckboxRenderer()));
    }
 
    /**
     * Creates a default checkbox style.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param config parameter used by this operation
+    * @param renderer parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public DefaultCheckboxStyle(CheckboxStyleConfig var1, CheckboxRenderer var2) {
-      this.config = var1;
-      this.renderer = var2;
-      this.themeProvider = var1 != null && var1.themeProvider != null ? var1.themeProvider : new ThemeManager();
+   public DefaultCheckboxStyle(CheckboxStyleConfig config, CheckboxRenderer renderer) {
+      this.config = config;
+      this.renderer = renderer;
+      this.themeProvider = config != null && config.themeProvider != null ? config.themeProvider : new ThemeManager();
    }
 
    /**
     * Renders the current frame.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param state parameter used by this operation
+    * @param snapshot parameter used by this operation
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
     */
-   public void render(PApplet var1, CheckboxViewState var2, ThemeSnapshot var3) {
-      ThemeTokens var4 = var3.tokens;
-      int var5 = var2.checked() ? this.resolveBaseFill(var4.primary, this.config.checkedFillOverride) : this.resolveBaseFill(var4.surface, this.config.uncheckedFillOverride);
-      int var6 = InteractiveStyleHelper.resolveFillColor(var5, this.resolveInteractiveColor(var5, var4.hoverOverlay, this.config.hoverFillOverride, this.config.boxHoverColor), this.resolveInteractiveColor(var5, var4.pressedOverlay, this.config.pressedFillOverride, this.config.boxPressedColor), var2.hovered(), var2.pressed());
-      int var7 = this.config.disabledAlpha != null ? this.config.disabledAlpha : var4.disabledAlpha;
-      int var8 = this.resolveColorOverride(var4.border, this.config.strokeOverride, this.config.borderColor);
-      int var9 = this.resolveColorOverride(var4.onPrimary, this.config.checkOverride, this.config.checkColor);
-      CheckboxRenderStyle var10 = new CheckboxRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(var6, var2.enabled(), var7), InteractiveStyleHelper.resolveStrokeColor(var8, var2.enabled(), var7), InteractiveStyleHelper.resolveStrokeWeight(this.config.borderWidth, this.config.borderWidthHover, var2.hovered()), this.config.cornerRadius, var2.checked(), InteractiveStyleHelper.resolveStrokeColor(var9, var2.enabled(), var7), this.config.checkInset, Math.max(2.5F, var2.width() * 0.12F));
-      this.renderer.render(var1, var2.x(), var2.y(), var2.width(), var2.height(), var10);
+   public void render(PApplet sketch, CheckboxViewState state, ThemeSnapshot snapshot) {
+      ThemeTokens tokens = snapshot.tokens;
+      int value = state.checked() ? this.resolveBaseFill(tokens.primary, this.config.checkedFillOverride) : this.resolveBaseFill(tokens.surface, this.config.uncheckedFillOverride);
+      int color = InteractiveStyleHelper.resolveFillColor(value, this.resolveInteractiveColor(value, tokens.hoverOverlay, this.config.hoverFillOverride, this.config.boxHoverColor), this.resolveInteractiveColor(value, tokens.pressedOverlay, this.config.pressedFillOverride, this.config.boxPressedColor), state.hovered(), state.pressed());
+      int disabledAlpha = this.config.disabledAlpha != null ? this.config.disabledAlpha : tokens.disabledAlpha;
+      int color2 = this.resolveColorOverride(tokens.border, this.config.strokeOverride, this.config.borderColor);
+      int color3 = this.resolveColorOverride(tokens.onPrimary, this.config.checkOverride, this.config.checkColor);
+      CheckboxRenderStyle renderStyle = new CheckboxRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(color, state.enabled(), disabledAlpha), InteractiveStyleHelper.resolveStrokeColor(color2, state.enabled(), disabledAlpha), InteractiveStyleHelper.resolveStrokeWeight(this.config.borderWidth, this.config.borderWidthHover, state.hovered()), this.config.cornerRadius, state.checked(), InteractiveStyleHelper.resolveStrokeColor(color3, state.enabled(), disabledAlpha), this.config.checkInset, Math.max(2.5F, state.width() * 0.12F));
+      this.renderer.render(sketch, state.x(), state.y(), state.width(), state.height(), renderStyle);
    }
 
-   private int resolveBaseFill(int var1, Integer var2) {
-      if (var2 != null) {
-         return var2;
+   private int resolveBaseFill(int value, Integer value2) {
+      if (value2 != null) {
+         return value2;
       } else {
-         return this.config.boxColor != null ? this.config.boxColor : var1;
+         return this.config.boxColor != null ? this.config.boxColor : value;
       }
    }
 
-   private int resolveInteractiveColor(int var1, int var2, Integer var3, Integer var4) {
-      if (var3 != null) {
-         return var3;
+   private int resolveInteractiveColor(int color, int color2, Integer color3, Integer color4) {
+      if (color3 != null) {
+         return color3;
       } else {
-         return var4 != null ? var4 : InteractiveStyleHelper.applyOverlay(var1, var2);
+         return color4 != null ? color4 : InteractiveStyleHelper.applyOverlay(color, color2);
       }
    }
 
-   private int resolveColorOverride(int var1, Integer var2, Integer var3) {
-      if (var2 != null) {
-         return var2;
+   private int resolveColorOverride(int color, Integer color2, Integer color3) {
+      if (color2 != null) {
+         return color2;
       } else {
-         return var3 != null ? var3 : var1;
+         return color3 != null ? color3 : color;
       }
    }
 

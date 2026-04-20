@@ -10,59 +10,55 @@ package "External Boundary" {
 }
 
 package "Input" {
-  class PointerEvent {
-    +type : MOVE|PRESS|RELEASE|DRAG|WHEEL
-    +x : float
-    +y : float
-    +pressed : boolean
-    +button : int
-    +shift : boolean
-    +ctrl : boolean
-    +alt : boolean
-    +wheelDelta : float
-  }
-  class KeyboardEvent {
-    +type : PRESS|TYPE|RELEASE
-    +key : char
-    +keyCode : int
-    +shift : boolean
-    +ctrl : boolean
-    +alt : boolean
-  }
+  class PointerEvent
+  class KeyboardEvent
   class KeyboardState
   class InputManager
   interface InputLayer
-  class InputAdapter
+  class DefaultInputLayer
+  class "...InputLayer" as ControlInputLayer
+  class "...InputAdapter" as ControlInputAdapter
   interface PointerInputTarget
   interface KeyboardInputTarget
   class FocusManager
 }
 
 package "Theme" {
+  class Sketch
   interface ThemeProvider
   class ThemeManager
   class ThemeSnapshot
   class ThemeTokens
+  class LightTheme
+  class DarkTheme
 }
 
 package "Overlay" {
   class OverlayManager
+  class OverlayEntry
 }
-
-ThemeManager ..|> ThemeProvider
-ThemeProvider --> ThemeSnapshot
-ThemeSnapshot --> ThemeTokens
 
 ExternalSource --> ExternalAdapter : raw callbacks or state
 ExternalAdapter --> PointerEvent : creates
 ExternalAdapter --> KeyboardEvent : creates
-ExternalAdapter --> KeyboardState : updates when needed
-ExternalAdapter --> InputManager : dispatches
-ProcessingKeyboardAdapter --|> ExternalAdapter
+ExternalAdapter --> KeyboardState : updates
+ProcessingKeyboardAdapter --> KeyboardState : reads modifier state
+ProcessingKeyboardAdapter --> InputManager : dispatches KeyboardEvent
 
-InputManager --> InputLayer : dispatches
-InputLayer --> InputAdapter : forwards
-InputAdapter --> PointerInputTarget : pointer events
-InputAdapter --> KeyboardInputTarget : keyboard events
-FocusManager --> KeyboardInputTarget : focuses
+InputManager --> InputLayer : ordered dispatch
+DefaultInputLayer ..|> InputLayer
+ControlInputLayer ..|> InputLayer
+ControlInputLayer --> ControlInputAdapter : forwards through facade/layer
+ControlInputAdapter --> PointerInputTarget : pointer behavior
+ControlInputAdapter --> KeyboardInputTarget : keyboard behavior
+FocusManager --> KeyboardInputTarget : focus ownership
+
+Sketch --> ThemeManager : owns
+ThemeManager ..|> ThemeProvider
+ThemeManager --> ThemeSnapshot : cached snapshot
+ThemeSnapshot --> ThemeTokens
+LightTheme --> ThemeTokens
+DarkTheme --> ThemeTokens
+
+OverlayManager --> OverlayEntry : orders overlays
 @enduml

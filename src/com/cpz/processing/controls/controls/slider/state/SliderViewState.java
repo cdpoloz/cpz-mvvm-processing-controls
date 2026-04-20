@@ -12,6 +12,8 @@ package com.cpz.processing.controls.controls.slider.state;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public record SliderViewState(float normalizedValue, boolean hovered, boolean pressed, boolean dragging, boolean showText, String displayText, boolean enabled) {
 }

@@ -12,6 +12,9 @@ import processing.core.PApplet;
 
 import java.io.File;
 
+/**
+ * @author CPZ
+ */
 public class ButtonSvgTest extends PApplet {
 
     private InputManager inputManager;

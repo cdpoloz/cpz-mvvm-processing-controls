@@ -25,6 +25,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class RadioGroupStyle {
    private final RadioGroupStyleConfig config;
@@ -34,86 +36,86 @@ public final class RadioGroupStyle {
    /**
     * Creates a radio group style.
     *
-    * @param var1 parameter used by this operation
+    * @param config parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public RadioGroupStyle(RadioGroupStyleConfig var1) {
-      this(var1, new DefaultRadioGroupRenderer());
+   public RadioGroupStyle(RadioGroupStyleConfig config) {
+      this(config, new DefaultRadioGroupRenderer());
    }
 
    /**
     * Creates a radio group style.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param config parameter used by this operation
+    * @param renderer parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public RadioGroupStyle(RadioGroupStyleConfig var1, DefaultRadioGroupRenderer var2) {
-      this.config = var1 == null ? new RadioGroupStyleConfig() : var1;
-      this.renderer = var2 == null ? new DefaultRadioGroupRenderer() : var2;
+   public RadioGroupStyle(RadioGroupStyleConfig config, DefaultRadioGroupRenderer renderer) {
+      this.config = config == null ? new RadioGroupStyleConfig() : config;
+      this.renderer = renderer == null ? new DefaultRadioGroupRenderer() : renderer;
       this.themeProvider = this.config.themeProvider != null ? this.config.themeProvider : new ThemeManager();
    }
 
    /**
     * Renders the current frame.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param state parameter used by this operation
+    * @param snapshot parameter used by this operation
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
     */
-   public void render(PApplet var1, RadioGroupViewState var2, ThemeSnapshot var3) {
-      this.renderer.render(var1, var2, this.resolveRenderStyle(var2, var3));
+   public void render(PApplet sketch, RadioGroupViewState state, ThemeSnapshot snapshot) {
+      this.renderer.render(sketch, state, this.resolveRenderStyle(state, snapshot));
    }
 
    /**
     * Resolves render style.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param state parameter used by this operation
+    * @param snapshot parameter used by this operation
     * @return resolved render style
     *
     * Behavior:
     * - Produces the public result required by the surrounding pipeline.
     */
-   public RadioGroupRenderStyle resolveRenderStyle(RadioGroupViewState var1, ThemeSnapshot var2) {
-      ThemeTokens var3 = var2.tokens;
-      ArrayList var4 = new ArrayList(var1.items().size());
-      int var5 = this.config.disabledAlpha != null ? this.config.disabledAlpha : var3.disabledAlpha;
+   public RadioGroupRenderStyle resolveRenderStyle(RadioGroupViewState state, ThemeSnapshot snapshot) {
+      ThemeTokens tokens = snapshot.tokens;
+      ArrayList itemStyles = new ArrayList(state.items().size());
+      int disabledAlpha = this.config.disabledAlpha != null ? this.config.disabledAlpha : tokens.disabledAlpha;
 
-      for(RadioGroupItemViewState var7 : var1.items()) {
-         int var8 = this.resolveColor(var3.onSurface, this.config.textOverride);
-         int var9 = this.resolveColor(var3.border, this.config.indicatorOverride);
-         int var10 = this.resolveBackground(var3, var7);
-         int var11 = var7.selected() ? this.resolveColor(var3.primary, this.config.selectedDotOverride) : Colors.argb(0, 0, 0, 0);
-         var4.add(new RadioGroupItemRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(var8, var1.enabled(), var5), InteractiveStyleHelper.applyDisabledAlpha(var9, var1.enabled(), var5), InteractiveStyleHelper.applyDisabledAlpha(var10, var1.enabled(), var5), InteractiveStyleHelper.applyDisabledAlpha(var11, var1.enabled(), var5), InteractiveStyleHelper.applyDisabledAlpha(var10, var1.enabled(), var5)));
+      for(RadioGroupItemViewState itemState : state.items()) {
+         int color3 = this.resolveColor(tokens.onSurface, this.config.textOverride);
+         int borderColor = this.resolveColor(tokens.border, this.config.indicatorOverride);
+         int backgroundColor = this.resolveBackground(tokens, itemState);
+         int selectedColor = itemState.selected() ? this.resolveColor(tokens.primary, this.config.selectedDotOverride) : Colors.argb(0, 0, 0, 0);
+         itemStyles.add(new RadioGroupItemRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(color3, state.enabled(), disabledAlpha), InteractiveStyleHelper.applyDisabledAlpha(borderColor, state.enabled(), disabledAlpha), InteractiveStyleHelper.applyDisabledAlpha(backgroundColor, state.enabled(), disabledAlpha), InteractiveStyleHelper.applyDisabledAlpha(selectedColor, state.enabled(), disabledAlpha), InteractiveStyleHelper.applyDisabledAlpha(backgroundColor, state.enabled(), disabledAlpha)));
       }
 
-      return new RadioGroupRenderStyle(var4, this.config.indicatorOuterDiameter, this.config.indicatorInnerDiameter, this.config.strokeWeight, this.config.textSize, this.config.cornerRadius, this.config.font);
+      return new RadioGroupRenderStyle(itemStyles, this.config.indicatorOuterDiameter, this.config.indicatorInnerDiameter, this.config.strokeWeight, this.config.textSize, this.config.cornerRadius, this.config.font);
    }
 
-   private int resolveBackground(ThemeTokens var1, RadioGroupItemViewState var2) {
-      int var3 = Colors.argb(0, var1.surface >>> 16 & 255, var1.surface >>> 8 & 255, var1.surface & 255);
-      int var4 = this.resolveColor(var3, this.config.backgroundOverride);
-      if (var2.pressed()) {
-         return this.config.pressedBackgroundOverride != null ? this.config.pressedBackgroundOverride : InteractiveStyleHelper.applyOverlay(var1.surface, var1.pressedOverlay);
-      } else if (var2.focused()) {
-         return InteractiveStyleHelper.applyOverlay(var1.surface, Colors.alpha(28, var1.primary));
-      } else if (var2.hovered()) {
-         return this.config.hoveredBackgroundOverride != null ? this.config.hoveredBackgroundOverride : InteractiveStyleHelper.applyOverlay(var1.surface, var1.hoverOverlay);
+   private int resolveBackground(ThemeTokens tokens, RadioGroupItemViewState state) {
+      int color = Colors.argb(0, tokens.surface >>> 16 & 255, tokens.surface >>> 8 & 255, tokens.surface & 255);
+      int color2 = this.resolveColor(color, this.config.backgroundOverride);
+      if (state.pressed()) {
+         return this.config.pressedBackgroundOverride != null ? this.config.pressedBackgroundOverride : InteractiveStyleHelper.applyOverlay(tokens.surface, tokens.pressedOverlay);
+      } else if (state.focused()) {
+         return InteractiveStyleHelper.applyOverlay(tokens.surface, Colors.alpha(28, tokens.primary));
+      } else if (state.hovered()) {
+         return this.config.hoveredBackgroundOverride != null ? this.config.hoveredBackgroundOverride : InteractiveStyleHelper.applyOverlay(tokens.surface, tokens.hoverOverlay);
       } else {
-         return var4;
+         return color2;
       }
    }
 
-   private int resolveColor(int var1, Integer var2) {
-      return var2 != null ? var2 : var1;
+   private int resolveColor(int color, Integer color2) {
+      return color2 != null ? color2 : color;
    }
 
    /**

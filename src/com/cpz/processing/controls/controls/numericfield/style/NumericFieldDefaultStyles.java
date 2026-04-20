@@ -15,6 +15,8 @@ import com.cpz.processing.controls.core.theme.ThemeProvider;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class NumericFieldDefaultStyles {
    private NumericFieldDefaultStyles() {
@@ -35,15 +37,15 @@ public final class NumericFieldDefaultStyles {
    /**
     * Performs standard.
     *
-    * @param var0 parameter used by this operation
+    * @param themeProvider parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static NumericFieldStyle standard(ThemeProvider var0) {
-      NumericFieldStyleConfig var1 = new NumericFieldStyleConfig();
-      var1.themeProvider = var0;
-      return new NumericFieldStyle(var1);
+   public static NumericFieldStyle standard(ThemeProvider themeProvider) {
+      NumericFieldStyleConfig config = new NumericFieldStyleConfig();
+      config.themeProvider = themeProvider;
+      return new NumericFieldStyle(config);
    }
 }

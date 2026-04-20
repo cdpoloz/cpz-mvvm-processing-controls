@@ -16,6 +16,8 @@ import processing.core.PShape;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class SvgButtonRenderer implements ButtonRenderer {
    private final PShape shape;
@@ -23,14 +25,14 @@ public final class SvgButtonRenderer implements ButtonRenderer {
    /**
     * Creates a svg button renderer.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param path parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public SvgButtonRenderer(PApplet var1, String var2) {
-      this.shape = loadShape(var1, var2);
+   public SvgButtonRenderer(PApplet sketch, String path) {
+      this.shape = loadShape(sketch, path);
       if (this.shape != null) {
          this.shape.disableStyle();
       }
@@ -40,48 +42,48 @@ public final class SvgButtonRenderer implements ButtonRenderer {
    /**
     * Renders the current frame.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
-    * @param var6 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
+    * @param height parameter used by this operation
+    * @param renderStyle parameter used by this operation
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
     */
-   public void render(PApplet var1, float var2, float var3, float var4, float var5, ButtonRenderStyle var6) {
-      String var7 = var6.text();
-      if (var7 == null) {
-         var7 = "";
+   public void render(PApplet sketch, float x, float y, float width, float height, ButtonRenderStyle renderStyle) {
+      String text = renderStyle.text();
+      if (text == null) {
+         text = "";
       }
 
-      var1.pushStyle();
+      sketch.pushStyle();
       if (this.shape != null) {
-         var1.shapeMode(3);
-         var1.fill(var6.fillColor());
-         var1.stroke(var6.strokeColor());
-         var1.strokeWeight(var6.strokeWeight());
-         var1.shape(this.shape, var2, var3, var4, var5);
+         sketch.shapeMode(3);
+         sketch.fill(renderStyle.fillColor());
+         sketch.stroke(renderStyle.strokeColor());
+         sketch.strokeWeight(renderStyle.strokeWeight());
+         sketch.shape(this.shape, x, y, width, height);
       }
 
-      if (var6.showText()) {
-         var1.fill(var6.textColor());
-         var1.textAlign(3, 3);
-         var1.text(var7, var2, var3);
+      if (renderStyle.showText()) {
+         sketch.fill(renderStyle.textColor());
+         sketch.textAlign(3, 3);
+         sketch.text(text, x, y);
       }
 
-      var1.popStyle();
+      sketch.popStyle();
    }
 
-   private static PShape loadShape(PApplet var0, String var1) {
-      if (var0 != null && var1 != null && !var1.isEmpty()) {
-         PShape var2 = var0.loadShape(var1);
-         if (var2 == null && var1.startsWith("data/")) {
-            var2 = var0.loadShape(var1.substring("data/".length()));
+   private static PShape loadShape(PApplet sketch, String path) {
+      if (sketch != null && path != null && !path.isEmpty()) {
+         PShape shape = sketch.loadShape(path);
+         if (shape == null && path.startsWith("data/")) {
+            shape = sketch.loadShape(path.substring("data/".length()));
          }
 
-         return var2;
+         return shape;
       } else {
          return null;
       }

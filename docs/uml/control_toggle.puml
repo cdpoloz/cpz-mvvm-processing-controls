@@ -1,17 +1,33 @@
 @startuml
-title Toggle Control Structure
+title Toggle Public Facade Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
+interface Control
+class Toggle
+class ToggleModel
+class ToggleViewModel
 class ToggleView
+class ToggleInputAdapter
 class ToggleViewState
 class ParametricToggleStyle
 class ToggleRenderStyle
+interface ThemeProvider
 class ThemeSnapshot
 
-ToggleView --> ToggleViewState
-ToggleView --> ThemeSnapshot
-ParametricToggleStyle --> ToggleViewState
-ParametricToggleStyle --> ThemeSnapshot
-ParametricToggleStyle --> ToggleRenderStyle
+Toggle ..|> Control
+Toggle --> ToggleModel : owns
+Toggle --> ToggleViewModel : owns
+Toggle --> ToggleView : owns
+Toggle --> ToggleInputAdapter : delegates input
+ToggleInputAdapter --> ToggleView : geometry / hit testing
+ToggleInputAdapter --> ToggleViewModel : interaction updates
+ToggleViewModel --> ToggleModel : updates
+ToggleView --> ToggleViewModel : reads
+ToggleView --> ToggleViewState : builds
+ToggleView --> ParametricToggleStyle : renders with
+ParametricToggleStyle --> ThemeProvider : reads snapshot
+ThemeProvider --> ThemeSnapshot
+ParametricToggleStyle --> ToggleViewState : resolves
+ParametricToggleStyle --> ToggleRenderStyle : creates
 @enduml

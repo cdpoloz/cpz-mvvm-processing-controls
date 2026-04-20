@@ -13,21 +13,51 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Loads one or more public controls from a JSON document.
+ * Loads one or more public control facades from a structural JSON document.
+ *
+ * <p>The loader expects the current multi-control format with a root
+ * {@code controls[]} array. Each entry must declare {@code type} and
+ * {@code code}. The result is a {@link LinkedHashMap} preserving JSON order and
+ * exposing controls through the minimal {@link Control} contract.</p>
+ *
+ * <p>JSON remains structural. This loader does not create listeners, binding,
+ * shortcuts, or sketch behavior.</p>
+ *
+ * @author CPZ
  */
 public final class ControlConfigLoader {
     private final PApplet sketch;
     private final ControlFactoryRegistry registry;
 
+    /**
+     * Creates a loader for controls that do not need overlay infrastructure.
+     *
+     * @param sketch Processing sketch used by concrete factories
+     */
     public ControlConfigLoader(PApplet sketch) {
         this(sketch, null, null);
     }
 
+    /**
+     * Creates a loader with optional overlay/input infrastructure for controls
+     * such as {@code DropDown}.
+     *
+     * @param sketch Processing sketch used by concrete factories
+     * @param overlayManager overlay manager required by dropdown controls
+     * @param inputManager input manager required by dropdown controls
+     */
     public ControlConfigLoader(PApplet sketch, OverlayManager overlayManager, InputManager inputManager) {
         this.sketch = Objects.requireNonNull(sketch, "sketch");
         this.registry = new ControlFactoryRegistry(sketch, overlayManager, inputManager);
     }
 
+    /**
+     * Loads the JSON document and returns public facades keyed by control code.
+     *
+     * @param path path to a JSON document with a root {@code controls[]} array
+     * @return ordered map of public controls
+     * @throws IllegalArgumentException when structure, type, code, or factory output is invalid
+     */
     public Map<String, Control> load(String path) {
         Objects.requireNonNull(path, "path");
 

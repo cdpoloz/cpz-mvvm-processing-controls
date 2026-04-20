@@ -9,6 +9,8 @@ import java.util.Objects;
 
 /**
  * Minimal config DTO for a single slider created from external data.
+ *
+ * @author CPZ
  */
 public final class SliderConfig {
     private final String code;

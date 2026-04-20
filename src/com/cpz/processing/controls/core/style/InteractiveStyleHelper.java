@@ -15,6 +15,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class InteractiveStyleHelper {
    private InteractiveStyleHelper() {
@@ -23,126 +25,126 @@ public final class InteractiveStyleHelper {
    /**
     * Resolves fill color.
     *
-    * @param var0 parameter used by this operation
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
+    * @param baseFillColor normal fill color
+    * @param hoverFillColor fill color used while hovered
+    * @param pressedFillColor fill color used while pressed
+    * @param hovered whether the control is hovered
+    * @param pressed whether the control is pressed
     * @return resolved fill color
     *
     * Behavior:
     * - Produces the public result required by the surrounding pipeline.
     */
-   public static int resolveFillColor(int var0, int var1, int var2, boolean var3, boolean var4) {
-      if (var4) {
-         return var2;
+   public static int resolveFillColor(int baseFillColor, int hoverFillColor, int pressedFillColor, boolean hovered, boolean pressed) {
+      if (pressed) {
+         return pressedFillColor;
       } else {
-         return var3 ? var1 : var0;
+         return hovered ? hoverFillColor : baseFillColor;
       }
    }
 
    /**
     * Resolves fill color with overlays.
     *
-    * @param var0 parameter used by this operation
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
+    * @param baseFillColor normal fill color
+    * @param hoverOverlay overlay applied while hovered
+    * @param pressedOverlay overlay applied while pressed
+    * @param hovered whether the control is hovered
+    * @param pressed whether the control is pressed
     * @return resolved fill color with overlays
     *
     * Behavior:
     * - Produces the public result required by the surrounding pipeline.
     */
-   public static int resolveFillColorWithOverlays(int var0, int var1, int var2, boolean var3, boolean var4) {
-      return resolveFillColor(var0, applyOverlay(var0, var1), applyOverlay(var0, var2), var3, var4);
+   public static int resolveFillColorWithOverlays(int baseFillColor, int hoverOverlay, int pressedOverlay, boolean hovered, boolean pressed) {
+      return resolveFillColor(baseFillColor, applyOverlay(baseFillColor, hoverOverlay), applyOverlay(baseFillColor, pressedOverlay), hovered, pressed);
    }
 
    /**
     * Resolves fill color.
     *
-    * @param var0 parameter used by this operation
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
+    * @param sketch Processing sketch used for color interpolation
+    * @param baseFillColor normal fill color
+    * @param hoverBlend blend factor for the hover color
+    * @param pressedBlend blend factor for the pressed color
+    * @param hovered whether the control is hovered
+    * @param pressed whether the control is pressed
     * @return resolved fill color
     *
     * Behavior:
     * - Produces the public result required by the surrounding pipeline.
     */
-   public static int resolveFillColor(PApplet var0, int var1, float var2, float var3, boolean var4, boolean var5) {
-      int var6 = var0.lerpColor(var1, var0.color(255), var2);
-      int var7 = var0.lerpColor(var1, var0.color(0), var3);
-      return resolveFillColor(var1, var6, var7, var4, var5);
+   public static int resolveFillColor(PApplet sketch, int baseFillColor, float hoverBlend, float pressedBlend, boolean hovered, boolean pressed) {
+      int hoverFillColor = sketch.lerpColor(baseFillColor, sketch.color(255), hoverBlend);
+      int pressedFillColor = sketch.lerpColor(baseFillColor, sketch.color(0), pressedBlend);
+      return resolveFillColor(baseFillColor, hoverFillColor, pressedFillColor, hovered, pressed);
    }
 
    /**
     * Performs apply disabled alpha.
     *
-    * @param var0 parameter used by this operation
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param color source color
+    * @param enabled whether the control is enabled
+    * @param disabledAlpha alpha applied while disabled
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static int applyDisabledAlpha(int var0, boolean var1, int var2) {
-      return var1 ? var0 : Colors.alpha(var2, var0);
+   public static int applyDisabledAlpha(int color, boolean enabled, int disabledAlpha) {
+      return enabled ? color : Colors.alpha(disabledAlpha, color);
    }
 
    /**
     * Performs apply overlay.
     *
-    * @param var0 parameter used by this operation
-    * @param var1 parameter used by this operation
+    * @param baseColor base color
+    * @param overlayColor ARGB overlay color
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static int applyOverlay(int var0, int var1) {
-      float var2 = (float)(var1 >>> 24 & 255) / 255.0F;
-      int var3 = blendChannel(var0 >>> 24 & 255, var1 >>> 24 & 255, var2);
-      int var4 = blendChannel(var0 >>> 16 & 255, var1 >>> 16 & 255, var2);
-      int var5 = blendChannel(var0 >>> 8 & 255, var1 >>> 8 & 255, var2);
-      int var6 = blendChannel(var0 & 255, var1 & 255, var2);
-      return Colors.argb(var3, var4, var5, var6);
+   public static int applyOverlay(int baseColor, int overlayColor) {
+      float overlayAlpha = (float)(overlayColor >>> 24 & 255) / 255.0F;
+      int alpha = blendChannel(baseColor >>> 24 & 255, overlayColor >>> 24 & 255, overlayAlpha);
+      int red = blendChannel(baseColor >>> 16 & 255, overlayColor >>> 16 & 255, overlayAlpha);
+      int green = blendChannel(baseColor >>> 8 & 255, overlayColor >>> 8 & 255, overlayAlpha);
+      int blue = blendChannel(baseColor & 255, overlayColor & 255, overlayAlpha);
+      return Colors.argb(alpha, red, green, blue);
    }
 
    /**
     * Resolves stroke weight.
     *
-    * @param var0 parameter used by this operation
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param baseStrokeWeight normal stroke weight
+    * @param hoverStrokeWeight stroke weight used while hovered
+    * @param hovered whether the control is hovered
     * @return resolved stroke weight
     *
     * Behavior:
     * - Produces the public result required by the surrounding pipeline.
     */
-   public static float resolveStrokeWeight(float var0, float var1, boolean var2) {
-      return var2 ? var1 : var0;
+   public static float resolveStrokeWeight(float baseStrokeWeight, float hoverStrokeWeight, boolean hovered) {
+      return hovered ? hoverStrokeWeight : baseStrokeWeight;
    }
 
    /**
     * Resolves stroke color.
     *
-    * @param var0 parameter used by this operation
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param color source stroke color
+    * @param enabled whether the control is enabled
+    * @param disabledAlpha alpha applied while disabled
     * @return resolved stroke color
     *
     * Behavior:
     * - Produces the public result required by the surrounding pipeline.
     */
-   public static int resolveStrokeColor(int var0, boolean var1, int var2) {
-      return applyDisabledAlpha(var0, var1, var2);
+   public static int resolveStrokeColor(int color, boolean enabled, int disabledAlpha) {
+      return applyDisabledAlpha(color, enabled, disabledAlpha);
    }
 
-   private static int blendChannel(int var0, int var1, float var2) {
-      return Math.round((float)var0 + (float)(var1 - var0) * var2);
+   private static int blendChannel(int baseChannel, int overlayChannel, float amount) {
+      return Math.round((float)baseChannel + (float)(overlayChannel - baseChannel) * amount);
    }
 }

@@ -15,6 +15,8 @@ import com.cpz.processing.controls.core.input.InputLayer;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public class OverlayEntry {
    private final int zIndex;
@@ -26,50 +28,50 @@ public class OverlayEntry {
    /**
     * Creates a overlay entry.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param priority parameter used by this operation
+    * @param render parameter used by this operation
+    * @param inputLayer parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public OverlayEntry(int var1, Runnable var2, InputLayer var3) {
-      this(var1, var2, var3, (Runnable)null, (Focusable)null);
+   public OverlayEntry(int priority, Runnable render, InputLayer inputLayer) {
+      this(priority, render, inputLayer, (Runnable)null, (Focusable)null);
    }
 
    /**
     * Creates a overlay entry.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
+    * @param priority parameter used by this operation
+    * @param render parameter used by this operation
+    * @param inputLayer parameter used by this operation
+    * @param onClose parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public OverlayEntry(int var1, Runnable var2, InputLayer var3, Runnable var4) {
-      this(var1, var2, var3, var4, (Focusable)null);
+   public OverlayEntry(int priority, Runnable render, InputLayer inputLayer, Runnable onClose) {
+      this(priority, render, inputLayer, onClose, (Focusable)null);
    }
 
    /**
     * Creates a overlay entry.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
+    * @param priority parameter used by this operation
+    * @param render parameter used by this operation
+    * @param inputLayer parameter used by this operation
+    * @param onClose parameter used by this operation
+    * @param focusTarget parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public OverlayEntry(int var1, Runnable var2, InputLayer var3, Runnable var4, Focusable var5) {
-      this.zIndex = var1;
-      this.render = var2;
-      this.inputLayer = var3;
-      this.onClose = var4;
-      this.focusTarget = var5;
+   public OverlayEntry(int priority, Runnable render, InputLayer inputLayer, Runnable onClose, Focusable focusTarget) {
+      this.zIndex = priority;
+      this.render = render;
+      this.inputLayer = inputLayer;
+      this.onClose = onClose;
+      this.focusTarget = focusTarget;
    }
 
    /**

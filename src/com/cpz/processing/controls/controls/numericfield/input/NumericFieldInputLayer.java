@@ -9,6 +9,8 @@ import java.util.Objects;
 
 /**
  * Reusable input layer for a single numeric field instance.
+ *
+ * @author CPZ
  */
 public final class NumericFieldInputLayer extends DefaultInputLayer {
     private final NumericField numericField;

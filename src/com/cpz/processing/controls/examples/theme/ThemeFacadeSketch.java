@@ -36,6 +36,10 @@ import java.util.List;
 /**
  * Official theme example based on public facades.
  *
+ * <p>The sketch owns its {@link ThemeManager}, creates controls through closed
+ * facades, passes the manager to public styles, and toggles the active theme in
+ * sketch code. It intentionally avoids direct use of MVVM internals.</p>
+ *
  * @author CPZ
  */
 public final class ThemeFacadeSketch extends PApplet {
@@ -55,11 +59,17 @@ public final class ThemeFacadeSketch extends PApplet {
     private Label lblTheme;
     private Label lblSliderValue;
 
+    /**
+     * Configures the Processing surface used by the visual theme example.
+     */
     public void settings() {
         size(920, 520);
         smooth(8);
     }
 
+    /**
+     * Creates controls, input routing, and the initial derived labels.
+     */
     public void setup() {
         inputManager = new InputManager();
         keyboardState = new KeyboardState();
@@ -70,28 +80,48 @@ public final class ThemeFacadeSketch extends PApplet {
         refreshDerivedLabels();
     }
 
+    /**
+     * Draws the themed background and the public control collection.
+     */
     public void draw() {
         ThemeTokens tokens = themeManager.getSnapshot().tokens;
         background(tokens.surface);
         controls.forEach(Control::draw);
     }
 
+    /**
+     * Dispatches mouse move events through the sketch-owned input manager.
+     */
     public void mouseMoved() {
         inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.MOVE, (float) mouseX, (float) mouseY, mouseButton));
     }
 
+    /**
+     * Dispatches mouse drag events through the sketch-owned input manager.
+     */
     public void mouseDragged() {
         inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.DRAG, (float) mouseX, (float) mouseY, mouseButton));
     }
 
+    /**
+     * Dispatches mouse press events through the sketch-owned input manager.
+     */
     public void mousePressed() {
         inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, (float) mouseX, (float) mouseY, mouseButton));
     }
 
+    /**
+     * Dispatches mouse release events through the sketch-owned input manager.
+     */
     public void mouseReleased() {
         inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, (float) mouseX, (float) mouseY, mouseButton));
     }
 
+    /**
+     * Dispatches mouse wheel events through the sketch-owned input manager.
+     *
+     * @param event Processing wheel event adapted into the framework event type
+     */
     public void mouseWheel(MouseEvent event) {
         inputManager.dispatchPointer(new PointerEvent(
                 PointerEvent.Type.WHEEL,
@@ -104,14 +134,23 @@ public final class ThemeFacadeSketch extends PApplet {
         ));
     }
 
+    /**
+     * Dispatches key press events through the Processing keyboard adapter.
+     */
     public void keyPressed() {
         processingKeyboardAdapter.keyPressed(key, keyCode);
     }
 
+    /**
+     * Dispatches key release events through the Processing keyboard adapter.
+     */
     public void keyReleased() {
         processingKeyboardAdapter.keyReleased(key, keyCode);
     }
 
+    /**
+     * Dispatches typed characters through the Processing keyboard adapter.
+     */
     public void keyTyped() {
         processingKeyboardAdapter.keyTyped(key, keyCode);
     }
@@ -215,6 +254,12 @@ public final class ThemeFacadeSketch extends PApplet {
             super(priority);
         }
 
+        /**
+         * Routes normalized pointer events to the concrete public facades.
+         *
+         * @param event pointer event from the input manager
+         * @return {@code true} when a non-null event was routed
+         */
         public boolean handlePointerEvent(PointerEvent event) {
             if (event == null) return false;
 
@@ -226,6 +271,12 @@ public final class ThemeFacadeSketch extends PApplet {
             return true;
         }
 
+        /**
+         * Gives focused text input priority, then handles the sketch theme shortcut.
+         *
+         * @param event keyboard event from the input manager
+         * @return {@code true} when the event was consumed
+         */
         public boolean handleKeyboardEvent(KeyboardEvent event) {
             if (event == null) return false;
 

@@ -6,51 +6,29 @@ skinparam shadowing false
 package "External Boundary" {
   class ExternalSource
   class ExternalAdapter
+  class ProcessingKeyboardAdapter
 }
 
 package "Input" {
-  class PointerEvent {
-    +type : MOVE|PRESS|RELEASE|DRAG|WHEEL
-    +x : float
-    +y : float
-    +pressed : boolean
-    +button : int
-    +shift : boolean
-    +ctrl : boolean
-    +alt : boolean
-    +wheelDelta : float
-  }
-  class KeyboardEvent {
-    +type : PRESS|TYPE|RELEASE
-    +key : char
-    +keyCode : int
-    +shift : boolean
-    +ctrl : boolean
-    +alt : boolean
-  }
+  class PointerEvent
+  class KeyboardEvent
   class KeyboardState
   class InputManager
   interface InputLayer
-  class InputAdapter
+  class "...InputAdapter" as ControlInputAdapter
   class FocusManager
 }
 
-package "MVVM" {
+package "Public API" {
+  interface Control
+  class "Button / Slider / ..." as PublicFacade
+}
+
+package "MVVM Internals" {
   class Model
   class ViewModel
   class View
   class ViewState
-}
-
-package "Public Facades" {
-  interface Control
-  class ConcreteControlFacade
-}
-
-package "JSON Configuration" {
-  class JsonDocument
-  class ControlConfigLoader
-  class ControlFactoryRegistry
 }
 
 package "Rendering" {
@@ -59,38 +37,62 @@ package "Rendering" {
   class Renderer
 }
 
-package "Infrastructure" {
+package "Theme" {
+  class Sketch
   interface ThemeProvider
   class ThemeManager
   class ThemeSnapshot
-  class OverlayManager
+  class ThemeTokens
 }
 
-ThemeManager ..|> ThemeProvider
-ThemeProvider --> ThemeSnapshot
+package "JSON Configuration" {
+  class JsonDocument
+  class ControlConfigLoader
+  class ControlFactoryRegistry
+  class "Map<String, Control>" as ControlMap
+}
 
-ExternalSource --> ExternalAdapter : raw callbacks or state
+package "Composition" {
+  class SketchBinding
+}
+
+ExternalSource --> ExternalAdapter : raw input
 ExternalAdapter --> PointerEvent : creates
 ExternalAdapter --> KeyboardEvent : creates
-ExternalAdapter --> KeyboardState : updates when needed
-ExternalAdapter --> InputManager : dispatches events
-JsonDocument --> ControlConfigLoader : loads
-ControlConfigLoader --> ControlFactoryRegistry : dispatches by type
-ControlFactoryRegistry --> ConcreteControlFacade : creates
-InputManager --> InputLayer : dispatches
-InputLayer --> InputAdapter : forwards
-InputAdapter --> ViewModel : updates interaction
-FocusManager --> ViewModel : manages focus
+ExternalAdapter --> KeyboardState : updates
+ProcessingKeyboardAdapter --> InputManager : dispatches keyboard
 
-ConcreteControlFacade ..|> Control
-ConcreteControlFacade --> ViewModel : delegates through closed facade
+InputManager --> InputLayer : ordered dispatch
+InputLayer --> PublicFacade : forwards to concrete facade API
+PublicFacade --> ControlInputAdapter : delegates input
+ControlInputAdapter --> View : uses geometry
+ControlInputAdapter --> ViewModel : updates interaction
+FocusManager --> ViewModel : focus ownership
+
+PublicFacade ..|> Control
+PublicFacade --> Model
+PublicFacade --> ViewModel
+PublicFacade --> View
 ViewModel --> Model : updates
 View --> ViewModel : reads
 View --> ViewState : builds
-View --> ThemeProvider : reads snapshot
-Style --> ViewState : resolves
+View --> Style : delegates drawing
 Style --> ThemeSnapshot : consumes
+Style --> ViewState : resolves
 Style --> RenderStyle : creates
 Renderer --> RenderStyle : draws
-OverlayManager --> View : coordinates overlays
+
+Sketch --> ThemeManager : owns
+ThemeManager ..|> ThemeProvider
+ThemeManager --> ThemeSnapshot : rebuilds on setTheme()
+ThemeSnapshot --> ThemeTokens
+Style --> ThemeProvider : reads current snapshot
+
+JsonDocument --> ControlConfigLoader : controls[]
+ControlConfigLoader --> ControlFactoryRegistry : dispatches by type
+ControlFactoryRegistry --> PublicFacade : creates closed facades
+ControlConfigLoader --> ControlMap : returns ordered map
+
+SketchBinding --> PublicFacade : explicit listeners
+SketchBinding ..> JsonDocument : JSON has no binding
 @enduml

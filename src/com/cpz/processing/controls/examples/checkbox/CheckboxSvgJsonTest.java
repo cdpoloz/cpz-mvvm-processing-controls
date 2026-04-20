@@ -11,6 +11,9 @@ import processing.core.PApplet;
 
 import java.io.File;
 
+/**
+ * @author CPZ
+ */
 public class CheckboxSvgJsonTest extends PApplet {
     private static final String CHECKBOX_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "checkbox-svg-test.json";
 

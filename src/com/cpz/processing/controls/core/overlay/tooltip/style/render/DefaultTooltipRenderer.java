@@ -16,36 +16,38 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class DefaultTooltipRenderer {
    /**
     * Renders the current frame.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param state parameter used by this operation
+    * @param renderStyle parameter used by this operation
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
     */
-   public void render(PApplet var1, TooltipViewState var2, TooltipRenderStyle var3) {
-      float var4 = var2.x() - var2.width() * 0.5F;
-      float var5 = var2.y() - var2.height() * 0.5F;
-      var1.pushStyle();
-      var1.rectMode(0);
-      var1.stroke(var3.strokeColor());
-      var1.strokeWeight(var3.strokeWeight());
-      var1.fill(var3.backgroundColor());
-      var1.rect(var4, var5, var2.width(), var2.height(), var3.cornerRadius());
-      if (var3.font() != null) {
-         var1.textFont(var3.font(), var3.textSize());
+   public void render(PApplet sketch, TooltipViewState state, TooltipRenderStyle renderStyle) {
+      float value = state.x() - state.width() * 0.5F;
+      float value2 = state.y() - state.height() * 0.5F;
+      sketch.pushStyle();
+      sketch.rectMode(0);
+      sketch.stroke(renderStyle.strokeColor());
+      sketch.strokeWeight(renderStyle.strokeWeight());
+      sketch.fill(renderStyle.backgroundColor());
+      sketch.rect(value, value2, state.width(), state.height(), renderStyle.cornerRadius());
+      if (renderStyle.font() != null) {
+         sketch.textFont(renderStyle.font(), renderStyle.textSize());
       } else {
-         var1.textSize(var3.textSize());
+         sketch.textSize(renderStyle.textSize());
       }
 
-      var1.fill(var3.textColor());
-      var1.textAlign(37, 3);
-      var1.text(var2.text(), var4 + var3.textPadding(), var2.y());
-      var1.popStyle();
+      sketch.fill(renderStyle.textColor());
+      sketch.textAlign(37, 3);
+      sketch.text(state.text(), value + renderStyle.textPadding(), state.y());
+      sketch.popStyle();
    }
 }

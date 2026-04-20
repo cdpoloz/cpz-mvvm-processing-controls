@@ -21,6 +21,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the MVVM View layer.
+ *
+ * @author CPZ
  */
 public final class TooltipView implements ControlView {
    private static final float VERTICAL_OFFSET = 10.0F;
@@ -35,15 +37,15 @@ public final class TooltipView implements ControlView {
    /**
     * Creates a tooltip view.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param viewModel parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public TooltipView(PApplet var1, TooltipViewModel var2) {
-      this.sketch = var1;
-      this.viewModel = var2;
+   public TooltipView(PApplet sketch, TooltipViewModel viewModel) {
+      this.sketch = sketch;
+      this.viewModel = viewModel;
       this.style = new DefaultTooltipStyle(new TooltipStyleConfig());
    }
 
@@ -55,68 +57,68 @@ public final class TooltipView implements ControlView {
     */
    public void draw() {
       if (this.viewModel.isVisible()) {
-         ThemeSnapshot var1 = this.style.getThemeSnapshot();
-         TooltipRenderStyle var2 = this.style.resolveRenderStyle(var1);
-         this.measureFromText(var2);
-         this.style.render(this.sketch, new TooltipViewState(this.x, this.y, this.width, this.height, this.viewModel.getText(), this.viewModel.isEnabled(), this.style.getTextPadding(), var2.cornerRadius()), var1);
+         ThemeSnapshot snapshot = this.style.getThemeSnapshot();
+         TooltipRenderStyle renderStyle = this.style.resolveRenderStyle(snapshot);
+         this.measureFromText(renderStyle);
+         this.style.render(this.sketch, new TooltipViewState(this.x, this.y, this.width, this.height, this.viewModel.getText(), this.viewModel.isEnabled(), this.style.getTextPadding(), renderStyle.cornerRadius()), snapshot);
       }
    }
 
    /**
     * Updates position.
     *
-    * @param var1 new position
-    * @param var2 parameter used by this operation
+    * @param x new position
+    * @param y parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setPosition(float var1, float var2) {
-      this.x = var1;
-      this.y = var2;
+   public void setPosition(float x, float y) {
+      this.x = x;
+      this.y = y;
    }
 
    /**
     * Updates anchor bounds.
     *
-    * @param var1 new anchor bounds
-    * @param var2 parameter used by this operation
+    * @param x new anchor bounds
+    * @param y parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setAnchorBounds(float var1, float var2) {
-      ThemeSnapshot var3 = this.style.getThemeSnapshot();
-      this.measureFromText(this.style.resolveRenderStyle(var3));
-      this.x = var1;
-      this.y = var2 - this.height * 0.5F - 10.0F;
+   public void setAnchorBounds(float x, float y) {
+      ThemeSnapshot snapshot = this.style.getThemeSnapshot();
+      this.measureFromText(this.style.resolveRenderStyle(snapshot));
+      this.x = x;
+      this.y = y - this.height * 0.5F - 10.0F;
    }
 
    /**
     * Updates style.
     *
-    * @param var1 new style
+    * @param style new style
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setStyle(DefaultTooltipStyle var1) {
-      if (var1 != null) {
-         this.style = var1;
+   public void setStyle(DefaultTooltipStyle style) {
+      if (style != null) {
+         this.style = style;
       }
 
    }
 
-   private void measureFromText(TooltipRenderStyle var1) {
+   private void measureFromText(TooltipRenderStyle renderStyle) {
       this.sketch.pushStyle();
-      if (var1.font() != null) {
-         this.sketch.textFont(var1.font(), var1.textSize());
+      if (renderStyle.font() != null) {
+         this.sketch.textFont(renderStyle.font(), renderStyle.textSize());
       } else {
-         this.sketch.textSize(var1.textSize());
+         this.sketch.textSize(renderStyle.textSize());
       }
 
-      this.width = Math.max(40.0F, this.sketch.textWidth(this.viewModel.getText()) + var1.textPadding() * 2.0F);
-      this.height = var1.minHeight();
+      this.width = Math.max(40.0F, this.sketch.textWidth(this.viewModel.getText()) + renderStyle.textPadding() * 2.0F);
+      this.height = renderStyle.minHeight();
       this.sketch.popStyle();
    }
 }

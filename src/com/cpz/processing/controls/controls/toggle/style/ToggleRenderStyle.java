@@ -12,6 +12,8 @@ package com.cpz.processing.controls.controls.toggle.style;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public record ToggleRenderStyle(int fillColor, int strokeColor, float strokeWeight) {
 }

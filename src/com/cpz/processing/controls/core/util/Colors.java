@@ -12,6 +12,8 @@ package com.cpz.processing.controls.core.util;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class Colors {
    private Colors() {
@@ -20,142 +22,142 @@ public final class Colors {
    /**
     * Performs agray.
     *
-    * @param var0 parameter used by this operation
-    * @param var1 parameter used by this operation
+    * @param alpha parameter used by this operation
+    * @param value parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static int agray(int var0, int var1) {
-      return argb(var0, var1, var1, var1);
+   public static int agray(int alpha, int value) {
+      return argb(alpha, value, value, value);
    }
 
    /**
     * Performs gray.
     *
-    * @param var0 parameter used by this operation
+    * @param value parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static int gray(int var0) {
-      return rgb(var0, var0, var0);
+   public static int gray(int value) {
+      return rgb(value, value, value);
    }
 
    /**
     * Performs rgb.
     *
-    * @param var0 parameter used by this operation
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param red parameter used by this operation
+    * @param green parameter used by this operation
+    * @param blue parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static int rgb(int var0, int var1, int var2) {
-      return argb(255, var0, var1, var2);
+   public static int rgb(int red, int green, int blue) {
+      return argb(255, red, green, blue);
    }
 
    /**
     * Performs argb.
     *
-    * @param var0 parameter used by this operation
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param alpha parameter used by this operation
+    * @param red parameter used by this operation
+    * @param green parameter used by this operation
+    * @param blue parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static int argb(int var0, int var1, int var2, int var3) {
-      var0 = clamp(var0);
-      var1 = clamp(var1);
-      var2 = clamp(var2);
-      var3 = clamp(var3);
-      return (var0 & 255) << 24 | (var1 & 255) << 16 | (var2 & 255) << 8 | var3 & 255;
+   public static int argb(int alpha, int red, int green, int blue) {
+      alpha = clamp(alpha);
+      red = clamp(red);
+      green = clamp(green);
+      blue = clamp(blue);
+      return (alpha & 255) << 24 | (red & 255) << 16 | (green & 255) << 8 | blue & 255;
    }
 
    /**
     * Performs rgb pct.
     *
-    * @param var0 parameter used by this operation
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param redPercent parameter used by this operation
+    * @param greenPercent parameter used by this operation
+    * @param bluePercent parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static int rgbPct(int var0, int var1, int var2) {
-      return rgb(pctToByte(var0), pctToByte(var1), pctToByte(var2));
+   public static int rgbPct(int redPercent, int greenPercent, int bluePercent) {
+      return rgb(pctToByte(redPercent), pctToByte(greenPercent), pctToByte(bluePercent));
    }
 
    /**
     * Performs argb pct.
     *
-    * @param var0 parameter used by this operation
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param alphaPercent parameter used by this operation
+    * @param redPercent parameter used by this operation
+    * @param greenPercent parameter used by this operation
+    * @param bluePercent parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static int argbPct(int var0, int var1, int var2, int var3) {
-      return argb(pctToByte(var0), pctToByte(var1), pctToByte(var2), pctToByte(var3));
+   public static int argbPct(int alphaPercent, int redPercent, int greenPercent, int bluePercent) {
+      return argb(pctToByte(alphaPercent), pctToByte(redPercent), pctToByte(greenPercent), pctToByte(bluePercent));
    }
 
    /**
     * Performs gray pct.
     *
-    * @param var0 parameter used by this operation
+    * @param valuePercent parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static int grayPct(int var0) {
-      return gray(pctToByte(var0));
+   public static int grayPct(int valuePercent) {
+      return gray(pctToByte(valuePercent));
    }
 
    /**
     * Performs agray pct.
     *
-    * @param var0 parameter used by this operation
-    * @param var1 parameter used by this operation
+    * @param alphaPercent parameter used by this operation
+    * @param valuePercent parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static int agrayPct(int var0, int var1) {
-      return agray(pctToByte(var0), pctToByte(var1));
+   public static int agrayPct(int alphaPercent, int valuePercent) {
+      return agray(pctToByte(alphaPercent), pctToByte(valuePercent));
    }
 
-   private static int pctToByte(int var0) {
-      return Math.max(0, Math.min(100, var0)) * 255 / 100;
+   private static int pctToByte(int value) {
+      return Math.max(0, Math.min(100, value)) * 255 / 100;
    }
 
    /**
     * Performs alpha.
     *
-    * @param var0 parameter used by this operation
-    * @param var1 parameter used by this operation
+    * @param alpha parameter used by this operation
+    * @param color parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public static int alpha(int var0, int var1) {
-      return var1 & 16777215 | (var0 & 255) << 24;
+   public static int alpha(int alpha, int color) {
+      return color & 16777215 | (alpha & 255) << 24;
    }
 
-   private static int clamp(int var0) {
-      return Math.max(0, Math.min(255, var0));
+   private static int clamp(int value) {
+      return Math.max(0, Math.min(255, value));
    }
 }

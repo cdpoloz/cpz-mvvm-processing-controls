@@ -11,6 +11,8 @@ import java.util.Objects;
 
 /**
  * Factory for creating the public drop down facade from external config.
+ *
+ * @author CPZ
  */
 public final class DropDownFactory {
     public static DropDown create(PApplet sketch, OverlayManager overlayManager, InputManager inputManager, DropDownConfig config) {

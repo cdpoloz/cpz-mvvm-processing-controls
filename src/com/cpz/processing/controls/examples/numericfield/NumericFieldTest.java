@@ -13,6 +13,9 @@ import processing.core.PApplet;
 
 import java.math.BigDecimal;
 
+/**
+ * @author CPZ
+ */
 public class NumericFieldTest extends PApplet {
     private InputManager inputManager;
     private KeyboardState keyboardState;

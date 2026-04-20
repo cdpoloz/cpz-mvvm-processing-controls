@@ -8,7 +8,7 @@ The current public model is explicit:
 - controls are created through public facades
 - styles receive the sketch-owned theme provider
 - the sketch changes the theme when needed
-- controls read the current `ThemeSnapshot` during rendering without requiring explicit updates in the sketch
+- styles read the current `ThemeSnapshot` during rendering without requiring explicit updates in the sketch
 
 There is no global theme singleton.
 
@@ -129,7 +129,7 @@ private void toggleTheme() {
 
 `ThemeManager.setTheme(...)` replaces the current theme and rebuilds the cached `ThemeSnapshot`.
 
-The sketch-owned `ThemeManager` is the single source of truth for the active theme. Controls do not store independent theme state and do not need extra synchronization. Their styles read the current snapshot when they render.
+The sketch-owned `ThemeManager` is the single source of truth for the active theme. Controls do not store independent theme state and do not need extra synchronization. Styles read the current snapshot when rendering the controls.
 
 ---
 
@@ -209,17 +209,17 @@ The theme flow stays aligned with the public facade architecture:
 
 ```text
 Sketch → ThemeManager → ThemeSnapshot
-                      ↓
+                      |
                  public styles
-                      ↓
-                public facades
+                      |
+                 renderers
 ```
 
 The sketch owns the theme decision.
 
 Styles consume `ThemeSnapshot`.
 
-Controls expose closed public facades and hide MVVM internals.
+Controls expose closed public facades and hide MVVM internals while styles and renderers keep the visual pipeline aligned with the current snapshot.
 
 This keeps theming explicit without adding global state or exposing internal rendering objects.
 

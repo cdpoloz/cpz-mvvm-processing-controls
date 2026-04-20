@@ -12,6 +12,9 @@ import processing.event.MouseEvent;
 
 import java.io.File;
 
+/**
+ * @author CPZ
+ */
 public class SliderJsonTest extends PApplet {
     private static final String SLIDER_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "slider-test.json";
 

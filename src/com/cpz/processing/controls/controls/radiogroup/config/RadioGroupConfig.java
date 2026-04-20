@@ -5,6 +5,8 @@ import java.util.Objects;
 
 /**
  * Minimal config DTO for a single radio group created from external data.
+ *
+ * @author CPZ
  */
 public final class RadioGroupConfig {
     private final String code;

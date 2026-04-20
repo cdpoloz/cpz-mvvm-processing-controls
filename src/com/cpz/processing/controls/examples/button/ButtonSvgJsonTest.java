@@ -11,6 +11,9 @@ import processing.core.PApplet;
 
 import java.io.File;
 
+/**
+ * @author CPZ
+ */
 public class ButtonSvgJsonTest extends PApplet {
     private static final String BUTTON_CONFIG_PATH = "data" + File.separator + "config" + File.separator + "button-svg-test.json";
 

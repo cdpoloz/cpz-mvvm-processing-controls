@@ -14,6 +14,8 @@ import processing.core.PFont;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public record TextFieldRenderStyle(int backgroundColor, int borderColor, int textColor, int cursorColor, int selectionColor, int selectionTextColor, float textSize, PFont font) {
 }

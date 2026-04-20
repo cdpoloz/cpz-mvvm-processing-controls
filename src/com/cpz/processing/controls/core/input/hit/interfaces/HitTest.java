@@ -12,10 +12,12 @@ package com.cpz.processing.controls.core.input.hit.interfaces;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public interface HitTest {
-   boolean contains(float var1, float var2);
+   boolean contains(float x, float y);
 
-   default void onLayout(float var1, float var2, float var3, float var4) {
+   default void onLayout(float x, float y, float width, float height) {
    }
 }

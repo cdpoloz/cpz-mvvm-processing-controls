@@ -8,6 +8,8 @@ import java.util.Objects;
 
 /**
  * Loads a minimal text field config from a JSON file.
+ *
+ * @author CPZ
  */
 public final class TextFieldConfigLoader {
     private final PApplet sketch;

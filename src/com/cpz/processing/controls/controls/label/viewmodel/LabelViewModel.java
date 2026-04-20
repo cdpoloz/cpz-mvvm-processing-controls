@@ -15,18 +15,20 @@ import com.cpz.processing.controls.core.viewmodel.AbstractControlViewModel;
  *
  * Notes:
  * - This type belongs to the MVVM ViewModel layer.
+ *
+ * @author CPZ
  */
 public final class LabelViewModel extends AbstractControlViewModel {
    /**
     * Creates a label view model.
     *
-    * @param var1 parameter used by this operation
+    * @param model parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public LabelViewModel(LabelModel var1) {
-      super(var1);
+   public LabelViewModel(LabelModel model) {
+      super(model);
    }
 
    /**
@@ -44,12 +46,12 @@ public final class LabelViewModel extends AbstractControlViewModel {
    /**
     * Updates text.
     *
-    * @param var1 new text
+    * @param text new text
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setText(String var1) {
-      ((LabelModel)this.model).setText(var1);
+   public void setText(String text) {
+      ((LabelModel)this.model).setText(text);
    }
 }

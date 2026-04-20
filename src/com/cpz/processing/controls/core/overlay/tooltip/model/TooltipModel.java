@@ -14,6 +14,8 @@ import com.cpz.processing.controls.core.model.Enableable;
  *
  * Notes:
  * - This type belongs to the MVVM Model layer.
+ *
+ * @author CPZ
  */
 public final class TooltipModel implements Enableable {
    private String text;
@@ -22,13 +24,13 @@ public final class TooltipModel implements Enableable {
    /**
     * Creates a tooltip model.
     *
-    * @param var1 parameter used by this operation
+    * @param text parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public TooltipModel(String var1) {
-      this.text = var1 == null ? "" : var1;
+   public TooltipModel(String text) {
+      this.text = text == null ? "" : text;
    }
 
    /**
@@ -46,13 +48,13 @@ public final class TooltipModel implements Enableable {
    /**
     * Updates text.
     *
-    * @param var1 new text
+    * @param text new text
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setText(String var1) {
-      this.text = var1 == null ? "" : var1;
+   public void setText(String text) {
+      this.text = text == null ? "" : text;
    }
 
    /**
@@ -70,12 +72,12 @@ public final class TooltipModel implements Enableable {
    /**
     * Updates enabled.
     *
-    * @param var1 new enabled
+    * @param enabled new enabled
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setEnabled(boolean var1) {
-      this.enabled = var1;
+   public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
    }
 }

@@ -23,6 +23,8 @@ import java.util.function.Function;
  *
  * Notes:
  * - This type belongs to the MVVM ViewModel layer.
+ *
+ * @author CPZ
  */
 public final class SliderViewModel extends AbstractControlViewModel {
    private boolean hovered;
@@ -36,25 +38,25 @@ public final class SliderViewModel extends AbstractControlViewModel {
    /**
     * Creates a slider view model.
     *
-    * @param var1 parameter used by this operation
+    * @param model parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public SliderViewModel(SliderModel var1) {
-      super(var1);
+   public SliderViewModel(SliderModel model) {
+      super(model);
    }
 
    /**
     * Handles pointer moved.
     *
-    * @param var1 parameter used by this operation
+    * @param inside parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onPointerMoved(boolean var1) {
-      this.hovered = this.isInteractive() && var1;
+   public void onPointerMoved(boolean inside) {
+      this.hovered = this.isInteractive() && inside;
       if (!this.isInteractive()) {
          this.resetInteractionState();
       }
@@ -64,34 +66,34 @@ public final class SliderViewModel extends AbstractControlViewModel {
    /**
     * Handles pointer pressed.
     *
-    * @param var1 parameter used by this operation
+    * @param wheelDelta mouse wheel delta
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onPointerPressed(float var1) {
+   public void onPointerPressed(float mouseX) {
       if (!this.isInteractive()) {
          this.resetInteractionState();
       } else {
          this.hovered = true;
          this.pressed = true;
          this.dragging = true;
-         this.applyNormalizedValue(var1, this.shouldSnapDuringInteraction());
+         this.applyNormalizedValue(mouseX, this.shouldSnapDuringInteraction());
       }
    }
 
    /**
     * Handles pointer dragged.
     *
-    * @param var1 parameter used by this operation
+    * @param wheelDelta mouse wheel delta
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onPointerDragged(float var1) {
+   public void onPointerDragged(float mouseX) {
       if (this.dragging && this.isInteractive()) {
          this.pressed = true;
-         this.applyNormalizedValue(var1, this.shouldSnapDuringInteraction());
+         this.applyNormalizedValue(mouseX, this.shouldSnapDuringInteraction());
       }
    }
 
@@ -113,27 +115,27 @@ public final class SliderViewModel extends AbstractControlViewModel {
    /**
     * Handles mouse wheel.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param wheelDelta mouse wheel delta
+    * @param coarseStep coarse-step modifier
+    * @param fineStep fine-step modifier
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onMouseWheel(float var1, boolean var2, boolean var3) {
-      if (this.isInteractive() && this.hovered && var1 != 0.0F) {
-         BigDecimal var4 = ((SliderModel)this.model).getStep();
-         if (var2) {
-            var4 = var4.multiply(BigDecimal.TEN);
-         } else if (var3) {
-            var4 = var4.multiply(new BigDecimal("0.1"));
+   public void onMouseWheel(float wheelDelta, boolean coarseStep, boolean fineStep) {
+      if (this.isInteractive() && this.hovered && wheelDelta != 0.0F) {
+         BigDecimal bigDecimal = ((SliderModel)this.model).getStep();
+         if (coarseStep) {
+            bigDecimal = bigDecimal.multiply(BigDecimal.TEN);
+         } else if (fineStep) {
+            bigDecimal = bigDecimal.multiply(new BigDecimal("0.1"));
          }
 
-         BigDecimal var5 = ((SliderModel)this.model).getValue();
-         BigDecimal var6 = BigDecimal.valueOf((double)(-Math.signum(var1)));
-         BigDecimal var7 = var5.add(var6.multiply(var4));
-         ((SliderModel)this.model).setValue(((SliderModel)this.model).normalizeValue(var7, true));
-         this.notifyValueChanged(var5);
+         BigDecimal bigDecimal2 = ((SliderModel)this.model).getValue();
+         BigDecimal bigDecimal3 = BigDecimal.valueOf((double)(-Math.signum(wheelDelta)));
+         BigDecimal bigDecimal4 = bigDecimal2.add(bigDecimal3.multiply(bigDecimal));
+         ((SliderModel)this.model).setValue(((SliderModel)this.model).normalizeValue(bigDecimal4, true));
+         this.notifyValueChanged(bigDecimal2);
       }
    }
 
@@ -188,26 +190,26 @@ public final class SliderViewModel extends AbstractControlViewModel {
    /**
     * Updates show text.
     *
-    * @param var1 new show text
+    * @param enabled new show text
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setShowText(boolean var1) {
-      this.showText = var1;
+   public void setShowText(boolean enabled) {
+      this.showText = enabled;
    }
 
    /**
     * Adds listener.
     *
-    * @param var1 parameter used by this operation
+    * @param listener parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void addListener(ValueListener<BigDecimal> var1) {
-      if (var1 != null) {
-         this.listeners.add(var1);
+   public void addListener(ValueListener<BigDecimal> listener) {
+      if (listener != null) {
+         this.listeners.add(listener);
       }
    }
 
@@ -226,19 +228,19 @@ public final class SliderViewModel extends AbstractControlViewModel {
    /**
     * Updates value.
     *
-    * @param var1 new value
+    * @param bigDecimal new value
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setValue(BigDecimal var1) {
-      BigDecimal var2 = ((SliderModel)this.model).getValue();
-      if (var2 != null && var2.equals(var1)) {
+   public void setValue(BigDecimal bigDecimal) {
+      BigDecimal bigDecimal2 = ((SliderModel)this.model).getValue();
+      if (bigDecimal2 != null && bigDecimal2.equals(bigDecimal)) {
          return;
       }
 
-      ((SliderModel)this.model).setValue(var1);
-      this.notifyValueChanged(var2);
+      ((SliderModel)this.model).setValue(bigDecimal);
+      this.notifyValueChanged(bigDecimal2);
    }
 
    /**
@@ -256,15 +258,15 @@ public final class SliderViewModel extends AbstractControlViewModel {
    /**
     * Updates min.
     *
-    * @param var1 new min
+    * @param bigDecimal new min
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setMin(BigDecimal var1) {
-      BigDecimal var2 = ((SliderModel)this.model).getValue();
-      ((SliderModel)this.model).setMin(var1);
-      this.notifyValueChanged(var2);
+   public void setMin(BigDecimal bigDecimal) {
+      BigDecimal bigDecimal2 = ((SliderModel)this.model).getValue();
+      ((SliderModel)this.model).setMin(bigDecimal);
+      this.notifyValueChanged(bigDecimal2);
    }
 
    /**
@@ -282,15 +284,15 @@ public final class SliderViewModel extends AbstractControlViewModel {
    /**
     * Updates max.
     *
-    * @param var1 new max
+    * @param bigDecimal new max
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setMax(BigDecimal var1) {
-      BigDecimal var2 = ((SliderModel)this.model).getValue();
-      ((SliderModel)this.model).setMax(var1);
-      this.notifyValueChanged(var2);
+   public void setMax(BigDecimal bigDecimal) {
+      BigDecimal bigDecimal2 = ((SliderModel)this.model).getValue();
+      ((SliderModel)this.model).setMax(bigDecimal);
+      this.notifyValueChanged(bigDecimal2);
    }
 
    /**
@@ -308,15 +310,15 @@ public final class SliderViewModel extends AbstractControlViewModel {
    /**
     * Updates step.
     *
-    * @param var1 new step
+    * @param bigDecimal new step
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setStep(BigDecimal var1) {
-      BigDecimal var2 = ((SliderModel)this.model).getValue();
-      ((SliderModel)this.model).setStep(var1);
-      this.notifyValueChanged(var2);
+   public void setStep(BigDecimal bigDecimal) {
+      BigDecimal bigDecimal2 = ((SliderModel)this.model).getValue();
+      ((SliderModel)this.model).setStep(bigDecimal);
+      this.notifyValueChanged(bigDecimal2);
    }
 
    /**
@@ -334,15 +336,15 @@ public final class SliderViewModel extends AbstractControlViewModel {
    /**
     * Updates snap mode.
     *
-    * @param var1 new snap mode
+    * @param snapMode new snap mode
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setSnapMode(SnapMode var1) {
-      BigDecimal var2 = ((SliderModel)this.model).getValue();
-      ((SliderModel)this.model).setSnapMode(var1);
-      this.notifyValueChanged(var2);
+   public void setSnapMode(SnapMode snapMode) {
+      BigDecimal bigDecimal = ((SliderModel)this.model).getValue();
+      ((SliderModel)this.model).setSnapMode(snapMode);
+      this.notifyValueChanged(bigDecimal);
    }
 
    /**
@@ -354,12 +356,12 @@ public final class SliderViewModel extends AbstractControlViewModel {
     * - Returns the current value without applying side effects.
     */
    public float getNormalizedValue() {
-      BigDecimal var1 = ((SliderModel)this.model).getMax().subtract(((SliderModel)this.model).getMin());
-      if (var1.signum() == 0) {
+      BigDecimal decimal = ((SliderModel)this.model).getMax().subtract(((SliderModel)this.model).getMin());
+      if (decimal.signum() == 0) {
          return 0.0F;
       } else {
-         BigDecimal var2 = ((SliderModel)this.model).getValue().subtract(((SliderModel)this.model).getMin());
-         return clampNormalized(var2.divide(var1, 6, RoundingMode.HALF_UP).floatValue());
+         BigDecimal decimal2 = ((SliderModel)this.model).getValue().subtract(((SliderModel)this.model).getMin());
+         return clampNormalized(decimal2.divide(decimal, 6, RoundingMode.HALF_UP).floatValue());
       }
    }
 
@@ -372,38 +374,38 @@ public final class SliderViewModel extends AbstractControlViewModel {
     * - Returns the current value without applying side effects.
     */
    public String getFormattedValue() {
-      BigDecimal var1 = ((SliderModel)this.model).getValue();
+      BigDecimal decimal = ((SliderModel)this.model).getValue();
       if (this.formatter != null) {
-         return (String)this.formatter.apply(var1);
+         return (String)this.formatter.apply(decimal);
       } else {
-         int var2 = Math.max(0, ((SliderModel)this.model).getStep().scale());
-         return var1.setScale(var2, RoundingMode.HALF_UP).toPlainString();
+         int decimal2 = Math.max(0, ((SliderModel)this.model).getStep().scale());
+         return decimal.setScale(decimal2, RoundingMode.HALF_UP).toPlainString();
       }
    }
 
    /**
     * Updates formatter.
     *
-    * @param Function<BigDecimal parameter used by this operation
-    * @param var1 new formatter
+    * @param function<BigDecimal parameter used by this operation
+    * @param function new formatter
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setFormatter(Function<BigDecimal, String> var1) {
-      this.formatter = var1;
+   public void setFormatter(Function<BigDecimal, String> function) {
+      this.formatter = function;
    }
 
    /**
     * Updates on value changed.
     *
-    * @param var1 new on value changed
+    * @param consumer new on value changed
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setOnValueChanged(Consumer<BigDecimal> var1) {
-      this.onValueChanged = var1;
+   public void setOnValueChanged(Consumer<BigDecimal> consumer) {
+      this.onValueChanged = consumer;
    }
 
    protected void onAvailabilityChanged() {
@@ -417,41 +419,41 @@ public final class SliderViewModel extends AbstractControlViewModel {
       return this.isEnabled() && this.isVisible();
    }
 
-   private void applyNormalizedValue(float var1, boolean var2) {
-      float var3 = clampNormalized(var1);
-      BigDecimal var4 = ((SliderModel)this.model).getMin();
-      BigDecimal var5 = ((SliderModel)this.model).getMax();
-      BigDecimal var6 = var5.subtract(var4);
-      BigDecimal var7 = var4.add(var6.multiply(BigDecimal.valueOf((double)var3)));
-      BigDecimal var8 = ((SliderModel)this.model).getValue();
-      if (var2) {
-         ((SliderModel)this.model).setValue(var7);
+   private void applyNormalizedValue(float x, boolean snap) {
+      float value = clampNormalized(x);
+      BigDecimal bigDecimal = ((SliderModel)this.model).getMin();
+      BigDecimal bigDecimal2 = ((SliderModel)this.model).getMax();
+      BigDecimal bigDecimal3 = bigDecimal2.subtract(bigDecimal);
+      BigDecimal bigDecimal4 = bigDecimal.add(bigDecimal3.multiply(BigDecimal.valueOf((double)value)));
+      BigDecimal bigDecimal5 = ((SliderModel)this.model).getValue();
+      if (snap) {
+         ((SliderModel)this.model).setValue(bigDecimal4);
       } else {
-         ((SliderModel)this.model).setValue(((SliderModel)this.model).normalizeValue(var7, false));
+         ((SliderModel)this.model).setValue(((SliderModel)this.model).normalizeValue(bigDecimal4, false));
       }
 
-      this.notifyValueChanged(var8);
+      this.notifyValueChanged(bigDecimal5);
    }
 
    private boolean shouldSnapDuringInteraction() {
       return ((SliderModel)this.model).getSnapMode() == SnapMode.ALWAYS;
    }
 
-   private void notifyValueChanged(BigDecimal var1) {
-      BigDecimal var2 = ((SliderModel)this.model).getValue();
-      if (var1.compareTo(var2) != 0) {
+   private void notifyValueChanged(BigDecimal bigDecimal) {
+      BigDecimal bigDecimal2 = ((SliderModel)this.model).getValue();
+      if (bigDecimal.compareTo(bigDecimal2) != 0) {
          if (this.onValueChanged != null) {
-            this.onValueChanged.accept(var2);
+            this.onValueChanged.accept(bigDecimal2);
          }
 
-         this.notifyListeners(var2);
+         this.notifyListeners(bigDecimal2);
       }
 
    }
 
-   private void notifyListeners(BigDecimal var1) {
-      for(ValueListener<BigDecimal> var3 : this.listeners) {
-         var3.onChange(var1);
+   private void notifyListeners(BigDecimal bigDecimal) {
+      for(ValueListener<BigDecimal> listener : this.listeners) {
+         listener.onChange(bigDecimal);
       }
 
    }
@@ -462,7 +464,7 @@ public final class SliderViewModel extends AbstractControlViewModel {
       this.dragging = false;
    }
 
-   private static float clampNormalized(float var0) {
-      return Math.max(0.0F, Math.min(1.0F, var0));
+   private static float clampNormalized(float x) {
+      return Math.max(0.0F, Math.min(1.0F, x));
    }
 }

@@ -17,6 +17,8 @@ import com.cpz.processing.controls.core.input.PointerInteractable;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class CheckboxInputAdapter {
    private final PointerInputAdapter delegate;
@@ -24,64 +26,64 @@ public final class CheckboxInputAdapter {
    /**
     * Creates a checkbox input adapter.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param interactable parameter used by this operation
+    * @param target parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public CheckboxInputAdapter(PointerInteractable var1, PointerInputTarget var2) {
-      this.delegate = new PointerInputAdapter(var1, var2);
+   public CheckboxInputAdapter(PointerInteractable interactable, PointerInputTarget target) {
+      this.delegate = new PointerInputAdapter(interactable, target);
    }
 
    /**
     * Handles mouse move.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMouseMove(float var1, float var2) {
-      this.delegate.handleMouseMove(var1, var2);
+   public void handleMouseMove(float mouseX, float mouseY) {
+      this.delegate.handleMouseMove(mouseX, mouseY);
    }
 
    /**
     * Handles mouse press.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMousePress(float var1, float var2) {
-      this.delegate.handleMousePress(var1, var2);
+   public void handleMousePress(float mouseX, float mouseY) {
+      this.delegate.handleMousePress(mouseX, mouseY);
    }
 
    /**
     * Handles mouse release.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param mouseX parameter used by this operation
+    * @param mouseY parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handleMouseRelease(float var1, float var2) {
-      this.delegate.handleMouseRelease(var1, var2);
+   public void handleMouseRelease(float mouseX, float mouseY) {
+      this.delegate.handleMouseRelease(mouseX, mouseY);
    }
 
    /**
     * Handles pointer event.
     *
-    * @param var1 parameter used by this operation
+    * @param event parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void handlePointerEvent(PointerEvent var1) {
-      this.delegate.handlePointerEvent(var1);
+   public void handlePointerEvent(PointerEvent event) {
+      this.delegate.handlePointerEvent(event);
    }
 }

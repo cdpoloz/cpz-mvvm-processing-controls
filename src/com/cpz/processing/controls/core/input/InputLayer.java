@@ -12,6 +12,8 @@ package com.cpz.processing.controls.core.input;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public interface InputLayer {
    /**
@@ -45,16 +47,16 @@ public interface InputLayer {
    /**
     * Handles a pointer event.
     *
-    * @param var1 pointer event being dispatched
+    * @param event pointer event being dispatched
     * @return {@code true} when the event is consumed
     */
-   boolean handlePointerEvent(PointerEvent var1);
+   boolean handlePointerEvent(PointerEvent event);
 
    /**
     * Handles a keyboard event.
     *
-    * @param var1 keyboard event being dispatched
+    * @param event keyboard event being dispatched
     * @return {@code true} when the event is consumed
     */
-   boolean handleKeyboardEvent(KeyboardEvent var1);
+   boolean handleKeyboardEvent(KeyboardEvent event);
 }

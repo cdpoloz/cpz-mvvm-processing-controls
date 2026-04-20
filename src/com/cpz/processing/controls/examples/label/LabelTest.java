@@ -8,6 +8,9 @@ import com.cpz.processing.controls.controls.label.style.VerticalAlign;
 import com.cpz.processing.controls.core.util.Colors;
 import processing.core.PApplet;
 
+/**
+ * @author CPZ
+ */
 public class LabelTest extends PApplet {
     private Label label;
 

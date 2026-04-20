@@ -23,6 +23,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type belongs to the visual styling pipeline.
+ *
+ * @author CPZ
  */
 public final class SliderStyle {
    private final SliderStyleConfig config;
@@ -32,75 +34,75 @@ public final class SliderStyle {
    /**
     * Creates a slider style.
     *
-    * @param var1 parameter used by this operation
+    * @param config parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public SliderStyle(SliderStyleConfig var1) {
-      this(var1, new SliderRenderer());
+   public SliderStyle(SliderStyleConfig config) {
+      this(config, new SliderRenderer());
    }
 
    /**
     * Creates a slider style.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param config parameter used by this operation
+    * @param renderer parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public SliderStyle(SliderStyleConfig var1, SliderRenderer var2) {
-      if (var1 == null) {
+   public SliderStyle(SliderStyleConfig config, SliderRenderer renderer) {
+      if (config == null) {
          throw new IllegalArgumentException("config must not be null");
       } else {
-         this.config = var1;
-         this.renderer = var2 == null ? new SliderRenderer() : var2;
-         this.themeProvider = var1.themeProvider != null ? var1.themeProvider : new ThemeManager();
+         this.config = config;
+         this.renderer = renderer == null ? new SliderRenderer() : renderer;
+         this.themeProvider = config.themeProvider != null ? config.themeProvider : new ThemeManager();
       }
    }
 
    /**
     * Renders the current frame.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param state parameter used by this operation
+    * @param snapshot parameter used by this operation
+    * @param sliderGeometry parameter used by this operation
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
     */
-   public void render(PApplet var1, SliderViewState var2, ThemeSnapshot var3, SliderGeometry var4) {
-      ThemeTokens var5 = var3.tokens;
-      boolean var6 = var2.pressed() || var2.dragging();
-      int var7 = this.resolveColorOverride(var5.surfaceVariant, this.config.trackOverride, this.config.trackColor);
-      int var8 = InteractiveStyleHelper.resolveFillColor(var7, this.resolveInteractiveColor(var7, var5.hoverOverlay, this.config.trackHoverOverride, this.config.trackHoverColor), this.resolveInteractiveColor(var7, var5.pressedOverlay, this.config.trackPressedOverride, this.config.trackPressedColor), var2.hovered(), var6);
-      int var9 = this.resolveColorOverride(var5.primary, this.config.progressOverride, this.config.activeTrackColor);
-      int var10 = InteractiveStyleHelper.resolveFillColor(var9, this.resolveInteractiveColor(var9, var5.hoverOverlay, this.config.progressHoverOverride, this.config.activeTrackHoverColor), this.resolveInteractiveColor(var9, var5.pressedOverlay, this.config.progressPressedOverride, this.config.activeTrackPressedColor), var2.hovered(), var6);
-      int var11 = this.resolveColorOverride(var5.primary, this.config.thumbOverride, this.config.thumbColor);
-      int var12 = InteractiveStyleHelper.resolveFillColor(var11, this.resolveInteractiveColor(var11, var5.hoverOverlay, this.config.thumbHoverOverride, this.config.thumbHoverColor), this.resolveInteractiveColor(var11, var5.pressedOverlay, this.config.thumbPressedOverride, this.config.thumbPressedColor), var2.hovered(), var6);
-      int var13 = this.config.disabledAlpha != null ? this.config.disabledAlpha : var5.disabledAlpha;
-      int var14 = this.resolveColorOverride(var5.border, this.config.trackStrokeOverride, this.config.trackStrokeColor);
-      int var15 = this.resolveColorOverride(var5.border, this.config.thumbStrokeOverride, this.config.thumbStrokeColor);
-      int var16 = this.resolveColorOverride(var5.onSurface, this.config.textOverride, this.config.textColor);
-      SliderRenderStyle var17 = new SliderRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(var8, var2.enabled(), var13), InteractiveStyleHelper.resolveStrokeColor(var14, var2.enabled(), var13), InteractiveStyleHelper.resolveStrokeWeight(this.config.trackStrokeWeight, this.config.trackStrokeWeightHover, var2.hovered()), this.config.trackThickness, InteractiveStyleHelper.applyDisabledAlpha(var10, var2.enabled(), var13), InteractiveStyleHelper.applyDisabledAlpha(var12, var2.enabled(), var13), InteractiveStyleHelper.resolveStrokeColor(var15, var2.enabled(), var13), InteractiveStyleHelper.resolveStrokeWeight(this.config.thumbStrokeWeight, this.config.thumbStrokeWeightHover, var2.hovered()), this.config.thumbSize, InteractiveStyleHelper.resolveStrokeColor(var16, var2.enabled(), var13), this.config.svgColorMode, this.config.thumbShape, this.config.showValueText);
-      this.renderer.render(var1, var4, var2, var17);
+   public void render(PApplet sketch, SliderViewState state, ThemeSnapshot snapshot, SliderGeometry sliderGeometry) {
+      ThemeTokens tokens = snapshot.tokens;
+      boolean shouldActivate = state.pressed() || state.dragging();
+      int color = this.resolveColorOverride(tokens.surfaceVariant, this.config.trackOverride, this.config.trackColor);
+      int color2 = InteractiveStyleHelper.resolveFillColor(color, this.resolveInteractiveColor(color, tokens.hoverOverlay, this.config.trackHoverOverride, this.config.trackHoverColor), this.resolveInteractiveColor(color, tokens.pressedOverlay, this.config.trackPressedOverride, this.config.trackPressedColor), state.hovered(), shouldActivate);
+      int color3 = this.resolveColorOverride(tokens.primary, this.config.progressOverride, this.config.activeTrackColor);
+      int color4 = InteractiveStyleHelper.resolveFillColor(color3, this.resolveInteractiveColor(color3, tokens.hoverOverlay, this.config.progressHoverOverride, this.config.activeTrackHoverColor), this.resolveInteractiveColor(color3, tokens.pressedOverlay, this.config.progressPressedOverride, this.config.activeTrackPressedColor), state.hovered(), shouldActivate);
+      int color5 = this.resolveColorOverride(tokens.primary, this.config.thumbOverride, this.config.thumbColor);
+      int color6 = InteractiveStyleHelper.resolveFillColor(color5, this.resolveInteractiveColor(color5, tokens.hoverOverlay, this.config.thumbHoverOverride, this.config.thumbHoverColor), this.resolveInteractiveColor(color5, tokens.pressedOverlay, this.config.thumbPressedOverride, this.config.thumbPressedColor), state.hovered(), shouldActivate);
+      int disabledAlpha = this.config.disabledAlpha != null ? this.config.disabledAlpha : tokens.disabledAlpha;
+      int color7 = this.resolveColorOverride(tokens.border, this.config.trackStrokeOverride, this.config.trackStrokeColor);
+      int color8 = this.resolveColorOverride(tokens.border, this.config.thumbStrokeOverride, this.config.thumbStrokeColor);
+      int color9 = this.resolveColorOverride(tokens.onSurface, this.config.textOverride, this.config.textColor);
+      SliderRenderStyle renderStyle = new SliderRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(color2, state.enabled(), disabledAlpha), InteractiveStyleHelper.resolveStrokeColor(color7, state.enabled(), disabledAlpha), InteractiveStyleHelper.resolveStrokeWeight(this.config.trackStrokeWeight, this.config.trackStrokeWeightHover, state.hovered()), this.config.trackThickness, InteractiveStyleHelper.applyDisabledAlpha(color4, state.enabled(), disabledAlpha), InteractiveStyleHelper.applyDisabledAlpha(color6, state.enabled(), disabledAlpha), InteractiveStyleHelper.resolveStrokeColor(color8, state.enabled(), disabledAlpha), InteractiveStyleHelper.resolveStrokeWeight(this.config.thumbStrokeWeight, this.config.thumbStrokeWeightHover, state.hovered()), this.config.thumbSize, InteractiveStyleHelper.resolveStrokeColor(color9, state.enabled(), disabledAlpha), this.config.svgColorMode, this.config.thumbShape, this.config.showValueText);
+      this.renderer.render(sketch, sliderGeometry, state, renderStyle);
    }
 
-   private int resolveInteractiveColor(int var1, int var2, Integer var3, Integer var4) {
-      if (var3 != null) {
-         return var3;
+   private int resolveInteractiveColor(int color, int color2, Integer color3, Integer color4) {
+      if (color3 != null) {
+         return color3;
       } else {
-         return var4 != null ? var4 : InteractiveStyleHelper.applyOverlay(var1, var2);
+         return color4 != null ? color4 : InteractiveStyleHelper.applyOverlay(color, color2);
       }
    }
 
-   private int resolveColorOverride(int var1, Integer var2, Integer var3) {
-      if (var2 != null) {
-         return var2;
+   private int resolveColorOverride(int color, Integer color2, Integer color3) {
+      if (color2 != null) {
+         return color2;
       } else {
-         return var3 != null ? var3 : var1;
+         return color3 != null ? color3 : color;
       }
    }
 

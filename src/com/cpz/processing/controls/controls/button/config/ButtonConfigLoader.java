@@ -9,6 +9,8 @@ import java.util.Objects;
 
 /**
  * Loads a minimal button config from a JSON file.
+ *
+ * @author CPZ
  */
 public final class ButtonConfigLoader {
     private final PApplet sketch;

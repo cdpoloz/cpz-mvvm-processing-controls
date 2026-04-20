@@ -14,6 +14,8 @@ import com.cpz.processing.controls.core.input.hit.interfaces.HitTest;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class CircleHitTest implements HitTest {
    private float cx;
@@ -32,62 +34,62 @@ public final class CircleHitTest implements HitTest {
    /**
     * Creates a circle hit test.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public CircleHitTest(float var1, float var2, float var3) {
-      this.set(var1, var2, var3);
+   public CircleHitTest(float x, float y, float width) {
+      this.set(x, y, width);
    }
 
    /**
     * Handles layout.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
+    * @param height parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
     */
-   public void onLayout(float var1, float var2, float var3, float var4) {
-      float var5 = Math.min(var3, var4);
-      this.set(var1, var2, var5 * 0.5F);
+   public void onLayout(float x, float y, float width, float height) {
+      float value = Math.min(width, height);
+      this.set(x, y, value * 0.5F);
    }
 
    /**
     * Performs set.
     *
-    * @param var1 new state
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
+    * @param x new state
+    * @param y parameter used by this operation
+    * @param width parameter used by this operation
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void set(float var1, float var2, float var3) {
-      this.cx = var1;
-      this.cy = var2;
-      this.r = var3;
+   public void set(float x, float y, float width) {
+      this.cx = x;
+      this.cy = y;
+      this.r = width;
    }
 
    /**
     * Performs contains.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
+    * @param x parameter used by this operation
+    * @param y parameter used by this operation
     * @return result of this operation
     *
     * Behavior:
     * - Executes the public operation exposed by this type.
     */
-   public boolean contains(float var1, float var2) {
-      float var3 = var1 - this.cx;
-      float var4 = var2 - this.cy;
-      return var3 * var3 + var4 * var4 <= this.r * this.r;
+   public boolean contains(float x, float y) {
+      float dx = x - this.cx;
+      float dy = y - this.cy;
+      return dx * dx + dy * dy <= this.r * this.r;
    }
 }

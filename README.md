@@ -10,6 +10,16 @@ explicit input routing, and high-performance rendering.
 
 ---
 
+## Key design decisions
+
+- Strict MVVM pipeline (Model → ViewModel → View → Style → Renderer)
+- Fully decoupled input system (no Processing dependency in interaction logic)
+- Explicit composition instead of implicit binding systems
+- Sketch-owned theming (no global state, no singletons)
+- Facade-based public API with hidden MVVM internals
+
+---
+
 ## Overview
 
 This project is a UI framework intended for Processing sketches and for other host environments that can provide normalized input events.
@@ -26,18 +36,37 @@ That separation keeps rendering concerns, interaction logic, and host-framework 
 
 ---
 
+## Mental Model
+
+At a high level, the framework works like this:
+
+```text
+Sketch (owns everything)
+   ├── ThemeManager
+   ├── InputManager
+   └── Controls (public facades)
+
+Input:
+External Source → Adapter → InputManager → InputLayer → Control facade → ViewModel
+
+Rendering:
+Model → ViewModel → View → ViewState → Style → Renderer
+```
+
+---
+
 ## Why this library?
 
 Processing sketches often mix rendering, input handling, and state in a single class.
 
 This project provides a structured alternative based on a strict MVVM pipeline, explicit input routing, and fully decoupled rendering.
 
-Key characteristics:
+What this gives you:
 
-- No reflection, no magic
-- Explicit data flow
-- Clear separation of concerns
-- Designed for real-time rendering and external input integration
+- predictable and debuggable behavior (no hidden state or implicit wiring)
+- clear separation between rendering, interaction, and state
+- full control from the sketch (no framework-owned lifecycle surprises)
+- reusable controls without sacrificing transparency
 
 ---
 
@@ -93,6 +122,76 @@ Both event types are normalized at the adapter boundary and consumed by the fram
 
 ## Quick Example
 
+### Minimal Example
+
+```java
+import com.cpz.processing.controls.controls.button.Button;
+import com.cpz.processing.controls.controls.button.style.ButtonDefaultStyles;
+import com.cpz.processing.controls.core.input.InputManager;
+import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.core.theme.LightTheme;
+import com.cpz.processing.controls.core.theme.ThemeManager;
+import processing.core.PApplet;
+
+public class MinimalSketch extends PApplet {
+
+    private ThemeManager themeManager;
+    private InputManager inputManager;
+
+    private Button button;
+
+    public void settings() {
+        size(400, 200);
+    }
+
+    public void setup() {
+        themeManager = new ThemeManager(new LightTheme());
+        inputManager = new InputManager();
+
+        button = new Button(this, "btnHello", "Click me", 140, 80, 120, 40);
+        button.setStyle(ButtonDefaultStyles.primary(themeManager));
+
+        button.setClickListener(() -> {
+            System.out.println("Hello from MVVM control!");
+        });
+
+        // Simple input layer (direct routing for this example)
+        inputManager.registerLayer(new SimpleInputLayer());
+    }
+
+    public void draw() {
+        background(240);
+        button.draw();
+    }
+
+    public void mousePressed() {
+        inputManager.dispatchPointer(
+                new PointerEvent(PointerEvent.Type.PRESS, mouseX, mouseY, mouseButton)
+        );
+    }
+
+    public void mouseReleased() {
+        inputManager.dispatchPointer(
+                new PointerEvent(PointerEvent.Type.RELEASE, mouseX, mouseY, mouseButton)
+        );
+    }
+
+    private class SimpleInputLayer extends com.cpz.processing.controls.core.input.DefaultInputLayer {
+
+        public SimpleInputLayer() {
+            super(0);
+        }
+
+        @Override
+        public boolean handlePointerEvent(PointerEvent event) {
+            button.handlePointerEvent(event);
+            return true;
+        }
+    }
+}
+```
+
+### Composition Example (JSON + Binding)
 ```java
 ControlConfigLoader loader = new ControlConfigLoader(this);
 Map<String, Control> controls = loader.load("data/config/json-multicontrol-binding-test.json");
@@ -135,6 +234,23 @@ At the public API level, each concrete facade keeps its own domain-specific meth
 You can find working examples in:
 
 `src/com/cpz/processing/controls/examples`
+
+---
+
+## When to use this
+
+This framework is a good fit when:
+
+- you are building non-trivial Processing applications with multiple UI controls
+- you want strict separation between rendering, interaction, and state
+- you need predictable input handling (keyboard + pointer)
+- you want theming without global state
+- you prefer explicit composition over hidden binding systems
+
+It may not be the best fit for:
+
+- very small sketches with minimal UI
+- quick prototypes where structure is not a concern
 
 ---
 
@@ -183,6 +299,41 @@ Public API notes:
 - `Control` is distinct from `ControlView`, which belongs to the internal MVVM view layer
 - the JSON layer creates closed facades and returns them through `Map<String, Control>`
 - JSON does not define binding; binding remains sketch-side
+
+---
+
+## Architecture Overview
+
+```text
+                ┌───────────────┐
+                │    Sketch     │
+                │ (owns state)  │
+                └──────┬────────┘
+                       │
+        ┌──────────────┼──────────────┐
+        │              │              │
+ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+ │ ThemeManager│ │ InputManager│ │  Controls   │
+ │             │ │             │ │ (facades)   │
+ └──────┬──────┘ └──────┬──────┘ └──────┬──────┘
+        │               │               │
+        │               │               ▼
+        │               │        ┌─────────────┐
+        │               │        │ ViewModel   │
+        │               │        └──────┬──────┘
+        │               │               │
+        │               │        ┌─────────────┐
+        │               │        │ View        │
+        │               │        └──────┬──────┘
+        │               │               │
+        │               │        ┌─────────────┐
+        │               │        │ Style       │◄──── ThemeSnapshot
+        │               │        └──────┬──────┘
+        │               │               │
+        │               │        ┌─────────────┐
+        │               │        │ Renderer    │
+        │               │        └─────────────┘
+```
 
 ---
 
@@ -238,6 +389,7 @@ That template demonstrates how to connect Processing callbacks to the framework 
 
 - [Control](docs/control.md)
 - [Architecture](docs/architecture.md)
+- [Composition Patterns](docs/composition-patterns.md)
 - [Binding](docs/binding.md)
 - [Input System](docs/input-system.md)
 - [JSON Configuration](docs/json-configuration.md)

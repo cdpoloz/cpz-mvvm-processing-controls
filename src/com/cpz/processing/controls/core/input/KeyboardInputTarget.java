@@ -14,21 +14,23 @@ import com.cpz.processing.controls.core.focus.Focusable;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public interface KeyboardInputTarget extends Focusable {
    /**
     * Handles a typed character.
     *
-    * @param var1 typed character
+    * @param key typed character
     */
-   void onKeyTyped(char var1);
+   void onKeyTyped(char key);
 
    /**
     * Inserts text at the current cursor or selection.
     *
-    * @param var1 text to insert
+    * @param text text to insert
     */
-   void insertText(String var1);
+   void insertText(String text);
 
    void backspace();
 
@@ -75,18 +77,18 @@ public interface KeyboardInputTarget extends Focusable {
    /**
     * Increments the current value when supported.
     *
-    * @param var1 coarse-step modifier
-    * @param var2 fine-step modifier
+    * @param coarseStep coarse-step modifier
+    * @param fineStep fine-step modifier
     */
-   default void increment(boolean var1, boolean var2) {
+   default void increment(boolean coarseStep, boolean fineStep) {
    }
 
    /**
     * Decrements the current value when supported.
     *
-    * @param var1 coarse-step modifier
-    * @param var2 fine-step modifier
+    * @param coarseStep coarse-step modifier
+    * @param fineStep fine-step modifier
     */
-   default void decrement(boolean var1, boolean var2) {
+   default void decrement(boolean coarseStep, boolean fineStep) {
    }
 }

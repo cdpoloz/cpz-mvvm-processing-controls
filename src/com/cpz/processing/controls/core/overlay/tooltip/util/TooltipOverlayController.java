@@ -24,6 +24,8 @@ import processing.core.PApplet;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class TooltipOverlayController {
    private final TooltipView view;
@@ -38,44 +40,44 @@ public final class TooltipOverlayController {
    /**
     * Creates a tooltip overlay controller.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param overlayManager parameter used by this operation
+    * @param hoverSupplier supplier for hover state
+    * @param textSupplier supplier for tooltip text
+    * @param anchorBoundsProvider parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public TooltipOverlayController(PApplet var1, OverlayManager var2, Supplier var3, Supplier var4, AnchorBoundsProvider var5) {
-      this(var1, var2, var3, var4, var5, new DefaultTooltipStyle(new TooltipStyleConfig()));
+   public TooltipOverlayController(PApplet sketch, OverlayManager overlayManager, Supplier hoverSupplier, Supplier textSupplier, AnchorBoundsProvider anchorBoundsProvider) {
+      this(sketch, overlayManager, hoverSupplier, textSupplier, anchorBoundsProvider, new DefaultTooltipStyle(new TooltipStyleConfig()));
    }
 
    /**
     * Creates a tooltip overlay controller.
     *
-    * @param var1 parameter used by this operation
-    * @param var2 parameter used by this operation
-    * @param var3 parameter used by this operation
-    * @param var4 parameter used by this operation
-    * @param var5 parameter used by this operation
-    * @param var6 parameter used by this operation
+    * @param sketch parameter used by this operation
+    * @param overlayManager parameter used by this operation
+    * @param hoverSupplier supplier for hover state
+    * @param textSupplier supplier for tooltip text
+    * @param anchorBoundsProvider parameter used by this operation
+    * @param style parameter used by this operation
     *
     * Behavior:
     * - Initializes the public state required by this type.
     */
-   public TooltipOverlayController(PApplet var1, OverlayManager var2, Supplier var3, Supplier var4, AnchorBoundsProvider var5, DefaultTooltipStyle var6) {
-      this.overlayManager = var2;
-      this.hoverSupplier = var3;
-      this.textSupplier = var4;
-      this.anchorBoundsProvider = var5;
+   public TooltipOverlayController(PApplet sketch, OverlayManager overlayManager, Supplier hoverSupplier, Supplier textSupplier, AnchorBoundsProvider anchorBoundsProvider, DefaultTooltipStyle style) {
+      this.overlayManager = overlayManager;
+      this.hoverSupplier = hoverSupplier;
+      this.textSupplier = textSupplier;
+      this.anchorBoundsProvider = anchorBoundsProvider;
       this.viewModel = new TooltipViewModel(new TooltipModel(""));
-      this.view = new TooltipView(var1, this.viewModel);
-      this.view.setStyle(var6);
-      PassiveTooltipInputLayer var7 = new PassiveTooltipInputLayer();
-      TooltipView var10004 = this.view;
-      Objects.requireNonNull(var10004);
-      this.overlayEntry = new OverlayEntry(10, var10004::draw, var7, this::hideTooltip);
+      this.view = new TooltipView(sketch, this.viewModel);
+      this.view.setStyle(style);
+      PassiveTooltipInputLayer passiveTooltipInputLayer = new PassiveTooltipInputLayer();
+      TooltipView view = this.view;
+      Objects.requireNonNull(view);
+      this.overlayEntry = new OverlayEntry(10, view::draw, passiveTooltipInputLayer, this::hideTooltip);
    }
 
    /**
@@ -85,10 +87,10 @@ public final class TooltipOverlayController {
     * - Executes the public operation exposed by this type.
     */
    public void sync() {
-      boolean var1 = this.hoverSupplier != null && Boolean.TRUE.equals(this.hoverSupplier.get());
-      String var2 = this.textSupplier == null ? "" : (String)this.textSupplier.get();
-      if (var1 && var2 != null && !var2.isBlank()) {
-         this.viewModel.setText(var2);
+      boolean active = this.hoverSupplier != null && Boolean.TRUE.equals(this.hoverSupplier.get());
+      String text = this.textSupplier == null ? "" : (String)this.textSupplier.get();
+      if (active && text != null && !text.isBlank()) {
+         this.viewModel.setText(text);
          this.viewModel.setVisible(true);
          this.view.setAnchorBounds(this.anchorBoundsProvider.getCenterX(), this.anchorBoundsProvider.getTopY());
          if (!this.registered) {

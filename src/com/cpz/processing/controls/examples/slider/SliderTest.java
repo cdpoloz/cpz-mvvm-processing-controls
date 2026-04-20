@@ -13,6 +13,9 @@ import processing.event.MouseEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+/**
+ * @author CPZ
+ */
 public class SliderTest extends PApplet {
     private InputManager inputManager;
     private Slider slider;

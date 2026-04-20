@@ -10,6 +10,8 @@ import java.util.Objects;
 
 /**
  * Factory for creating the public checkbox facade from external config.
+ *
+ * @author CPZ
  */
 public final class CheckboxFactory {
     public static Checkbox create(PApplet sketch, CheckboxConfig config) {

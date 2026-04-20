@@ -15,6 +15,8 @@ import com.cpz.processing.controls.core.theme.ThemeProvider;
  *
  * Notes:
  * - This type is part of the public project surface.
+ *
+ * @author CPZ
  */
 public final class CheckboxStyleConfig {
    public Integer checkedFillOverride;
@@ -39,24 +41,24 @@ public final class CheckboxStyleConfig {
    /**
     * Updates renderer.
     *
-    * @param var1 new renderer
+    * @param renderer new renderer
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setRenderer(CheckboxRenderer var1) {
-      this.renderer = var1;
+   public void setRenderer(CheckboxRenderer renderer) {
+      this.renderer = renderer;
    }
 
    /**
     * Updates theme provider.
     *
-    * @param var1 new theme provider
+    * @param themeProvider new theme provider
     *
     * Behavior:
     * - Updates the public state or registration owned by this type.
     */
-   public void setThemeProvider(ThemeProvider var1) {
-      this.themeProvider = var1;
+   public void setThemeProvider(ThemeProvider themeProvider) {
+      this.themeProvider = themeProvider;
    }
 }
