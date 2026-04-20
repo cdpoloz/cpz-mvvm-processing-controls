@@ -44,7 +44,7 @@ public class Launcher {
         // You can choose an example from the list below
 
         // Button *****************************************
-        PApplet.main(ButtonTest.class);
+        //PApplet.main(ButtonTest.class);
         //PApplet.main(ButtonSvgTest.class);
         //PApplet.main(ButtonJsonTest.class);
         //PApplet.main(ButtonSvgJsonTest.class);
@@ -67,8 +67,8 @@ public class Launcher {
         //PApplet.main(SliderSvgJsonTest.class);
 
         // Label ******************************************
-        //PApplet.main(LabelTest.class);
-        //PApplet.main(LabelJsonTest.class);
+        PApplet.main(LabelTest.class);
+        PApplet.main(LabelJsonTest.class);
 
         // RadioGroup *************************************
         //PApplet.main(RadioGroupTest.class);

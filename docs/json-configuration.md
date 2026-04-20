@@ -138,7 +138,11 @@ Multi-control document:
       "x": 120.0,
       "y": 50.0,
       "width": 320.0,
-      "height": 60.0
+      "height": 60.0,
+      "style": {
+        "textSize": 24.0,
+        "font": "data/font/abel-regular.ttf"
+      }
     },
     {
       "type": "button",
@@ -271,6 +275,33 @@ Style remains nested under each control entry:
 ```
 
 The style block still affects appearance only. It does not define behavior, listeners, input routing, or binding.
+
+Label style supports an optional `font` path:
+
+```json
+{
+  "type": "label",
+  "code": "lblJsonTest",
+  "text": "Label facade\nJSON example",
+  "x": 120.0,
+  "y": 70.0,
+  "width": 360.0,
+  "height": 100.0,
+  "style": {
+    "textSize": 24.0,
+    "font": "data/font/abel-regular.ttf",
+    "textColor": "#D2E4FF",
+    "lineSpacingMultiplier": 1.2,
+    "alignX": "center",
+    "alignY": "center",
+    "disabledAlpha": 80
+  }
+}
+```
+
+For `Label`, `style.font` is a font file path resolved by the label JSON pipeline. `LabelConfigLoader` reads the path, and `LabelFactory` creates the `PFont` with `sketch.createFont(...)` using `textSize` when present, or `12.0f` otherwise.
+
+The font file must exist in resources accessible to the Processing sketch, such as `data/font/abel-regular.ttf`. If `font` is omitted or `null`, the label keeps the previous default-font behavior.
 
 SVG renderer configuration also remains local to the control style block:
 

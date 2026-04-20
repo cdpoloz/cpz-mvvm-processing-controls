@@ -92,6 +92,8 @@ Because `Label` is non-interactive, there are no click listeners, change listene
 ```java
 LabelStyleConfig lsc = new LabelStyleConfig();
 lsc.textSize = 24.0f;
+PFont font = createFont("data/font/abel-regular.ttf", 24);
+lsc.font = font;
 lsc.textColor = Colors.rgb(210, 228, 255);
 lsc.lineSpacingMultiplier = 1.2f;
 lsc.alignX = HorizontalAlign.CENTER;
@@ -104,11 +106,16 @@ label.setStyle(new DefaultLabelStyle(lsc));
 This configuration controls the visual appearance:
 
 - `textSize` controls font size
+- `font` optionally assigns a specific `PFont`
 - `textColor` controls the resolved text color
 - `lineSpacingMultiplier` controls spacing between lines
 - `alignX` controls horizontal alignment
 - `alignY` controls vertical alignment
 - `disabledAlpha` controls disabled transparency
+
+The sketch owns programmatic resource loading. When a custom font is needed, load it with Processing's `createFont(...)` and assign the resulting `PFont` to `LabelStyleConfig.font`.
+
+If no font is assigned, the label keeps the previous behavior and renders with the default Processing text font for the current sketch.
 
 The facade uses the existing style mechanism. It does not introduce a new styling path.
 
@@ -136,6 +143,22 @@ Minimal JSON:
   "visible": true
 }
 ```
+
+JSON style can also provide a custom font path:
+
+```json
+"style": {
+  "textSize": 24.0,
+  "font": "data/font/abel-regular.ttf",
+  "textColor": "#D2E4FF",
+  "lineSpacingMultiplier": 1.2,
+  "alignX": "center",
+  "alignY": "center",
+  "disabledAlpha": 80
+}
+```
+
+In the JSON flow, `LabelConfigLoader` reads the `font` path and `LabelFactory` materializes it with `sketch.createFont(...)`. The size passed to `createFont(...)` is `textSize` when present, or `12.0f` otherwise. If `font` is omitted or `null`, the previous default-font behavior is preserved.
 
 Minimal Java sketch flow:
 
@@ -180,6 +203,7 @@ import com.cpz.processing.controls.controls.label.style.HorizontalAlign;
 import com.cpz.processing.controls.controls.label.style.VerticalAlign;
 import com.cpz.processing.controls.core.util.Colors;
 import processing.core.PApplet;
+import processing.core.PFont;
 
 public class LabelTest extends PApplet {
     private Label label;
@@ -198,6 +222,8 @@ public class LabelTest extends PApplet {
         // style
         LabelStyleConfig lsc = new LabelStyleConfig();
         lsc.textSize = 24.0f;
+        PFont font = createFont("data/font/abel-regular.ttf", 24);
+        lsc.font = font;
         lsc.textColor = Colors.rgb(210, 228, 255);
         lsc.lineSpacingMultiplier = 1.2f;
         lsc.alignX = HorizontalAlign.CENTER;
@@ -231,4 +257,3 @@ public class LabelTest extends PApplet {
 
 - [JSON Configuration](json-configuration.md)
 - [Architecture](architecture.md)
-

@@ -71,23 +71,31 @@ public final class LabelConfig {
 
     public static final class StyleConfig {
         private final Float textSize;
+        private final String fontPath;
         private final Integer textColor;
         private final Float lineSpacingMultiplier;
         private final HorizontalAlign alignX;
         private final VerticalAlign alignY;
         private final Integer disabledAlpha;
+        private final String sourcePath;
 
-        public StyleConfig(Float textSize, Integer textColor, Float lineSpacingMultiplier, HorizontalAlign alignX, VerticalAlign alignY, Integer disabledAlpha) {
+        public StyleConfig(Float textSize, String fontPath, Integer textColor, Float lineSpacingMultiplier, HorizontalAlign alignX, VerticalAlign alignY, Integer disabledAlpha, String sourcePath) {
             this.textSize = textSize;
+            this.fontPath = fontPath;
             this.textColor = textColor;
             this.lineSpacingMultiplier = lineSpacingMultiplier;
             this.alignX = alignX;
             this.alignY = alignY;
             this.disabledAlpha = disabledAlpha;
+            this.sourcePath = sourcePath;
         }
 
         public Float getTextSize() {
             return this.textSize;
+        }
+
+        public String getFontPath() {
+            return this.fontPath;
         }
 
         public Integer getTextColor() {
@@ -108,6 +116,10 @@ public final class LabelConfig {
 
         public Integer getDisabledAlpha() {
             return this.disabledAlpha;
+        }
+
+        public String getSourcePath() {
+            return this.sourcePath;
         }
     }
 }

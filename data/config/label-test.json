@@ -12,6 +12,7 @@
       "visible": true,
       "style": {
         "textSize": 24.0,
+        "font": "data/font/abel-regular.ttf",
         "textColor": "#D2E4FF",
         "lineSpacingMultiplier": 1.2,
         "alignX": "center",

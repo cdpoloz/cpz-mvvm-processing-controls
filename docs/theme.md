@@ -111,6 +111,8 @@ config.themeProvider = themeManager;
 label.setStyle(new DefaultLabelStyle(config));
 ```
 
+`LabelStyleConfig.font` can still be assigned directly with a sketch-created `PFont` when a label needs a custom font.
+
 The important point is that every style receives the same sketch-owned `ThemeManager`.
 
 ---
