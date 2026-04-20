@@ -20,109 +20,28 @@ explicit input routing, and high-performance rendering.
 
 ---
 
-## Overview
+## Installation
 
-This project is a UI framework intended for Processing sketches and for other host environments that can provide normalized input events.
+This library is currently distributed as a JAR.
 
-The public control layer is exposed through closed ergonomic facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, and `DropDown`.
+### Option 1 — Using the release
 
-Those facades also share a lightweight public contract, `Control`, for the small transversal surface that is common across the controls without exposing MVVM internals.
+1. Download the latest release JAR from GitHub
+2. Add it to your project classpath
+3. Add Processing 4.5.x (`core.jar`) as well
 
-The JSON layer can also create one or more controls from a single document and returns them as `Map<String, Control>`. JSON remains structural only: binding and behavior wiring stay in sketch code.
+### Option 2 — Using source
 
-The framework does not depend on Processing internally for input dispatch or interaction rules. It consumes framework-owned `PointerEvent` and `KeyboardEvent` instances that are expected to be produced by external adapters.
+1. Clone the repository
+2. Add it as a module/dependency in your project
 
-That separation keeps rendering concerns, interaction logic, and host-framework integration independent from each other.
-
----
-
-## Mental Model
-
-At a high level, the framework works like this:
-
-```text
-Sketch (owns everything)
-   ├── ThemeManager
-   ├── InputManager
-   └── Controls (public facades)
-
-Input:
-External Source → Adapter → InputManager → InputLayer → Control facade → ViewModel
-
-Rendering:
-Model → ViewModel → View → ViewState → Style → Renderer
-```
+Once added, you can run the quick example below.
 
 ---
 
-## Why this library?
+## Quick example
 
-Processing sketches often mix rendering, input handling, and state in a single class.
-
-This project provides a structured alternative based on a strict MVVM pipeline, explicit input routing, and fully decoupled rendering.
-
-What this gives you:
-
-- predictable and debuggable behavior (no hidden state or implicit wiring)
-- clear separation between rendering, interaction, and state
-- full control from the sketch (no framework-owned lifecycle surprises)
-- reusable controls without sacrificing transparency
-
----
-
-## Input Philosophy
-
-The framework does not own any input source. It only consumes normalized events provided by external adapters.
-
-- Source-agnostic design keeps host-framework concerns outside the core controls package
-- State-driven events make pointer and keyboard dispatch explicit and deterministic
-- Separation of concerns keeps adapters responsible for translation and ViewModels responsible for behavior
-
----
-
-## Input Flow (Simplified)
-
-```text
-External Source (Processing, etc.)
-        ↓
-Adapter (external)
-        ↓
-InputManager
-        ↓
-InputLayer
-        ↓
-InputAdapter (per control)
-        ↓
-ViewModel
-```
-
----
-
-## Event Model
-
-`PointerEvent` includes:
-
-- `type`
-- `x`, `y`
-- `pressed`
-- `button`
-- `shift`, `ctrl`, `alt`
-- `wheelDelta`
-
-`KeyboardEvent` includes:
-
-- `type`
-- `key`
-- `keyCode`
-- `shift`, `ctrl`, `alt`
-
-Both event types are normalized at the adapter boundary and consumed by the framework without any dependency on Processing-specific event objects.
-
----
-
-## Quick Example
-
-### Minimal Example
+Here is a minimal Processing sketch using a single control:
 
 ```java
 import com.cpz.processing.controls.controls.button.Button;
@@ -191,7 +110,116 @@ public class MinimalSketch extends PApplet {
 }
 ```
 
-### Composition Example (JSON + Binding)
+Run it, click the button, and you should see output in the console.
+
+This example shows the core interaction flow:
+- create a control facade
+- attach a listener
+- dispatch input through InputManager
+
+---
+
+## Why this library?
+
+Processing sketches often mix rendering, input handling, and state in a single class.
+
+This project provides a structured alternative based on a strict MVVM pipeline, explicit input routing, and fully decoupled rendering.
+
+What this gives you:
+
+- predictable and debuggable behavior (no hidden state or implicit wiring)
+- clear separation between rendering, interaction, and state
+- full control from the sketch (no framework-owned lifecycle surprises)
+- reusable controls without sacrificing transparency
+
+---
+
+## Mental Model
+
+At a high level, the framework works like this:
+
+```text
+Sketch (owns everything)
+   ├── ThemeManager
+   ├── InputManager
+   └── Controls (public facades)
+
+Input:
+External Source → Adapter → InputManager → InputLayer → Control facade → ViewModel
+
+Rendering:
+Model → ViewModel → View → ViewState → Style → Renderer
+```
+
+---
+
+## Overview
+
+This project is a UI framework intended for Processing sketches and for other host environments that can provide normalized input events.
+
+The public control layer is exposed through closed ergonomic facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, and `DropDown`.
+
+Those facades also share a lightweight public contract, `Control`, for the small transversal surface that is common across the controls without exposing MVVM internals.
+
+The JSON layer can also create one or more controls from a single document and returns them as `Map<String, Control>`. JSON remains structural only: binding and behavior wiring stay in sketch code.
+
+The framework does not depend on Processing internally for input dispatch or interaction rules. It consumes framework-owned `PointerEvent` and `KeyboardEvent` instances that are expected to be produced by external adapters.
+
+That separation keeps rendering concerns, interaction logic, and host-framework integration independent from each other.
+
+---
+
+## Input Philosophy
+
+The framework does not own any input source. It only consumes normalized events provided by external adapters.
+
+- Source-agnostic design keeps host-framework concerns outside the core controls package
+- State-driven events make pointer and keyboard dispatch explicit and deterministic
+- Separation of concerns keeps adapters responsible for translation and ViewModels responsible for behavior
+
+---
+
+## Input Flow (Simplified)
+
+```text
+External Source (Processing, etc.)
+        ↓
+Adapter (external)
+        ↓
+InputManager
+        ↓
+InputLayer
+        ↓
+InputAdapter (per control)
+        ↓
+ViewModel
+```
+
+---
+
+## Event Model
+
+`PointerEvent` includes:
+
+- `type`
+- `x`, `y`
+- `pressed`
+- `button`
+- `shift`, `ctrl`, `alt`
+- `wheelDelta`
+
+`KeyboardEvent` includes:
+
+- `type`
+- `key`
+- `keyCode`
+- `shift`, `ctrl`, `alt`
+
+Both event types are normalized at the adapter boundary and consumed by the framework without any dependency on Processing-specific event objects.
+
+---
+
+## Composition Example (JSON + Binding)
 ```java
 ControlConfigLoader loader = new ControlConfigLoader(this);
 Map<String, Control> controls = loader.load("data/config/json-multicontrol-binding-test.json");
