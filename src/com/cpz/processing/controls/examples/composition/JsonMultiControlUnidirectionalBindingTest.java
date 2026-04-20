@@ -16,13 +16,12 @@ import processing.core.PApplet;
 import processing.event.MouseEvent;
 
 import java.io.File;
-import java.math.BigDecimal;
 import java.util.Map;
 
 /**
  * @author CPZ
  */
-public class JsonMultiControlBindingTest extends PApplet {
+public class JsonMultiControlUnidirectionalBindingTest extends PApplet {
     private static final String CONFIG_PATH = "data" + File.separator + "config" + File.separator + "json-multicontrol-binding-test.json";
 
     private InputManager inputManager;
@@ -33,9 +32,6 @@ public class JsonMultiControlBindingTest extends PApplet {
     private Slider sldValue;
     private NumericField numValue;
     private Label lblCurrentValue;
-
-    // Guards bidirectional updates triggered by programmatic synchronization.
-    private boolean internalUpdate;
 
     public void settings() {
         size(860, 360);
@@ -61,19 +57,12 @@ public class JsonMultiControlBindingTest extends PApplet {
         processingKeyboardAdapter = new ProcessingKeyboardAdapter(keyboardState, inputManager);
 
         // Binding lives in the sketch, not in JSON.
-        // Compared with JsonMultiControlUnidirectionalBindingTest, this adds
-        // the NumericField listener, syncFromNumericField(), and the anti-loop guard.
+        // Single source of truth: Slider drives the UI.
         sldValue.setChangeListener(value -> syncFromSlider());
-        numValue.setChangeListener(value -> syncFromNumericField());
 
         // initial state
-        internalUpdate = true;
-        try {
-            numValue.setValue(sldValue.getValue());
-            refreshDerivedLabels();
-        } finally {
-            internalUpdate = false;
-        }
+        numValue.setValue(sldValue.getValue());
+        refreshDerivedLabels();
     }
 
     public void draw() {
@@ -123,32 +112,8 @@ public class JsonMultiControlBindingTest extends PApplet {
     }
 
     private void syncFromSlider() {
-        if (internalUpdate) return;
-        internalUpdate = true;
-        try {
-            numValue.setValue(sldValue.getValue());
-            refreshDerivedLabels();
-        } finally {
-            internalUpdate = false;
-        }
-    }
-
-    private void syncFromNumericField() {
-        if (internalUpdate) return;
-        internalUpdate = true;
-        try {
-            if (numValue.isValid()) {
-                BigDecimal parsedValue = numValue.getValue();
-                if (parsedValue != null) {
-                    sldValue.setValue(parsedValue);
-                    // Re-apply the normalized slider value so both controls show the same committed value.
-                    numValue.setValue(sldValue.getValue());
-                }
-            }
-            refreshDerivedLabels();
-        } finally {
-            internalUpdate = false;
-        }
+        numValue.setValue(sldValue.getValue());
+        refreshDerivedLabels();
     }
 
     private void refreshDerivedLabels() {

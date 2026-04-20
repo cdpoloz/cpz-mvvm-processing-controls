@@ -22,7 +22,7 @@
     {
       "type": "label",
       "code": "lblHelp",
-      "text": "Slider and NumericField are synchronized. Binding is resolved in the sketch, not in the JSON.",
+      "text": "Slider, Label and NumericField are synchronized. Binding is resolved in the sketch, not in the JSON.",
       "x": 80.0,
       "y": 72.0,
       "width": 700.0,
@@ -73,7 +73,7 @@
         "thumbSize": 28.0,
         "textColor": "#F5F5F5",
         "disabledAlpha": 90,
-        "showValueText": true
+        "showValueText": false
       }
     },
     {
@@ -109,25 +109,6 @@
       "style": {
         "textSize": 17.0,
         "textColor": "#F0F6FF",
-        "lineSpacingMultiplier": 1.1,
-        "alignX": "start",
-        "alignY": "top",
-        "disabledAlpha": 80
-      }
-    },
-    {
-      "type": "label",
-      "code": "lblValidity",
-      "text": "Valid value",
-      "x": 80.0,
-      "y": 274.0,
-      "width": 240.0,
-      "height": 28.0,
-      "enabled": true,
-      "visible": true,
-      "style": {
-        "textSize": 17.0,
-        "textColor": "#A9EBC0",
         "lineSpacingMultiplier": 1.1,
         "alignX": "start",
         "alignY": "top",

@@ -26,6 +26,8 @@ import processing.core.PApplet;
  * <p>
  * Notes:
  * - This type is intended for development and demonstration flows.
+ *
+ * @author CPZ
  */
 public class Launcher {
     /**
@@ -84,6 +86,7 @@ public class Launcher {
         //PApplet.main(DropDownJsonTest.class);
 
         // Composition **********************************
+        PApplet.main(JsonMultiControlUnidirectionalBindingTest.class);
         //PApplet.main(JsonMultiControlBindingTest.class);
 
         //PApplet.main(ThemeDevSketch.class);

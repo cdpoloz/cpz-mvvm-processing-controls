@@ -113,6 +113,7 @@ Binding is intentionally explicit.
 - `ControlConfigLoader` and `Map<String, Control>` support composition, not declarative behavior
 - JSON does not define binding
 - the framework does not provide a separate low-level binding utility as part of the current public model
+- the documented learning path starts with one-way sketch synchronization and extends it to bidirectional synchronization with one extra listener, one extra sync routine, and a local anti-loop guard
 
 See [Binding](binding.md).
 

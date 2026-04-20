@@ -109,7 +109,7 @@ slider.setChangeListener(value -> {
 
 This keeps structure in JSON and behavior in the sketch: `ControlConfigLoader` creates closed facades, `Map<String, Control>` provides the common composition surface, and the sketch wires the controls together.
 
-The canonical multi-control example is `JsonMultiControlBindingTest`, which shows bidirectional sketch binding between `Slider` and `NumericField` and uses `Label` for all visible text.
+The canonical progression starts with `JsonMultiControlUnidirectionalBindingTest`, where `Slider` is the only source and updates `NumericField` plus `Label` from one listener. `JsonMultiControlBindingTest` extends the same composition into controlled bidirectional synchronization by adding a numeric-field listener, one extra sync routine, and a local anti-loop guard.
 
 ---
 
@@ -147,7 +147,7 @@ Key goals:
 - keep `Model`, `ViewModel`, `View`, `Style`, and `Renderer` responsibilities explicit
 - centralize pointer and keyboard dispatch instead of handling input ad hoc in each host integration
 - support theming and overlays without adding per-frame architectural noise
-- validate lightweight ViewModel binding without coupling the binding layer to specific controls
+- validate explicit synchronization between public facades without adding framework-level binding helpers
 
 ---
 
@@ -209,7 +209,7 @@ Binding is explicit and sketch-side.
 - the sketch wires listeners and synchronization explicitly
 - JSON does not define binding
 
-This keeps all synchronization logic visible at the application level and preserves a single public narrative around facades and composition.
+The base example is unidirectional; the bidirectional example is a small extension of it. This keeps all synchronization logic visible at the application level and preserves a single public narrative around facades and composition.
 
 See [Binding](docs/binding.md).
 
@@ -251,7 +251,7 @@ That template demonstrates how to connect Processing callbacks to the framework 
 - [TextField](docs/textfield.md)
 - [Toggle](docs/toggle.md)
 
-The JSON documentation includes a canonical multi-control example that loads `Map<String, Control>` from one document and resolves binding in the sketch with `Label` used for all visible text.
+The JSON documentation includes the canonical multi-control binding progression: first unidirectional sketch synchronization, then controlled bidirectional synchronization, both loaded from the same structural JSON document.
 
 ---
 

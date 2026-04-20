@@ -155,32 +155,34 @@ Multi-control document:
 
 The document defines structure only. Any listener wiring or binding still belongs to the sketch.
 
-Canonical example:
+Canonical examples:
 
+- `JsonMultiControlUnidirectionalBindingTest`
 - `JsonMultiControlBindingTest`
 - `data/config/json-multicontrol-binding-test.json`
 
-That example keeps the scope intentionally small:
+Those examples keep the scope intentionally small:
 
 - `Label` for title
 - `Label` for help text
 - `Slider`
 - `NumericField`
 - `Label` for the current value
-- `Label` for validity state
 
-It demonstrates:
+They demonstrate:
 
 - loading multiple controls from one JSON document
 - retrieving them from `Map<String, Control>`
-- binding `Slider` and `NumericField` in the sketch
+- binding `Slider` and `NumericField` in the sketch, not in JSON
 - updating derived `Label` controls programmatically
 - keeping all visible text in `Label` instead of `text()`
 
-That example is intentionally explicit:
+The unidirectional sketch is the base pattern: one slider listener updates the numeric field and label. The bidirectional sketch keeps the same JSON and composition, then adds one numeric-field listener, one extra sync routine, and a local anti-loop guard.
+
+Those examples are intentionally explicit:
 
 - JSON defines the controls, layout, style, and base text
-- the sketch performs the binding and derived-state updates
+- the sketch performs binding and derived-state updates
 - visible UI text is rendered through `Label`, not through `text()`
 
 ---

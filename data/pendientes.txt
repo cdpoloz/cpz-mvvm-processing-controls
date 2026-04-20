@@ -2,3 +2,7 @@
 
 - Tutoriales de uso en .md detallados
 - Falta ejemplo que reemplace a ThemeDevSketch
+
+/**
+ * @author CPZ
+ */
