@@ -368,9 +368,15 @@ See [Binding](docs/binding.md).
 
 ## Example Usage
 
-See `cpz-mvvm-processing-template` for an integration example.
+For a complete, ready-to-run Processing integration, see the companion template:
 
-That template demonstrates how to connect Processing callbacks to the framework through external adapters while keeping the control library itself source-agnostic.
+👉 https://github.com/cdpoloz/cpz-mvvm-processing-template
+
+That template shows:
+- how to wire Processing input callbacks
+- how to use `InputManager` and `InputLayer`
+- how to compose controls using public facades
+- how to structure a real sketch using this framework
 
 ---
 
