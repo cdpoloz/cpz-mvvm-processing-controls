@@ -20,6 +20,26 @@ This contract is intentionally small:
 
 `Control` is distinct from `ControlView`. `Control` belongs to the public facade layer, while `ControlView` belongs to the internal MVVM view layer.
 
+## External Dependencies
+
+The controls project depends on Processing for rendering and on `cpz-utils` for
+shared utility APIs.
+
+In the current repository layout, `cpz-utils` is expected at:
+
+```text
+lib/cpz-utils/cpz-utils.jar
+```
+
+Add that JAR to the module dependencies or runtime classpath together with
+Processing. Color helpers used by styles and examples are imported from:
+
+```java
+import com.cpz.utils.color.Colors;
+```
+
+`Colors` is not part of `com.cpz.processing.controls`.
+
 ## Pipeline
 
 ```text

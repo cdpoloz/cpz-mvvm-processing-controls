@@ -285,7 +285,7 @@ import com.cpz.processing.controls.controls.radiogroup.input.RadioGroupInputLaye
 import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupStyle;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
-import com.cpz.processing.controls.core.util.Colors;
+import com.cpz.utils.color.Colors;
 import com.cpz.processing.controls.input.KeyboardState;
 import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
 import processing.core.PApplet;
@@ -395,4 +395,3 @@ public class RadioGroupTest extends PApplet {
 - [JSON Configuration](json-configuration.md)
 - [Input system](input-system.md)
 - [Architecture](architecture.md)
-

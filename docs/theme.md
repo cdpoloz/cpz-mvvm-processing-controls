@@ -2,6 +2,16 @@
 
 Theming in this framework means providing visual tokens to control styles through a `ThemeManager`.
 
+Color helper examples in this document use `Colors` from `cpz-utils`:
+
+```java
+import com.cpz.utils.color.Colors;
+```
+
+The required JAR is expected at `lib/cpz-utils/cpz-utils.jar` and must be added
+to the module dependencies or classpath together with Processing. `Colors` is no
+longer provided by the controls package.
+
 The current public model is explicit:
 
 - the sketch owns a `ThemeManager`

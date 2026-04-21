@@ -5,9 +5,8 @@ import com.cpz.processing.controls.controls.label.config.LabelStyleConfig;
 import com.cpz.processing.controls.controls.label.style.DefaultLabelStyle;
 import com.cpz.processing.controls.controls.label.style.HorizontalAlign;
 import com.cpz.processing.controls.controls.label.style.VerticalAlign;
-import com.cpz.processing.controls.core.util.Colors;
+import com.cpz.utils.color.Colors;
 import processing.core.PApplet;
-import processing.core.PFont;
 
 import java.io.File;
 

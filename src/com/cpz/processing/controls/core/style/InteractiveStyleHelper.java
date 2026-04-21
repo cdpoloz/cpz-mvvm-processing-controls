@@ -1,6 +1,6 @@
 package com.cpz.processing.controls.core.style;
 
-import com.cpz.processing.controls.core.util.Colors;
+import com.cpz.utils.color.Colors;
 import processing.core.PApplet;
 
 /**

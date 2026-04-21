@@ -6,7 +6,7 @@ import com.cpz.processing.controls.controls.checkbox.input.CheckboxInputLayer;
 import com.cpz.processing.controls.controls.checkbox.style.DefaultCheckboxStyle;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
-import com.cpz.processing.controls.core.util.Colors;
+import com.cpz.utils.color.Colors;
 import processing.core.PApplet;
 
 /**

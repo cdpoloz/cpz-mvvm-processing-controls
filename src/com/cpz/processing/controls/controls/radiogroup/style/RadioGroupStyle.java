@@ -9,8 +9,9 @@ import com.cpz.processing.controls.core.theme.ThemeManager;
 import com.cpz.processing.controls.core.theme.ThemeProvider;
 import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.theme.ThemeTokens;
-import com.cpz.processing.controls.core.util.Colors;
 import java.util.ArrayList;
+
+import com.cpz.utils.color.Colors;
 import processing.core.PApplet;
 
 /**

@@ -7,7 +7,7 @@ import com.cpz.processing.controls.controls.toggle.style.ParametricToggleStyle;
 import com.cpz.processing.controls.controls.toggle.style.render.CircleShapeRenderer;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
-import com.cpz.processing.controls.core.util.Colors;
+import com.cpz.utils.color.Colors;
 import processing.core.PApplet;
 
 /**

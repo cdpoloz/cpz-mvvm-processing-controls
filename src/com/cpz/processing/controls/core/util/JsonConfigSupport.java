@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.core.util;
 
+import com.cpz.utils.color.Colors;
 import processing.core.PApplet;
 import processing.data.JSONArray;
 import processing.data.JSONObject;

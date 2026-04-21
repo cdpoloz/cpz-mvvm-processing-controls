@@ -6,7 +6,7 @@ import com.cpz.processing.controls.controls.slider.input.SliderInputLayer;
 import com.cpz.processing.controls.controls.slider.style.SliderStyle;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
-import com.cpz.processing.controls.core.util.Colors;
+import com.cpz.utils.color.Colors;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
 

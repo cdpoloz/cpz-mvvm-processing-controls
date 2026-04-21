@@ -6,9 +6,9 @@ import com.cpz.processing.controls.controls.numericfield.input.NumericFieldInput
 import com.cpz.processing.controls.controls.numericfield.style.NumericFieldStyle;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
-import com.cpz.processing.controls.core.util.Colors;
 import com.cpz.processing.controls.input.KeyboardState;
 import com.cpz.processing.controls.input.ProcessingKeyboardAdapter;
+import com.cpz.utils.color.Colors;
 import processing.core.PApplet;
 
 import java.math.BigDecimal;

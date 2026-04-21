@@ -24,18 +24,53 @@ explicit input routing, and high-performance rendering.
 
 This library is currently distributed as a JAR.
 
+`cpz-mvvm-processing-controls` also requires `cpz-utils`. In the current
+repository layout, the expected dependency JAR is:
+
+```text
+lib/cpz-utils/cpz-utils.jar
+```
+
+`cpz-utils` provides shared utility APIs used by the controls project. Color
+helpers such as `Colors.rgb(...)` and `Colors.gray(...)` now belong to
+`com.cpz.utils.color.Colors`; they are no longer part of
+`com.cpz.processing.controls`.
+
 ### Option 1 — Using the release
 
 1. Download the latest release JAR from GitHub
 2. Add it to your project classpath
 3. Add Processing 4.5.x (`core.jar`) as well
+4. Add `cpz-utils.jar` to the same classpath
 
 ### Option 2 — Using source
 
 1. Clone the repository
 2. Add it as a module/dependency in your project
+3. Add `lib/cpz-utils/cpz-utils.jar` to the module dependencies/classpath
 
 Once added, you can run the quick example below.
+
+### IntelliJ setup
+
+The module file expects a project library named `cpz-utils`. If IntelliJ cannot
+resolve it after cloning, add a library pointing to
+`lib/cpz-utils/cpz-utils.jar` and attach it to the
+`cpz-mvvm-processing-controls` module. Processing must also be configured as a
+module dependency.
+
+### Manual classpath
+
+When compiling or running manually, include both Processing and `cpz-utils`.
+For example, from this repository:
+
+```text
+javac -cp "lib/Processing 4.5.2/core-4.5.2.jar:lib/cpz-utils/cpz-utils.jar:src" ...
+java  -cp "lib/Processing 4.5.2/core-4.5.2.jar:lib/cpz-utils/cpz-utils.jar:src" ...
+```
+
+Use the classpath separator required by your platform (`:` on Linux/macOS, `;`
+on Windows).
 
 ---
 
@@ -244,11 +279,12 @@ The canonical progression starts with `JsonMultiControlUnidirectionalBindingTest
 
 1. Add Processing to your project when Processing is your host environment.
 2. Include this library in your classpath.
-3. Create controls directly through the public facades or load them from JSON with `ControlConfigLoader`.
-4. Provide normalized input events through an external adapter.
-5. Dispatch those events through `InputManager`.
-6. Resolve listeners and binding in the sketch.
-7. Call `draw()` inside your host render loop.
+3. Include `lib/cpz-utils/cpz-utils.jar` in the same module/classpath.
+4. Create controls directly through the public facades or load them from JSON with `ControlConfigLoader`.
+5. Provide normalized input events through an external adapter.
+6. Dispatch those events through `InputManager`.
+7. Resolve listeners and binding in the sketch.
+8. Call `draw()` inside your host render loop.
 
 Typical flow:
 
@@ -410,10 +446,11 @@ That template shows:
 
 ## Project Structure
 
-- `src/com/cpz/processing/controls/common`: shared infrastructure and utilities
+- `src/com/cpz/processing/controls/common`: shared controls infrastructure; generic helpers such as color utilities live in `cpz-utils`
 - `src/com/cpz/processing/controls/core`: cross-cutting MVVM, input, theme, overlay, focus, and layout primitives
 - `src/com/cpz/processing/controls/controls`: public control facades and the minimal shared `Control` contract
 - `src/com/cpz/processing/controls/examples`: example sketches used as interactive playgrounds
+- `lib/cpz-utils/cpz-utils.jar`: required external utility dependency, including `com.cpz.utils.color.Colors`
 - `docs`: human-facing documentation
 - `docs/uml`: PlantUML diagrams
 

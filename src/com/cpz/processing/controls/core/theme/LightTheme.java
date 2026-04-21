@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.core.theme;
 
-import com.cpz.processing.controls.core.util.Colors;
+
+import com.cpz.utils.color.Colors;
 
 /**
  * Built-in light theme token set.
