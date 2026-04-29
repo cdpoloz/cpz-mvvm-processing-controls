@@ -122,6 +122,24 @@ public final class Slider implements Control {
         this.inputAdapter.handlePointerEvent(event);
     }
 
+    public boolean canConsumePointerEvent(PointerEvent event) {
+        if (event == null || !this.viewModel.isVisible()) {
+            return false;
+        }
+        switch (event.getType()) {
+            case MOVE:
+            case PRESS:
+            case WHEEL:
+                return this.viewModel.isEnabled() && this.view.contains(event.getX(), event.getY());
+            case DRAG:
+            case RELEASE:
+                return this.viewModel.isDragging()
+                        || (this.viewModel.isEnabled() && this.view.contains(event.getX(), event.getY()));
+            default:
+                return false;
+        }
+    }
+
     public String getCode() {
         return this.model.getCode();
     }

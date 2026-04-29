@@ -181,9 +181,27 @@ inputManager = new InputManager();
 inputManager.registerLayer(new SliderInputLayer(0, slider));
 ```
 
+When working with multiple sliders at the same priority, register them in a single `SliderInputLayer` instead of creating one layer per slider:
+
+```java
+inputManager = new InputManager();
+inputManager.registerLayer(new SliderInputLayer(0, slider1, slider2));
+```
+
+Alternatively, the layer can be built incrementally:
+
+```java
+SliderInputLayer sliderLayer = new SliderInputLayer(0);
+sliderLayer.addSlider(slider1);
+sliderLayer.addSlider(slider2);
+inputManager.registerLayer(sliderLayer);
+```
+
+This ensures that all sliders receive pointer events consistently while preserving the input priority model.
+
 `InputManager` remains application-owned.
 
-`SliderInputLayer` is the reusable bridge for the simple single-slider case:
+`SliderInputLayer` is the reusable bridge for one or more sliders that share the same priority:
 
 - the sketch still owns the global input pipeline
 - the layer forwards pointer events to the slider facade
