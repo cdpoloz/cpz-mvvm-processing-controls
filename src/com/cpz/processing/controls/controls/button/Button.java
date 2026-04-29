@@ -86,6 +86,13 @@ public final class Button implements Control {
         }
     }
 
+    public boolean canConsumePointerEvent(PointerEvent event) {
+        return event != null
+                && event.getType() != PointerEvent.Type.WHEEL
+                && this.isVisible()
+                && this.view.contains(event.getX(), event.getY());
+    }
+
     // <editor-fold defaultstate="collapsed" desc="*** setter & getter ***">
     public String getCode() {
         return this.model.getCode();

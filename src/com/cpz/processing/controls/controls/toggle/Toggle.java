@@ -65,6 +65,13 @@ public final class Toggle implements Control {
         this.notifyChangeIfNeeded(before);
     }
 
+    public boolean canConsumePointerEvent(PointerEvent event) {
+        return event != null
+                && event.getType() != PointerEvent.Type.WHEEL
+                && this.isVisible()
+                && this.view.contains(event.getX(), event.getY());
+    }
+
     public String getCode() {
         return this.model.getCode();
     }

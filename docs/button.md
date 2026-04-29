@@ -150,9 +150,27 @@ inputManager = new InputManager();
 inputManager.registerLayer(new ButtonInputLayer(0, button));
 ```
 
+When working with multiple buttons at the same priority, register them in a single `ButtonInputLayer` instead of creating one layer per control:
+
+```java
+inputManager = new InputManager();
+inputManager.registerLayer(new ButtonInputLayer(0, button1, button2));
+```
+
+Alternatively, the layer can be built incrementally:
+
+```java
+ButtonInputLayer layer = new ButtonInputLayer(0);
+layer.addButton(button1);
+layer.addButton(button2);
+inputManager.registerLayer(layer);
+```
+
+This ensures that all controls are evaluated within the same input layer while preserving the priority-based input routing model.
+
 `InputManager` remains application-owned.
 
-`ButtonInputLayer` is the reusable bridge for the simple single-button case:
+`ButtonInputLayer` is the reusable bridge for one or more buttons that share the same priority:
 
 - the sketch still owns the global input pipeline
 - the layer forwards pointer events to the button facade

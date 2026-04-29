@@ -157,9 +157,27 @@ inputManager = new InputManager();
 inputManager.registerLayer(new ToggleInputLayer(0, toggle));
 ```
 
+When working with multiple toggles at the same priority, register them in a single `ToggleInputLayer` instead of creating one layer per control:
+
+```java
+inputManager = new InputManager();
+inputManager.registerLayer(new ToggleInputLayer(0, toggle1, toggle2));
+```
+
+Alternatively, the layer can be built incrementally:
+
+```java
+ToggleInputLayer layer = new ToggleInputLayer(0);
+layer.addToggle(toggle1);
+layer.addToggle(toggle2);
+inputManager.registerLayer(layer);
+```
+
+This ensures that all controls are evaluated within the same input layer while preserving the priority-based input routing model.
+
 `InputManager` remains application-owned.
 
-`ToggleInputLayer` is the reusable bridge for the simple single-toggle case:
+`ToggleInputLayer` is the reusable bridge for one or more toggles that share the same priority:
 
 - the sketch still owns the global input pipeline
 - the layer forwards pointer events to the toggle facade

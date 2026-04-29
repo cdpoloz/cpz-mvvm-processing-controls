@@ -77,6 +77,8 @@ In practice:
 
 - `InputManager` does not depend on Processing types
 - layers are ordered by priority
+- input layers may group multiple controls that share the same priority and routing behavior
+- controls of the same type should usually be registered in one shared control-specific layer instead of one layer per control
 - inactive layers are skipped
 - a layer that consumes an event stops propagation
 - pointer and keyboard dispatch share the same layer ordering model
