@@ -144,6 +144,17 @@ This configuration controls the visual appearance:
 
 Styles resolve visuals only. They do not contain interaction logic.
 
+Pointer interaction uses the full control bounds defined by `x`, `y`, `width`, and `height`.
+
+For a toggle centered at `x, y`, the clickable area is the rectangle:
+
+- `left = x - width / 2`
+- `right = x + width / 2`
+- `top = y - height / 2`
+- `bottom = y + height / 2`
+
+Internal visual elements such as the knob, circle, or other rendered shape do not reduce that hit area.
+
 The toggle can also be rendered using SVG. See [Toggle (SVG)](toggle-svg.md) for the specialized variant.
 
 The same control can also be created from JSON. See [JSON Configuration](json-configuration.md) for the config-driven setup.
