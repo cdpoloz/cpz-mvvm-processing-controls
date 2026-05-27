@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.label;
 
 import com.cpz.processing.controls.controls.Control;
+import com.cpz.processing.controls.controls.label.config.LabelStyleConfig;
 import com.cpz.processing.controls.controls.label.model.LabelModel;
 import com.cpz.processing.controls.controls.label.style.LabelStyle;
 import com.cpz.processing.controls.controls.label.view.LabelView;
@@ -78,6 +79,10 @@ public final class Label implements Control {
 
     public LabelStyle getStyle() {
         return this.view.getStyle();
+    }
+
+    public LabelStyleConfig getStyleConfig() {
+        return this.view.getStyle().getLabelStyleConfig();
     }
 
     public void setPosition(float x, float y) {
