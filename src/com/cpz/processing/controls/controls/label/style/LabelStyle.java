@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.controls.label.style;
 
+import com.cpz.processing.controls.controls.label.config.LabelStyleConfig;
 import com.cpz.processing.controls.controls.label.state.LabelViewState;
 import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import processing.core.PApplet;
@@ -42,4 +43,6 @@ public interface LabelStyle {
     * @return cached theme snapshot
     */
    ThemeSnapshot getThemeSnapshot();
+
+   LabelStyleConfig getLabelStyleConfig();
 }
