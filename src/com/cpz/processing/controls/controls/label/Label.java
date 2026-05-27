@@ -76,6 +76,10 @@ public final class Label implements Control {
         this.view.setStyle(style);
     }
 
+    public LabelStyle getStyle() {
+        return this.view.getStyle();
+    }
+
     public void setPosition(float x, float y) {
         this.view.setPosition(x, y);
     }
