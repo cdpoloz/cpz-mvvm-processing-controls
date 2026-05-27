@@ -99,4 +99,10 @@ public final class DefaultLabelStyle implements LabelStyle {
    public ThemeSnapshot getThemeSnapshot() {
       return this.themeProvider.getSnapshot();
    }
+
+   @Override
+   public LabelStyleConfig getLabelStyleConfig() {
+      return config;
+   }
+
 }
