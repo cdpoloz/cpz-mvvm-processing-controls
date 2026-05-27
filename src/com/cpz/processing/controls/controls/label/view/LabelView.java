@@ -196,6 +196,10 @@ public final class LabelView implements ControlView {
 
    }
 
+   public LabelStyle getStyle() {
+      return this.style;
+   }
+
    /**
     * Updates position.
     *
