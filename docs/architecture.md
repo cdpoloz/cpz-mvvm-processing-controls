@@ -22,17 +22,18 @@ This contract is intentionally small:
 
 ## External Dependencies
 
-The controls project depends on Processing for rendering and on `cpz-utils` for
-shared utility APIs.
+The controls project has two dependency levels:
 
-In the current repository layout, `cpz-utils` is expected at:
+- CPZ dependency: `com.cpz:cpz-utils:0.2.2`, controlled by the author and
+  versioned as a normal Maven dependency
+- external dependency: `org.processing:core:4.5.2`, resolved by Maven and
+  distributed under its own license
 
-```text
-lib/cpz-utils/cpz-utils-0.2.0.jar
-```
+If `cpz-utils` is not available from the Maven repositories configured in your
+environment, install it into the local Maven repository from the `cpz-utils`
+checkout with `mvn clean install`.
 
-Add that JAR to the module dependencies or runtime classpath together with
-Processing. Color helpers used by styles and examples are imported from:
+Color helpers used by styles and examples are imported from:
 
 ```java
 import com.cpz.utils.color.Colors;

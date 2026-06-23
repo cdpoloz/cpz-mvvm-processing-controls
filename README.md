@@ -2,7 +2,7 @@
 ![Java](https://img.shields.io/badge/Java-17+-orange)
 ![Processing](https://img.shields.io/badge/Processing-4.5.x-blue)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-lightgrey)
+![License](https://img.shields.io/badge/license-Apache--2.0-lightgrey)
 [![GitHub](https://img.shields.io/badge/GitHub-cdpoloz-181717?logo=github)](https://github.com/cdpoloz)
 
 A UI control framework for Processing built around a strict MVVM architecture,
@@ -22,76 +22,100 @@ explicit input routing, and high-performance rendering.
 
 ## Installation
 
-This library is currently distributed as a JAR.
+This project is built as a Maven JAR. Dependencies are resolved by Maven; the
+repository does not require a local dependency directory or manual Processing
+JAR setup.
 
-`cpz-mvvm-processing-controls` also requires `cpz-utils`. In the current
-repository layout, the expected dependency JAR is:
+### Requirements
 
-```text
-lib/cpz-utils/cpz-utils-0.2.0.jar
+- JDK 17 or newer, matching the Maven compiler release used by the project
+- Maven
+- A resolvable `com.cpz:cpz-utils:0.2.2` artifact, either from a configured
+  Maven repository or from your local Maven repository
+
+Processing itself does not need to be installed manually for the Maven build.
+Maven resolves Processing Core as `org.processing:core:4.5.2`.
+
+### Dependency levels
+
+CPZ dependencies:
+
+- `com.cpz:cpz-utils:0.2.2`
+- controlled by the author and versioned as a normal Maven dependency
+- provides shared utility APIs used by the controls project
+- color helpers such as `Colors.rgb(...)` and `Colors.gray(...)` belong to
+  `com.cpz.utils.color.Colors`; they are no longer part of
+  `com.cpz.processing.controls`
+
+External dependencies:
+
+- `org.processing:core:4.5.2`
+- resolved by Maven from configured repositories
+- provides Processing rendering APIs and keeps its own license, separate from
+  this project's Apache 2.0 license
+
+### Maven dependency
+
+If consuming a published or locally installed build, add the controls artifact
+to your Maven project:
+
+```xml
+<dependency>
+    <groupId>com.cpz</groupId>
+    <artifactId>cpz-mvvm-processing-controls</artifactId>
+    <version>0.3.1</version>
+</dependency>
 ```
 
-`cpz-utils` provides shared utility APIs used by the controls project. Color
-helpers such as `Colors.rgb(...)` and `Colors.gray(...)` now belong to
-`com.cpz.utils.color.Colors`; they are no longer part of
-`com.cpz.processing.controls`.
+Processing Core and `cpz-utils` are Maven dependencies. Do not add them as
+manually copied JARs.
 
-### Option 1 — Using the release
+### Local development
 
-1. Download the latest release JAR from GitHub
-2. Add it to your project classpath
-3. Add Processing 4.5.x (`core.jar`) as well
-4. Add `cpz-utils-0.2.0.jar` to the same classpath
+If `cpz-utils` is not available from Maven Central, GitHub Packages, JitPack,
+or another repository configured in your Maven setup, install it into your
+local Maven repository first:
 
-### Option 2 — Using source
+```text
+git clone <cpz-utils-repository-url>
+cd cpz-utils
+mvn clean install
+```
 
-1. Clone the repository
-2. Add it as a module/dependency in your project
-3. Add `lib/cpz-utils/cpz-utils-0.2.0.jar` to the module dependencies/classpath
+Then build this project:
 
-Once added, you can run the quick example below.
+```text
+git clone <cpz-mvvm-processing-controls-repository-url>
+cd cpz-mvvm-processing-controls
+mvn clean test
+mvn clean package
+```
+
+Use `mvn clean install` in this repository when another local project needs to
+consume this library from your local Maven repository.
 
 ### IntelliJ setup
 
-The module file expects a project library named `cpz-utils`. If IntelliJ cannot
-resolve it after cloning, add a library pointing to
-`lib/cpz-utils/cpz-utils-0.2.0.jar` and attach it to the
-`cpz-mvvm-processing-controls` module. Processing must also be configured as a
-module dependency.
+Open the repository as a Maven project and reload Maven dependencies. If
+IntelliJ cannot resolve `cpz-utils`, build and install `cpz-utils` locally with
+`mvn clean install`, then reload this project. Processing Core is resolved by
+Maven as `org.processing:core:4.5.2`.
 
 ### Maven layout
 
 The project is prepared for Maven with the main library code in
 `src/main/java`. Example sketches and the development launcher live under
-`examples/src/main/java`, outside the main JAR.
+`src/main/java/com/cpz/processing/controls/examples` and
+`src/main/java/com/cpz/processing/controls/main`; the Maven JAR plugin excludes
+those packages from the published library JAR.
 
 When Maven is available, the expected build commands are:
 
 ```text
+mvn clean test
 mvn clean package
 mvn clean install
 ```
-
-The Maven build currently uses the local Processing core JAR in `lib`.
-`cpz-utils` is declared as a regular Maven dependency; before compiling this
-project locally, install `cpz-utils` from its own repository:
-
-```text
-mvn clean install
-```
-
-### Manual classpath
-
-When compiling or running manually, include both Processing and `cpz-utils`.
-For example, from this repository:
-
-```text
-javac -cp "lib/Processing 4.5.2/core-4.5.2.jar:lib/cpz-utils/cpz-utils-0.2.0.jar:src/main/java" ...
-java  -cp "lib/Processing 4.5.2/core-4.5.2.jar:lib/cpz-utils/cpz-utils-0.2.0.jar:src/main/java:examples/src/main/java" ...
-```
-
-Use the classpath separator required by your platform (`:` on Linux/macOS, `;`
-on Windows).
 
 ---
 
@@ -298,14 +322,13 @@ The canonical progression starts with `JsonMultiControlUnidirectionalBindingTest
 
 ## Getting Started
 
-1. Add Processing to your project when Processing is your host environment.
-2. Include this library in your classpath.
-3. Include `lib/cpz-utils/cpz-utils-0.2.0.jar` in the same module/classpath.
-4. Create controls directly through the public facades or load them from JSON with `ControlConfigLoader`.
-5. Provide normalized input events through an external adapter.
-6. Dispatch those events through `InputManager`.
-7. Resolve listeners and binding in the sketch.
-8. Call `draw()` inside your host render loop.
+1. Add this library as a Maven dependency, or build and install it locally with Maven.
+2. Let Maven resolve Processing Core and `cpz-utils` from configured repositories or the local Maven repository.
+3. Create controls directly through the public facades or load them from JSON with `ControlConfigLoader`.
+4. Provide normalized input events through an external adapter.
+5. Dispatch those events through `InputManager`.
+6. Resolve listeners and binding in the sketch.
+7. Call `draw()` inside your host render loop.
 
 Typical flow:
 
@@ -472,10 +495,9 @@ That template shows:
 - `src/main/java/com/cpz/processing/controls/controls`: public control facades and the minimal shared `Control` contract
 - `src/main/resources`: main resources for future library resources
 - `src/test/java` and `src/test/resources`: standard Maven test source and resource roots
-- `examples/src/main/java/com/cpz/processing/controls/examples`: example sketches used as interactive playgrounds, excluded from the main JAR
-- `examples/src/main/java/com/cpz/processing/controls/main`: development launcher, excluded from the main JAR
+- `src/main/java/com/cpz/processing/controls/examples`: example sketches used as interactive playgrounds, excluded from the main JAR
+- `src/main/java/com/cpz/processing/controls/main`: development launcher, excluded from the main JAR
 - `data`: example and sketch assets kept at the repository root so existing `data/...` Processing paths continue to work
-- `lib`: local dependency JARs kept in place for now, including Processing 4.5.2 and `cpz-utils-0.2.0.jar`
 - `docs`: human-facing documentation
 - `docs/uml`: PlantUML diagrams
 
