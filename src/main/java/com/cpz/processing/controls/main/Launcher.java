@@ -1,34 +1,8 @@
-package src.main.java.com.cpz.processing.controls.main;
+package com.cpz.processing.controls.main;
 
 import java.util.Locale;
 
-import com.cpz.processing.controls.examples.button.ButtonJsonTest;
-import com.cpz.processing.controls.examples.button.ButtonSvgJsonTest;
 import com.cpz.processing.controls.examples.button.ButtonTest;
-import com.cpz.processing.controls.examples.checkbox.CheckboxJsonTest;
-import com.cpz.processing.controls.examples.checkbox.CheckboxSvgJsonTest;
-import com.cpz.processing.controls.examples.checkbox.CheckboxTest;
-import com.cpz.processing.controls.examples.composition.JsonMultiControlBindingTest;
-import com.cpz.processing.controls.examples.composition.JsonMultiControlUnidirectionalBindingTest;
-import com.cpz.processing.controls.examples.dropdown.DropDownJsonTest;
-import com.cpz.processing.controls.examples.dropdown.DropDownTest;
-import com.cpz.processing.controls.examples.label.LabelJsonTest;
-import com.cpz.processing.controls.examples.label.LabelTest;
-import com.cpz.processing.controls.examples.numericfield.NumericFieldJsonTest;
-import com.cpz.processing.controls.examples.numericfield.NumericFieldTest;
-import com.cpz.processing.controls.examples.radiogroup.RadioGroupJsonTest;
-import com.cpz.processing.controls.examples.radiogroup.RadioGroupTest;
-import com.cpz.processing.controls.examples.slider.SliderJsonTest;
-import com.cpz.processing.controls.examples.slider.SliderSvgJsonTest;
-import com.cpz.processing.controls.examples.slider.SliderSvgTest;
-import com.cpz.processing.controls.examples.slider.SliderTest;
-import com.cpz.processing.controls.examples.textfield.TextFieldJsonTest;
-import com.cpz.processing.controls.examples.textfield.TextFieldTest;
-import com.cpz.processing.controls.examples.theme.ThemeFacadeSketch;
-import com.cpz.processing.controls.examples.toggle.ToggleJsonTest;
-import com.cpz.processing.controls.examples.toggle.ToggleSvgJsonTest;
-import com.cpz.processing.controls.examples.toggle.ToggleSvgTest;
-import com.cpz.processing.controls.examples.toggle.ToggleTest;
 
 import processing.core.PApplet;
 

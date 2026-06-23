@@ -18,6 +18,22 @@ import com.cpz.processing.controls.core.focus.FocusManager;
  * @author CPZ
  */
 public final class KeyboardInputAdapter {
+   private static final char DELETE_KEY = 127;
+   private static final int KEY_CODE_BACKSPACE = 8;
+   private static final int KEY_CODE_TAB = 9;
+   private static final int KEY_CODE_ENTER = 10;
+   private static final int KEY_CODE_RETURN = 13;
+   private static final int KEY_CODE_DELETE = 127;
+   private static final int KEY_CODE_HOME = 36;
+   private static final int KEY_CODE_END = 35;
+   private static final int KEY_CODE_LEFT = 37;
+   private static final int KEY_CODE_RIGHT = 39;
+   private static final int KEY_CODE_UP = 38;
+   private static final int KEY_CODE_DOWN = 40;
+   private static final int KEY_CODE_A = 65;
+   private static final int KEY_CODE_C = 67;
+   private static final int KEY_CODE_V = 86;
+   private static final int KEY_CODE_X = 88;
    private final FocusManager focusManager;
    private boolean suppressTypedOnce;
 
@@ -66,7 +82,7 @@ public final class KeyboardInputAdapter {
       if (event != null) {
          switch (event.getType()) {
             case PRESS:
-               this.handlePressed(event.getKeyCode(), event.isShiftDown(), event.isControlDown(), event.getKeyCode());
+               this.handlePressed(event);
                return;
             case TYPE:
                this.onKeyTyped(event.getKey());
@@ -76,10 +92,13 @@ public final class KeyboardInputAdapter {
       }
    }
 
-   private void handlePressed(int value, boolean pressed, boolean pressed2, int value2) {
-      if (value == 9) {
+   private void handlePressed(KeyboardEvent event) {
+      int keyCode = event.getKeyCode();
+      boolean shiftDown = event.isShiftDown();
+      boolean controlDown = event.isControlDown();
+      if (keyCode == KEY_CODE_TAB) {
          this.suppressTypedOnce = true;
-         if (pressed) {
+         if (shiftDown) {
             this.focusManager.focusPrevious();
          } else {
             this.focusManager.focusNext();
@@ -88,67 +107,67 @@ public final class KeyboardInputAdapter {
       } else {
          KeyboardInputTarget target = this.focusManager.getFocusedKeyboardTarget();
          if (target != null && target.isVisible() && target.isEnabled()) {
-            if (pressed2) {
-               switch (value2) {
-                  case 65:
+            if (controlDown) {
+               switch (keyCode) {
+                  case KEY_CODE_A:
                      this.suppressTypedOnce = true;
                      target.selectAll();
                      return;
-                  case 67:
+                  case KEY_CODE_C:
                      this.suppressTypedOnce = true;
                      target.copySelection();
                      return;
-                  case 86:
+                  case KEY_CODE_V:
                      this.suppressTypedOnce = true;
                      target.pasteFromClipboard();
                      return;
-                  case 88:
+                  case KEY_CODE_X:
                      this.suppressTypedOnce = true;
                      target.cutSelection();
                      return;
                }
             }
 
-            if (value == 8) {
+            if (keyCode == KEY_CODE_BACKSPACE) {
                target.backspace();
-            } else if (value == 127) {
+            } else if (this.isDeleteForward(event)) {
                target.deleteForward();
-            } else if (value == 36) {
+            } else if (keyCode == KEY_CODE_HOME) {
                this.suppressTypedOnce = true;
-               if (pressed) {
+               if (shiftDown) {
                   target.moveCursorHomeWithSelection();
                } else {
                   target.moveCursorHome();
                }
-            } else if (value == 35) {
+            } else if (keyCode == KEY_CODE_END) {
                this.suppressTypedOnce = true;
-               if (pressed) {
+               if (shiftDown) {
                   target.moveCursorEndWithSelection();
                } else {
                   target.moveCursorEnd();
                }
-            } else if (value == 37) {
-               if (pressed) {
+            } else if (keyCode == KEY_CODE_LEFT) {
+               if (shiftDown) {
                   target.moveCursorLeftWithSelection();
                } else {
                   target.moveCursorLeft();
                }
 
-            } else if (value == 39) {
-               if (pressed) {
+            } else if (keyCode == KEY_CODE_RIGHT) {
+               if (shiftDown) {
                   target.moveCursorRightWithSelection();
                } else {
                   target.moveCursorRight();
                }
 
-            } else if (value == 38) {
+            } else if (keyCode == KEY_CODE_UP) {
                this.suppressTypedOnce = true;
-               target.increment(pressed, pressed2);
-            } else if (value == 40) {
+               target.increment(shiftDown, controlDown);
+            } else if (keyCode == KEY_CODE_DOWN) {
                this.suppressTypedOnce = true;
-               target.decrement(pressed, pressed2);
+               target.decrement(shiftDown, controlDown);
             } else {
-               if (value == 10 || value == 13) {
+               if (keyCode == KEY_CODE_ENTER || keyCode == KEY_CODE_RETURN) {
                   this.suppressTypedOnce = true;
                   target.commit();
                }
@@ -156,5 +175,9 @@ public final class KeyboardInputAdapter {
             }
          }
       }
+   }
+
+   private boolean isDeleteForward(KeyboardEvent event) {
+      return event.getKeyCode() == KEY_CODE_DELETE || event.getKey() == DELETE_KEY;
    }
 }

@@ -6,7 +6,7 @@
 
     <groupId>com.cpz</groupId>
     <artifactId>cpz-mvvm-processing-controls</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
     <packaging>jar</packaging>
 
     <name>cpz-mvvm-processing-controls</name>
