@@ -29,8 +29,6 @@
             <groupId>org.processing</groupId>
             <artifactId>core</artifactId>
             <version>4.5.2</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/Processing 4.5.2/core-4.5.2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.cpz</groupId>
