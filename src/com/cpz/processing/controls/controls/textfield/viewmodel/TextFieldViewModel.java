@@ -23,6 +23,7 @@ import java.util.function.Consumer;
  * @author CPZ
  */
 public final class TextFieldViewModel extends AbstractControlViewModel implements KeyboardInputTarget {
+   private static final char NO_PENDING_ACCENT = '\0';
    private final ClipboardService clipboardService = new ClipboardService();
    private int cursorIndex;
    private int selectionStart;
@@ -30,6 +31,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    private int selectionAnchor;
    private boolean selecting;
    private boolean focused;
+   private char pendingAccent = NO_PENDING_ACCENT;
    private Consumer<String> onTextChanged;
 
    /**
@@ -69,6 +71,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     * - Updates the public state or registration owned by this type.
     */
    public void setText(String text) {
+      this.clearPendingAccent();
       ((TextFieldModel)this.model).setText(text);
       this.cursorIndex = this.clampIndex(this.cursorIndex);
       this.clearSelection();
@@ -96,6 +99,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     * - Updates the public state or registration owned by this type.
     */
    public void setCursorIndex(int index) {
+      this.clearPendingAccent();
       this.cursorIndex = this.clampIndex(index);
       this.clearSelection();
    }
@@ -109,6 +113,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     * - Updates the public state or registration owned by this type.
     */
    public void setCursorIndexWithoutSelectionReset(int index) {
+      this.clearPendingAccent();
       this.cursorIndex = this.clampIndex(index);
    }
 
@@ -255,6 +260,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    public void setFocused(boolean focused) {
       this.focused = focused && this.isEnabled() && this.isVisible();
       if (!this.focused) {
+         this.clearPendingAccent();
          this.cursorIndex = this.clampIndex(this.cursorIndex);
          this.clearSelection();
          this.selecting = false;
@@ -295,6 +301,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     */
    public void onFocusLost() {
       this.focused = false;
+      this.clearPendingAccent();
       this.cursorIndex = this.clampIndex(this.cursorIndex);
       this.clearSelection();
       this.selecting = false;
@@ -309,8 +316,39 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     * - Applies the public interaction flow exposed by this type.
     */
    public void onKeyTyped(char key) {
-      if (!Character.isISOControl(key)) {
-         this.insertText(String.valueOf(key));
+      if (!this.canEdit() || Character.isISOControl(key)) {
+         return;
+      }
+
+      if (this.pendingAccent != NO_PENDING_ACCENT) {
+         if (this.isAccentKey(key)) {
+            char accent = this.pendingAccent;
+            this.pendingAccent = key;
+            this.insertTextInternal(String.valueOf(accent));
+            return;
+         }
+
+         if (key == ' ') {
+            char accent = this.pendingAccent;
+            this.clearPendingAccent();
+            this.insertTextInternal(String.valueOf(accent));
+            return;
+         }
+
+         char composed = this.composeAccent(this.pendingAccent, key);
+         if (composed != NO_PENDING_ACCENT) {
+            this.clearPendingAccent();
+            this.insertTextInternal(String.valueOf(composed));
+            return;
+         }
+
+         String text = String.valueOf(this.pendingAccent) + key;
+         this.clearPendingAccent();
+         this.insertTextInternal(text);
+      } else if (this.isAccentKey(key)) {
+         this.pendingAccent = key;
+      } else {
+         this.insertTextInternal(String.valueOf(key));
       }
 
    }
@@ -324,6 +362,11 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     * - Executes the public operation exposed by this type.
     */
    public void insertText(String text) {
+      this.clearPendingAccent();
+      this.insertTextInternal(text);
+   }
+
+   private void insertTextInternal(String text) {
       if (this.canEdit() && text != null && !text.isEmpty()) {
          if (this.hasSelection()) {
             this.deleteSelectionInternal();
@@ -346,6 +389,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     */
    public void backspace() {
       if (this.canEdit()) {
+         this.clearPendingAccent();
          if (this.hasSelection()) {
             this.deleteSelection();
          } else if (this.cursorIndex != 0) {
@@ -368,6 +412,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     */
    public void deleteForward() {
       if (this.canEdit()) {
+         this.clearPendingAccent();
          if (this.hasSelection()) {
             this.deleteSelection();
          } else {
@@ -391,6 +436,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     */
    public void moveCursorLeft() {
       if (this.focused) {
+         this.clearPendingAccent();
          this.cursorIndex = this.hasSelection() ? this.getSelectionMin() : Math.max(0, this.cursorIndex - 1);
          this.clearSelection();
       }
@@ -404,6 +450,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     */
    public void moveCursorRight() {
       if (this.focused) {
+         this.clearPendingAccent();
          this.cursorIndex = this.hasSelection() ? this.getSelectionMax() : Math.min(((TextFieldModel)this.model).getText().length(), this.cursorIndex + 1);
          this.clearSelection();
       }
@@ -417,6 +464,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     */
    public void moveCursorHome() {
       if (this.focused) {
+         this.clearPendingAccent();
          this.cursorIndex = 0;
          this.clearSelection();
       }
@@ -430,6 +478,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     */
    public void moveCursorEnd() {
       if (this.focused) {
+         this.clearPendingAccent();
          this.cursorIndex = ((TextFieldModel)this.model).getText().length();
          this.clearSelection();
       }
@@ -443,6 +492,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     */
    public void moveCursorLeftWithSelection() {
       if (this.focused) {
+         this.clearPendingAccent();
          this.ensureSelectionAnchor();
          this.cursorIndex = Math.max(0, this.cursorIndex - 1);
          this.updateSelectionFromAnchor();
@@ -457,8 +507,39 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     */
    public void moveCursorRightWithSelection() {
       if (this.focused) {
+         this.clearPendingAccent();
          this.ensureSelectionAnchor();
          this.cursorIndex = Math.min(((TextFieldModel)this.model).getText().length(), this.cursorIndex + 1);
+         this.updateSelectionFromAnchor();
+      }
+   }
+
+   /**
+    * Performs move cursor home with selection.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
+   public void moveCursorHomeWithSelection() {
+      if (this.focused) {
+         this.clearPendingAccent();
+         this.ensureSelectionAnchor();
+         this.cursorIndex = 0;
+         this.updateSelectionFromAnchor();
+      }
+   }
+
+   /**
+    * Performs move cursor end with selection.
+    *
+    * Behavior:
+    * - Executes the public operation exposed by this type.
+    */
+   public void moveCursorEndWithSelection() {
+      if (this.focused) {
+         this.clearPendingAccent();
+         this.ensureSelectionAnchor();
+         this.cursorIndex = ((TextFieldModel)this.model).getText().length();
          this.updateSelectionFromAnchor();
       }
    }
@@ -471,6 +552,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     */
    public void selectAll() {
       if (this.focused) {
+         this.clearPendingAccent();
          this.selectionAnchor = 0;
          this.selectionStart = 0;
          this.selectionEnd = ((TextFieldModel)this.model).getText().length();
@@ -486,6 +568,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     */
    public void deleteSelection() {
       if (this.canEdit() && this.hasSelection()) {
+         this.clearPendingAccent();
          this.deleteSelectionInternal();
          this.notifyTextChanged();
       }
@@ -526,6 +609,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     */
    public void cutSelection() {
       if (this.canEdit()) {
+         this.clearPendingAccent();
          this.clipboardService.copy(this.getSelectedText());
          this.deleteSelection();
       }
@@ -539,6 +623,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
     */
    public void pasteFromClipboard() {
       if (this.canEdit()) {
+         this.clearPendingAccent();
          this.insertText(this.clipboardService.paste());
       }
    }
@@ -558,6 +643,7 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
    protected void onAvailabilityChanged() {
       if (!this.isEnabled() || !this.isVisible()) {
          this.focused = false;
+         this.clearPendingAccent();
       }
 
       this.cursorIndex = this.clampIndex(this.cursorIndex);
@@ -566,9 +652,162 @@ public final class TextFieldViewModel extends AbstractControlViewModel implement
       this.selectionAnchor = this.clampIndex(this.selectionAnchor);
       this.selecting = this.selecting && this.focused;
       if (!this.focused) {
+         this.clearPendingAccent();
          this.clearSelection();
       }
 
+   }
+
+   private boolean isAccentKey(char key) {
+      return key == '\u00B4' || key == '`' || key == '^' || key == '\u00A8' || key == '~';
+   }
+
+   private char composeAccent(char accent, char key) {
+      switch (accent) {
+         case '\u00B4':
+            return this.composeAcute(key);
+         case '`':
+            return this.composeGrave(key);
+         case '^':
+            return this.composeCircumflex(key);
+         case '\u00A8':
+            return this.composeDiaeresis(key);
+         case '~':
+            return this.composeTilde(key);
+         default:
+            return NO_PENDING_ACCENT;
+      }
+   }
+
+   private char composeAcute(char key) {
+      switch (key) {
+         case 'a':
+            return '\u00E1';
+         case 'e':
+            return '\u00E9';
+         case 'i':
+            return '\u00ED';
+         case 'o':
+            return '\u00F3';
+         case 'u':
+            return '\u00FA';
+         case 'A':
+            return '\u00C1';
+         case 'E':
+            return '\u00C9';
+         case 'I':
+            return '\u00CD';
+         case 'O':
+            return '\u00D3';
+         case 'U':
+            return '\u00DA';
+         default:
+            return NO_PENDING_ACCENT;
+      }
+   }
+
+   private char composeGrave(char key) {
+      switch (key) {
+         case 'a':
+            return '\u00E0';
+         case 'e':
+            return '\u00E8';
+         case 'i':
+            return '\u00EC';
+         case 'o':
+            return '\u00F2';
+         case 'u':
+            return '\u00F9';
+         case 'A':
+            return '\u00C0';
+         case 'E':
+            return '\u00C8';
+         case 'I':
+            return '\u00CC';
+         case 'O':
+            return '\u00D2';
+         case 'U':
+            return '\u00D9';
+         default:
+            return NO_PENDING_ACCENT;
+      }
+   }
+
+   private char composeCircumflex(char key) {
+      switch (key) {
+         case 'a':
+            return '\u00E2';
+         case 'e':
+            return '\u00EA';
+         case 'i':
+            return '\u00EE';
+         case 'o':
+            return '\u00F4';
+         case 'u':
+            return '\u00FB';
+         case 'A':
+            return '\u00C2';
+         case 'E':
+            return '\u00CA';
+         case 'I':
+            return '\u00CE';
+         case 'O':
+            return '\u00D4';
+         case 'U':
+            return '\u00DB';
+         default:
+            return NO_PENDING_ACCENT;
+      }
+   }
+
+   private char composeDiaeresis(char key) {
+      switch (key) {
+         case 'a':
+            return '\u00E4';
+         case 'e':
+            return '\u00EB';
+         case 'i':
+            return '\u00EF';
+         case 'o':
+            return '\u00F6';
+         case 'u':
+            return '\u00FC';
+         case 'A':
+            return '\u00C4';
+         case 'E':
+            return '\u00CB';
+         case 'I':
+            return '\u00CF';
+         case 'O':
+            return '\u00D6';
+         case 'U':
+            return '\u00DC';
+         default:
+            return NO_PENDING_ACCENT;
+      }
+   }
+
+   private char composeTilde(char key) {
+      switch (key) {
+         case 'a':
+            return '\u00E3';
+         case 'o':
+            return '\u00F5';
+         case 'n':
+            return '\u00F1';
+         case 'A':
+            return '\u00C3';
+         case 'O':
+            return '\u00D5';
+         case 'N':
+            return '\u00D1';
+         default:
+            return NO_PENDING_ACCENT;
+      }
+   }
+
+   private void clearPendingAccent() {
+      this.pendingAccent = NO_PENDING_ACCENT;
    }
 
    private void deleteSelectionInternal() {

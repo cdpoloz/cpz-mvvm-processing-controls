@@ -91,6 +91,30 @@ In practice:
 - keyboard handling remains state-driven even when the host delivers transient callbacks
 - `ProcessingKeyboardAdapter` is one example of an external adapter, not a requirement of the framework
 
+## KeyboardInputTarget
+
+`KeyboardInputTarget` is the focusable editing contract used by text-oriented ViewModels. It exposes character insertion and editing operations rather than host-specific key constants.
+
+Core editing operations include:
+
+- `onKeyTyped(char key)`
+- `insertText(String text)`
+- `backspace()`
+- `deleteForward()`
+- `moveCursorLeft()`
+- `moveCursorRight()`
+- `moveCursorHome()`
+- `moveCursorEnd()`
+- `moveCursorLeftWithSelection()`
+- `moveCursorRightWithSelection()`
+- `moveCursorHomeWithSelection()`
+- `moveCursorEndWithSelection()`
+- `selectAll()`
+- `deleteSelection()`
+- `copySelection()`
+- `cutSelection()`
+- `pasteFromClipboard()`
+
 ## MVVM Boundary
 
 - views provide layout and hit testing

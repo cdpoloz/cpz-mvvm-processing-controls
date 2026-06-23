@@ -56,6 +56,18 @@ public interface KeyboardInputTarget extends Focusable {
 
    void moveCursorRightWithSelection();
 
+   /**
+    * Moves the cursor to the start of the current value while extending selection when supported.
+    */
+   default void moveCursorHomeWithSelection() {
+   }
+
+   /**
+    * Moves the cursor to the end of the current value while extending selection when supported.
+    */
+   default void moveCursorEndWithSelection() {
+   }
+
    void selectAll();
 
    void deleteSelection();

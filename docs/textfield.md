@@ -70,11 +70,14 @@ Focus behavior in the public single-field flow:
 Supported keyboard behavior in the current iteration:
 
 - typing inserts characters at the cursor
+- dead-key accent composition is supported for common Latin characters, including `á`, `é`, `í`, `ó`, `ú`, `ñ`, `ü`, and uppercase variants
 - `backspace` deletes the character before the cursor
-- `delete` deletes the character after the cursor
+- `delete` / `supr` deletes the character after the cursor, or the selected text when a selection exists
 - `left` and `right` move the cursor
-- `home` moves the cursor to the start of the text
-- `end` moves the cursor to the end of the text
+- `home` / `inicio` moves the cursor to the start of the text
+- `end` / `fin` moves the cursor to the end of the text
+- `shift + home` / `shift + inicio` extends the selection from the cursor to the start of the text
+- `shift + end` / `shift + fin` extends the selection from the cursor to the end of the text
 - `enter` is currently a no-op
 
 ---

@@ -115,10 +115,18 @@ public final class KeyboardInputAdapter {
                target.deleteForward();
             } else if (value == 36) {
                this.suppressTypedOnce = true;
-               target.moveCursorHome();
+               if (pressed) {
+                  target.moveCursorHomeWithSelection();
+               } else {
+                  target.moveCursorHome();
+               }
             } else if (value == 35) {
                this.suppressTypedOnce = true;
-               target.moveCursorEnd();
+               if (pressed) {
+                  target.moveCursorEndWithSelection();
+               } else {
+                  target.moveCursorEnd();
+               }
             } else if (value == 37) {
                if (pressed) {
                   target.moveCursorLeftWithSelection();
