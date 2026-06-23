@@ -523,7 +523,7 @@ The focus is on architectural clarity and explicit behavior rather than framewor
 
 ## License
 
-`cpz-mvvm-processing-controls` is released under the MIT License. See [LICENSE](LICENSE).
+`cpz-mvvm-processing-controls` is released under the Apache License, Version 2.0. See [LICENSE](LICENSE).
 
 ---
 
