@@ -28,7 +28,7 @@ shared utility APIs.
 In the current repository layout, `cpz-utils` is expected at:
 
 ```text
-lib/cpz-utils/cpz-utils.jar
+lib/cpz-utils/cpz-utils-0.2.0.jar
 ```
 
 Add that JAR to the module dependencies or runtime classpath together with

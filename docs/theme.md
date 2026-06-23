@@ -8,7 +8,7 @@ Color helper examples in this document use `Colors` from `cpz-utils`:
 import com.cpz.utils.color.Colors;
 ```
 
-The required JAR is expected at `lib/cpz-utils/cpz-utils.jar` and must be added
+The required JAR is expected at `lib/cpz-utils/cpz-utils-0.2.0.jar` and must be added
 to the module dependencies or classpath together with Processing. `Colors` is no
 longer provided by the controls package.
 
