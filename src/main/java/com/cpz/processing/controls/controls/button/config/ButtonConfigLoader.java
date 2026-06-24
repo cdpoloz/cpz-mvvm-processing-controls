@@ -65,7 +65,10 @@ public final class ButtonConfigLoader {
                 JsonConfigSupport.getOptionalInt(style, "disabledAlpha"),
                 JsonConfigSupport.getOptionalFloat(style, "hoverBlendWithWhite"),
                 JsonConfigSupport.getOptionalFloat(style, "pressedBlendWithBlack"),
-                this.readRenderer(style, path)
+                this.readRenderer(style, path),
+                JsonConfigSupport.getOptionalNonBlankString(style, "font", path, "button style"),
+                JsonConfigSupport.getOptionalFloat(style, "textSize"),
+                path
         );
     }
 

@@ -56,6 +56,8 @@ button.setClickListener(() -> {
 
 ```java
 ButtonStyleConfig bsc = new ButtonStyleConfig();
+bsc.font = createFont("data/font/JetBrainsMono.ttf", 16.0f);
+bsc.textSize = 16.0f;
 bsc.baseColor = Colors.rgb(48, 98, 219);
 bsc.textColor = Colors.gray(255);
 bsc.strokeColor = Colors.gray(255);
@@ -82,6 +84,8 @@ The SVG renderer can be configured in two equivalent ways:
 - through JSON using the `renderer` block described in [JSON Configuration](json-configuration.md)
 
 Both approaches use the same internal styling and rendering infrastructure.
+The SVG renderer applies the same `font`/`textSize` matrix documented for the
+regular [Button](button.md); typography is not SVG-specific.
 
 ---
 

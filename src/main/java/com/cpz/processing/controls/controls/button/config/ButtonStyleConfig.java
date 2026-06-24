@@ -2,6 +2,7 @@ package com.cpz.processing.controls.controls.button.config;
 
 import com.cpz.processing.controls.controls.button.style.render.ButtonRenderer;
 import com.cpz.processing.controls.core.theme.ThemeProvider;
+import processing.core.PFont;
 
 /**
  * Configuration holder for button style config.
@@ -33,6 +34,14 @@ public final class ButtonStyleConfig {
    public Float pressedBlendWithBlack;
    public ButtonRenderer renderer;
    public ThemeProvider themeProvider;
+   /**
+    * Optional control font. {@code null} preserves the active Processing font.
+    */
+   public PFont font;
+   /**
+    * Optional control text size. {@code null} preserves the active Processing size.
+    */
+   public Float textSize;
 
    /**
     * Updates renderer.

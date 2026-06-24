@@ -3,6 +3,8 @@ package com.cpz.processing.controls.controls.slider;
 import com.cpz.processing.controls.controls.slider.config.SliderConfig;
 import com.cpz.processing.controls.controls.slider.config.SliderStyleConfig;
 import com.cpz.processing.controls.controls.slider.style.SliderStyle;
+import com.cpz.processing.controls.core.style.TypographySupport;
+import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PApplet;
 import processing.core.PShape;
 
@@ -95,6 +97,13 @@ public final class SliderFactory {
         }
         if (style.getRenderer() != null && "svg".equals(style.getRenderer().getType())) {
             result.thumbShape = loadThumbShape(sketch, style.getRenderer().getPath());
+        }
+        result.textSize = style.getTextSize();
+        if (style.getFontPath() != null) {
+            float creationSize = result.textSize != null
+                    ? result.textSize
+                    : TypographySupport.DEFAULT_CUSTOM_FONT_SIZE;
+            result.font = FontLoader.load(sketch, style.getFontPath(), creationSize, "slider", style.getSourcePath());
         }
         return result;
     }

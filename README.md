@@ -62,11 +62,11 @@ to your Maven project:
 <dependency>
     <groupId>io.github.cdpoloz</groupId>
     <artifactId>cpz-mvvm-processing-controls</artifactId>
-    <version>0.3.2</version>
+    <version>0.4.0</version>
 </dependency>
 ```
 
-Version `0.3.2` will be available from Maven Central after its release is
+Version `0.4.0` will be available from Maven Central after its release is
 published. Processing Core (`org.processing:core:4.5.2`) and `cpz-utils`
 (`io.github.cdpoloz:cpz-utils:0.2.3`) are resolved transitively by Maven; do
 not add them as manually copied JARs.
@@ -492,6 +492,12 @@ That template shows:
 - `docs`: human-facing documentation
 - `docs/uml`: PlantUML diagrams
 
+Text-rendering controls (`Button`, `Label`, `Slider`, `RadioGroup`,
+`TextField`, `NumericField`, and `DropDown`) support an optional per-control
+`PFont`, including JSON `style.font` paths. Fonts from JSON are loaded when the
+control is created. A `null` font preserves the font active in
+Processing/PGraphics; the theme does not yet define a global font.
+
 ---
 
 ## Documentation
@@ -537,6 +543,9 @@ The focus is on architectural clarity and explicit behavior rather than framewor
 ## License
 
 `cpz-mvvm-processing-controls` is released under the Apache License, Version 2.0. See [LICENSE](LICENSE).
+
+The examples include JetBrains Mono, distributed under the SIL Open Font
+License 1.1. See [OFL](data/font/OFL.txt).
 
 ---
 

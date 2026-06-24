@@ -64,7 +64,9 @@ public final class NumericFieldConfigLoader {
                 JsonConfigSupport.getOptionalColor(style, "cursorColor", path),
                 JsonConfigSupport.getOptionalColor(style, "selectionColor", path),
                 JsonConfigSupport.getOptionalColor(style, "selectionTextColor", path),
-                JsonConfigSupport.getOptionalFloat(style, "textSize")
+                JsonConfigSupport.getOptionalFloat(style, "textSize"),
+                JsonConfigSupport.getOptionalNonBlankString(style, "font", path, "numeric field style"),
+                path
         );
     }
 

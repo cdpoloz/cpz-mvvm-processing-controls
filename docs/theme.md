@@ -121,7 +121,13 @@ config.themeProvider = themeManager;
 label.setStyle(new DefaultLabelStyle(config));
 ```
 
-`LabelStyleConfig.font` can still be assigned directly with a sketch-created `PFont` when a label needs a custom font.
+The theme currently defines visual tokens but no global/default font.
+Control-specific fonts can be assigned directly with a sketch-created `PFont`
+through `ButtonStyleConfig`, `LabelStyleConfig`, `SliderStyleConfig`,
+`RadioGroupStyleConfig`, `TextFieldStyleConfig`, `NumericFieldStyleConfig`, or
+`DropDownStyleConfig`. A `null` font means that the control falls back to the
+font active in Processing/PGraphics. Theme-level font fallback is intentionally
+reserved for a later stage.
 
 The important point is that every style receives the same sketch-owned `ThemeManager`.
 

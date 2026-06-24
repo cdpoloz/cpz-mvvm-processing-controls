@@ -3,6 +3,7 @@ package com.cpz.processing.controls.controls.numericfield;
 import com.cpz.processing.controls.controls.numericfield.config.NumericFieldConfig;
 import com.cpz.processing.controls.controls.numericfield.config.NumericFieldStyleConfig;
 import com.cpz.processing.controls.controls.numericfield.style.NumericFieldStyle;
+import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PApplet;
 
 import java.util.Objects;
@@ -30,13 +31,13 @@ public final class NumericFieldFactory {
         numericField.setVisible(config.isVisible());
 
         if (config.getStyle() != null) {
-            numericField.setStyle(new NumericFieldStyle(toStyleConfig(config.getStyle())));
+            numericField.setStyle(new NumericFieldStyle(toStyleConfig(sketch, config.getStyle())));
         }
 
         return numericField;
     }
 
-    private static NumericFieldStyleConfig toStyleConfig(NumericFieldConfig.StyleConfig style) {
+    private static NumericFieldStyleConfig toStyleConfig(PApplet sketch, NumericFieldConfig.StyleConfig style) {
         NumericFieldStyleConfig result = new NumericFieldStyleConfig();
         result.backgroundColor = style.getBackgroundColor();
         result.borderColor = style.getBorderColor();
@@ -47,7 +48,9 @@ public final class NumericFieldFactory {
         if (style.getTextSize() != null) {
             result.textSize = style.getTextSize();
         }
-        result.font = null;
+        if (style.getFontPath() != null) {
+            result.font = FontLoader.load(sketch, style.getFontPath(), result.textSize, "numeric field", style.getSourcePath());
+        }
         return result;
     }
 }

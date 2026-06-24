@@ -74,6 +74,8 @@ public final class TextFieldConfig {
         private final Integer selectionColor;
         private final Integer selectionTextColor;
         private final Float textSize;
+        private final String fontPath;
+        private final String sourcePath;
 
         public StyleConfig(
                 Integer backgroundColor,
@@ -84,6 +86,30 @@ public final class TextFieldConfig {
                 Integer selectionTextColor,
                 Float textSize
         ) {
+            this(
+                    backgroundColor,
+                    borderColor,
+                    textColor,
+                    cursorColor,
+                    selectionColor,
+                    selectionTextColor,
+                    textSize,
+                    null,
+                    null
+            );
+        }
+
+        public StyleConfig(
+                Integer backgroundColor,
+                Integer borderColor,
+                Integer textColor,
+                Integer cursorColor,
+                Integer selectionColor,
+                Integer selectionTextColor,
+                Float textSize,
+                String fontPath,
+                String sourcePath
+        ) {
             this.backgroundColor = backgroundColor;
             this.borderColor = borderColor;
             this.textColor = textColor;
@@ -91,6 +117,8 @@ public final class TextFieldConfig {
             this.selectionColor = selectionColor;
             this.selectionTextColor = selectionTextColor;
             this.textSize = textSize;
+            this.fontPath = fontPath;
+            this.sourcePath = sourcePath;
         }
 
         public Integer getBackgroundColor() {
@@ -119,6 +147,14 @@ public final class TextFieldConfig {
 
         public Float getTextSize() {
             return this.textSize;
+        }
+
+        public String getFontPath() {
+            return this.fontPath;
+        }
+
+        public String getSourcePath() {
+            return this.sourcePath;
         }
     }
 }

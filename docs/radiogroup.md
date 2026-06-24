@@ -141,6 +141,7 @@ When the group is disabled, selection can still be set programmatically through 
 
 ```java
 RadioGroupStyleConfig rgsc = new RadioGroupStyleConfig();
+rgsc.font = createFont("data/font/JetBrainsMono.ttf", 17.0f);
 rgsc.textOverride = Colors.gray(245);
 rgsc.indicatorOverride = Colors.gray(255);
 rgsc.hoveredBackgroundOverride = Colors.rgb(44, 56, 74);
@@ -159,6 +160,10 @@ radioGroup.setStyle(new RadioGroupStyle(rgsc));
 ```
 
 This configuration controls the visual appearance of the text, indicator, spacing, and per-item background states.
+
+`font == null` means that the group does not impose a font. The fallback is
+the font currently active in Processing/PGraphics. `textSize` keeps its current
+default of `16.0f`; the example overrides it with `17.0f`.
 
 The facade uses the existing style mechanism. It does not introduce a new styling path.
 
@@ -239,9 +244,17 @@ Minimal JSON:
   "y": 70.0,
   "width": 200.0,
   "enabled": true,
-  "visible": true
+  "visible": true,
+  "style": {
+    "font": "data/font/JetBrainsMono.ttf",
+    "textSize": 17.0
+  }
 }
 ```
+
+The optional font path is loaded while `RadioGroupFactory` creates the
+control, never during `draw()`. Omitted or JSON `null` means that no
+control-specific font is imposed.
 
 Minimal Java sketch flow:
 

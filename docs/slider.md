@@ -123,6 +123,8 @@ slider.setFormatter(value -> value.setScale(2, RoundingMode.HALF_UP).toPlainStri
 slider.setShowValueText(true);
 
 SliderStyleConfig ssc = new SliderStyleConfig();
+ssc.font = createFont("data/font/JetBrainsMono.ttf", 16.0f);
+ssc.textSize = 16.0f;
 ssc.trackColor = Colors.rgb(62, 72, 86);
 ssc.trackHoverColor = Colors.rgb(86, 98, 116);
 ssc.trackPressedColor = Colors.rgb(44, 52, 64);
@@ -149,6 +151,8 @@ slider.setStyle(new SliderStyle(ssc));
 
 This configuration controls the visual appearance:
 
+- `font` optionally assigns a control-specific `PFont` for the value text
+- `textSize` optionally assigns the value text size
 - `trackColor`, `trackHoverColor`, and `trackPressedColor` define the base track colors
 - `activeTrackColor`, `activeTrackHoverColor`, and `activeTrackPressedColor` define the filled portion
 - `thumbColor`, `thumbHoverColor`, and `thumbPressedColor` define the thumb colors
@@ -156,6 +160,21 @@ This configuration controls the visual appearance:
 - `trackThickness` controls track geometry
 - `thumbSize` controls thumb size
 - `showValueText` controls whether the resolved text is drawn by the slider renderer
+
+`font == null` means that the slider does not impose a font. The fallback is
+the font currently active in Processing/PGraphics, not a fixed font owned by
+the controls library. The same typography is used for horizontal and vertical
+value text.
+
+| `font` | `textSize` | Result |
+| --- | --- | --- |
+| `null` | `null` | Preserve the active Processing font and size |
+| `null` | value | Preserve the active font and apply the configured size |
+| value | value | Apply the configured font and size |
+| value | `null` | Apply the configured font at `16.0f` |
+
+In JSON, `style.font` is an optional font path. The font is loaded when the
+control is created, never during `draw()`.
 
 The facade also exposes range and behavior methods such as:
 

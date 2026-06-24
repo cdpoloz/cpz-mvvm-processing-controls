@@ -2,6 +2,7 @@ package com.cpz.processing.controls.controls.dropdown.style.render;
 
 import com.cpz.processing.controls.controls.dropdown.state.DropDownViewState;
 import com.cpz.processing.controls.controls.dropdown.style.DropDownRenderStyle;
+import com.cpz.processing.controls.core.style.TypographySupport;
 import processing.core.PApplet;
 
 /**
@@ -34,22 +35,25 @@ public final class DefaultDropDownRenderer {
       float value = state.x() - state.width() * 0.5F;
       float value2 = state.y() - state.height() * 0.5F;
       float value3 = value + state.width();
+      TypographySupport.prepareStyleScope(sketch, renderStyle.font());
       sketch.pushStyle();
-      sketch.rectMode(0);
-      this.applyTypography(sketch, renderStyle);
-      sketch.stroke(renderStyle.strokeColor());
-      sketch.strokeWeight(renderStyle.strokeWeight());
-      sketch.fill(renderStyle.baseFillColor());
-      sketch.rect(value, value2, state.width(), state.height(), renderStyle.cornerRadius());
-      sketch.fill(renderStyle.textColor());
-      sketch.textAlign(37, 3);
-      sketch.text(state.selectedText(), value + renderStyle.textPadding(), state.y());
-      this.drawArrow(sketch, value3 - renderStyle.arrowPadding(), state.y(), renderStyle.arrowColor(), state.expanded());
-      if (state.expanded()) {
-         this.drawExpandedList(sketch, state, renderStyle, value, value2);
+      try {
+         sketch.rectMode(0);
+         TypographySupport.apply(sketch, renderStyle.font(), renderStyle.textSize());
+         sketch.stroke(renderStyle.strokeColor());
+         sketch.strokeWeight(renderStyle.strokeWeight());
+         sketch.fill(renderStyle.baseFillColor());
+         sketch.rect(value, value2, state.width(), state.height(), renderStyle.cornerRadius());
+         sketch.fill(renderStyle.textColor());
+         sketch.textAlign(37, 3);
+         sketch.text(state.selectedText(), value + renderStyle.textPadding(), state.y());
+         this.drawArrow(sketch, value3 - renderStyle.arrowPadding(), state.y(), renderStyle.arrowColor(), state.expanded());
+         if (state.expanded()) {
+            this.drawExpandedList(sketch, state, renderStyle, value, value2);
+         }
+      } finally {
+         sketch.popStyle();
       }
-
-      sketch.popStyle();
    }
 
    private void drawExpandedList(PApplet sketch, DropDownViewState state, DropDownRenderStyle renderStyle, float x, float y) {
@@ -99,12 +103,4 @@ public final class DefaultDropDownRenderer {
       sketch.endShape(2);
    }
 
-   private void applyTypography(PApplet sketch, DropDownRenderStyle renderStyle) {
-      if (renderStyle.font() != null) {
-         sketch.textFont(renderStyle.font(), renderStyle.textSize());
-      } else {
-         sketch.textSize(renderStyle.textSize());
-      }
-
-   }
 }

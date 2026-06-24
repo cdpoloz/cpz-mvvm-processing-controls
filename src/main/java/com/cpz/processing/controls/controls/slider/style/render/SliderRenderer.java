@@ -5,6 +5,7 @@ import com.cpz.processing.controls.controls.slider.state.SliderViewState;
 import com.cpz.processing.controls.controls.slider.style.SliderRenderStyle;
 import com.cpz.processing.controls.controls.slider.style.SvgColorMode;
 import com.cpz.processing.controls.controls.slider.view.SliderGeometry;
+import com.cpz.processing.controls.core.style.TypographySupport;
 import processing.core.PApplet;
 import processing.core.PShape;
 
@@ -34,14 +35,22 @@ public final class SliderRenderer {
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
-    */
+   */
    public void render(PApplet sketch, SliderGeometry sliderGeometry, SliderViewState state, SliderRenderStyle renderStyle) {
+      boolean valueTextVisible = renderStyle.showValueText()
+              && state.showText()
+              && state.displayText() != null
+              && !state.displayText().isEmpty();
+      TypographySupport.prepareStyleScope(sketch, valueTextVisible ? renderStyle.font() : null);
       sketch.pushStyle();
-      this.drawBaseTrack(sketch, sliderGeometry, renderStyle);
-      this.drawActiveTrack(sketch, sliderGeometry, state, renderStyle);
-      this.drawThumb(sketch, sliderGeometry, state, renderStyle);
-      this.drawValueText(sketch, sliderGeometry, state, renderStyle);
-      sketch.popStyle();
+      try {
+         this.drawBaseTrack(sketch, sliderGeometry, renderStyle);
+         this.drawActiveTrack(sketch, sliderGeometry, state, renderStyle);
+         this.drawThumb(sketch, sliderGeometry, state, renderStyle);
+         this.drawValueText(sketch, sliderGeometry, state, renderStyle);
+      } finally {
+         sketch.popStyle();
+      }
    }
 
    private void drawBaseTrack(PApplet sketch, SliderGeometry sliderGeometry, SliderRenderStyle renderStyle) {
@@ -109,6 +118,7 @@ public final class SliderRenderer {
 
    private void drawValueText(PApplet sketch, SliderGeometry sliderGeometry, SliderViewState state, SliderRenderStyle renderStyle) {
       if (renderStyle.showValueText() && state.showText() && state.displayText() != null && !state.displayText().isEmpty()) {
+         TypographySupport.apply(sketch, renderStyle.font(), renderStyle.textSize());
          sketch.fill(renderStyle.textColor());
          sketch.noStroke();
          if (sliderGeometry.orientation() == SliderOrientation.HORIZONTAL) {

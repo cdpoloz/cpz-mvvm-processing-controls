@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.button.style.render;
 
 import com.cpz.processing.controls.controls.button.style.ButtonRenderStyle;
+import com.cpz.processing.controls.core.style.TypographySupport;
 import processing.core.PApplet;
 import processing.core.PShape;
 
@@ -58,22 +59,26 @@ public final class SvgButtonRenderer implements ButtonRenderer {
          text = "";
       }
 
+      TypographySupport.prepareStyleScope(sketch, renderStyle.showText() ? renderStyle.font() : null);
       sketch.pushStyle();
-      if (this.shape != null) {
-         sketch.shapeMode(3);
-         sketch.fill(renderStyle.fillColor());
-         sketch.stroke(renderStyle.strokeColor());
-         sketch.strokeWeight(renderStyle.strokeWeight());
-         sketch.shape(this.shape, x, y, width, height);
-      }
+      try {
+         if (this.shape != null) {
+            sketch.shapeMode(3);
+            sketch.fill(renderStyle.fillColor());
+            sketch.stroke(renderStyle.strokeColor());
+            sketch.strokeWeight(renderStyle.strokeWeight());
+            sketch.shape(this.shape, x, y, width, height);
+         }
 
-      if (renderStyle.showText()) {
-         sketch.fill(renderStyle.textColor());
-         sketch.textAlign(3, 3);
-         sketch.text(text, x, y);
+         if (renderStyle.showText()) {
+            TypographySupport.apply(sketch, renderStyle.font(), renderStyle.textSize());
+            sketch.fill(renderStyle.textColor());
+            sketch.textAlign(3, 3);
+            sketch.text(text, x, y);
+         }
+      } finally {
+         sketch.popStyle();
       }
-
-      sketch.popStyle();
    }
 
    private static PShape loadShape(PApplet sketch, String path) {

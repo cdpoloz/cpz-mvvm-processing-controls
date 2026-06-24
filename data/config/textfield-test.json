@@ -17,7 +17,8 @@
         "cursorColor": "#2684D4",
         "selectionColor": "#B6D9F8",
         "selectionTextColor": "#1C2C3E",
-        "textSize": 16.0
+        "textSize": 16.0,
+        "font": "data/font/JetBrainsMono.ttf"
       }
     }
   ]

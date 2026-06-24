@@ -141,7 +141,7 @@ Multi-control document:
       "height": 60.0,
       "style": {
         "textSize": 24.0,
-        "font": "data/font/abel-regular.ttf"
+        "font": "data/font/JetBrainsMono.ttf"
       }
     },
     {
@@ -276,7 +276,19 @@ Style remains nested under each control entry:
 
 The style block still affects appearance only. It does not define behavior, listeners, input routing, or binding.
 
-Label style supports an optional `font` path:
+Every control that currently renders text accepts an optional `font` path in
+its style:
+
+- `button`
+- `label`
+- `slider`, for the value text
+- `radiogroup`
+- `textfield`
+- `numericfield`
+- `dropdown`, for both the collapsed value and expanded items
+
+`checkbox` and `toggle` do not render text and therefore do not accept this
+typography property. `Tooltip` is outside this JSON feature.
 
 ```json
 {
@@ -289,7 +301,7 @@ Label style supports an optional `font` path:
   "height": 100.0,
   "style": {
     "textSize": 24.0,
-    "font": "data/font/abel-regular.ttf",
+    "font": "data/font/JetBrainsMono.ttf",
     "textColor": "#D2E4FF",
     "lineSpacingMultiplier": 1.2,
     "alignX": "center",
@@ -299,9 +311,36 @@ Label style supports an optional `font` path:
 }
 ```
 
-For `Label`, `style.font` is a font file path resolved by the label JSON pipeline. `LabelConfigLoader` reads the path, and `LabelFactory` creates the `PFont` with `sketch.createFont(...)` using `textSize` when present, or `12.0f` otherwise.
+The control-specific loader validates and stores the path. The corresponding
+factory then creates the `PFont` through the shared font loader. Loading occurs
+once while the control is created, never during `draw()`.
 
-The font file must exist in resources accessible to the Processing sketch, such as `data/font/abel-regular.ttf`. If `font` is omitted or `null`, the label keeps the previous default-font behavior.
+`font` may be omitted or set to JSON `null`. Both mean that the control does
+not impose a font; rendering falls back to the font currently active in
+Processing/PGraphics. That fallback is not a fixed font owned by this library.
+An empty or whitespace-only string is invalid and produces an error containing
+the control, the `font` property, the JSON source path when available, and the
+cause.
+
+Existing default text sizes remain unchanged:
+
+- `Label`: `12.0f`
+- `RadioGroup`, `TextField`, `NumericField`, and `DropDown`: `16.0f`
+
+`Button` and `Slider` preserve their historical ambient size behavior by
+making `textSize` optional:
+
+| `font` | `textSize` | Result |
+| --- | --- | --- |
+| omitted or `null` | omitted or `null` | Preserve the active Processing font and size |
+| omitted or `null` | value | Preserve the active font and apply the configured size |
+| path | value | Apply the loaded font and configured size |
+| path | omitted or `null` | Apply the loaded font at `16.0f` |
+
+The font file must be accessible to the Processing sketch, for example
+`data/font/JetBrainsMono.ttf`. Invalid, unreadable or unsupported font files
+fail control creation with an `IllegalArgumentException`; they do not fail
+later from the render loop.
 
 SVG renderer configuration also remains local to the control style block:
 

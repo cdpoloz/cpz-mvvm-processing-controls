@@ -2,6 +2,7 @@ package com.cpz.processing.controls.controls.slider.config;
 
 import com.cpz.processing.controls.controls.slider.style.SvgColorMode;
 import com.cpz.processing.controls.core.theme.ThemeProvider;
+import processing.core.PFont;
 import processing.core.PShape;
 
 /**
@@ -55,6 +56,14 @@ public final class SliderStyleConfig {
    public SvgColorMode svgColorMode;
    public PShape thumbShape;
    public ThemeProvider themeProvider;
+   /**
+    * Optional value-text font. {@code null} preserves the active Processing font.
+    */
+   public PFont font;
+   /**
+    * Optional value-text size. {@code null} preserves the active Processing size.
+    */
+   public Float textSize;
 
    /**
     * Creates a slider style config.

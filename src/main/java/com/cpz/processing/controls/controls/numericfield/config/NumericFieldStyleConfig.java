@@ -32,6 +32,11 @@ public final class NumericFieldStyleConfig {
    public Integer selectionColor;
    public Integer selectionTextColor;
    public float textSize = 16.0F;
+
+   /**
+    * Optional control font used consistently for measurement and rendering.
+    * {@code null} preserves the active Processing font.
+    */
    public PFont font;
    public ThemeProvider themeProvider;
 

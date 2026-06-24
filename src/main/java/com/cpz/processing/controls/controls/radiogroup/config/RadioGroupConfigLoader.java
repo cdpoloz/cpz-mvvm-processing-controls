@@ -99,7 +99,9 @@ public final class RadioGroupConfigLoader {
                 JsonConfigSupport.getOptionalFloat(style, "strokeWeight"),
                 JsonConfigSupport.getOptionalFloat(style, "textSize"),
                 JsonConfigSupport.getOptionalFloat(style, "cornerRadius"),
-                JsonConfigSupport.getOptionalInt(style, "disabledAlpha")
+                JsonConfigSupport.getOptionalInt(style, "disabledAlpha"),
+                JsonConfigSupport.getOptionalNonBlankString(style, "font", path, "radio group style"),
+                path
         );
     }
 }

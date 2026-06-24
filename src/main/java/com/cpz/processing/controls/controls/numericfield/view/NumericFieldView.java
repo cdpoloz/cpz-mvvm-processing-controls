@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.numericfield.style.NumericFieldRende
 import com.cpz.processing.controls.controls.numericfield.style.NumericFieldStyle;
 import com.cpz.processing.controls.controls.numericfield.viewmodel.NumericFieldViewModel;
 import com.cpz.processing.controls.core.input.PointerInteractable;
+import com.cpz.processing.controls.core.style.TypographySupport;
 import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import processing.core.PApplet;
@@ -279,17 +280,15 @@ public final class NumericFieldView implements ControlView, PointerInteractable 
 
    private float measureTextWidth(String text, ThemeSnapshot snapshot) {
       NumericFieldRenderStyle renderStyle = this.style.resolveRenderStyle(this.buildMeasureState(), snapshot);
+      TypographySupport.prepareStyleScope(this.sketch, renderStyle.font());
       this.sketch.pushStyle();
-      if (renderStyle.font() != null) {
-         this.sketch.textFont(renderStyle.font(), renderStyle.textSize());
-      } else {
-         this.sketch.textSize(renderStyle.textSize());
+      try {
+         TypographySupport.apply(this.sketch, renderStyle.font(), renderStyle.textSize());
+         this.sketch.textAlign(37, 3);
+         return this.sketch.textWidth(text == null ? "" : text);
+      } finally {
+         this.sketch.popStyle();
       }
-
-      this.sketch.textAlign(37, 3);
-      float value = this.sketch.textWidth(text == null ? "" : text);
-      this.sketch.popStyle();
-      return value;
    }
 
    private NumericFieldViewState buildMeasureState() {

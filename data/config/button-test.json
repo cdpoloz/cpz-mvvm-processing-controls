@@ -13,6 +13,8 @@
       "style": {
         "baseColor": "#3062DB",
         "textColor": "#FFFFFF",
+        "font": "data/font/JetBrainsMono.ttf",
+        "textSize": 16.0,
         "strokeColor": "#FFFFFF",
         "strokeWeight": 2.0,
         "strokeWeightHover": 4.0,

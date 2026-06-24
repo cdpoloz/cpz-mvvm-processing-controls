@@ -195,6 +195,7 @@ dropDown.setChangeListener(index -> {
 
 ```java
 DropDownStyleConfig style = new DropDownStyleConfig();
+style.font = createFont("data/font/JetBrainsMono.ttf", 16.0f);
 style.baseFillOverride = Colors.rgb(236, 242, 248);
 style.listFillOverride = Colors.rgb(245, 248, 252);
 style.textOverride = Colors.rgb(28, 44, 62);
@@ -207,6 +208,11 @@ dropDown.setStyle(new DefaultDropDownStyle(style));
 ```
 
 The facade does not introduce a second styling path.
+
+The same `font` and `textSize` are applied to the collapsed value and every
+expanded list item. `font == null` means that the drop-down does not impose a
+font; the fallback is the font currently active in Processing/PGraphics.
+`textSize` keeps its existing default of `16.0f`.
 
 ---
 
@@ -249,9 +255,17 @@ Minimal JSON:
   "width": 420.0,
   "height": 48.0,
   "enabled": true,
-  "visible": true
+  "visible": true,
+  "style": {
+    "font": "data/font/JetBrainsMono.ttf",
+    "textSize": 16.0
+  }
 }
 ```
+
+The optional font path is loaded while `DropDownFactory` creates the control,
+never during `draw()`. Omitted or JSON `null` means that no control-specific
+font is imposed.
 
 The loader validates the supported surface directly:
 

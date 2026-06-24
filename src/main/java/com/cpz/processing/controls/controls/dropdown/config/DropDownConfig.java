@@ -91,6 +91,8 @@ public final class DropDownConfig {
         private final Float arrowPadding;
         private final Integer maxVisibleItems;
         private final Integer disabledAlpha;
+        private final String fontPath;
+        private final String sourcePath;
 
         public StyleConfig(
                 Integer baseFillOverride,
@@ -111,6 +113,50 @@ public final class DropDownConfig {
                 Integer maxVisibleItems,
                 Integer disabledAlpha
         ) {
+            this(
+                    baseFillOverride,
+                    listFillOverride,
+                    textOverride,
+                    borderOverride,
+                    hoverItemOverlayOverride,
+                    selectedItemOverlayOverride,
+                    focusedBorderOverride,
+                    cornerRadius,
+                    listCornerRadius,
+                    strokeWeight,
+                    focusedStrokeWeight,
+                    textSize,
+                    itemHeight,
+                    textPadding,
+                    arrowPadding,
+                    maxVisibleItems,
+                    disabledAlpha,
+                    null,
+                    null
+            );
+        }
+
+        public StyleConfig(
+                Integer baseFillOverride,
+                Integer listFillOverride,
+                Integer textOverride,
+                Integer borderOverride,
+                Integer hoverItemOverlayOverride,
+                Integer selectedItemOverlayOverride,
+                Integer focusedBorderOverride,
+                Float cornerRadius,
+                Float listCornerRadius,
+                Float strokeWeight,
+                Float focusedStrokeWeight,
+                Float textSize,
+                Float itemHeight,
+                Float textPadding,
+                Float arrowPadding,
+                Integer maxVisibleItems,
+                Integer disabledAlpha,
+                String fontPath,
+                String sourcePath
+        ) {
             this.baseFillOverride = baseFillOverride;
             this.listFillOverride = listFillOverride;
             this.textOverride = textOverride;
@@ -128,6 +174,8 @@ public final class DropDownConfig {
             this.arrowPadding = arrowPadding;
             this.maxVisibleItems = maxVisibleItems;
             this.disabledAlpha = disabledAlpha;
+            this.fontPath = fontPath;
+            this.sourcePath = sourcePath;
         }
 
         public Integer getBaseFillOverride() {
@@ -196,6 +244,14 @@ public final class DropDownConfig {
 
         public Integer getDisabledAlpha() {
             return this.disabledAlpha;
+        }
+
+        public String getFontPath() {
+            return this.fontPath;
+        }
+
+        public String getSourcePath() {
+            return this.sourcePath;
         }
     }
 }

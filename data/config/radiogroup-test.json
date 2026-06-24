@@ -22,6 +22,7 @@
         "indicatorInnerDiameter": 8.0,
         "strokeWeight": 1.8,
         "textSize": 17.0,
+        "font": "data/font/JetBrainsMono.ttf",
         "cornerRadius": 8.0,
         "disabledAlpha": 85
       }

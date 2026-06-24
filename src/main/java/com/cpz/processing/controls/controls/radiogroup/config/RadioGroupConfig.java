@@ -85,6 +85,8 @@ public final class RadioGroupConfig {
         private final Float textSize;
         private final Float cornerRadius;
         private final Integer disabledAlpha;
+        private final String fontPath;
+        private final String sourcePath;
 
         public StyleConfig(
                 Integer textOverride,
@@ -105,6 +107,50 @@ public final class RadioGroupConfig {
                 Float cornerRadius,
                 Integer disabledAlpha
         ) {
+            this(
+                    textOverride,
+                    indicatorOverride,
+                    backgroundOverride,
+                    hoveredBackgroundOverride,
+                    pressedBackgroundOverride,
+                    selectedDotOverride,
+                    itemHeight,
+                    itemSpacing,
+                    minimumItemHeight,
+                    indicatorOffsetX,
+                    textOffsetX,
+                    indicatorOuterDiameter,
+                    indicatorInnerDiameter,
+                    strokeWeight,
+                    textSize,
+                    cornerRadius,
+                    disabledAlpha,
+                    null,
+                    null
+            );
+        }
+
+        public StyleConfig(
+                Integer textOverride,
+                Integer indicatorOverride,
+                Integer backgroundOverride,
+                Integer hoveredBackgroundOverride,
+                Integer pressedBackgroundOverride,
+                Integer selectedDotOverride,
+                Float itemHeight,
+                Float itemSpacing,
+                Float minimumItemHeight,
+                Float indicatorOffsetX,
+                Float textOffsetX,
+                Float indicatorOuterDiameter,
+                Float indicatorInnerDiameter,
+                Float strokeWeight,
+                Float textSize,
+                Float cornerRadius,
+                Integer disabledAlpha,
+                String fontPath,
+                String sourcePath
+        ) {
             this.textOverride = textOverride;
             this.indicatorOverride = indicatorOverride;
             this.backgroundOverride = backgroundOverride;
@@ -122,6 +168,8 @@ public final class RadioGroupConfig {
             this.textSize = textSize;
             this.cornerRadius = cornerRadius;
             this.disabledAlpha = disabledAlpha;
+            this.fontPath = fontPath;
+            this.sourcePath = sourcePath;
         }
 
         public Integer getTextOverride() {
@@ -190,6 +238,14 @@ public final class RadioGroupConfig {
 
         public Integer getDisabledAlpha() {
             return this.disabledAlpha;
+        }
+
+        public String getFontPath() {
+            return this.fontPath;
+        }
+
+        public String getSourcePath() {
+            return this.sourcePath;
         }
     }
 }

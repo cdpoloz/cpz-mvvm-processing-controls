@@ -114,7 +114,10 @@ public final class SliderConfigLoader {
                 JsonConfigSupport.getOptionalInt(style, "disabledAlpha"),
                 readOptionalBoolean(style, "showValueText"),
                 readSvgColorMode(style, path),
-                this.readRenderer(style, path)
+                this.readRenderer(style, path),
+                JsonConfigSupport.getOptionalNonBlankString(style, "font", path, "slider style"),
+                JsonConfigSupport.getOptionalFloat(style, "textSize"),
+                path
         );
     }
 

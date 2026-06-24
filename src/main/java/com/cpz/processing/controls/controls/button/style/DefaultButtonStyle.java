@@ -77,7 +77,7 @@ public final class DefaultButtonStyle implements ButtonStyle {
       int disabledAlpha = this.config.disabledAlpha != null ? this.config.disabledAlpha : tokens.disabledAlpha;
       int color3 = this.resolveColorOverride(tokens.border, this.config.strokeOverride, this.config.strokeColor);
       int color4 = this.resolveColorOverride(tokens.onPrimary, this.config.textOverride, this.config.textColor);
-      ButtonRenderStyle renderStyle = new ButtonRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(color2, state.enabled(), disabledAlpha), InteractiveStyleHelper.resolveStrokeColor(color3, state.enabled(), disabledAlpha), InteractiveStyleHelper.resolveStrokeWeight(this.config.strokeWeight, this.config.strokeWeightHover, state.hovered()), InteractiveStyleHelper.applyDisabledAlpha(color4, state.enabled(), disabledAlpha), this.config.cornerRadius, state.showText(), state.text());
+      ButtonRenderStyle renderStyle = new ButtonRenderStyle(InteractiveStyleHelper.applyDisabledAlpha(color2, state.enabled(), disabledAlpha), InteractiveStyleHelper.resolveStrokeColor(color3, state.enabled(), disabledAlpha), InteractiveStyleHelper.resolveStrokeWeight(this.config.strokeWeight, this.config.strokeWeightHover, state.hovered()), InteractiveStyleHelper.applyDisabledAlpha(color4, state.enabled(), disabledAlpha), this.config.cornerRadius, state.showText(), state.text(), this.config.font, this.config.textSize);
       this.renderer.render(sketch, state.x(), state.y(), state.width(), state.height(), renderStyle);
    }
 

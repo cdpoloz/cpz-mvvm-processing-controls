@@ -67,6 +67,8 @@ slider.setChangeListener(value -> {
 
 ```java
 SliderStyleConfig ssc = new SliderStyleConfig();
+ssc.font = createFont("data/font/JetBrainsMono.ttf", 16.0f);
+ssc.textSize = 16.0f;
 ssc.trackColor = Colors.rgb(62, 72, 86);
 ssc.trackHoverColor = Colors.rgb(86, 98, 116);
 ssc.trackPressedColor = Colors.rgb(44, 52, 64);
@@ -107,6 +109,8 @@ The same internal slider pipeline is reused in both cases:
 - JSON setup uses the `renderer` block and the optional `svgColorMode` field described below
 
 Both approaches end in the same internal `SliderStyle` and `SliderRenderer` behavior. SVG is not a separate control architecture.
+The value text uses the same optional font and size behavior documented for
+the regular [Slider](slider.md), independently of the thumb renderer.
 
 ---
 
@@ -154,6 +158,8 @@ Minimal SVG JSON:
     "thumbStrokeWeightHover": 3.0,
     "thumbSize": 28.0,
     "textColor": "#F5F5F5",
+    "font": "data/font/JetBrainsMono.ttf",
+    "textSize": 16.0,
     "disabledAlpha": 90,
     "showValueText": true,
     "svgColorMode": "use_render_style",

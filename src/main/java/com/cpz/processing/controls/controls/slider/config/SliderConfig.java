@@ -151,6 +151,9 @@ public final class SliderConfig {
         private final Boolean showValueText;
         private final SvgColorMode svgColorMode;
         private final RendererConfig renderer;
+        private final String fontPath;
+        private final Float textSize;
+        private final String sourcePath;
 
         public StyleConfig(
                 Integer trackOverride,
@@ -188,6 +191,86 @@ public final class SliderConfig {
                 SvgColorMode svgColorMode,
                 RendererConfig renderer
         ) {
+            this(
+                    trackOverride,
+                    trackHoverOverride,
+                    trackPressedOverride,
+                    progressOverride,
+                    progressHoverOverride,
+                    progressPressedOverride,
+                    thumbOverride,
+                    thumbHoverOverride,
+                    thumbPressedOverride,
+                    trackStrokeOverride,
+                    thumbStrokeOverride,
+                    textOverride,
+                    trackColor,
+                    trackHoverColor,
+                    trackPressedColor,
+                    trackStrokeColor,
+                    trackStrokeWeight,
+                    trackStrokeWeightHover,
+                    trackThickness,
+                    activeTrackColor,
+                    activeTrackHoverColor,
+                    activeTrackPressedColor,
+                    thumbColor,
+                    thumbHoverColor,
+                    thumbPressedColor,
+                    thumbStrokeColor,
+                    thumbStrokeWeight,
+                    thumbStrokeWeightHover,
+                    thumbSize,
+                    textColor,
+                    disabledAlpha,
+                    showValueText,
+                    svgColorMode,
+                    renderer,
+                    null,
+                    null,
+                    null
+            );
+        }
+
+        public StyleConfig(
+                Integer trackOverride,
+                Integer trackHoverOverride,
+                Integer trackPressedOverride,
+                Integer progressOverride,
+                Integer progressHoverOverride,
+                Integer progressPressedOverride,
+                Integer thumbOverride,
+                Integer thumbHoverOverride,
+                Integer thumbPressedOverride,
+                Integer trackStrokeOverride,
+                Integer thumbStrokeOverride,
+                Integer textOverride,
+                Integer trackColor,
+                Integer trackHoverColor,
+                Integer trackPressedColor,
+                Integer trackStrokeColor,
+                Float trackStrokeWeight,
+                Float trackStrokeWeightHover,
+                Float trackThickness,
+                Integer activeTrackColor,
+                Integer activeTrackHoverColor,
+                Integer activeTrackPressedColor,
+                Integer thumbColor,
+                Integer thumbHoverColor,
+                Integer thumbPressedColor,
+                Integer thumbStrokeColor,
+                Float thumbStrokeWeight,
+                Float thumbStrokeWeightHover,
+                Float thumbSize,
+                Integer textColor,
+                Integer disabledAlpha,
+                Boolean showValueText,
+                SvgColorMode svgColorMode,
+                RendererConfig renderer,
+                String fontPath,
+                Float textSize,
+                String sourcePath
+        ) {
             this.trackOverride = trackOverride;
             this.trackHoverOverride = trackHoverOverride;
             this.trackPressedOverride = trackPressedOverride;
@@ -222,6 +305,9 @@ public final class SliderConfig {
             this.showValueText = showValueText;
             this.svgColorMode = svgColorMode;
             this.renderer = renderer;
+            this.fontPath = fontPath;
+            this.textSize = textSize;
+            this.sourcePath = sourcePath;
         }
 
         public Integer getTrackOverride() {
@@ -358,6 +444,18 @@ public final class SliderConfig {
 
         public RendererConfig getRenderer() {
             return this.renderer;
+        }
+
+        public String getFontPath() {
+            return this.fontPath;
+        }
+
+        public Float getTextSize() {
+            return this.textSize;
+        }
+
+        public String getSourcePath() {
+            return this.sourcePath;
         }
     }
 

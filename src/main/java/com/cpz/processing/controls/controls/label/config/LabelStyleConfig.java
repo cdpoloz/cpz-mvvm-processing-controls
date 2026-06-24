@@ -22,7 +22,14 @@ import processing.core.PFont;
  * @author CPZ
  */
 public class LabelStyleConfig {
+   /**
+    * Optional control font. {@code null} preserves the active Processing font.
+    */
    public PFont font;
+
+   /**
+    * Text size used for rendering and measurement.
+    */
    public float textSize = 12.0F;
    public Integer textColor;
    public float lineSpacingMultiplier = 1.0F;

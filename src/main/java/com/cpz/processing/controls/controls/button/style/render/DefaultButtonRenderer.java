@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.button.style.render;
 
 import com.cpz.processing.controls.controls.button.style.ButtonRenderStyle;
+import com.cpz.processing.controls.core.style.TypographySupport;
 import processing.core.PApplet;
 
 /**
@@ -40,17 +41,21 @@ public final class DefaultButtonRenderer implements ButtonRenderer {
          text = "";
       }
 
+      TypographySupport.prepareStyleScope(sketch, renderStyle.showText() ? renderStyle.font() : null);
       sketch.pushStyle();
-      sketch.fill(renderStyle.fillColor());
-      sketch.stroke(renderStyle.strokeColor());
-      sketch.strokeWeight(renderStyle.strokeWeight());
-      sketch.rect(value, value2, width, height, renderStyle.cornerRadius());
-      if (renderStyle.showText()) {
-         sketch.fill(renderStyle.textColor());
-         sketch.textAlign(3, 3);
-         sketch.text(text, x, y);
+      try {
+         sketch.fill(renderStyle.fillColor());
+         sketch.stroke(renderStyle.strokeColor());
+         sketch.strokeWeight(renderStyle.strokeWeight());
+         sketch.rect(value, value2, width, height, renderStyle.cornerRadius());
+         if (renderStyle.showText()) {
+            TypographySupport.apply(sketch, renderStyle.font(), renderStyle.textSize());
+            sketch.fill(renderStyle.textColor());
+            sketch.textAlign(3, 3);
+            sketch.text(text, x, y);
+         }
+      } finally {
+         sketch.popStyle();
       }
-
-      sketch.popStyle();
    }
 }

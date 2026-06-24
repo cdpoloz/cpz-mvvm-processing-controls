@@ -4,6 +4,8 @@ import com.cpz.processing.controls.controls.button.config.ButtonConfig;
 import com.cpz.processing.controls.controls.button.config.ButtonStyleConfig;
 import com.cpz.processing.controls.controls.button.style.DefaultButtonStyle;
 import com.cpz.processing.controls.controls.button.style.render.SvgButtonRenderer;
+import com.cpz.processing.controls.core.style.TypographySupport;
+import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PApplet;
 
 import java.util.Objects;
@@ -60,6 +62,13 @@ public final class ButtonFactory {
         }
         if (style.getRenderer() != null && "svg".equals(style.getRenderer().getType())) {
             result.setRenderer(new SvgButtonRenderer(sketch, style.getRenderer().getPath()));
+        }
+        result.textSize = style.getTextSize();
+        if (style.getFontPath() != null) {
+            float creationSize = result.textSize != null
+                    ? result.textSize
+                    : TypographySupport.DEFAULT_CUSTOM_FONT_SIZE;
+            result.font = FontLoader.load(sketch, style.getFontPath(), creationSize, "button", style.getSourcePath());
         }
         return result;
     }

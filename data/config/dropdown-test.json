@@ -20,6 +20,7 @@
         "hoverItemOverlayOverride": "#302684D4",
         "selectedItemOverlayOverride": "#482684D4",
         "textSize": 16.0,
+        "font": "data/font/JetBrainsMono.ttf",
         "itemHeight": 38.0,
         "maxVisibleItems": 5
       }

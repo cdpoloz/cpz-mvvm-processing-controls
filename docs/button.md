@@ -113,6 +113,8 @@ The stable control identity is available through `button.getCode()`.
 
 ```java
 ButtonStyleConfig bsc = new ButtonStyleConfig();
+bsc.font = createFont("data/font/JetBrainsMono.ttf", 16.0f);
+bsc.textSize = 16.0f;
 bsc.baseColor = Colors.rgb(48, 98, 219);
 bsc.textColor = Colors.gray(255);
 bsc.strokeColor = Colors.gray(255);
@@ -127,6 +129,8 @@ button.setStyle(new DefaultButtonStyle(bsc));
 
 This configuration controls the visual appearance:
 
+- `font` optionally assigns a control-specific `PFont`
+- `textSize` optionally assigns the text size
 - `baseColor` is the main color
 - `textColor` is the label color
 - `strokeColor` is the border color
@@ -138,6 +142,21 @@ This configuration controls the visual appearance:
 - `pressedBlendWithBlack` darkens the button while pressed
 
 Styles resolve visuals only. They do not contain interaction logic.
+
+`font == null` means that the button does not impose a font. The fallback is
+the font currently active in Processing/PGraphics, not a fixed font owned by
+the controls library. `Button` preserves its historical ambient behavior when
+both `font` and `textSize` are `null`:
+
+| `font` | `textSize` | Result |
+| --- | --- | --- |
+| `null` | `null` | Preserve the active Processing font and size |
+| `null` | value | Preserve the active font and apply the configured size |
+| value | value | Apply the configured font and size |
+| value | `null` | Apply the configured font at `16.0f` |
+
+In JSON, `style.font` is an optional font path. The font is loaded when the
+control is created, never during `draw()`.
 
 The button can also be rendered using SVG. See [Button (SVG)](button-svg.md) for the specialized variant.
 

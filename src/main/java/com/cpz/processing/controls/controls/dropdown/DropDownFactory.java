@@ -5,6 +5,7 @@ import com.cpz.processing.controls.controls.dropdown.config.DropDownStyleConfig;
 import com.cpz.processing.controls.controls.dropdown.style.DefaultDropDownStyle;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
+import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PApplet;
 
 import java.util.Objects;
@@ -36,12 +37,12 @@ public final class DropDownFactory {
         dropDown.setEnabled(config.isEnabled());
         dropDown.setVisible(config.isVisible());
         if (config.getStyle() != null) {
-            dropDown.setStyle(new DefaultDropDownStyle(toStyleConfig(config.getStyle())));
+            dropDown.setStyle(new DefaultDropDownStyle(toStyleConfig(sketch, config.getStyle())));
         }
         return dropDown;
     }
 
-    private static DropDownStyleConfig toStyleConfig(DropDownConfig.StyleConfig style) {
+    private static DropDownStyleConfig toStyleConfig(PApplet sketch, DropDownConfig.StyleConfig style) {
         DropDownStyleConfig result = new DropDownStyleConfig();
         result.baseFillOverride = style.getBaseFillOverride();
         result.listFillOverride = style.getListFillOverride();
@@ -78,7 +79,9 @@ public final class DropDownFactory {
             result.maxVisibleItems = style.getMaxVisibleItems();
         }
         result.disabledAlpha = style.getDisabledAlpha();
-        result.font = null;
+        if (style.getFontPath() != null) {
+            result.font = FontLoader.load(sketch, style.getFontPath(), result.textSize, "drop down", style.getSourcePath());
+        }
         result.themeProvider = null;
         return result;
     }

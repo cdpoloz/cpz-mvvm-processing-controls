@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.label.style.LabelStyle;
 import com.cpz.processing.controls.controls.label.style.LabelTypography;
 import com.cpz.processing.controls.controls.label.style.render.LabelAlignMapper;
 import com.cpz.processing.controls.controls.label.viewmodel.LabelViewModel;
+import com.cpz.processing.controls.core.style.TypographySupport;
 import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import java.util.Objects;
@@ -91,28 +92,28 @@ public final class LabelView implements ControlView {
             text2 = "";
          }
 
-         this.sketch.pushStyle();
          LabelTypography labelTypography = this.style.resolveTypography();
-         if (labelTypography.font() != null) {
-            this.sketch.textFont(labelTypography.font());
-         }
+         TypographySupport.prepareStyleScope(this.sketch, labelTypography.font());
+         this.sketch.pushStyle();
+         try {
+            TypographySupport.apply(this.sketch, labelTypography.font(), labelTypography.textSize());
+            this.sketch.textAlign(LabelAlignMapper.mapHorizontal(labelTypography.textAlignHorizontal()), LabelAlignMapper.mapVertical(labelTypography.textAlignVertical()));
+            String[] text3 = text2.split("\n", -1);
+            float value = 0.0F;
+            float value2 = (this.sketch.textAscent() + this.sketch.textDescent()) * labelTypography.lineSpacingMultiplier();
 
-         this.sketch.textSize(labelTypography.textSize());
-         this.sketch.textAlign(LabelAlignMapper.mapHorizontal(labelTypography.textAlignHorizontal()), LabelAlignMapper.mapVertical(labelTypography.textAlignVertical()));
-         String[] text3 = text2.split("\n", -1);
-         float value = 0.0F;
-         float value2 = (this.sketch.textAscent() + this.sketch.textDescent()) * labelTypography.lineSpacingMultiplier();
-
-         for(String text4 : text3) {
-            float value3 = this.sketch.textWidth(text4);
-            if (value3 > value) {
-               value = value3;
+            for(String text4 : text3) {
+               float value3 = this.sketch.textWidth(text4);
+               if (value3 > value) {
+                  value = value3;
+               }
             }
-         }
 
-         this.cachedWidth = value;
-         this.cachedHeight = (float)text3.length * value2;
-         this.sketch.popStyle();
+            this.cachedWidth = value;
+            this.cachedHeight = (float)text3.length * value2;
+         } finally {
+            this.sketch.popStyle();
+         }
          this.lastMeasuredText = text;
          this.metricsDirty = false;
       }

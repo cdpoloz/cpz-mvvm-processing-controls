@@ -3,6 +3,7 @@ package com.cpz.processing.controls.controls.radiogroup;
 import com.cpz.processing.controls.controls.radiogroup.config.RadioGroupConfig;
 import com.cpz.processing.controls.controls.radiogroup.config.RadioGroupStyleConfig;
 import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupStyle;
+import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PApplet;
 
 import java.util.Objects;
@@ -30,13 +31,13 @@ public final class RadioGroupFactory {
         radioGroup.setVisible(config.isVisible());
 
         if (config.getStyle() != null) {
-            radioGroup.setStyle(new RadioGroupStyle(toStyleConfig(config.getStyle())));
+            radioGroup.setStyle(new RadioGroupStyle(toStyleConfig(sketch, config.getStyle())));
         }
 
         return radioGroup;
     }
 
-    private static RadioGroupStyleConfig toStyleConfig(RadioGroupConfig.StyleConfig style) {
+    private static RadioGroupStyleConfig toStyleConfig(PApplet sketch, RadioGroupConfig.StyleConfig style) {
         RadioGroupStyleConfig result = new RadioGroupStyleConfig();
         result.textOverride = style.getTextOverride();
         result.indicatorOverride = style.getIndicatorOverride();
@@ -75,6 +76,9 @@ public final class RadioGroupFactory {
             result.cornerRadius = style.getCornerRadius();
         }
         result.disabledAlpha = style.getDisabledAlpha();
+        if (style.getFontPath() != null) {
+            result.font = FontLoader.load(sketch, style.getFontPath(), result.textSize, "radio group", style.getSourcePath());
+        }
         return result;
     }
 }

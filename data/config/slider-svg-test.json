@@ -34,6 +34,8 @@
         "thumbStrokeWeightHover": 3.0,
         "thumbSize": 28.0,
         "textColor": "#F5F5F5",
+        "font": "data/font/JetBrainsMono.ttf",
+        "textSize": 16.0,
         "disabledAlpha": 90,
         "showValueText": true,
         "svgColorMode": "use_render_style",

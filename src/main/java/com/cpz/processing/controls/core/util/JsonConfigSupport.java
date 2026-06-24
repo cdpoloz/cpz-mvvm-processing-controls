@@ -127,6 +127,32 @@ public final class JsonConfigSupport {
         return json.getFloat(key);
     }
 
+    public static String getOptionalNonBlankString(JSONObject json, String key, String path, String context) {
+        if (!json.hasKey(key) || json.isNull(key)) {
+            return null;
+        }
+
+        String value;
+        try {
+            value = json.getString(key);
+        } catch (RuntimeException ex) {
+            throw new IllegalArgumentException(
+                    "Invalid '" + key + "' value in " + path + " for " + context
+                            + ": expected a non-blank string. Cause: the value is not a string.",
+                    ex
+            );
+        }
+
+        String normalized = value.trim();
+        if (normalized.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Invalid '" + key + "' value in " + path + " for " + context
+                            + ": expected a non-blank string. Cause: the value is blank."
+            );
+        }
+        return normalized;
+    }
+
     public static String getRequiredString(JSONObject json, String key, String path, String context) {
         if (!json.hasKey(key) || json.isNull(key)) {
             throw new IllegalArgumentException("Missing required key '" + key + "' in " + path + " for " + context + ".");

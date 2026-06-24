@@ -36,6 +36,11 @@ public final class DropDownStyleConfig {
    public float arrowPadding = 14.0F;
    public int maxVisibleItems = 6;
    public Integer disabledAlpha;
+
+   /**
+    * Optional font for both the collapsed value and expanded list items.
+    * {@code null} preserves the active Processing font.
+    */
    public PFont font;
    public ThemeProvider themeProvider;
 

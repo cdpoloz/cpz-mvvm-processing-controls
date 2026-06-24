@@ -59,7 +59,7 @@ public final class LabelConfigLoader {
         JSONObject style = root.getJSONObject("style");
         return new LabelConfig.StyleConfig(
                 JsonConfigSupport.getOptionalFloat(style, "textSize"),
-                this.readFontPath(style, path),
+                JsonConfigSupport.getOptionalNonBlankString(style, "font", path, "label style"),
                 JsonConfigSupport.getOptionalColor(style, "textColor", path),
                 JsonConfigSupport.getOptionalFloat(style, "lineSpacingMultiplier"),
                 readHorizontalAlign(style, path),
@@ -67,20 +67,6 @@ public final class LabelConfigLoader {
                 JsonConfigSupport.getOptionalInt(style, "disabledAlpha"),
                 path
         );
-    }
-
-    private String readFontPath(JSONObject style, String path) {
-        if (!style.hasKey("font") || style.isNull("font")) {
-            return null;
-        }
-
-        String fontPath = style.getString("font");
-        String normalizedPath = fontPath.trim();
-        if (normalizedPath.isEmpty()) {
-            throw new IllegalArgumentException("Invalid 'font' value in " + path + " for label style: \"" + fontPath + "\". Expected a non-empty font path.");
-        }
-
-        return normalizedPath;
     }
 
     private HorizontalAlign readHorizontalAlign(JSONObject style, String path) {

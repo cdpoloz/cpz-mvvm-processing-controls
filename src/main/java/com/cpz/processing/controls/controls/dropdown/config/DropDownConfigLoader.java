@@ -102,7 +102,9 @@ public final class DropDownConfigLoader {
                 JsonConfigSupport.getOptionalFloat(style, "textPadding"),
                 JsonConfigSupport.getOptionalFloat(style, "arrowPadding"),
                 JsonConfigSupport.getOptionalInt(style, "maxVisibleItems"),
-                JsonConfigSupport.getOptionalInt(style, "disabledAlpha")
+                JsonConfigSupport.getOptionalInt(style, "disabledAlpha"),
+                JsonConfigSupport.getOptionalNonBlankString(style, "font", path, "drop down style"),
+                path
         );
     }
 }

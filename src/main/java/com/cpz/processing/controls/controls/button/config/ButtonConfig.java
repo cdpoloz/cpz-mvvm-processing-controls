@@ -80,6 +80,9 @@ public final class ButtonConfig {
         private final Float hoverBlendWithWhite;
         private final Float pressedBlendWithBlack;
         private final RendererConfig renderer;
+        private final String fontPath;
+        private final Float textSize;
+        private final String sourcePath;
 
         public StyleConfig(
                 Integer baseColor,
@@ -93,6 +96,38 @@ public final class ButtonConfig {
                 Float pressedBlendWithBlack,
                 RendererConfig renderer
         ) {
+            this(
+                    baseColor,
+                    textColor,
+                    strokeColor,
+                    strokeWeight,
+                    strokeWeightHover,
+                    cornerRadius,
+                    disabledAlpha,
+                    hoverBlendWithWhite,
+                    pressedBlendWithBlack,
+                    renderer,
+                    null,
+                    null,
+                    null
+            );
+        }
+
+        public StyleConfig(
+                Integer baseColor,
+                Integer textColor,
+                Integer strokeColor,
+                Float strokeWeight,
+                Float strokeWeightHover,
+                Float cornerRadius,
+                Integer disabledAlpha,
+                Float hoverBlendWithWhite,
+                Float pressedBlendWithBlack,
+                RendererConfig renderer,
+                String fontPath,
+                Float textSize,
+                String sourcePath
+        ) {
             this.baseColor = baseColor;
             this.textColor = textColor;
             this.strokeColor = strokeColor;
@@ -103,6 +138,9 @@ public final class ButtonConfig {
             this.hoverBlendWithWhite = hoverBlendWithWhite;
             this.pressedBlendWithBlack = pressedBlendWithBlack;
             this.renderer = renderer;
+            this.fontPath = fontPath;
+            this.textSize = textSize;
+            this.sourcePath = sourcePath;
         }
 
         public Integer getBaseColor() {
@@ -143,6 +181,18 @@ public final class ButtonConfig {
 
         public RendererConfig getRenderer() {
             return this.renderer;
+        }
+
+        public String getFontPath() {
+            return this.fontPath;
+        }
+
+        public Float getTextSize() {
+            return this.textSize;
+        }
+
+        public String getSourcePath() {
+            return this.sourcePath;
         }
     }
 

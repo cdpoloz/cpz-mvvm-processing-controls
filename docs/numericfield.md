@@ -148,6 +148,7 @@ This keeps intermediate editing states usable without exposing MVVM internals.
 
 ```java
 NumericFieldStyleConfig nfsc = new NumericFieldStyleConfig();
+nfsc.font = createFont("data/font/JetBrainsMono.ttf", 16.0f);
 nfsc.backgroundColor = Colors.rgb(236, 242, 248);
 nfsc.borderColor = Colors.rgb(72, 116, 156);
 nfsc.textColor = Colors.rgb(28, 44, 62);
@@ -160,6 +161,11 @@ numericField.setStyle(new NumericFieldStyle(nfsc));
 ```
 
 The facade uses the existing style mechanism. It does not introduce a new styling path.
+
+`font == null` means that the field does not impose a font. The fallback is
+the font currently active in Processing/PGraphics. `textSize` keeps its
+existing default of `16.0f`. Text measurement, selection, caret placement and
+rendering use the same resolved font and size.
 
 ---
 
@@ -279,9 +285,17 @@ Minimal JSON:
   "width": 420.0,
   "height": 48.0,
   "enabled": true,
-  "visible": true
+  "visible": true,
+  "style": {
+    "font": "data/font/JetBrainsMono.ttf",
+    "textSize": 16.0
+  }
 }
 ```
+
+The optional font path is loaded while `NumericFieldFactory` creates the
+control, never during `draw()`. Omitted or JSON `null` means that no
+control-specific font is imposed.
 
 Minimal Java sketch flow:
 

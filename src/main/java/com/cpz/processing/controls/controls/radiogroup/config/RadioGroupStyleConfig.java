@@ -36,6 +36,10 @@ public final class RadioGroupStyleConfig {
    public float textSize = 16.0F;
    public float cornerRadius = 6.0F;
    public Integer disabledAlpha;
+
+   /**
+    * Optional control font. {@code null} preserves the active Processing font.
+    */
    public PFont font;
    public ThemeProvider themeProvider;
 

@@ -3,6 +3,7 @@ package com.cpz.processing.controls.controls.textfield;
 import com.cpz.processing.controls.controls.textfield.config.TextFieldConfig;
 import com.cpz.processing.controls.controls.textfield.config.TextFieldStyleConfig;
 import com.cpz.processing.controls.controls.textfield.style.DefaultTextFieldStyle;
+import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PApplet;
 
 import java.util.Objects;
@@ -30,13 +31,13 @@ public final class TextFieldFactory {
         textField.setVisible(config.isVisible());
 
         if (config.getStyle() != null) {
-            textField.setStyle(new DefaultTextFieldStyle(toStyleConfig(config.getStyle())));
+            textField.setStyle(new DefaultTextFieldStyle(toStyleConfig(sketch, config.getStyle())));
         }
 
         return textField;
     }
 
-    private static TextFieldStyleConfig toStyleConfig(TextFieldConfig.StyleConfig style) {
+    private static TextFieldStyleConfig toStyleConfig(PApplet sketch, TextFieldConfig.StyleConfig style) {
         TextFieldStyleConfig result = new TextFieldStyleConfig();
         result.backgroundColor = style.getBackgroundColor();
         result.borderColor = style.getBorderColor();
@@ -47,7 +48,9 @@ public final class TextFieldFactory {
         if (style.getTextSize() != null) {
             result.textSize = style.getTextSize();
         }
-        result.font = null;
+        if (style.getFontPath() != null) {
+            result.font = FontLoader.load(sketch, style.getFontPath(), result.textSize, "text field", style.getSourcePath());
+        }
         return result;
     }
 }

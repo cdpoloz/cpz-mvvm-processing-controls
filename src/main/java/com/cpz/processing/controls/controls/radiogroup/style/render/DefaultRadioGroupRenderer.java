@@ -4,6 +4,7 @@ import com.cpz.processing.controls.controls.radiogroup.state.RadioGroupItemViewS
 import com.cpz.processing.controls.controls.radiogroup.state.RadioGroupViewState;
 import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupItemRenderStyle;
 import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupRenderStyle;
+import com.cpz.processing.controls.core.style.TypographySupport;
 import processing.core.PApplet;
 
 /**
@@ -31,24 +32,22 @@ public final class DefaultRadioGroupRenderer {
     *
     * Behavior:
     * - Uses already available state and does not define business rules.
-    */
+   */
    public void render(PApplet sketch, RadioGroupViewState state, RadioGroupRenderStyle renderStyle) {
+      TypographySupport.prepareStyleScope(sketch, renderStyle.font());
       sketch.pushStyle();
-      if (renderStyle.font() != null) {
-         sketch.textFont(renderStyle.font(), renderStyle.textSize());
-      } else {
-         sketch.textSize(renderStyle.textSize());
+      try {
+         TypographySupport.apply(sketch, renderStyle.font(), renderStyle.textSize());
+         sketch.textAlign(37, 3);
+
+         for(int value = 0; value < state.items().size(); ++value) {
+            RadioGroupItemViewState state2 = (RadioGroupItemViewState)state.items().get(value);
+            RadioGroupItemRenderStyle renderStyle2 = (RadioGroupItemRenderStyle)renderStyle.itemStyles().get(value);
+            this.drawItem(sketch, state2, renderStyle2, renderStyle);
+         }
+      } finally {
+         sketch.popStyle();
       }
-
-      sketch.textAlign(37, 3);
-
-      for(int value = 0; value < state.items().size(); ++value) {
-         RadioGroupItemViewState state2 = (RadioGroupItemViewState)state.items().get(value);
-         RadioGroupItemRenderStyle renderStyle2 = (RadioGroupItemRenderStyle)renderStyle.itemStyles().get(value);
-         this.drawItem(sketch, state2, renderStyle2, renderStyle);
-      }
-
-      sketch.popStyle();
    }
 
    private void drawItem(PApplet sketch, RadioGroupItemViewState state, RadioGroupItemRenderStyle renderStyle, RadioGroupRenderStyle renderStyle2) {

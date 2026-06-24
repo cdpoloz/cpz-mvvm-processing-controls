@@ -1,5 +1,7 @@
 package com.cpz.processing.controls.controls.button.style;
 
+import processing.core.PFont;
+
 /**
  * Immutable render-state record for button render style.
  *
@@ -20,7 +22,15 @@ package com.cpz.processing.controls.controls.button.style;
  * @param cornerRadius corner radius
  * @param showText whether text is displayed
  * @param text displayed text
+ * @param font optional text font
+ * @param textSize optional text size
  * @author CPZ
  */
-public record ButtonRenderStyle(int fillColor, int strokeColor, float strokeWeight, int textColor, float cornerRadius, boolean showText, String text) {
+public record ButtonRenderStyle(int fillColor, int strokeColor, float strokeWeight, int textColor, float cornerRadius, boolean showText, String text, PFont font, Float textSize) {
+   /**
+    * Creates a render style using the historical ambient typography behavior.
+    */
+   public ButtonRenderStyle(int fillColor, int strokeColor, float strokeWeight, int textColor, float cornerRadius, boolean showText, String text) {
+      this(fillColor, strokeColor, strokeWeight, textColor, cornerRadius, showText, text, null, null);
+   }
 }
