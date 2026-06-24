@@ -43,7 +43,7 @@ public final class SliderInputAdapter {
    /**
     * Handles mouse move.
     *
-    * @param wheelDelta mouse wheel delta
+    * @param mouseX parameter used by this operation
     * @param mouseY parameter used by this operation
     *
     * Behavior:
@@ -56,7 +56,7 @@ public final class SliderInputAdapter {
    /**
     * Handles mouse press.
     *
-    * @param wheelDelta mouse wheel delta
+    * @param mouseX parameter used by this operation
     * @param mouseY parameter used by this operation
     *
     * Behavior:
@@ -78,7 +78,7 @@ public final class SliderInputAdapter {
    /**
     * Handles mouse drag.
     *
-    * @param wheelDelta mouse wheel delta
+    * @param mouseX parameter used by this operation
     * @param mouseY parameter used by this operation
     *
     * Behavior:
@@ -94,7 +94,7 @@ public final class SliderInputAdapter {
    /**
     * Handles mouse release.
     *
-    * @param wheelDelta mouse wheel delta
+    * @param mouseX parameter used by this operation
     * @param mouseY parameter used by this operation
     *
     * Behavior:

@@ -46,7 +46,7 @@ public final class PointerEvent {
     * @param type parameter used by this operation
     * @param mouseX parameter used by this operation
     * @param mouseY parameter used by this operation
-    * @param button pointer button
+    * @param value pointer button
     *
     * Behavior:
     * - Initializes the public state required by this type.
@@ -63,8 +63,8 @@ public final class PointerEvent {
     * @param mouseY parameter used by this operation
     * @param button pointer button
     * @param wheelDelta wheel delta
-    * @param pressed whether the pointer is pressed
     * @param shiftDown whether Shift is down
+    * @param controlDown whether Control is down
     *
     * Behavior:
     * - Initializes the public state required by this type.

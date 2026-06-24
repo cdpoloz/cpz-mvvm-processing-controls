@@ -13,6 +13,9 @@ package com.cpz.processing.controls.controls.label.style;
  * Notes:
  * - This type belongs to the visual styling pipeline.
  *
+ * @param text displayed text
+ * @param textColor text color
+ * @param typography typography settings
  * @author CPZ
  */
 public record LabelRenderStyle(String text, int textColor, LabelTypography typography) {

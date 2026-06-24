@@ -30,17 +30,16 @@ JAR setup.
 
 - JDK 17 or newer, matching the Maven compiler release used by the project
 - Maven
-- A resolvable `com.cpz:cpz-utils:0.2.2` artifact, either from a configured
-  Maven repository or from your local Maven repository
 
 Processing itself does not need to be installed manually for the Maven build.
-Maven resolves Processing Core as `org.processing:core:4.5.2`.
+Maven resolves Processing Core and `cpz-utils` as transitive dependencies of
+this library.
 
 ### Dependency levels
 
 CPZ dependencies:
 
-- `com.cpz:cpz-utils:0.2.2`
+- `io.github.cdpoloz:cpz-utils:0.2.3`
 - controlled by the author and versioned as a normal Maven dependency
 - provides shared utility APIs used by the controls project
 - color helpers such as `Colors.rgb(...)` and `Colors.gray(...)` belong to
@@ -61,28 +60,20 @@ to your Maven project:
 
 ```xml
 <dependency>
-    <groupId>com.cpz</groupId>
+    <groupId>io.github.cdpoloz</groupId>
     <artifactId>cpz-mvvm-processing-controls</artifactId>
-    <version>0.3.1</version>
+    <version>0.3.2</version>
 </dependency>
 ```
 
-Processing Core and `cpz-utils` are Maven dependencies. Do not add them as
-manually copied JARs.
+Version `0.3.2` will be available from Maven Central after its release is
+published. Processing Core (`org.processing:core:4.5.2`) and `cpz-utils`
+(`io.github.cdpoloz:cpz-utils:0.2.3`) are resolved transitively by Maven; do
+not add them as manually copied JARs.
 
 ### Local development
 
-If `cpz-utils` is not available from Maven Central, GitHub Packages, JitPack,
-or another repository configured in your Maven setup, install it into your
-local Maven repository first:
-
-```text
-git clone <cpz-utils-repository-url>
-cd cpz-utils
-mvn clean install
-```
-
-Then build this project:
+Build this project with:
 
 ```text
 git clone <cpz-mvvm-processing-controls-repository-url>
@@ -97,9 +88,9 @@ consume this library from your local Maven repository.
 ### IntelliJ setup
 
 Open the repository as a Maven project and reload Maven dependencies. If
-IntelliJ cannot resolve `cpz-utils`, build and install `cpz-utils` locally with
-`mvn clean install`, then reload this project. Processing Core is resolved by
-Maven as `org.processing:core:4.5.2`.
+IntelliJ cannot resolve the dependencies, reload the Maven project and verify
+that Maven Central is reachable. Processing Core and `cpz-utils` are resolved
+transitively by Maven.
 
 ### Maven layout
 
@@ -323,7 +314,7 @@ The canonical progression starts with `JsonMultiControlUnidirectionalBindingTest
 ## Getting Started
 
 1. Add this library as a Maven dependency, or build and install it locally with Maven.
-2. Let Maven resolve Processing Core and `cpz-utils` from configured repositories or the local Maven repository.
+2. Let Maven resolve Processing Core and `cpz-utils` transitively from Maven Central.
 3. Create controls directly through the public facades or load them from JSON with `ControlConfigLoader`.
 4. Provide normalized input events through an external adapter.
 5. Dispatch those events through `InputManager`.

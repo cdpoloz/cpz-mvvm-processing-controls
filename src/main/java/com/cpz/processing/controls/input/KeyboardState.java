@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Tracks pressed keys and keyboard modifier state.
+ *
  * @author CPZ
  */
 public final class KeyboardState {

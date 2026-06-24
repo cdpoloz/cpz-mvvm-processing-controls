@@ -13,6 +13,11 @@ package com.cpz.processing.controls.controls.radiogroup.style;
  * Notes:
  * - This type belongs to the visual styling pipeline.
  *
+ * @param textColor text color
+ * @param indicatorStrokeColor indicator stroke color
+ * @param indicatorFillColor indicator fill color
+ * @param indicatorDotColor selected indicator dot color
+ * @param backgroundColor item background color
  * @author CPZ
  */
 public record RadioGroupItemRenderStyle(int textColor, int indicatorStrokeColor, int indicatorFillColor, int indicatorDotColor, int backgroundColor) {

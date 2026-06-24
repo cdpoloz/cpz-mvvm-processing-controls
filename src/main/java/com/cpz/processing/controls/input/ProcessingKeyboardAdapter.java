@@ -4,6 +4,8 @@ import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 
 /**
+ * Translates Processing keyboard callbacks into normalized keyboard events.
+ *
  * @author CPZ
  */
 public final class ProcessingKeyboardAdapter {

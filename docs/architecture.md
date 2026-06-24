@@ -24,14 +24,13 @@ This contract is intentionally small:
 
 The controls project has two dependency levels:
 
-- CPZ dependency: `com.cpz:cpz-utils:0.2.2`, controlled by the author and
+- CPZ dependency: `io.github.cdpoloz:cpz-utils:0.2.3`, controlled by the author and
   versioned as a normal Maven dependency
 - external dependency: `org.processing:core:4.5.2`, resolved by Maven and
   distributed under its own license
 
-If `cpz-utils` is not available from the Maven repositories configured in your
-environment, install it into the local Maven repository from the `cpz-utils`
-checkout with `mvn clean install`.
+Both dependencies are resolved transitively from Maven Central when this
+library is consumed through Maven.
 
 Color helpers used by styles and examples are imported from:
 

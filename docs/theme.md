@@ -8,11 +8,9 @@ Color helper examples in this document use `Colors` from `cpz-utils`:
 import com.cpz.utils.color.Colors;
 ```
 
-`cpz-utils` is resolved as the Maven dependency `com.cpz:cpz-utils:0.2.2`.
-If that artifact is not available from the Maven repositories configured in
-your environment, install it into the local Maven repository from the
-`cpz-utils` checkout with `mvn clean install`. `Colors` is no longer provided by
-the controls package.
+`cpz-utils` is resolved transitively from Maven Central as
+`io.github.cdpoloz:cpz-utils:0.2.3`. `Colors` is no longer provided by the
+controls package.
 
 The current public model is explicit:
 

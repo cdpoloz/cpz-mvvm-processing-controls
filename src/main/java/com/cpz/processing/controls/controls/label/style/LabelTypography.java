@@ -15,6 +15,11 @@ import processing.core.PFont;
  * Notes:
  * - This type belongs to the visual styling pipeline.
  *
+ * @param font text font
+ * @param textSize text size
+ * @param lineSpacingMultiplier line spacing multiplier
+ * @param textAlignHorizontal horizontal text alignment
+ * @param textAlignVertical vertical text alignment
  * @author CPZ
  */
 public record LabelTypography(PFont font, float textSize, float lineSpacingMultiplier, HorizontalAlign textAlignHorizontal, VerticalAlign textAlignVertical) {

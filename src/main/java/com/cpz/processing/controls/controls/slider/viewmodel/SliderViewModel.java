@@ -66,7 +66,7 @@ public final class SliderViewModel extends AbstractControlViewModel {
    /**
     * Handles pointer pressed.
     *
-    * @param wheelDelta mouse wheel delta
+    * @param mouseX normalized pointer position
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
@@ -85,7 +85,7 @@ public final class SliderViewModel extends AbstractControlViewModel {
    /**
     * Handles pointer dragged.
     *
-    * @param wheelDelta mouse wheel delta
+    * @param mouseX normalized pointer position
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.
@@ -386,7 +386,6 @@ public final class SliderViewModel extends AbstractControlViewModel {
    /**
     * Updates formatter.
     *
-    * @param function<BigDecimal parameter used by this operation
     * @param function new formatter
     *
     * Behavior:

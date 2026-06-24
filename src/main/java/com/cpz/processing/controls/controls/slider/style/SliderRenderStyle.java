@@ -15,6 +15,19 @@ import processing.core.PShape;
  * Notes:
  * - This type belongs to the visual styling pipeline.
  *
+ * @param trackColor track color
+ * @param trackStrokeColor track stroke color
+ * @param trackStrokeWeight track stroke width
+ * @param trackThickness track thickness
+ * @param activeTrackColor active track color
+ * @param thumbColor thumb color
+ * @param thumbStrokeColor thumb stroke color
+ * @param thumbStrokeWeight thumb stroke width
+ * @param thumbSize thumb size
+ * @param textColor value text color
+ * @param svgColorMode SVG color mode
+ * @param thumbShape optional thumb shape
+ * @param showValueText whether value text is displayed
  * @author CPZ
  */
 public record SliderRenderStyle(int trackColor, int trackStrokeColor, float trackStrokeWeight, float trackThickness, int activeTrackColor, int thumbColor, int thumbStrokeColor, float thumbStrokeWeight, float thumbSize, int textColor, SvgColorMode svgColorMode, PShape thumbShape, boolean showValueText) {

@@ -30,7 +30,7 @@ public class LabelTest extends PApplet {
         // style
         LabelStyleConfig lsc = new LabelStyleConfig();
         lsc.textSize = 24.0f;
-        lsc.font = createFont("data" + File.separator + "font" + File.separator + "abel-regular.ttf", 24);
+        //lsc.font = createFont("data" + File.separator + "font" + File.separator + "abel-regular.ttf", 24);
         lsc.textColor = Colors.rgb(210, 228, 255);
         lsc.lineSpacingMultiplier = 1.2f;
         lsc.alignX = HorizontalAlign.CENTER;

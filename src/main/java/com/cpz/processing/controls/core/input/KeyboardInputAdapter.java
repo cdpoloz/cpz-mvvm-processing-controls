@@ -72,8 +72,6 @@ public final class KeyboardInputAdapter {
     * Handles key pressed.
     *
     * @param event parameter used by this operation
-    * @param param parameter used by this operation
-    * @param param parameter used by this operation
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.

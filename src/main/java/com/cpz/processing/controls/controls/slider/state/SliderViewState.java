@@ -13,6 +13,13 @@ package com.cpz.processing.controls.controls.slider.state;
  * Notes:
  * - This type is part of the public project surface.
  *
+ * @param normalizedValue normalized slider value
+ * @param hovered whether the pointer is over the slider
+ * @param pressed whether the slider is pressed
+ * @param dragging whether the thumb is being dragged
+ * @param showText whether value text is displayed
+ * @param displayText displayed value text
+ * @param enabled whether the slider is enabled
  * @author CPZ
  */
 public record SliderViewState(float normalizedValue, boolean hovered, boolean pressed, boolean dragging, boolean showText, String displayText, boolean enabled) {

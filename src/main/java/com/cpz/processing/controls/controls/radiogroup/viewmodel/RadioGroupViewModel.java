@@ -275,7 +275,7 @@ public final class RadioGroupViewModel extends AbstractControlViewModel implemen
    /**
     * Handles pointer press.
     *
-    * @param coarseStep coarse navigation modifier
+    * @param enabled whether the pressed item is enabled
     *
     * Behavior:
     * - Applies the public interaction flow exposed by this type.

@@ -13,6 +13,13 @@ package com.cpz.processing.controls.controls.button.style;
  * Notes:
  * - This type belongs to the visual styling pipeline.
  *
+ * @param fillColor fill color
+ * @param strokeColor stroke color
+ * @param strokeWeight stroke width
+ * @param textColor text color
+ * @param cornerRadius corner radius
+ * @param showText whether text is displayed
+ * @param text displayed text
  * @author CPZ
  */
 public record ButtonRenderStyle(int fillColor, int strokeColor, float strokeWeight, int textColor, float cornerRadius, boolean showText, String text) {

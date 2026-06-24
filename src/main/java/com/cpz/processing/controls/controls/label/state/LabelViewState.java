@@ -13,6 +13,12 @@ package com.cpz.processing.controls.controls.label.state;
  * Notes:
  * - This type is part of the public project surface.
  *
+ * @param x left coordinate
+ * @param y top coordinate
+ * @param width control width
+ * @param height control height
+ * @param text displayed text
+ * @param enabled whether the label is enabled
  * @author CPZ
  */
 public record LabelViewState(float x, float y, float width, float height, String text, boolean enabled) {

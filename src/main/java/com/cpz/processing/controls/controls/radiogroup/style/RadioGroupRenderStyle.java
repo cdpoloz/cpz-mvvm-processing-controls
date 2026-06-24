@@ -16,6 +16,13 @@ import processing.core.PFont;
  * Notes:
  * - This type belongs to the visual styling pipeline.
  *
+ * @param itemStyles item render styles
+ * @param indicatorOuterDiameter outer indicator diameter
+ * @param indicatorInnerDiameter inner indicator diameter
+ * @param strokeWeight stroke width
+ * @param textSize text size
+ * @param cornerRadius corner radius
+ * @param font text font
  * @author CPZ
  */
 public record RadioGroupRenderStyle(List itemStyles, float indicatorOuterDiameter, float indicatorInnerDiameter, float strokeWeight, float textSize, float cornerRadius, PFont font) {
