@@ -11,8 +11,13 @@ import com.cpz.processing.controls.core.focus.FocusManager;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.KeyboardInputAdapter;
 import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
 import com.cpz.processing.controls.core.util.ControlCode;
 import processing.core.PApplet;
+import processing.core.PFont;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,13 +27,14 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class RadioGroup implements Control {
+public final class RadioGroup implements Control, TooltipTarget {
     private final RadioGroupModel model;
     private final RadioGroupViewModel viewModel;
     private final RadioGroupView view;
     private final FocusManager focusManager;
     private final RadioGroupInputAdapter inputAdapter;
     private final KeyboardInputAdapter keyboardInputAdapter;
+    private final TooltipSupport tooltipSupport;
 
     public RadioGroup(PApplet sketch, List<String> options, float x, float y, float width) {
         this(sketch, ControlCode.auto("radiogroup"), options, -1, x, y, width);
@@ -50,6 +56,7 @@ public final class RadioGroup implements Control {
         this.focusManager = new FocusManager();
         this.inputAdapter = new RadioGroupInputAdapter(this.view, this.viewModel, this.focusManager);
         this.keyboardInputAdapter = new KeyboardInputAdapter(this.focusManager);
+        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible, this::isEnabled);
     }
 
     public void draw() {
@@ -133,5 +140,76 @@ public final class RadioGroup implements Control {
 
     public void setItemSpacing(float itemSpacing) {
         this.view.setItemSpacing(itemSpacing);
+    }
+
+    public RadioGroup setTooltip(String text) {
+        this.tooltipSupport.setTooltip(text);
+        return this;
+    }
+
+    public RadioGroup setTooltip(Tooltip tooltip) {
+        this.tooltipSupport.setTooltip(tooltip);
+        return this;
+    }
+
+    public RadioGroup setTooltipText(String text) {
+        this.tooltipSupport.setTooltipText(text);
+        return this;
+    }
+
+    public RadioGroup setTooltipFont(PFont font) {
+        this.tooltipSupport.setTooltipFont(font);
+        return this;
+    }
+
+    public RadioGroup setTooltipTextSize(float size) {
+        this.tooltipSupport.setTooltipTextSize(size);
+        return this;
+    }
+
+    public RadioGroup setTooltipBackgroundColor(int argb) {
+        this.tooltipSupport.setTooltipBackgroundColor(argb);
+        return this;
+    }
+
+    public RadioGroup setTooltipTextColor(int argb) {
+        this.tooltipSupport.setTooltipTextColor(argb);
+        return this;
+    }
+
+    public RadioGroup setTooltipBorderColor(int argb) {
+        this.tooltipSupport.setTooltipBorderColor(argb);
+        return this;
+    }
+
+    public RadioGroup setTooltipPadding(float padding) {
+        this.tooltipSupport.setTooltipPadding(padding);
+        return this;
+    }
+
+    public RadioGroup setTooltipOffset(float offset) {
+        this.tooltipSupport.setTooltipOffset(offset);
+        return this;
+    }
+
+    public RadioGroup clearTooltip() {
+        this.tooltipSupport.clearTooltip();
+        return this;
+    }
+
+    public TooltipBounds getTooltipBounds() {
+        return this.tooltipSupport.getTooltipBounds();
+    }
+
+    public Tooltip getTooltip() {
+        return this.tooltipSupport.getTooltip();
+    }
+
+    public boolean isTooltipTargetVisible() {
+        return this.tooltipSupport.isTooltipTargetVisible();
+    }
+
+    public boolean isTooltipTargetEnabled() {
+        return this.tooltipSupport.isTooltipTargetEnabled();
     }
 }

@@ -126,6 +126,23 @@ Behavior:
 - MVVM internals remain hidden
 - binding is not part of JSON and remains the responsibility of the sketch
 
+## Tooltip Overlay
+
+Tooltips are modeled as reusable overlays, not as part of the `Control`
+contract.
+
+- `TooltipTarget` exposes only bounds, optional tooltip, visibility, and
+  enabled state
+- public controls can implement `TooltipTarget` without changing `Control`
+- `TooltipArea` lets sketches attach tooltips to arbitrary Processing regions
+  such as images, icons, racks, servers, or manually drawn rectangles
+- `TooltipOverlayController` selects the last registered matching target and
+  keeps a single active overlay
+- `TooltipInputLayer` is passive and never consumes pointer events
+
+This keeps tooltip behavior reusable for both MVVM controls and non-control
+sketch content.
+
 ## Binding
 
 Binding is intentionally explicit.
@@ -143,6 +160,7 @@ See [Binding](binding.md).
 - [Control](control.md)
 - [JSON Configuration](json-configuration.md)
 - [Theme](theme.md)
+- [Tooltip](tooltip.md)
 - [README](../README.md)
 - [Input System](input-system.md)
 - [Binding](binding.md)

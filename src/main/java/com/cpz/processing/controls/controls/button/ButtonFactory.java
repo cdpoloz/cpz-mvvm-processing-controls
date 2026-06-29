@@ -4,6 +4,7 @@ import com.cpz.processing.controls.controls.button.config.ButtonConfig;
 import com.cpz.processing.controls.controls.button.config.ButtonStyleConfig;
 import com.cpz.processing.controls.controls.button.style.DefaultButtonStyle;
 import com.cpz.processing.controls.controls.button.style.render.SvgButtonRenderer;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipFactory;
 import com.cpz.processing.controls.core.style.TypographySupport;
 import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PApplet;
@@ -27,6 +28,7 @@ public final class ButtonFactory {
         if (config.getStyle() != null) {
             button.setStyle(new DefaultButtonStyle(toStyleConfig(sketch, config.getStyle())));
         }
+        button.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
 
         return button;
     }

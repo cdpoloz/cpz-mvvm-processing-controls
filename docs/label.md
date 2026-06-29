@@ -253,7 +253,8 @@ public class LabelTest extends PApplet {
 
 ## Notes / limitations
 
-- `Label` is non-interactive and does not use `InputManager`
+- `Label` is non-interactive and does not use `InputManager` for its own behavior
+- a `Label` can still be registered as a `TooltipTarget` in `TooltipInputLayer`
 - the facade does not expose `getView()` or `getViewModel()`
 - the public API is intentionally small and aligned with the other closed control facades
 - SVG is not part of the label public surface in this iteration

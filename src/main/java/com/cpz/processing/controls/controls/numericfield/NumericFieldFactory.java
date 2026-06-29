@@ -3,6 +3,7 @@ package com.cpz.processing.controls.controls.numericfield;
 import com.cpz.processing.controls.controls.numericfield.config.NumericFieldConfig;
 import com.cpz.processing.controls.controls.numericfield.config.NumericFieldStyleConfig;
 import com.cpz.processing.controls.controls.numericfield.style.NumericFieldStyle;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipFactory;
 import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PApplet;
 
@@ -33,6 +34,7 @@ public final class NumericFieldFactory {
         if (config.getStyle() != null) {
             numericField.setStyle(new NumericFieldStyle(toStyleConfig(sketch, config.getStyle())));
         }
+        numericField.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
 
         return numericField;
     }

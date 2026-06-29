@@ -5,6 +5,7 @@ import com.cpz.processing.controls.controls.toggle.config.ToggleStyleConfig;
 import com.cpz.processing.controls.controls.toggle.style.ParametricToggleStyle;
 import com.cpz.processing.controls.controls.toggle.style.render.CircleShapeRenderer;
 import com.cpz.processing.controls.controls.toggle.style.render.SvgShapeRenderer;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipFactory;
 import processing.core.PApplet;
 
 import java.util.Objects;
@@ -35,6 +36,7 @@ public final class ToggleFactory {
         if (config.getStyle() != null) {
             toggle.setStyle(new ParametricToggleStyle(toStyleConfig(sketch, config.getStyle())));
         }
+        toggle.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
 
         return toggle;
     }

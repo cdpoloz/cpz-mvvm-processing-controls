@@ -7,6 +7,7 @@ import com.cpz.processing.controls.controls.toggle.viewmodel.ToggleViewModel;
 import com.cpz.processing.controls.core.input.PointerInteractable;
 import com.cpz.processing.controls.core.input.hit.RectHitTest;
 import com.cpz.processing.controls.core.input.hit.interfaces.HitTest;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import processing.core.PApplet;
@@ -106,6 +107,10 @@ public final class ToggleView implements ControlView, PointerInteractable {
     */
    public boolean contains(float x, float y) {
       return this.hitTest.contains(x, y);
+   }
+
+   public TooltipBounds getTooltipBounds() {
+      return new TooltipBounds(this.x - this.width * 0.5F, this.y - this.height * 0.5F, this.width, this.height);
    }
 
    /**

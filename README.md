@@ -220,6 +220,9 @@ External Source → Adapter → InputManager → InputLayer → Control facade �
 
 Rendering:
 Model → ViewModel → View → ViewState → Style → Renderer
+
+Tooltips:
+TooltipTarget → TooltipOverlayController → OverlayManager
 ```
 
 ---
@@ -231,6 +234,10 @@ This project is a UI framework intended for Processing sketches and for other ho
 The public control layer is exposed through closed ergonomic facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, and `DropDown`.
 
 Those facades also share a lightweight public contract, `Control`, for the small transversal surface that is common across the controls without exposing MVVM internals.
+
+Tooltips are reusable overlays attached through `TooltipTarget`; they can be
+used with controls or arbitrary Processing regions such as images and manually
+drawn rectangles without changing the `Control` contract.
 
 The JSON layer can also create one or more controls from a single document and returns them as `Map<String, Control>`. JSON remains structural only: binding and behavior wiring stay in sketch code.
 
@@ -508,6 +515,7 @@ Processing/PGraphics; the theme does not yet define a global font.
 - [Binding](docs/binding.md)
 - [Input System](docs/input-system.md)
 - [JSON Configuration](docs/json-configuration.md)
+- [Tooltip](docs/tooltip.md)
 - [Theme](docs/theme.md)
 - [Button](docs/button.md)
 - [Checkbox](docs/checkbox.md)

@@ -35,7 +35,7 @@ public class Launcher {
 
         // Button *****************************************
         PApplet.main(ButtonTest.class);
-        //PApplet.main(com.cpz.processing.controls.examples.button.ButtonSvgTest.class);
+        //PApplet.main(ButtonSvgTest.class);
         //PApplet.main(ButtonJsonTest.class);
         //PApplet.main(ButtonSvgJsonTest.class);
 

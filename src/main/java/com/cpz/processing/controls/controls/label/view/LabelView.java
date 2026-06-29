@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.label.style.LabelStyle;
 import com.cpz.processing.controls.controls.label.style.LabelTypography;
 import com.cpz.processing.controls.controls.label.style.render.LabelAlignMapper;
 import com.cpz.processing.controls.controls.label.viewmodel.LabelViewModel;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import com.cpz.processing.controls.core.style.TypographySupport;
 import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
@@ -220,6 +221,10 @@ public final class LabelView implements ControlView {
       this.width = Math.max(0.0F, width);
       this.height = Math.max(0.0F, height);
       this.metricsDirty = true;
+   }
+
+   public TooltipBounds getTooltipBounds() {
+      return new TooltipBounds(this.x, this.y, this.getWidth(), this.getHeight());
    }
 
    /**

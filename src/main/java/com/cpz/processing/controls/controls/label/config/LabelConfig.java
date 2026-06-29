@@ -2,6 +2,7 @@ package com.cpz.processing.controls.controls.label.config;
 
 import com.cpz.processing.controls.controls.label.style.HorizontalAlign;
 import com.cpz.processing.controls.controls.label.style.VerticalAlign;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipConfig;
 
 import java.util.Objects;
 
@@ -20,8 +21,13 @@ public final class LabelConfig {
     private final boolean enabled;
     private final boolean visible;
     private final StyleConfig style;
+    private final TooltipConfig tooltip;
 
     public LabelConfig(String code, String text, float x, float y, float width, float height, boolean enabled, boolean visible, StyleConfig style) {
+        this(code, text, x, y, width, height, enabled, visible, style, null);
+    }
+
+    public LabelConfig(String code, String text, float x, float y, float width, float height, boolean enabled, boolean visible, StyleConfig style, TooltipConfig tooltip) {
         this.code = Objects.requireNonNull(code, "code");
         this.text = text == null ? "" : text;
         this.x = x;
@@ -31,6 +37,7 @@ public final class LabelConfig {
         this.enabled = enabled;
         this.visible = visible;
         this.style = style;
+        this.tooltip = tooltip;
     }
 
     public String getCode() {
@@ -67,6 +74,10 @@ public final class LabelConfig {
 
     public StyleConfig getStyle() {
         return this.style;
+    }
+
+    public TooltipConfig getTooltip() {
+        return this.tooltip;
     }
 
     public static final class StyleConfig {

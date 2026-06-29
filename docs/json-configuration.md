@@ -30,6 +30,7 @@ Rules:
 - all other fields remain control-specific
 - JSON does not define listeners
 - JSON does not define binding
+- a control may include an optional `tooltip` block
 
 Binding remains sketch-side code.
 
@@ -288,7 +289,9 @@ its style:
 - `dropdown`, for both the collapsed value and expanded items
 
 `checkbox` and `toggle` do not render text and therefore do not accept this
-typography property. `Tooltip` is outside this JSON feature.
+typography property in their own `style` block. They can still use
+`tooltip.style.font`, because tooltip text belongs to the reusable tooltip
+overlay, not to the control renderer.
 
 ```json
 {
@@ -341,6 +344,46 @@ The font file must be accessible to the Processing sketch, for example
 `data/font/JetBrainsMono.ttf`. Invalid, unreadable or unsupported font files
 fail control creation with an `IllegalArgumentException`; they do not fail
 later from the render loop.
+
+---
+
+## Tooltip Blocks
+
+Every supported control type accepts an optional top-level `tooltip` block:
+
+```json
+{
+  "type": "button",
+  "code": "btnSave",
+  "text": "Save",
+  "x": 120.0,
+  "y": 80.0,
+  "width": 160.0,
+  "height": 44.0,
+  "tooltip": {
+    "text": "Guardar cambios",
+    "enabled": true,
+    "style": {
+      "backgroundColor": "#E61B1F26",
+      "textColor": "#FFFFFFFF",
+      "borderColor": "#668A94A6",
+      "font": "data/font/JetBrainsMono.ttf",
+      "textSize": 14.0,
+      "textPadding": 10.0,
+      "offset": 10.0,
+      "cornerRadius": 8.0
+    }
+  }
+}
+```
+
+Tooltip colors use the same color parsing as control styles: integer values,
+`#RRGGBB`, or `#AARRGGBB`. A missing or `null` tooltip leaves the created
+control unchanged.
+
+The JSON loader assigns tooltips to controls, but the sketch still owns overlay
+registration. Register controls with a `TooltipOverlayController` and route
+pointer motion through `TooltipInputLayer`.
 
 SVG renderer configuration also remains local to the control style block:
 

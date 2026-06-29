@@ -4,6 +4,7 @@ import com.cpz.processing.controls.controls.slider.model.SliderOrientation;
 import com.cpz.processing.controls.controls.slider.model.SnapMode;
 import com.cpz.processing.controls.controls.slider.style.SvgColorMode;
 import com.cpz.processing.controls.core.util.JsonConfigSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipJsonSupport;
 import processing.core.PApplet;
 import processing.data.JSONObject;
 
@@ -70,7 +71,8 @@ public final class SliderConfigLoader {
                 readSnapMode(root, path),
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
-                this.readStyle(root, path)
+                this.readStyle(root, path),
+                TooltipJsonSupport.readTooltip(root, path)
         );
     }
 

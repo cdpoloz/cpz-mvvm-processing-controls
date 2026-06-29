@@ -30,6 +30,7 @@ This keeps interaction deterministic, testable, and source-agnostic.
 - `PointerInputTarget`: contract for pointer-aware ViewModels
 - `KeyboardInputTarget`: contract for focusable text-oriented ViewModels
 - Control-specific input adapters: handle `PointerEvent` or `KeyboardEvent` and translate geometry-aware input into `ViewModel` calls
+- `TooltipInputLayer`: passive pointer layer that refreshes tooltip overlays without consuming events
 
 ## PointerEvent
 
@@ -81,6 +82,7 @@ In practice:
 - controls of the same type should usually be registered in one shared control-specific layer instead of one layer per control
 - inactive layers are skipped
 - a layer that consumes an event stops propagation
+- passive layers such as `TooltipInputLayer` can observe pointer motion and return `false`
 - pointer and keyboard dispatch share the same layer ordering model
 - focus remains managed by `FocusManager`, not by the external source
 
@@ -127,3 +129,4 @@ This keeps interaction logic independent from both the rendering pipeline and th
 ## Related
 
 - [Architecture](architecture.md)
+- [Tooltip](tooltip.md)

@@ -5,6 +5,7 @@ import com.cpz.processing.controls.controls.dropdown.config.DropDownStyleConfig;
 import com.cpz.processing.controls.controls.dropdown.style.DefaultDropDownStyle;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipFactory;
 import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PApplet;
 
@@ -39,6 +40,7 @@ public final class DropDownFactory {
         if (config.getStyle() != null) {
             dropDown.setStyle(new DefaultDropDownStyle(toStyleConfig(sketch, config.getStyle())));
         }
+        dropDown.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
         return dropDown;
     }
 

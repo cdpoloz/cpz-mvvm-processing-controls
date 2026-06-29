@@ -1,5 +1,7 @@
 package com.cpz.processing.controls.controls.checkbox.config;
 
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipConfig;
+
 import java.util.Objects;
 
 /**
@@ -17,8 +19,13 @@ public final class CheckboxConfig {
     private final boolean enabled;
     private final boolean visible;
     private final StyleConfig style;
+    private final TooltipConfig tooltip;
 
     public CheckboxConfig(String code, boolean checked, float x, float y, float width, float height, boolean enabled, boolean visible, StyleConfig style) {
+        this(code, checked, x, y, width, height, enabled, visible, style, null);
+    }
+
+    public CheckboxConfig(String code, boolean checked, float x, float y, float width, float height, boolean enabled, boolean visible, StyleConfig style, TooltipConfig tooltip) {
         this.code = Objects.requireNonNull(code, "code");
         this.checked = checked;
         this.x = x;
@@ -28,6 +35,7 @@ public final class CheckboxConfig {
         this.enabled = enabled;
         this.visible = visible;
         this.style = style;
+        this.tooltip = tooltip;
     }
 
     public String getCode() {
@@ -64,6 +72,10 @@ public final class CheckboxConfig {
 
     public StyleConfig getStyle() {
         return this.style;
+    }
+
+    public TooltipConfig getTooltip() {
+        return this.tooltip;
     }
 
     public static final class StyleConfig {

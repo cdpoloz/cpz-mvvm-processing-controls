@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.textfield.config;
 
 import com.cpz.processing.controls.core.util.JsonConfigSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipJsonSupport;
 import processing.core.PApplet;
 import processing.data.JSONObject;
 
@@ -44,7 +45,8 @@ public final class TextFieldConfigLoader {
                 height,
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
-                this.readStyle(root, path)
+                this.readStyle(root, path),
+                TooltipJsonSupport.readTooltip(root, path)
         );
     }
 

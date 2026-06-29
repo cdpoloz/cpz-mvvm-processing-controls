@@ -8,11 +8,16 @@ import com.cpz.processing.controls.controls.button.util.ButtonListener;
 import com.cpz.processing.controls.controls.button.view.ButtonView;
 import com.cpz.processing.controls.controls.button.viewmodel.ButtonViewModel;
 import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
 import com.cpz.processing.controls.core.util.ControlCode;
 
 import java.util.Objects;
 
 import processing.core.PApplet;
+import processing.core.PFont;
 
 /**
  * Convenience facade for the button control.
@@ -30,11 +35,12 @@ import processing.core.PApplet;
  *
  * @author CPZ
  */
-public final class Button implements Control {
+public final class Button implements Control, TooltipTarget {
     private final ButtonModel model;
     private final ButtonViewModel viewModel;
     private final ButtonView view;
     private final ButtonInputAdapter inputAdapter;
+    private final TooltipSupport tooltipSupport;
 
     /**
      * Creates a button with the default internal MVVM composition.
@@ -56,6 +62,7 @@ public final class Button implements Control {
         this.viewModel = new ButtonViewModel(this.model);
         this.view = new ButtonView(sketch, this.viewModel, x, y, width, height);
         this.inputAdapter = new ButtonInputAdapter(this.view, this.viewModel);
+        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible, this::isEnabled);
     }
 
     /**
@@ -136,6 +143,77 @@ public final class Button implements Control {
 
     public void setSize(float width, float height) {
         this.view.setSize(width, height);
+    }
+
+    public Button setTooltip(String text) {
+        this.tooltipSupport.setTooltip(text);
+        return this;
+    }
+
+    public Button setTooltip(Tooltip tooltip) {
+        this.tooltipSupport.setTooltip(tooltip);
+        return this;
+    }
+
+    public Button setTooltipText(String text) {
+        this.tooltipSupport.setTooltipText(text);
+        return this;
+    }
+
+    public Button setTooltipFont(PFont font) {
+        this.tooltipSupport.setTooltipFont(font);
+        return this;
+    }
+
+    public Button setTooltipTextSize(float size) {
+        this.tooltipSupport.setTooltipTextSize(size);
+        return this;
+    }
+
+    public Button setTooltipBackgroundColor(int argb) {
+        this.tooltipSupport.setTooltipBackgroundColor(argb);
+        return this;
+    }
+
+    public Button setTooltipTextColor(int argb) {
+        this.tooltipSupport.setTooltipTextColor(argb);
+        return this;
+    }
+
+    public Button setTooltipBorderColor(int argb) {
+        this.tooltipSupport.setTooltipBorderColor(argb);
+        return this;
+    }
+
+    public Button setTooltipPadding(float padding) {
+        this.tooltipSupport.setTooltipPadding(padding);
+        return this;
+    }
+
+    public Button setTooltipOffset(float offset) {
+        this.tooltipSupport.setTooltipOffset(offset);
+        return this;
+    }
+
+    public Button clearTooltip() {
+        this.tooltipSupport.clearTooltip();
+        return this;
+    }
+
+    public TooltipBounds getTooltipBounds() {
+        return this.tooltipSupport.getTooltipBounds();
+    }
+
+    public Tooltip getTooltip() {
+        return this.tooltipSupport.getTooltip();
+    }
+
+    public boolean isTooltipTargetVisible() {
+        return this.tooltipSupport.isTooltipTargetVisible();
+    }
+
+    public boolean isTooltipTargetEnabled() {
+        return this.tooltipSupport.isTooltipTargetEnabled();
     }
     // </editor-fold>
 }

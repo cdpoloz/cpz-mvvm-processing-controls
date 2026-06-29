@@ -24,8 +24,10 @@ public final class TooltipStyleConfig {
    public Integer borderOverride;
    public float textSize = 14.0F;
    public float textPadding = 10.0F;
+   public float offset = 10.0F;
    public float cornerRadius = 8.0F;
    public float minHeight = 32.0F;
+   public float strokeWeight = 1.0F;
    public PFont font;
    public ThemeProvider themeProvider;
 
