@@ -4,11 +4,15 @@ import com.cpz.processing.controls.controls.slider.model.SliderOrientation;
 import com.cpz.processing.controls.controls.slider.model.SnapMode;
 import com.cpz.processing.controls.controls.slider.style.SvgColorMode;
 import com.cpz.processing.controls.core.util.JsonConfigSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipJsonSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import processing.core.PApplet;
 import processing.data.JSONObject;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -18,9 +22,15 @@ import java.util.Objects;
  */
 public final class SliderConfigLoader {
     private final PApplet sketch;
+    private final Map<String, TooltipStyleConfig> tooltipStyles;
 
     public SliderConfigLoader(PApplet sketch) {
+        this(sketch, Collections.emptyMap());
+    }
+
+    public SliderConfigLoader(PApplet sketch, Map<String, TooltipStyleConfig> tooltipStyles) {
         this.sketch = Objects.requireNonNull(sketch, "sketch");
+        this.tooltipStyles = tooltipStyles == null ? Collections.emptyMap() : tooltipStyles;
     }
 
     public SliderConfig load(String path) {
@@ -70,7 +80,8 @@ public final class SliderConfigLoader {
                 readSnapMode(root, path),
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
-                this.readStyle(root, path)
+                this.readStyle(root, path),
+                TooltipJsonSupport.readTooltip(this.sketch, root, path, this.tooltipStyles)
         );
     }
 

@@ -220,6 +220,9 @@ External Source → Adapter → InputManager → InputLayer → Control facade �
 
 Rendering:
 Model → ViewModel → View → ViewState → Style → Renderer
+
+Tooltips:
+TooltipTarget → TooltipOverlayController → OverlayManager
 ```
 
 ---
@@ -231,6 +234,15 @@ This project is a UI framework intended for Processing sketches and for other ho
 The public control layer is exposed through closed ergonomic facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, and `DropDown`.
 
 Those facades also share a lightweight public contract, `Control`, for the small transversal surface that is common across the controls without exposing MVVM internals.
+
+Tooltips are reusable overlays attached through `TooltipTarget`; they can be
+used with controls or arbitrary Processing regions such as images and manually
+drawn rectangles without changing the `Control` contract.
+
+Control JSON can include tooltip blocks, reusable root `tooltipStyles`, and
+`styleRef` references. Standalone tooltips can also be loaded with
+`TooltipFactory.loadFromJson(...)` and assigned to manual `TooltipArea`
+targets.
 
 The JSON layer can also create one or more controls from a single document and returns them as `Map<String, Control>`. JSON remains structural only: binding and behavior wiring stay in sketch code.
 
@@ -333,6 +345,12 @@ At the public API level, each concrete facade keeps its own domain-specific meth
 You can find working examples in:
 
 `examples/src/main/java/com/cpz/processing/controls/examples`
+
+The tooltip JSON example is
+`src/main/java/com/cpz/processing/controls/examples/tooltip/TooltipVisualJsonTest.java`.
+It uses `data/config/tooltip-visual-test.json` for control tooltip blocks and
+`data/config/server-tooltip.json` for a standalone tooltip assigned to a manual
+`TooltipArea`.
 
 ---
 
@@ -498,6 +516,10 @@ Text-rendering controls (`Button`, `Label`, `Slider`, `RadioGroup`,
 control is created. A `null` font preserves the font active in
 Processing/PGraphics; the theme does not yet define a global font.
 
+Tooltip JSON follows the same render-loop rule: fonts from `tooltipStyles` and
+standalone tooltip JSON are loaded during configuration/control creation, not
+from `draw()`.
+
 ---
 
 ## Documentation
@@ -508,6 +530,7 @@ Processing/PGraphics; the theme does not yet define a global font.
 - [Binding](docs/binding.md)
 - [Input System](docs/input-system.md)
 - [JSON Configuration](docs/json-configuration.md)
+- [Tooltip](docs/tooltip.md)
 - [Theme](docs/theme.md)
 - [Button](docs/button.md)
 - [Checkbox](docs/checkbox.md)

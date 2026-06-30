@@ -3,6 +3,7 @@ package com.cpz.processing.controls.controls.radiogroup;
 import com.cpz.processing.controls.controls.radiogroup.config.RadioGroupConfig;
 import com.cpz.processing.controls.controls.radiogroup.config.RadioGroupStyleConfig;
 import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupStyle;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipFactory;
 import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PApplet;
 
@@ -33,6 +34,7 @@ public final class RadioGroupFactory {
         if (config.getStyle() != null) {
             radioGroup.setStyle(new RadioGroupStyle(toStyleConfig(sketch, config.getStyle())));
         }
+        radioGroup.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
 
         return radioGroup;
     }

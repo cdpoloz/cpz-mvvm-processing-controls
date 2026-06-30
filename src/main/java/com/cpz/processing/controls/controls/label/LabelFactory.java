@@ -5,6 +5,7 @@ import com.cpz.processing.controls.controls.label.config.LabelStyleConfig;
 import com.cpz.processing.controls.controls.label.style.DefaultLabelStyle;
 import com.cpz.processing.controls.controls.label.style.HorizontalAlign;
 import com.cpz.processing.controls.controls.label.style.VerticalAlign;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipFactory;
 import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PApplet;
 
@@ -35,6 +36,7 @@ public final class LabelFactory {
         if (config.getStyle() != null) {
             label.setStyle(new DefaultLabelStyle(toStyleConfig(sketch, config.getStyle())));
         }
+        label.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
 
         return label;
     }

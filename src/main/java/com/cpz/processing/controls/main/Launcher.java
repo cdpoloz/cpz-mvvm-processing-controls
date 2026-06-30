@@ -35,7 +35,7 @@ public class Launcher {
 
         // Button *****************************************
         PApplet.main(ButtonTest.class);
-        //PApplet.main(com.cpz.processing.controls.examples.button.ButtonSvgTest.class);
+        //PApplet.main(ButtonSvgTest.class);
         //PApplet.main(ButtonJsonTest.class);
         //PApplet.main(ButtonSvgJsonTest.class);
 
@@ -75,6 +75,10 @@ public class Launcher {
         // DropDown *************************************
         //PApplet.main(DropDownTest.class);
         //PApplet.main(DropDownJsonTest.class);
+
+        // Tooltip **************************************
+        //PApplet.main(TooltipVisualTest.class);
+        //PApplet.main(TooltipVisualJsonTest.class);
 
         // Composition **********************************
         //PApplet.main(JsonMultiControlUnidirectionalBindingTest.class);

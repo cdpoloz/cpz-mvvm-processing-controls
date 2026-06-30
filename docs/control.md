@@ -74,8 +74,13 @@ The following are intentionally outside `Control`:
 - listeners
 - text, value, selection, items, or options APIs
 - overlay lifecycle methods
+- tooltip overlay management
 
 Those concerns remain in the concrete facade where they belong.
+
+Tooltips are intentionally modeled outside `Control`. Controls that support
+tooltips expose the generic `TooltipTarget` contract, and arbitrary sketch
+regions can use `TooltipArea` without implementing `Control`.
 
 ---
 
@@ -96,5 +101,6 @@ They are intentionally separate:
 
 - [Architecture](architecture.md)
 - [JSON Configuration](json-configuration.md)
+- [Tooltip](tooltip.md)
 - [Theme](theme.md)
 - [README](../README.md)

@@ -11,8 +11,14 @@ import com.cpz.processing.controls.core.focus.FocusManager;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.KeyboardInputAdapter;
 import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
 import processing.core.PApplet;
+import processing.core.PFont;
 
 import java.util.Objects;
 
@@ -21,13 +27,14 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class TextField implements Control {
+public final class TextField implements Control, TooltipTarget {
     private final TextFieldModel model;
     private final TextFieldViewModel viewModel;
     private final TextFieldView view;
     private final FocusManager focusManager;
     private final TextFieldInputAdapter inputAdapter;
     private final KeyboardInputAdapter keyboardInputAdapter;
+    private final TooltipSupport tooltipSupport;
 
     public TextField(PApplet sketch, String text, float x, float y, float width, float height) {
         this(sketch, ControlCode.auto("textfield"), text, x, y, width, height);
@@ -42,6 +49,7 @@ public final class TextField implements Control {
         this.focusManager = new FocusManager();
         this.inputAdapter = new TextFieldInputAdapter(this.view, this.viewModel, this.focusManager);
         this.keyboardInputAdapter = new KeyboardInputAdapter(this.focusManager);
+        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible, this::isEnabled);
     }
 
     public void draw() {
@@ -107,5 +115,81 @@ public final class TextField implements Control {
 
     public void setSize(float width, float height) {
         this.view.setSize(width, height);
+    }
+
+    public TextField setTooltip(String text) {
+        this.tooltipSupport.setTooltip(text);
+        return this;
+    }
+
+    public TextField setTooltip(Tooltip tooltip) {
+        this.tooltipSupport.setTooltip(tooltip);
+        return this;
+    }
+
+    public TextField setTooltipText(String text) {
+        this.tooltipSupport.setTooltipText(text);
+        return this;
+    }
+
+    public TextField setTooltipStyle(TooltipStyleConfig styleConfig) {
+        this.tooltipSupport.setTooltipStyle(styleConfig);
+        return this;
+    }
+
+    public TextField setTooltipFont(PFont font) {
+        this.tooltipSupport.setTooltipFont(font);
+        return this;
+    }
+
+    public TextField setTooltipTextSize(float size) {
+        this.tooltipSupport.setTooltipTextSize(size);
+        return this;
+    }
+
+    public TextField setTooltipBackgroundColor(int argb) {
+        this.tooltipSupport.setTooltipBackgroundColor(argb);
+        return this;
+    }
+
+    public TextField setTooltipTextColor(int argb) {
+        this.tooltipSupport.setTooltipTextColor(argb);
+        return this;
+    }
+
+    public TextField setTooltipBorderColor(int argb) {
+        this.tooltipSupport.setTooltipBorderColor(argb);
+        return this;
+    }
+
+    public TextField setTooltipPadding(float padding) {
+        this.tooltipSupport.setTooltipPadding(padding);
+        return this;
+    }
+
+    public TextField setTooltipOffset(float offset) {
+        this.tooltipSupport.setTooltipOffset(offset);
+        return this;
+    }
+
+    public TextField clearTooltip() {
+        this.tooltipSupport.clearTooltip();
+        return this;
+    }
+
+    public TooltipBounds getTooltipBounds() {
+        return this.tooltipSupport.getTooltipBounds();
+    }
+
+    public Tooltip getTooltip() {
+        return this.tooltipSupport.getTooltip();
+    }
+
+    public boolean isTooltipTargetVisible() {
+        return this.tooltipSupport.isTooltipTargetVisible();
+    }
+
+    public boolean isTooltipTargetEnabled() {
+        return this.tooltipSupport.isTooltipTargetEnabled();
     }
 }

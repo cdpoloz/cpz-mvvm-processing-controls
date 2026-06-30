@@ -10,8 +10,14 @@ import com.cpz.processing.controls.controls.slider.style.SliderStyle;
 import com.cpz.processing.controls.controls.slider.view.SliderView;
 import com.cpz.processing.controls.controls.slider.viewmodel.SliderViewModel;
 import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
 import processing.core.PApplet;
+import processing.core.PFont;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -22,11 +28,12 @@ import java.util.function.Function;
  *
  * @author CPZ
  */
-public final class Slider implements Control {
+public final class Slider implements Control, TooltipTarget {
     private final SliderModel model;
     private final SliderViewModel viewModel;
     private final SliderView view;
     private final SliderInputAdapter inputAdapter;
+    private final TooltipSupport tooltipSupport;
 
     public Slider(PApplet sketch, float x, float y, float width, float height) {
         this(
@@ -112,6 +119,7 @@ public final class Slider implements Control {
         this.viewModel = new SliderViewModel(this.model);
         this.view = new SliderView(sketch, this.viewModel, x, y, width, height, orientation);
         this.inputAdapter = new SliderInputAdapter(this.view, this.viewModel);
+        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible, this::isEnabled);
     }
 
     public void draw() {
@@ -238,5 +246,81 @@ public final class Slider implements Control {
 
     public void setSize(float width, float height) {
         this.view.setSize(width, height);
+    }
+
+    public Slider setTooltip(String text) {
+        this.tooltipSupport.setTooltip(text);
+        return this;
+    }
+
+    public Slider setTooltip(Tooltip tooltip) {
+        this.tooltipSupport.setTooltip(tooltip);
+        return this;
+    }
+
+    public Slider setTooltipText(String text) {
+        this.tooltipSupport.setTooltipText(text);
+        return this;
+    }
+
+    public Slider setTooltipStyle(TooltipStyleConfig styleConfig) {
+        this.tooltipSupport.setTooltipStyle(styleConfig);
+        return this;
+    }
+
+    public Slider setTooltipFont(PFont font) {
+        this.tooltipSupport.setTooltipFont(font);
+        return this;
+    }
+
+    public Slider setTooltipTextSize(float size) {
+        this.tooltipSupport.setTooltipTextSize(size);
+        return this;
+    }
+
+    public Slider setTooltipBackgroundColor(int argb) {
+        this.tooltipSupport.setTooltipBackgroundColor(argb);
+        return this;
+    }
+
+    public Slider setTooltipTextColor(int argb) {
+        this.tooltipSupport.setTooltipTextColor(argb);
+        return this;
+    }
+
+    public Slider setTooltipBorderColor(int argb) {
+        this.tooltipSupport.setTooltipBorderColor(argb);
+        return this;
+    }
+
+    public Slider setTooltipPadding(float padding) {
+        this.tooltipSupport.setTooltipPadding(padding);
+        return this;
+    }
+
+    public Slider setTooltipOffset(float offset) {
+        this.tooltipSupport.setTooltipOffset(offset);
+        return this;
+    }
+
+    public Slider clearTooltip() {
+        this.tooltipSupport.clearTooltip();
+        return this;
+    }
+
+    public TooltipBounds getTooltipBounds() {
+        return this.tooltipSupport.getTooltipBounds();
+    }
+
+    public Tooltip getTooltip() {
+        return this.tooltipSupport.getTooltip();
+    }
+
+    public boolean isTooltipTargetVisible() {
+        return this.tooltipSupport.isTooltipTargetVisible();
+    }
+
+    public boolean isTooltipTargetEnabled() {
+        return this.tooltipSupport.isTooltipTargetEnabled();
     }
 }

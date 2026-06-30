@@ -1,10 +1,14 @@
 package com.cpz.processing.controls.controls.checkbox.config;
 
 import com.cpz.processing.controls.core.util.JsonConfigSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipJsonSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import processing.core.PApplet;
 import processing.data.JSONObject;
 
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -14,9 +18,15 @@ import java.util.Objects;
  */
 public final class CheckboxConfigLoader {
     private final PApplet sketch;
+    private final Map<String, TooltipStyleConfig> tooltipStyles;
 
     public CheckboxConfigLoader(PApplet sketch) {
+        this(sketch, Collections.emptyMap());
+    }
+
+    public CheckboxConfigLoader(PApplet sketch, Map<String, TooltipStyleConfig> tooltipStyles) {
         this.sketch = Objects.requireNonNull(sketch, "sketch");
+        this.tooltipStyles = tooltipStyles == null ? Collections.emptyMap() : tooltipStyles;
     }
 
     public CheckboxConfig load(String path) {
@@ -45,7 +55,8 @@ public final class CheckboxConfigLoader {
                 height,
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
-                this.readStyle(root, path)
+                this.readStyle(root, path),
+                TooltipJsonSupport.readTooltip(this.sketch, root, path, this.tooltipStyles)
         );
     }
 

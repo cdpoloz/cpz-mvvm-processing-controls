@@ -8,8 +8,14 @@ import com.cpz.processing.controls.controls.checkbox.style.CheckboxStyle;
 import com.cpz.processing.controls.controls.checkbox.view.CheckboxView;
 import com.cpz.processing.controls.controls.checkbox.viewmodel.CheckboxViewModel;
 import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
 import processing.core.PApplet;
+import processing.core.PFont;
 
 import java.util.Objects;
 
@@ -18,11 +24,12 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class Checkbox implements Control {
+public final class Checkbox implements Control, TooltipTarget {
     private final CheckboxModel model;
     private final CheckboxViewModel viewModel;
     private final CheckboxView view;
     private final CheckboxInputAdapter inputAdapter;
+    private final TooltipSupport tooltipSupport;
     private ValueListener<Boolean> changeListener;
 
     public Checkbox(PApplet sketch, boolean checked, float x, float y, float size) {
@@ -43,6 +50,7 @@ public final class Checkbox implements Control {
         this.viewModel = new CheckboxViewModel(this.model);
         this.view = new CheckboxView(sketch, this.viewModel, x, y, width, height);
         this.inputAdapter = new CheckboxInputAdapter(this.view, this.viewModel);
+        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible, this::isEnabled);
     }
 
     public void draw() {
@@ -111,6 +119,82 @@ public final class Checkbox implements Control {
         if (previousValue != currentValue && this.changeListener != null) {
             this.changeListener.onChange(currentValue);
         }
+    }
+
+    public Checkbox setTooltip(String text) {
+        this.tooltipSupport.setTooltip(text);
+        return this;
+    }
+
+    public Checkbox setTooltip(Tooltip tooltip) {
+        this.tooltipSupport.setTooltip(tooltip);
+        return this;
+    }
+
+    public Checkbox setTooltipText(String text) {
+        this.tooltipSupport.setTooltipText(text);
+        return this;
+    }
+
+    public Checkbox setTooltipStyle(TooltipStyleConfig styleConfig) {
+        this.tooltipSupport.setTooltipStyle(styleConfig);
+        return this;
+    }
+
+    public Checkbox setTooltipFont(PFont font) {
+        this.tooltipSupport.setTooltipFont(font);
+        return this;
+    }
+
+    public Checkbox setTooltipTextSize(float size) {
+        this.tooltipSupport.setTooltipTextSize(size);
+        return this;
+    }
+
+    public Checkbox setTooltipBackgroundColor(int argb) {
+        this.tooltipSupport.setTooltipBackgroundColor(argb);
+        return this;
+    }
+
+    public Checkbox setTooltipTextColor(int argb) {
+        this.tooltipSupport.setTooltipTextColor(argb);
+        return this;
+    }
+
+    public Checkbox setTooltipBorderColor(int argb) {
+        this.tooltipSupport.setTooltipBorderColor(argb);
+        return this;
+    }
+
+    public Checkbox setTooltipPadding(float padding) {
+        this.tooltipSupport.setTooltipPadding(padding);
+        return this;
+    }
+
+    public Checkbox setTooltipOffset(float offset) {
+        this.tooltipSupport.setTooltipOffset(offset);
+        return this;
+    }
+
+    public Checkbox clearTooltip() {
+        this.tooltipSupport.clearTooltip();
+        return this;
+    }
+
+    public TooltipBounds getTooltipBounds() {
+        return this.tooltipSupport.getTooltipBounds();
+    }
+
+    public Tooltip getTooltip() {
+        return this.tooltipSupport.getTooltip();
+    }
+
+    public boolean isTooltipTargetVisible() {
+        return this.tooltipSupport.isTooltipTargetVisible();
+    }
+
+    public boolean isTooltipTargetEnabled() {
+        return this.tooltipSupport.isTooltipTargetEnabled();
     }
     // </editor-fold>
 }

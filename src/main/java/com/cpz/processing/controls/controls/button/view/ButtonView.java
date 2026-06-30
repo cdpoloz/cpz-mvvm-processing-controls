@@ -9,6 +9,7 @@ import com.cpz.processing.controls.core.input.hit.RectHitTest;
 import com.cpz.processing.controls.core.input.hit.interfaces.HitTest;
 import com.cpz.processing.controls.core.layout.LayoutConfig;
 import com.cpz.processing.controls.core.layout.LayoutResolver;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import processing.core.PApplet;
@@ -212,6 +213,11 @@ public final class ButtonView implements ControlView, PointerInteractable {
     */
    public float getHeight() {
       return this.height;
+   }
+
+   public TooltipBounds getTooltipBounds() {
+      this.applyLayoutIfNeeded();
+      return new TooltipBounds(this.x - this.width * 0.5F, this.y - this.height * 0.5F, this.width, this.height);
    }
 
    private ButtonViewState buildViewState() {

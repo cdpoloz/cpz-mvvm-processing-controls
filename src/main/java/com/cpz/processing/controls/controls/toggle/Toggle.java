@@ -8,8 +8,14 @@ import com.cpz.processing.controls.controls.toggle.style.ToggleStyle;
 import com.cpz.processing.controls.controls.toggle.view.ToggleView;
 import com.cpz.processing.controls.controls.toggle.viewmodel.ToggleViewModel;
 import com.cpz.processing.controls.core.input.PointerEvent;
+import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
 import processing.core.PApplet;
+import processing.core.PFont;
 
 import java.util.Objects;
 
@@ -18,11 +24,12 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class Toggle implements Control {
+public final class Toggle implements Control, TooltipTarget {
     private final ToggleModel model;
     private final ToggleViewModel viewModel;
     private final ToggleView view;
     private final ToggleInputAdapter inputAdapter;
+    private final TooltipSupport tooltipSupport;
     private ValueListener<Integer> changeListener;
 
     public Toggle(PApplet sketch, float x, float y, float size) {
@@ -51,6 +58,7 @@ public final class Toggle implements Control {
         this.viewModel = new ToggleViewModel(this.model);
         this.view = new ToggleView(sketch, this.viewModel, x, y, width, height);
         this.inputAdapter = new ToggleInputAdapter(this.view, this.viewModel);
+        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible, this::isEnabled);
         this.setTotalStates(totalStates);
         this.setState(initialState);
     }
@@ -144,5 +152,81 @@ public final class Toggle implements Control {
         if (previousState != currentState && this.changeListener != null) {
             this.changeListener.onChange(currentState);
         }
+    }
+
+    public Toggle setTooltip(String text) {
+        this.tooltipSupport.setTooltip(text);
+        return this;
+    }
+
+    public Toggle setTooltip(Tooltip tooltip) {
+        this.tooltipSupport.setTooltip(tooltip);
+        return this;
+    }
+
+    public Toggle setTooltipText(String text) {
+        this.tooltipSupport.setTooltipText(text);
+        return this;
+    }
+
+    public Toggle setTooltipStyle(TooltipStyleConfig styleConfig) {
+        this.tooltipSupport.setTooltipStyle(styleConfig);
+        return this;
+    }
+
+    public Toggle setTooltipFont(PFont font) {
+        this.tooltipSupport.setTooltipFont(font);
+        return this;
+    }
+
+    public Toggle setTooltipTextSize(float size) {
+        this.tooltipSupport.setTooltipTextSize(size);
+        return this;
+    }
+
+    public Toggle setTooltipBackgroundColor(int argb) {
+        this.tooltipSupport.setTooltipBackgroundColor(argb);
+        return this;
+    }
+
+    public Toggle setTooltipTextColor(int argb) {
+        this.tooltipSupport.setTooltipTextColor(argb);
+        return this;
+    }
+
+    public Toggle setTooltipBorderColor(int argb) {
+        this.tooltipSupport.setTooltipBorderColor(argb);
+        return this;
+    }
+
+    public Toggle setTooltipPadding(float padding) {
+        this.tooltipSupport.setTooltipPadding(padding);
+        return this;
+    }
+
+    public Toggle setTooltipOffset(float offset) {
+        this.tooltipSupport.setTooltipOffset(offset);
+        return this;
+    }
+
+    public Toggle clearTooltip() {
+        this.tooltipSupport.clearTooltip();
+        return this;
+    }
+
+    public TooltipBounds getTooltipBounds() {
+        return this.tooltipSupport.getTooltipBounds();
+    }
+
+    public Tooltip getTooltip() {
+        return this.tooltipSupport.getTooltip();
+    }
+
+    public boolean isTooltipTargetVisible() {
+        return this.tooltipSupport.isTooltipTargetVisible();
+    }
+
+    public boolean isTooltipTargetEnabled() {
+        return this.tooltipSupport.isTooltipTargetEnabled();
     }
 }

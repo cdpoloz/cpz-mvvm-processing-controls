@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.slider.style.SliderDefaultStyles;
 import com.cpz.processing.controls.controls.slider.style.SliderStyle;
 import com.cpz.processing.controls.controls.slider.viewmodel.SliderViewModel;
 import com.cpz.processing.controls.core.input.PointerInteractable;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import processing.core.PApplet;
@@ -161,6 +162,10 @@ public final class SliderView implements ControlView, PointerInteractable {
       float halfWidth = this.width * 0.5F;
       float halfHeight = this.height * 0.5F;
       return x >= this.x - halfWidth && x <= this.x + halfWidth && y >= this.y - halfHeight && y <= this.y + halfHeight;
+   }
+
+   public TooltipBounds getTooltipBounds() {
+      return new TooltipBounds(this.x - this.width * 0.5F, this.y - this.height * 0.5F, this.width, this.height);
    }
 
    private SliderViewState buildViewState() {

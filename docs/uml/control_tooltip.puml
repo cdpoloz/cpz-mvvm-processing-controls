@@ -3,6 +3,12 @@ title Tooltip Overlay Structure
 skinparam packageStyle rectangle
 skinparam shadowing false
 
+class Tooltip
+class TooltipBounds
+interface TooltipTarget
+class TooltipArea
+class TooltipSupport
+class TooltipInputLayer
 class TooltipOverlayController
 class TooltipModel
 class TooltipViewModel
@@ -15,17 +21,22 @@ class OverlayManager
 interface ThemeProvider
 class ThemeSnapshot
 
+TooltipArea ..|> TooltipTarget
+TooltipSupport ..|> TooltipTarget
+TooltipTarget --> Tooltip : optional
+TooltipTarget --> TooltipBounds : exposes
+TooltipInputLayer --> TooltipOverlayController : showIfMouseOver
+TooltipOverlayController --> TooltipTarget : registered targets
+TooltipOverlayController --> OverlayManager : registers one overlay
 TooltipOverlayController --> TooltipModel : owns
 TooltipOverlayController --> TooltipViewModel : owns
 TooltipOverlayController --> TooltipView : owns
-TooltipOverlayController --> OverlayManager : registers overlay
 TooltipViewModel --> TooltipModel : reads / updates
 TooltipView --> TooltipViewModel : reads
 TooltipView --> TooltipViewState : builds
 TooltipView --> DefaultTooltipStyle : renders with
 DefaultTooltipStyle --> ThemeProvider : reads snapshot
 ThemeProvider --> ThemeSnapshot
-DefaultTooltipStyle --> TooltipViewState : resolves
 DefaultTooltipStyle --> TooltipRenderStyle : creates
 DefaultTooltipRenderer --> TooltipRenderStyle : draws
 @enduml

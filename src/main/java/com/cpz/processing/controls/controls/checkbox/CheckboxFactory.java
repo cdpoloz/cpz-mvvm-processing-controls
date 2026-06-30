@@ -4,6 +4,7 @@ import com.cpz.processing.controls.controls.checkbox.config.CheckboxConfig;
 import com.cpz.processing.controls.controls.checkbox.config.CheckboxStyleConfig;
 import com.cpz.processing.controls.controls.checkbox.style.DefaultCheckboxStyle;
 import com.cpz.processing.controls.controls.checkbox.style.render.SvgCheckboxRenderer;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipFactory;
 import processing.core.PApplet;
 
 import java.util.Objects;
@@ -25,6 +26,7 @@ public final class CheckboxFactory {
         if (config.getStyle() != null) {
             checkbox.setStyle(new DefaultCheckboxStyle(toStyleConfig(sketch, config.getStyle())));
         }
+        checkbox.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
 
         return checkbox;
     }

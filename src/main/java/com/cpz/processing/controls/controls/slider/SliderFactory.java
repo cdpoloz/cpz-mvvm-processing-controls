@@ -3,6 +3,7 @@ package com.cpz.processing.controls.controls.slider;
 import com.cpz.processing.controls.controls.slider.config.SliderConfig;
 import com.cpz.processing.controls.controls.slider.config.SliderStyleConfig;
 import com.cpz.processing.controls.controls.slider.style.SliderStyle;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipFactory;
 import com.cpz.processing.controls.core.style.TypographySupport;
 import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PApplet;
@@ -40,6 +41,7 @@ public final class SliderFactory {
         if (config.getStyle() != null) {
             slider.setStyle(new SliderStyle(toStyleConfig(sketch, config.getStyle())));
         }
+        slider.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
 
         return slider;
     }

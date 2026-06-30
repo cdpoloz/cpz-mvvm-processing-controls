@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupDefaultSt
 import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupStyle;
 import com.cpz.processing.controls.controls.radiogroup.viewmodel.RadioGroupViewModel;
 import com.cpz.processing.controls.core.input.PointerInteractable;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import java.util.ArrayList;
@@ -192,6 +193,10 @@ public final class RadioGroupView implements ControlView, PointerInteractable {
     */
    public float getHeight() {
       return this.viewModel.getOptions().isEmpty() ? 0.0F : (float)this.viewModel.getOptions().size() * this.itemHeight + (float)Math.max(0, this.viewModel.getOptions().size() - 1) * this.itemSpacing;
+   }
+
+   public TooltipBounds getTooltipBounds() {
+      return new TooltipBounds(this.x - this.width * 0.5F, this.y - this.itemHeight * 0.5F, this.width, this.getHeight());
    }
 
    private RadioGroupViewState buildViewState() {

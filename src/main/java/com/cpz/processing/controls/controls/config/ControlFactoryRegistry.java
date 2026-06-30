@@ -21,6 +21,7 @@ import com.cpz.processing.controls.controls.toggle.ToggleFactory;
 import com.cpz.processing.controls.controls.toggle.config.ToggleConfigLoader;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.JsonConfigSupport;
 import processing.core.PApplet;
 import processing.data.JSONObject;
@@ -46,17 +47,27 @@ final class ControlFactoryRegistry {
      * Creates a registry with the currently supported control types.
      */
     ControlFactoryRegistry(PApplet sketch, OverlayManager overlayManager, InputManager inputManager) {
-        Objects.requireNonNull(sketch, "sketch");
+        this(sketch, overlayManager, inputManager, Collections.emptyMap());
+    }
 
-        ButtonConfigLoader buttonLoader = new ButtonConfigLoader(sketch);
-        CheckboxConfigLoader checkboxLoader = new CheckboxConfigLoader(sketch);
-        ToggleConfigLoader toggleLoader = new ToggleConfigLoader(sketch);
-        SliderConfigLoader sliderLoader = new SliderConfigLoader(sketch);
-        LabelConfigLoader labelLoader = new LabelConfigLoader(sketch);
-        RadioGroupConfigLoader radioGroupLoader = new RadioGroupConfigLoader(sketch);
-        TextFieldConfigLoader textFieldLoader = new TextFieldConfigLoader(sketch);
-        NumericFieldConfigLoader numericFieldLoader = new NumericFieldConfigLoader(sketch);
-        DropDownConfigLoader dropDownLoader = new DropDownConfigLoader(sketch);
+    /**
+     * Creates a registry with the currently supported control types.
+     */
+    ControlFactoryRegistry(PApplet sketch, OverlayManager overlayManager, InputManager inputManager, Map<String, TooltipStyleConfig> tooltipStyles) {
+        Objects.requireNonNull(sketch, "sketch");
+        Map<String, TooltipStyleConfig> sharedTooltipStyles = tooltipStyles == null
+                ? Collections.emptyMap()
+                : tooltipStyles;
+
+        ButtonConfigLoader buttonLoader = new ButtonConfigLoader(sketch, sharedTooltipStyles);
+        CheckboxConfigLoader checkboxLoader = new CheckboxConfigLoader(sketch, sharedTooltipStyles);
+        ToggleConfigLoader toggleLoader = new ToggleConfigLoader(sketch, sharedTooltipStyles);
+        SliderConfigLoader sliderLoader = new SliderConfigLoader(sketch, sharedTooltipStyles);
+        LabelConfigLoader labelLoader = new LabelConfigLoader(sketch, sharedTooltipStyles);
+        RadioGroupConfigLoader radioGroupLoader = new RadioGroupConfigLoader(sketch, sharedTooltipStyles);
+        TextFieldConfigLoader textFieldLoader = new TextFieldConfigLoader(sketch, sharedTooltipStyles);
+        NumericFieldConfigLoader numericFieldLoader = new NumericFieldConfigLoader(sketch, sharedTooltipStyles);
+        DropDownConfigLoader dropDownLoader = new DropDownConfigLoader(sketch, sharedTooltipStyles);
 
         Map<String, ControlEntryFactory> entries = new LinkedHashMap<>();
         entries.put("button", (json, path) -> ButtonFactory.create(sketch, buttonLoader.loadFromJson(json, path)));

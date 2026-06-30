@@ -3,6 +3,7 @@ package com.cpz.processing.controls.controls.textfield;
 import com.cpz.processing.controls.controls.textfield.config.TextFieldConfig;
 import com.cpz.processing.controls.controls.textfield.config.TextFieldStyleConfig;
 import com.cpz.processing.controls.controls.textfield.style.DefaultTextFieldStyle;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipFactory;
 import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PApplet;
 
@@ -33,6 +34,7 @@ public final class TextFieldFactory {
         if (config.getStyle() != null) {
             textField.setStyle(new DefaultTextFieldStyle(toStyleConfig(sketch, config.getStyle())));
         }
+        textField.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
 
         return textField;
     }

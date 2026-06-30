@@ -98,7 +98,7 @@ public final class DefaultTooltipStyle {
       int backgroundColor = this.config.backgroundOverride != null ? this.config.backgroundOverride : InteractiveStyleHelper.applyOverlay(tokens.surfaceVariant, Colors.argb(220, 0, 0, 0));
       int index = this.config.textOverride != null ? this.config.textOverride : tokens.onSurface;
       int color = this.config.borderOverride != null ? this.config.borderOverride : tokens.border;
-      return new TooltipRenderStyle(backgroundColor, index, color, 1.0F, this.config.textSize, this.config.textPadding, this.config.cornerRadius, this.config.minHeight, this.config.font);
+      return new TooltipRenderStyle(backgroundColor, index, color, this.config.strokeWeight, this.config.textSize, this.config.textPadding, this.config.cornerRadius, this.config.minHeight, this.config.font);
    }
 
    /**
@@ -111,6 +111,10 @@ public final class DefaultTooltipStyle {
     */
    public float getTextPadding() {
       return this.config.textPadding;
+   }
+
+   public float getOffset() {
+      return this.config.offset;
    }
 
    /**

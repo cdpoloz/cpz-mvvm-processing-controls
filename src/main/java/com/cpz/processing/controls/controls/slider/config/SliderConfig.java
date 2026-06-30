@@ -3,6 +3,7 @@ package com.cpz.processing.controls.controls.slider.config;
 import com.cpz.processing.controls.controls.slider.model.SliderOrientation;
 import com.cpz.processing.controls.controls.slider.model.SnapMode;
 import com.cpz.processing.controls.controls.slider.style.SvgColorMode;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipConfig;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -27,6 +28,7 @@ public final class SliderConfig {
     private final boolean enabled;
     private final boolean visible;
     private final StyleConfig style;
+    private final TooltipConfig tooltip;
 
     public SliderConfig(
             String code,
@@ -44,6 +46,26 @@ public final class SliderConfig {
             boolean visible,
             StyleConfig style
     ) {
+        this(code, min, max, step, value, x, y, width, height, orientation, snapMode, enabled, visible, style, null);
+    }
+
+    public SliderConfig(
+            String code,
+            BigDecimal min,
+            BigDecimal max,
+            BigDecimal step,
+            BigDecimal value,
+            float x,
+            float y,
+            float width,
+            float height,
+            SliderOrientation orientation,
+            SnapMode snapMode,
+            boolean enabled,
+            boolean visible,
+            StyleConfig style,
+            TooltipConfig tooltip
+    ) {
         this.code = Objects.requireNonNull(code, "code");
         this.min = Objects.requireNonNull(min, "min");
         this.max = Objects.requireNonNull(max, "max");
@@ -58,6 +80,7 @@ public final class SliderConfig {
         this.enabled = enabled;
         this.visible = visible;
         this.style = style;
+        this.tooltip = tooltip;
     }
 
     public String getCode() {
@@ -114,6 +137,10 @@ public final class SliderConfig {
 
     public StyleConfig getStyle() {
         return this.style;
+    }
+
+    public TooltipConfig getTooltip() {
+        return this.tooltip;
     }
 
     public static final class StyleConfig {

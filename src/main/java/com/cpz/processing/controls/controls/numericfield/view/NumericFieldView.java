@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.numericfield.style.NumericFieldRende
 import com.cpz.processing.controls.controls.numericfield.style.NumericFieldStyle;
 import com.cpz.processing.controls.controls.numericfield.viewmodel.NumericFieldViewModel;
 import com.cpz.processing.controls.core.input.PointerInteractable;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import com.cpz.processing.controls.core.style.TypographySupport;
 import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
@@ -132,6 +133,10 @@ public final class NumericFieldView implements ControlView, PointerInteractable 
       float relativeX = this.width * 0.5F;
       float halfHeight = this.height * 0.5F;
       return x >= this.x - relativeX && x <= this.x + relativeX && y >= this.y - halfHeight && y <= this.y + halfHeight;
+   }
+
+   public TooltipBounds getTooltipBounds() {
+      return new TooltipBounds(this.x - this.width * 0.5F, this.y - this.height * 0.5F, this.width, this.height);
    }
 
    /**

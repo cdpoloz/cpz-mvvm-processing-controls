@@ -8,6 +8,7 @@ import com.cpz.processing.controls.core.focus.FocusManager;
 import com.cpz.processing.controls.core.input.PointerInteractable;
 import com.cpz.processing.controls.core.layout.LayoutConfig;
 import com.cpz.processing.controls.core.layout.LayoutResolver;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.view.ControlView;
 import java.util.List;
@@ -303,6 +304,11 @@ public final class DropDownView implements ControlView, PointerInteractable {
     */
    public float getHeight() {
       return this.height;
+   }
+
+   public TooltipBounds getTooltipBounds() {
+      this.applyLayoutIfNeeded();
+      return new TooltipBounds(this.x - this.width * 0.5F, this.y - this.height * 0.5F, this.width, this.height);
    }
 
    /**
