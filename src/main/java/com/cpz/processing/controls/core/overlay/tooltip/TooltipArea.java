@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.core.overlay.tooltip;
 
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import java.util.Objects;
 import java.util.function.Supplier;
 import processing.core.PFont;
@@ -46,6 +47,11 @@ public final class TooltipArea implements TooltipTarget {
 
     public TooltipArea setTooltipText(String text) {
         this.ensureTooltip().setText(text);
+        return this;
+    }
+
+    public TooltipArea setTooltipStyle(TooltipStyleConfig styleConfig) {
+        this.ensureTooltip().setStyle(styleConfig);
         return this;
     }
 

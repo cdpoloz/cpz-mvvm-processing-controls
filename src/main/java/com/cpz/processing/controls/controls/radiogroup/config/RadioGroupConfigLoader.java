@@ -2,12 +2,15 @@ package com.cpz.processing.controls.controls.radiogroup.config;
 
 import com.cpz.processing.controls.core.util.JsonConfigSupport;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipJsonSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import processing.core.PApplet;
 import processing.data.JSONArray;
 import processing.data.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -17,9 +20,15 @@ import java.util.Objects;
  */
 public final class RadioGroupConfigLoader {
     private final PApplet sketch;
+    private final Map<String, TooltipStyleConfig> tooltipStyles;
 
     public RadioGroupConfigLoader(PApplet sketch) {
+        this(sketch, Collections.emptyMap());
+    }
+
+    public RadioGroupConfigLoader(PApplet sketch, Map<String, TooltipStyleConfig> tooltipStyles) {
         this.sketch = Objects.requireNonNull(sketch, "sketch");
+        this.tooltipStyles = tooltipStyles == null ? Collections.emptyMap() : tooltipStyles;
     }
 
     public RadioGroupConfig load(String path) {
@@ -57,7 +66,7 @@ public final class RadioGroupConfigLoader {
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
                 this.readStyle(root, path),
-                TooltipJsonSupport.readTooltip(root, path)
+                TooltipJsonSupport.readTooltip(this.sketch, root, path, this.tooltipStyles)
         );
     }
 

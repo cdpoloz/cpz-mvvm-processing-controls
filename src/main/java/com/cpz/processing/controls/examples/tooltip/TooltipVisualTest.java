@@ -18,6 +18,7 @@ import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipArea;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.overlay.tooltip.input.TooltipInputLayer;
 import com.cpz.processing.controls.core.overlay.tooltip.util.TooltipOverlayController;
 import com.cpz.utils.color.Colors;
@@ -31,10 +32,6 @@ import processing.core.PFont;
  * @author CPZ
  */
 public class TooltipVisualTest extends PApplet {
-    private static final int TOOLTIP_BACKGROUND = 0xE61B1F26;
-    private static final int TOOLTIP_TEXT = 0xFFFFFFFF;
-    private static final int TOOLTIP_BORDER = 0x668A94A6;
-
     private InputManager inputManager;
     private OverlayManager overlayManager;
     private TooltipOverlayController tooltips;
@@ -59,14 +56,16 @@ public class TooltipVisualTest extends PApplet {
         this.overlayManager = new OverlayManager();
         this.tooltips = new TooltipOverlayController(this, this.overlayManager);
         PFont jetBrainsMono = createFont("data/font/JetBrainsMono.ttf", 14.0f);
+        TooltipStyleConfig darkTooltipStyle = new TooltipStyleConfig()
+                .setFont(jetBrainsMono)
+                .setTextSize(14.0f)
+                .setBackgroundColor(0xE61B1F26)
+                .setTextColor(0xFFFFFFFF)
+                .setBorderColor(0x668A94A6);
 
         this.button = new Button(this, "btnTooltip", "Button target", 185.0f, 95.0f, 210.0f, 52.0f)
                 .setTooltip("Button tooltip")
-                .setTooltipFont(jetBrainsMono)
-                .setTooltipTextSize(14.0f)
-                .setTooltipBackgroundColor(TOOLTIP_BACKGROUND)
-                .setTooltipTextColor(TOOLTIP_TEXT)
-                .setTooltipBorderColor(TOOLTIP_BORDER);
+                .setTooltipStyle(darkTooltipStyle);
         this.button.setClickListener(() -> System.out.println("TooltipVisualTest button clicked"));
         ButtonStyleConfig buttonStyle = new ButtonStyleConfig();
         buttonStyle.baseColor = Colors.rgb(42, 96, 194);
@@ -77,11 +76,7 @@ public class TooltipVisualTest extends PApplet {
 
         this.label = new Label(this, "lblTooltip", "Label target", 70.0f, 178.0f, 230.0f, 42.0f)
                 .setTooltip("Label tooltip")
-                .setTooltipFont(jetBrainsMono)
-                .setTooltipTextSize(14.0f)
-                .setTooltipBackgroundColor(TOOLTIP_BACKGROUND)
-                .setTooltipTextColor(TOOLTIP_TEXT)
-                .setTooltipBorderColor(TOOLTIP_BORDER);
+                .setTooltipStyle(darkTooltipStyle);
         LabelStyleConfig labelStyle = new LabelStyleConfig();
         labelStyle.font = createFont("data/font/JetBrainsMono.ttf", 20.0f);
         labelStyle.textSize = 20.0f;
@@ -102,11 +97,7 @@ public class TooltipVisualTest extends PApplet {
                 300.0f,
                 50.0f
         ).setTooltip("DropDown base tooltip")
-                .setTooltipFont(jetBrainsMono)
-                .setTooltipTextSize(14.0f)
-                .setTooltipBackgroundColor(TOOLTIP_BACKGROUND)
-                .setTooltipTextColor(TOOLTIP_TEXT)
-                .setTooltipBorderColor(TOOLTIP_BORDER);
+                .setTooltipStyle(darkTooltipStyle);
         DropDownStyleConfig dropDownStyle = new DropDownStyleConfig();
         dropDownStyle.baseFillOverride = Colors.rgb(238, 243, 248);
         dropDownStyle.listFillOverride = Colors.rgb(248, 250, 252);
@@ -119,11 +110,7 @@ public class TooltipVisualTest extends PApplet {
 
         this.serverArea = new TooltipArea(500.0f, 235.0f, 170.0f, 90.0f)
                 .setTooltip("Manual rectangle tooltip")
-                .setTooltipFont(jetBrainsMono)
-                .setTooltipTextSize(14.0f)
-                .setTooltipBackgroundColor(TOOLTIP_BACKGROUND)
-                .setTooltipTextColor(TOOLTIP_TEXT)
-                .setTooltipBorderColor(TOOLTIP_BORDER);
+                .setTooltipStyle(darkTooltipStyle);
 
         this.tooltips.registerTarget(this.button);
         this.tooltips.registerTarget(this.label);

@@ -76,6 +76,10 @@ public class Launcher {
         //PApplet.main(DropDownTest.class);
         //PApplet.main(DropDownJsonTest.class);
 
+        // Tooltip **************************************
+        //PApplet.main(TooltipVisualTest.class);
+        //PApplet.main(TooltipVisualJsonTest.class);
+
         // Composition **********************************
         //PApplet.main(JsonMultiControlUnidirectionalBindingTest.class);
         //PApplet.main(JsonMultiControlBindingTest.class);

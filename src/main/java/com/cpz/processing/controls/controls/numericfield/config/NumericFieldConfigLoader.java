@@ -2,9 +2,12 @@ package com.cpz.processing.controls.controls.numericfield.config;
 
 import com.cpz.processing.controls.core.util.JsonConfigSupport;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipJsonSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import processing.core.PApplet;
 import processing.data.JSONObject;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -14,9 +17,15 @@ import java.util.Objects;
  */
 public final class NumericFieldConfigLoader {
     private final PApplet sketch;
+    private final Map<String, TooltipStyleConfig> tooltipStyles;
 
     public NumericFieldConfigLoader(PApplet sketch) {
+        this(sketch, Collections.emptyMap());
+    }
+
+    public NumericFieldConfigLoader(PApplet sketch, Map<String, TooltipStyleConfig> tooltipStyles) {
         this.sketch = Objects.requireNonNull(sketch, "sketch");
+        this.tooltipStyles = tooltipStyles == null ? Collections.emptyMap() : tooltipStyles;
     }
 
     public NumericFieldConfig load(String path) {
@@ -49,7 +58,7 @@ public final class NumericFieldConfigLoader {
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
                 this.readStyle(root, path),
-                TooltipJsonSupport.readTooltip(root, path)
+                TooltipJsonSupport.readTooltip(this.sketch, root, path, this.tooltipStyles)
         );
     }
 

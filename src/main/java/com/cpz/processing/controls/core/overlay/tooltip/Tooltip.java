@@ -40,7 +40,7 @@ public final class Tooltip {
      */
     public Tooltip(String text, TooltipStyleConfig styleConfig) {
         this.text = text == null ? "" : text;
-        this.styleConfig = styleConfig == null ? new TooltipStyleConfig() : styleConfig;
+        this.styleConfig = styleConfig == null ? new TooltipStyleConfig() : new TooltipStyleConfig(styleConfig);
     }
 
     public String getText() {
@@ -65,43 +65,58 @@ public final class Tooltip {
         return this.styleConfig;
     }
 
+    public Tooltip setStyle(TooltipStyleConfig styleConfig) {
+        this.styleConfig.copyFrom(styleConfig);
+        return this;
+    }
+
     public Tooltip setFont(PFont font) {
-        this.styleConfig.font = font;
+        this.styleConfig.setFont(font);
         return this;
     }
 
     public Tooltip setTextSize(float size) {
-        this.styleConfig.textSize = size;
+        this.styleConfig.setTextSize(size);
         return this;
     }
 
     public Tooltip setBackgroundColor(int argb) {
-        this.styleConfig.backgroundOverride = argb;
+        this.styleConfig.setBackgroundColor(argb);
         return this;
     }
 
     public Tooltip setTextColor(int argb) {
-        this.styleConfig.textOverride = argb;
+        this.styleConfig.setTextColor(argb);
         return this;
     }
 
     public Tooltip setBorderColor(int argb) {
-        this.styleConfig.borderOverride = argb;
+        this.styleConfig.setBorderColor(argb);
         return this;
     }
 
     public Tooltip setPadding(float padding) {
-        this.styleConfig.textPadding = Math.max(0.0F, padding);
+        this.styleConfig.setPadding(padding);
+        return this;
+    }
+
+    public Tooltip setTextPadding(float padding) {
+        this.styleConfig.setTextPadding(padding);
         return this;
     }
 
     public Tooltip setOffset(float offset) {
-        this.styleConfig.offset = Math.max(0.0F, offset);
+        this.styleConfig.setOffset(offset);
         return this;
     }
 
     public Tooltip setCornerRadius(float cornerRadius) {
-        this.styleConfig.cornerRadius = Math.max(0.0F, cornerRadius);
+        this.styleConfig.setCornerRadius(cornerRadius);
+        return this;
+    }
+
+    public Tooltip setStrokeWeight(float strokeWeight) {
+        this.styleConfig.setStrokeWeight(strokeWeight);
         return this;
     }
 }

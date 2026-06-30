@@ -349,6 +349,27 @@ later from the render loop.
 
 ## Tooltip Blocks
 
+Multi-control documents may define reusable tooltip styles at the root:
+
+```json
+{
+  "tooltipStyles": {
+    "dark": {
+      "backgroundColor": "#E61B1F26",
+      "textColor": "#FFFFFFFF",
+      "borderColor": "#668A94A6",
+      "font": "data/font/JetBrainsMono.ttf",
+      "textSize": 14.0,
+      "textPadding": 10.0,
+      "offset": 10.0,
+      "cornerRadius": 8.0,
+      "strokeWeight": 1.0
+    }
+  },
+  "controls": []
+}
+```
+
 Every supported control type accepts an optional top-level `tooltip` block:
 
 ```json
@@ -363,6 +384,7 @@ Every supported control type accepts an optional top-level `tooltip` block:
   "tooltip": {
     "text": "Guardar cambios",
     "enabled": true,
+    "styleRef": "dark",
     "style": {
       "backgroundColor": "#E61B1F26",
       "textColor": "#FFFFFFFF",
@@ -371,7 +393,8 @@ Every supported control type accepts an optional top-level `tooltip` block:
       "textSize": 14.0,
       "textPadding": 10.0,
       "offset": 10.0,
-      "cornerRadius": 8.0
+      "cornerRadius": 8.0,
+      "strokeWeight": 1.0
     }
   }
 }
@@ -381,9 +404,38 @@ Tooltip colors use the same color parsing as control styles: integer values,
 `#RRGGBB`, or `#AARRGGBB`. A missing or `null` tooltip leaves the created
 control unchanged.
 
+`tooltip.styleRef` references an entry from root `tooltipStyles`. The local
+`tooltip.style` block remains supported and, when combined with `styleRef`,
+overrides only the fields it defines. Unknown references fail config loading
+with an `IllegalArgumentException`. `textPadding` and `padding` are accepted as
+aliases for tooltip text padding.
+
 The JSON loader assigns tooltips to controls, but the sketch still owns overlay
 registration. Register controls with a `TooltipOverlayController` and route
 pointer motion through `TooltipInputLayer`.
+
+Fonts declared in `tooltipStyles` are loaded once when the JSON document is
+loaded and then copied into each tooltip. Tooltip fonts are not loaded from
+`draw()`.
+
+The control-level tooltip block is distinct from standalone tooltip loading:
+
+```java
+Tooltip tooltip = TooltipFactory.loadFromJson(this, "data/config/server-tooltip.json");
+TooltipArea serverArea = new TooltipArea(520, 230, 190, 92).setTooltip(tooltip);
+```
+
+Use the control `tooltip` block when the tooltip belongs to a control in
+`controls[]`. Use `TooltipFactory.loadFromJson(...)` when the sketch owns the
+target, such as a `TooltipArea`, `PImage` region, icon, or manually rendered
+shape. In both cases, JSON only configures tooltip data; the sketch still
+registers the control or area with `TooltipOverlayController`.
+
+The dedicated visual example is
+`src/main/java/com/cpz/processing/controls/examples/tooltip/TooltipVisualJsonTest.java`.
+It uses `data/config/tooltip-visual-test.json` for control tooltips and
+`data/config/server-tooltip.json` for a standalone tooltip assigned to a
+manual `TooltipArea`.
 
 SVG renderer configuration also remains local to the control style block:
 
@@ -442,3 +494,4 @@ It intentionally does not support:
 - [TextField](textfield.md)
 - [NumericField](numericfield.md)
 - [Dropdown](dropdown.md)
+- [Tooltip](tooltip.md)

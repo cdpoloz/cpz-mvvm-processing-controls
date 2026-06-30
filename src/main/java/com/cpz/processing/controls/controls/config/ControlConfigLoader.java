@@ -3,6 +3,8 @@ package com.cpz.processing.controls.controls.config;
 import com.cpz.processing.controls.controls.Control;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipJsonSupport;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.JsonConfigSupport;
 import processing.core.PApplet;
 import processing.data.JSONArray;
@@ -27,7 +29,8 @@ import java.util.Objects;
  */
 public final class ControlConfigLoader {
     private final PApplet sketch;
-    private final ControlFactoryRegistry registry;
+    private final OverlayManager overlayManager;
+    private final InputManager inputManager;
 
     /**
      * Creates a loader for controls that do not need overlay infrastructure.
@@ -48,7 +51,8 @@ public final class ControlConfigLoader {
      */
     public ControlConfigLoader(PApplet sketch, OverlayManager overlayManager, InputManager inputManager) {
         this.sketch = Objects.requireNonNull(sketch, "sketch");
-        this.registry = new ControlFactoryRegistry(sketch, overlayManager, inputManager);
+        this.overlayManager = overlayManager;
+        this.inputManager = inputManager;
     }
 
     /**
@@ -62,6 +66,8 @@ public final class ControlConfigLoader {
         Objects.requireNonNull(path, "path");
 
         JSONObject root = JsonConfigSupport.loadRequiredObject(this.sketch, path, "control");
+        Map<String, TooltipStyleConfig> tooltipStyles = TooltipJsonSupport.readTooltipStyles(this.sketch, root, path);
+        ControlFactoryRegistry registry = new ControlFactoryRegistry(this.sketch, this.overlayManager, this.inputManager, tooltipStyles);
         JSONArray controls = JsonConfigSupport.getRequiredArray(root, "controls", path);
 
         Map<String, Control> result = new LinkedHashMap<>();
@@ -83,7 +89,7 @@ public final class ControlConfigLoader {
                 );
             }
 
-            Control control = this.registry.create(type, controlJson, controlPath);
+            Control control = registry.create(type, controlJson, controlPath);
             if (control == null) {
                 throw new IllegalArgumentException(
                         "Control factory returned null in " + controlPath + " for code '" + code + "'."

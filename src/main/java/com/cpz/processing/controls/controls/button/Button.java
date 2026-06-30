@@ -12,6 +12,7 @@ import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
 
 import java.util.Objects;
@@ -157,6 +158,11 @@ public final class Button implements Control, TooltipTarget {
 
     public Button setTooltipText(String text) {
         this.tooltipSupport.setTooltipText(text);
+        return this;
+    }
+
+    public Button setTooltipStyle(TooltipStyleConfig styleConfig) {
+        this.tooltipSupport.setTooltipStyle(styleConfig);
         return this;
     }
 

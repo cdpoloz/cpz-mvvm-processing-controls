@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.core.overlay.tooltip;
 
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -37,6 +38,11 @@ public final class TooltipSupport implements TooltipTarget {
 
     public TooltipSupport setTooltipText(String text) {
         this.ensureTooltip().setText(text);
+        return this;
+    }
+
+    public TooltipSupport setTooltipStyle(TooltipStyleConfig styleConfig) {
+        this.ensureTooltip().setStyle(styleConfig);
         return this;
     }
 

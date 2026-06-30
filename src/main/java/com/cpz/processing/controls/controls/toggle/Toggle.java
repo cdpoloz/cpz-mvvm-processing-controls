@@ -12,6 +12,7 @@ import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
+import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -165,6 +166,11 @@ public final class Toggle implements Control, TooltipTarget {
 
     public Toggle setTooltipText(String text) {
         this.tooltipSupport.setTooltipText(text);
+        return this;
+    }
+
+    public Toggle setTooltipStyle(TooltipStyleConfig styleConfig) {
+        this.tooltipSupport.setTooltipStyle(styleConfig);
         return this;
     }
 
