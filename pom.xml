@@ -17,7 +17,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
         <junit.version>5.10.2</junit.version>
-        <processing.version>4.5.2</processing.version>
+        <processing.version>4.5.5</processing.version>
         <cpz-utils.version>0.2.3</cpz-utils.version>
     </properties>
 
