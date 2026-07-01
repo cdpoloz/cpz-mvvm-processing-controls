@@ -1,7 +1,10 @@
 package com.cpz.processing.controls.core.overlay.tooltip;
 
+import com.cpz.processing.controls.controls.button.Button;
 import org.junit.jupiter.api.Test;
+import processing.core.PApplet;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -32,5 +35,27 @@ class TooltipAreaTest {
 
         assertTrue(area.getTooltipBounds().contains(10.0F, 10.0F));
         assertFalse(area.getTooltipBounds().contains(30.0F, 30.0F));
+    }
+
+    @Test
+    void setTooltipTextUpdatesCurrentTooltip() {
+        TooltipArea area = new TooltipArea(0.0F, 0.0F, 10.0F, 10.0F).setTooltip("Initial");
+
+        area.setTooltipText("Updated");
+
+        assertEquals("Updated", area.getTooltip().getText());
+    }
+
+    @Test
+    void tooltipAttachableCanRepresentControlsAndAreas() {
+        TooltipAttachable area = new TooltipArea(0.0F, 0.0F, 10.0F, 10.0F).setTooltip("Area");
+        TooltipAttachable button = new Button(new PApplet(), "btn", "Button", 50.0F, 50.0F, 100.0F, 40.0F)
+                .setTooltip("Button");
+
+        area.setTooltipText("Area updated");
+        button.setTooltipText("Button updated");
+
+        assertEquals("Area updated", area.getTooltip().getText());
+        assertEquals("Button updated", button.getTooltip().getText());
     }
 }

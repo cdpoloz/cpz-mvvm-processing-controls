@@ -13,8 +13,8 @@ import com.cpz.processing.controls.core.input.KeyboardInputAdapter;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
-import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
 import processing.core.PApplet;
@@ -27,7 +27,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class TextField implements Control, TooltipTarget {
+public final class TextField implements Control, TooltipAttachable {
     private final TextFieldModel model;
     private final TextFieldViewModel viewModel;
     private final TextFieldView view;
@@ -49,7 +49,7 @@ public final class TextField implements Control, TooltipTarget {
         this.focusManager = new FocusManager();
         this.inputAdapter = new TextFieldInputAdapter(this.view, this.viewModel, this.focusManager);
         this.keyboardInputAdapter = new KeyboardInputAdapter(this.focusManager);
-        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible, this::isEnabled);
+        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible);
     }
 
     public void draw() {

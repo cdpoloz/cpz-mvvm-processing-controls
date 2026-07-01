@@ -10,8 +10,8 @@ import com.cpz.processing.controls.controls.checkbox.viewmodel.CheckboxViewModel
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
-import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
 import processing.core.PApplet;
@@ -24,7 +24,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class Checkbox implements Control, TooltipTarget {
+public final class Checkbox implements Control, TooltipAttachable {
     private final CheckboxModel model;
     private final CheckboxViewModel viewModel;
     private final CheckboxView view;
@@ -50,7 +50,7 @@ public final class Checkbox implements Control, TooltipTarget {
         this.viewModel = new CheckboxViewModel(this.model);
         this.view = new CheckboxView(sketch, this.viewModel, x, y, width, height);
         this.inputAdapter = new CheckboxInputAdapter(this.view, this.viewModel);
-        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible, this::isEnabled);
+        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible);
     }
 
     public void draw() {

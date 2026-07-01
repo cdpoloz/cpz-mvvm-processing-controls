@@ -62,11 +62,11 @@ to your Maven project:
 <dependency>
     <groupId>io.github.cdpoloz</groupId>
     <artifactId>cpz-mvvm-processing-controls</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.1</version>
 </dependency>
 ```
 
-Version `0.4.0` will be available from Maven Central after its release is
+Version `0.5.1` will be available from Maven Central after its release is
 published. Processing Core (`org.processing:core:4.5.2`) and `cpz-utils`
 (`io.github.cdpoloz:cpz-utils:0.2.3`) are resolved transitively by Maven; do
 not add them as manually copied JARs.
@@ -222,7 +222,7 @@ Rendering:
 Model → ViewModel → View → ViewState → Style → Renderer
 
 Tooltips:
-TooltipTarget → TooltipOverlayController → OverlayManager
+TooltipAttachable / TooltipTarget → TooltipOverlayController → OverlayManager
 ```
 
 ---
@@ -235,9 +235,16 @@ The public control layer is exposed through closed ergonomic facades such as `Bu
 
 Those facades also share a lightweight public contract, `Control`, for the small transversal surface that is common across the controls without exposing MVVM internals.
 
-Tooltips are reusable overlays attached through `TooltipTarget`; they can be
-used with controls or arbitrary Processing regions such as images and manually
-drawn rectangles without changing the `Control` contract.
+Tooltips are reusable overlays attached through `TooltipTarget`; controls and
+manual regions that own mutable tooltip data also implement `TooltipAttachable`.
+They can be used with controls or arbitrary Processing regions such as images
+and manually drawn rectangles without changing the `Control` contract.
+
+Tooltip text can be updated at runtime with `setTooltipText(...)`; call
+`TooltipOverlayController.refresh()` after programmatic updates when the pointer
+is already over the target. Disabled controls can still show tooltips while
+ignoring their normal input actions; disabling the `Tooltip` itself with
+`tooltip.setEnabled(false)` hides the overlay.
 
 Control JSON can include tooltip blocks, reusable root `tooltipStyles`, and
 `styleRef` references. Standalone tooltips can also be loaded with

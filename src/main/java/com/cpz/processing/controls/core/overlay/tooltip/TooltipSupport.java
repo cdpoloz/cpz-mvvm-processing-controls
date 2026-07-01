@@ -11,7 +11,7 @@ import processing.core.PFont;
  *
  * @author CPZ
  */
-public final class TooltipSupport implements TooltipTarget {
+public final class TooltipSupport implements TooltipAttachable {
     private final Supplier<TooltipBounds> boundsSupplier;
     private final BooleanSupplier visibleSupplier;
     private final BooleanSupplier enabledSupplier;
@@ -25,6 +25,10 @@ public final class TooltipSupport implements TooltipTarget {
         this.boundsSupplier = Objects.requireNonNull(boundsSupplier, "boundsSupplier");
         this.visibleSupplier = visibleSupplier == null ? () -> true : visibleSupplier;
         this.enabledSupplier = enabledSupplier == null ? () -> true : enabledSupplier;
+    }
+
+    public TooltipSupport(Supplier<TooltipBounds> boundsSupplier, BooleanSupplier visibleSupplier) {
+        this(boundsSupplier, visibleSupplier, null);
     }
 
     public TooltipSupport setTooltip(String text) {

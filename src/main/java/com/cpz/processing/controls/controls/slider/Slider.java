@@ -12,8 +12,8 @@ import com.cpz.processing.controls.controls.slider.viewmodel.SliderViewModel;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
-import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
 import processing.core.PApplet;
@@ -28,7 +28,7 @@ import java.util.function.Function;
  *
  * @author CPZ
  */
-public final class Slider implements Control, TooltipTarget {
+public final class Slider implements Control, TooltipAttachable {
     private final SliderModel model;
     private final SliderViewModel viewModel;
     private final SliderView view;
@@ -119,7 +119,7 @@ public final class Slider implements Control, TooltipTarget {
         this.viewModel = new SliderViewModel(this.model);
         this.view = new SliderView(sketch, this.viewModel, x, y, width, height, orientation);
         this.inputAdapter = new SliderInputAdapter(this.view, this.viewModel);
-        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible, this::isEnabled);
+        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible);
     }
 
     public void draw() {

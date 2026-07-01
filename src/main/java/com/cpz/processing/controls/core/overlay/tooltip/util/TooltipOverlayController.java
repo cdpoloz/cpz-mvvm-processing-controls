@@ -116,6 +116,10 @@ public final class TooltipOverlayController {
       }
    }
 
+   public void refresh() {
+      this.sync();
+   }
+
    public void registerTarget(TooltipTarget target) {
       if (target != null && !this.targets.contains(target)) {
          this.targets.add(target);
@@ -198,6 +202,10 @@ public final class TooltipOverlayController {
 
    TooltipTarget getActiveTarget() {
       return this.activeTarget;
+   }
+
+   String getCurrentText() {
+      return this.viewModel.getText();
    }
 
    private TooltipTarget findTarget(float mouseX, float mouseY) {

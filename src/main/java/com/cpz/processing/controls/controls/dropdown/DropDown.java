@@ -14,8 +14,8 @@ import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
-import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
 import processing.core.PApplet;
@@ -29,7 +29,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class DropDown implements Control, TooltipTarget {
+public final class DropDown implements Control, TooltipAttachable {
     private static final int DEFAULT_OVERLAY_Z_INDEX = 100;
 
     private final DropDownModel model;
@@ -62,7 +62,7 @@ public final class DropDown implements Control, TooltipTarget {
         this.focusManager = new FocusManager();
         this.overlayController = new DropDownOverlayController(this.view, this.viewModel, this.focusManager, overlayManager, inputManager, DEFAULT_OVERLAY_Z_INDEX);
         this.inputAdapter = new DropDownInputAdapter(this.view, this.viewModel, this.focusManager, this.overlayController);
-        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible, this::isEnabled);
+        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible);
     }
 
     public void draw() {

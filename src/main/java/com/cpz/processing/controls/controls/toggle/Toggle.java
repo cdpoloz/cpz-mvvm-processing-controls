@@ -10,8 +10,8 @@ import com.cpz.processing.controls.controls.toggle.viewmodel.ToggleViewModel;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
-import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
 import processing.core.PApplet;
@@ -24,7 +24,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class Toggle implements Control, TooltipTarget {
+public final class Toggle implements Control, TooltipAttachable {
     private final ToggleModel model;
     private final ToggleViewModel viewModel;
     private final ToggleView view;
@@ -58,7 +58,7 @@ public final class Toggle implements Control, TooltipTarget {
         this.viewModel = new ToggleViewModel(this.model);
         this.view = new ToggleView(sketch, this.viewModel, x, y, width, height);
         this.inputAdapter = new ToggleInputAdapter(this.view, this.viewModel);
-        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible, this::isEnabled);
+        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible);
         this.setTotalStates(totalStates);
         this.setState(initialState);
     }

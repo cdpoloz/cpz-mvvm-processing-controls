@@ -13,8 +13,8 @@ import com.cpz.processing.controls.core.input.KeyboardInputAdapter;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
-import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
 import processing.core.PApplet;
@@ -28,7 +28,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class NumericField implements Control, TooltipTarget {
+public final class NumericField implements Control, TooltipAttachable {
     private static final BigDecimal DEFAULT_MIN = null;
     private static final BigDecimal DEFAULT_MAX = null;
     private static final BigDecimal DEFAULT_STEP = BigDecimal.ONE;
@@ -55,7 +55,7 @@ public final class NumericField implements Control, TooltipTarget {
         this.focusManager = new FocusManager();
         this.inputAdapter = new NumericFieldInputAdapter(this.view, this.viewModel, this.focusManager);
         this.keyboardInputAdapter = new KeyboardInputAdapter(this.focusManager);
-        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible, this::isEnabled);
+        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible);
     }
 
     public void draw() {

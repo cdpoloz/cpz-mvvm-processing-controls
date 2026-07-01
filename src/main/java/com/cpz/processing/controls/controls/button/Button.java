@@ -10,8 +10,8 @@ import com.cpz.processing.controls.controls.button.viewmodel.ButtonViewModel;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
-import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
 
@@ -36,7 +36,7 @@ import processing.core.PFont;
  *
  * @author CPZ
  */
-public final class Button implements Control, TooltipTarget {
+public final class Button implements Control, TooltipAttachable {
     private final ButtonModel model;
     private final ButtonViewModel viewModel;
     private final ButtonView view;
@@ -63,7 +63,7 @@ public final class Button implements Control, TooltipTarget {
         this.viewModel = new ButtonViewModel(this.model);
         this.view = new ButtonView(sketch, this.viewModel, x, y, width, height);
         this.inputAdapter = new ButtonInputAdapter(this.view, this.viewModel);
-        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible, this::isEnabled);
+        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible);
     }
 
     /**

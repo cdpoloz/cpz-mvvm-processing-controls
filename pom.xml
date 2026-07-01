@@ -6,7 +6,7 @@
 
     <groupId>io.github.cdpoloz</groupId>
     <artifactId>cpz-mvvm-processing-controls</artifactId>
-    <version>0.5.0</version>
+    <version>0.5.1</version>
     <packaging>jar</packaging>
 
     <name>cpz-mvvm-processing-controls</name>
@@ -17,6 +17,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
         <junit.version>5.10.2</junit.version>
+        <processing.version>4.5.2</processing.version>
+        <cpz.utils.version>0.2.3</cpz.utils.version>
     </properties>
 
     <licenses>
@@ -46,12 +48,12 @@
         <dependency>
             <groupId>org.processing</groupId>
             <artifactId>core</artifactId>
-            <version>4.5.2</version>
+            <version>${processing.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.cdpoloz</groupId>
             <artifactId>cpz-utils</artifactId>
-            <version>0.2.3</version>
+            <version>${cpz.utils.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

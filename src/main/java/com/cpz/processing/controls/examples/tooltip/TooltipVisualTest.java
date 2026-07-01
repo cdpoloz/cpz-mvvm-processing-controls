@@ -36,10 +36,12 @@ public class TooltipVisualTest extends PApplet {
     private OverlayManager overlayManager;
     private TooltipOverlayController tooltips;
     private Button button;
+    private Button disabledButton;
     private Label label;
     private DropDown dropDown;
     private TooltipArea serverArea;
     private boolean autorun;
+    private int buttonClicks;
 
     public static void main(String[] args) {
         PApplet.main(TooltipVisualTest.class);
@@ -66,13 +68,31 @@ public class TooltipVisualTest extends PApplet {
         this.button = new Button(this, "btnTooltip", "Button target", 185.0f, 95.0f, 210.0f, 52.0f)
                 .setTooltip("Button tooltip")
                 .setTooltipStyle(darkTooltipStyle);
-        this.button.setClickListener(() -> System.out.println("TooltipVisualTest button clicked"));
+        this.button.setClickListener(() -> {
+            this.buttonClicks++;
+            this.button.setTooltipText("Button tooltip updated " + this.buttonClicks);
+            this.tooltips.refresh();
+            System.out.println("TooltipVisualTest button clicked");
+        });
         ButtonStyleConfig buttonStyle = new ButtonStyleConfig();
         buttonStyle.baseColor = Colors.rgb(42, 96, 194);
         buttonStyle.textColor = Colors.gray(255);
         buttonStyle.strokeColor = Colors.argb(180, 255, 255, 255);
         buttonStyle.cornerRadius = 12.0f;
         this.button.setStyle(new DefaultButtonStyle(buttonStyle));
+
+        this.disabledButton = new Button(this, "btnDisabledTooltip", "Disabled target", 185.0f, 260.0f, 210.0f, 52.0f)
+                .setTooltip("Disabled control tooltip")
+                .setTooltipStyle(darkTooltipStyle);
+        this.disabledButton.setEnabled(false);
+        this.disabledButton.setClickListener(() -> System.out.println("Disabled button should not click"));
+        ButtonStyleConfig disabledButtonStyle = new ButtonStyleConfig();
+        disabledButtonStyle.baseColor = Colors.rgb(88, 98, 112);
+        disabledButtonStyle.textColor = Colors.gray(255);
+        disabledButtonStyle.strokeColor = Colors.argb(150, 255, 255, 255);
+        disabledButtonStyle.cornerRadius = 12.0f;
+        disabledButtonStyle.disabledAlpha = 125;
+        this.disabledButton.setStyle(new DefaultButtonStyle(disabledButtonStyle));
 
         this.label = new Label(this, "lblTooltip", "Label target", 70.0f, 178.0f, 230.0f, 42.0f)
                 .setTooltip("Label tooltip")
@@ -113,12 +133,13 @@ public class TooltipVisualTest extends PApplet {
                 .setTooltipStyle(darkTooltipStyle);
 
         this.tooltips.registerTarget(this.button);
+        this.tooltips.registerTarget(this.disabledButton);
         this.tooltips.registerTarget(this.label);
         this.tooltips.registerTarget(this.dropDown);
         this.tooltips.registerTarget(this.serverArea);
 
         this.inputManager.registerLayer(new TooltipInputLayer(1000, this.tooltips));
-        this.inputManager.registerLayer(new ButtonInputLayer(0, this.button));
+        this.inputManager.registerLayer(new ButtonInputLayer(0, this.button, this.disabledButton));
         this.inputManager.registerLayer(new DropDownInputLayer(0, this.dropDown));
     }
 
@@ -130,13 +151,14 @@ public class TooltipVisualTest extends PApplet {
         background(28);
         this.drawManualTarget();
         this.button.draw();
+        this.disabledButton.draw();
         this.label.draw();
         this.dropDown.draw();
         this.drawActiveOverlays();
 
         fill(170);
         textAlign(CENTER, CENTER);
-        text("Hover controls and the manual rectangle. TooltipInputLayer observes without consuming events.", width * 0.5f, 370.0f);
+        text("Click the first button to update its tooltip; disabled controls can still explain their state.", width * 0.5f, 370.0f);
 
         if (this.autorun && (frameCount == 2 || frameCount == 4 || frameCount == 6 || frameCount == 8)) {
             saveFrame("target/tooltip-visual-validation-####.png");
@@ -187,8 +209,8 @@ public class TooltipVisualTest extends PApplet {
             x = 185.0f;
             y = 95.0f;
         } else if (frameCount < 5) {
-            x = 180.0f;
-            y = 195.0f;
+            x = 185.0f;
+            y = 260.0f;
         } else if (frameCount < 7) {
             x = 550.0f;
             y = 95.0f;

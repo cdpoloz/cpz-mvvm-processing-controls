@@ -10,7 +10,7 @@ import processing.core.PFont;
  *
  * @author CPZ
  */
-public final class TooltipArea implements TooltipTarget {
+public final class TooltipArea implements TooltipAttachable {
     private TooltipBounds bounds;
     private Supplier<TooltipBounds> boundsSupplier;
     private Tooltip tooltip;

@@ -14,6 +14,9 @@ rectangle. Control tooltips can be assigned from Java code or from JSON.
 - `Tooltip`: stores text, enabled state, and visual configuration
 - `TooltipTarget`: generic target contract with bounds, optional tooltip,
   visibility, and enabled state
+- `TooltipAttachable`: common public API for controls and manual areas that own
+  a tooltip (`getTooltip()`, `setTooltip(...)`, `setTooltipText(...)`, and
+  `clearTooltip()`)
 - `TooltipArea`: rectangular manual target for arbitrary Processing content
 - `TooltipOverlayController`: owns active tooltip overlay registration
 - `TooltipInputLayer`: passive input layer that updates the controller without
@@ -66,6 +69,60 @@ for (OverlayEntry entry : overlayManager.getActiveOverlays()) {
 
 If a control has no tooltip, or its tooltip text is blank, nothing is shown and
 the control behavior is unchanged.
+
+Controls can still show tooltips while disabled. Disabled controls do not accept
+their normal input actions, but their tooltip remains available when the control
+is visible and the `Tooltip` itself is enabled.
+
+---
+
+## Runtime Updates
+
+`Tooltip` text is mutable at runtime:
+
+```java
+slider.setChangeListener(value -> {
+    slider.setTooltipText("Valor: " + value);
+    tooltips.refresh();
+});
+```
+
+`refresh()` is a public alias for `sync()` and is useful after programmatic
+tooltip text or state changes. Pointer movement also refreshes the controller
+through `TooltipInputLayer`, but calling `refresh()` makes the update immediate
+when the pointer is already over the target.
+
+When controls are loaded as `Map<String, Control>`, cast to the concrete facade
+or to `TooltipAttachable` when you only need tooltip operations:
+
+```java
+TooltipAttachable target = (TooltipAttachable) controls.get("sldTemplate");
+target.setTooltipText("Valor: " + value);
+tooltips.refresh();
+```
+
+---
+
+## Enabled State
+
+Disabling a control and disabling its tooltip are separate operations:
+
+```java
+button.setEnabled(false);
+button.setTooltipText("Unavailable until data is loaded");
+tooltips.refresh();
+```
+
+The disabled button still ignores its normal click/input behavior, but it remains
+a tooltip target while visible. To hide the tooltip itself, disable the `Tooltip`:
+
+```java
+button.getTooltip().setEnabled(false);
+tooltips.refresh();
+```
+
+When `Tooltip.isEnabled()` is `false`, the overlay is hidden even if the target
+is visible and the pointer is inside its bounds.
 
 ---
 

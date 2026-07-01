@@ -8,8 +8,8 @@ import com.cpz.processing.controls.controls.label.view.LabelView;
 import com.cpz.processing.controls.controls.label.viewmodel.LabelViewModel;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
-import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
 import processing.core.PApplet;
@@ -22,7 +22,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class Label implements Control, TooltipTarget {
+public final class Label implements Control, TooltipAttachable {
     private final LabelModel model;
     private final LabelViewModel viewModel;
     private final LabelView view;
@@ -46,7 +46,7 @@ public final class Label implements Control, TooltipTarget {
         this.viewModel = new LabelViewModel(this.model);
         this.viewModel.setText(text);
         this.view = new LabelView(sketch, this.viewModel, x, y, width, height);
-        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible, this::isEnabled);
+        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible);
     }
 
     public void draw() {
