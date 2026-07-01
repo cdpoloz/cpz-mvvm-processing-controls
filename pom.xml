@@ -18,7 +18,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <junit.version>5.10.2</junit.version>
         <processing.version>4.5.2</processing.version>
-        <cpz.utils.version>0.2.3</cpz.utils.version>
+        <cpz-utils.version>0.2.3</cpz-utils.version>
     </properties>
 
     <licenses>
@@ -53,7 +53,7 @@
         <dependency>
             <groupId>io.github.cdpoloz</groupId>
             <artifactId>cpz-utils</artifactId>
-            <version>${cpz.utils.version}</version>
+            <version>${cpz-utils.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
