@@ -1,6 +1,6 @@
 package com.cpz.processing.controls.controls.button;
 
-import com.cpz.processing.controls.controls.Control;
+import com.cpz.processing.controls.controls.PointerRoutableControl;
 import com.cpz.processing.controls.controls.button.input.ButtonInputAdapter;
 import com.cpz.processing.controls.controls.button.model.ButtonModel;
 import com.cpz.processing.controls.controls.button.style.ButtonStyle;
@@ -36,7 +36,7 @@ import processing.core.PFont;
  *
  * @author CPZ
  */
-public final class Button implements Control, TooltipAttachable {
+public final class Button implements PointerRoutableControl, TooltipAttachable {
     private final ButtonModel model;
     private final ButtonViewModel viewModel;
     private final ButtonView view;

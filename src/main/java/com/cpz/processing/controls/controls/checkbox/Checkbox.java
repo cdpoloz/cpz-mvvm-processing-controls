@@ -1,7 +1,7 @@
 package com.cpz.processing.controls.controls.checkbox;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
-import com.cpz.processing.controls.controls.Control;
+import com.cpz.processing.controls.controls.PointerRoutableControl;
 import com.cpz.processing.controls.controls.checkbox.input.CheckboxInputAdapter;
 import com.cpz.processing.controls.controls.checkbox.model.CheckboxModel;
 import com.cpz.processing.controls.controls.checkbox.style.CheckboxStyle;
@@ -24,7 +24,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class Checkbox implements Control, TooltipAttachable {
+public final class Checkbox implements PointerRoutableControl, TooltipAttachable {
     private final CheckboxModel model;
     private final CheckboxViewModel viewModel;
     private final CheckboxView view;
@@ -61,6 +61,13 @@ public final class Checkbox implements Control, TooltipAttachable {
         boolean before = this.viewModel.isChecked();
         this.inputAdapter.handlePointerEvent(event);
         this.notifyChangeIfNeeded(before);
+    }
+
+    public boolean canConsumePointerEvent(PointerEvent event) {
+        return event != null
+                && event.getType() != PointerEvent.Type.WHEEL
+                && this.isVisible()
+                && this.view.contains(event.getX(), event.getY());
     }
 
     public String getCode() {

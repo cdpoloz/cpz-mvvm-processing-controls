@@ -1,7 +1,8 @@
 package com.cpz.processing.controls.controls.numericfield;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
-import com.cpz.processing.controls.controls.Control;
+import com.cpz.processing.controls.controls.KeyboardRoutableControl;
+import com.cpz.processing.controls.controls.PointerRoutableControl;
 import com.cpz.processing.controls.controls.numericfield.input.NumericFieldInputAdapter;
 import com.cpz.processing.controls.controls.numericfield.model.NumericFieldModel;
 import com.cpz.processing.controls.controls.numericfield.style.NumericFieldStyle;
@@ -28,7 +29,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class NumericField implements Control, TooltipAttachable {
+public final class NumericField implements PointerRoutableControl, KeyboardRoutableControl, TooltipAttachable {
     private static final BigDecimal DEFAULT_MIN = null;
     private static final BigDecimal DEFAULT_MAX = null;
     private static final BigDecimal DEFAULT_STEP = BigDecimal.ONE;
@@ -70,6 +71,17 @@ public final class NumericField implements Control, TooltipAttachable {
 
     public void handleKeyboardEvent(KeyboardEvent event) {
         this.keyboardInputAdapter.handleKeyboardEvent(event);
+    }
+
+    public boolean canConsumePointerEvent(PointerEvent event) {
+        return event != null
+                && event.getType() != PointerEvent.Type.WHEEL
+                && this.isVisible()
+                && this.view.contains(event.getX(), event.getY());
+    }
+
+    public boolean canConsumeKeyboardEvent(KeyboardEvent event) {
+        return event != null && this.isFocused() && this.isVisible() && this.isEnabled();
     }
 
     public String getCode() {

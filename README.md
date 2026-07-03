@@ -17,6 +17,7 @@ explicit input routing, and high-performance rendering.
 - Explicit composition instead of implicit binding systems
 - Sketch-owned theming (no global state, no singletons)
 - Facade-based public API with hidden MVVM internals
+- Panel-based grouping for controls that share a local coordinate space
 
 ---
 
@@ -190,6 +191,32 @@ This example shows the core interaction flow:
 
 ---
 
+## Panel Example
+
+`Panel` groups child controls without changing the `Control` contract. Child
+coordinates are local to the panel. If the panel is at `(100, 80)` and a child
+button is at `(10, 20)`, the child is drawn and hit-tested at `(110, 100)`.
+
+```java
+Panel panel = new Panel(this, "pnlSettings", 100, 80, 320, 220);
+
+panel.add(new Label(this, "lblTitle", "Settings", 16, 16, 220, 28));
+panel.add(new Button(this, "btnSave", "Save", 24, 70, 120, 40));
+
+inputManager.registerLayer(new PanelInputLayer(0, panel));
+
+public void draw() {
+    background(32);
+    panel.draw();
+}
+```
+
+Moving the panel with `setPosition(...)` moves the group visually and
+interactively without rewriting child coordinates. See [Panel](docs/panel.md)
+and `src/main/java/com/cpz/processing/controls/examples/panel/PanelVisualTest.java`.
+
+---
+
 ## Why this library?
 
 Processing sketches often mix rendering, input handling, and state in a single class.
@@ -231,9 +258,13 @@ TooltipAttachable / TooltipTarget → TooltipOverlayController → OverlayManage
 
 This project is a UI framework intended for Processing sketches and for other host environments that can provide normalized input events.
 
-The public control layer is exposed through closed ergonomic facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, and `DropDown`.
+The public control layer is exposed through closed ergonomic facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, `DropDown`, and `Panel`.
 
 Those facades also share a lightweight public contract, `Control`, for the small transversal surface that is common across the controls without exposing MVVM internals.
+
+`Panel` is the container facade for grouping controls. It uses local child
+coordinates and receives input through `PanelInputLayer`. JSON creation for
+panels is not part of the current JSON layer.
 
 Tooltips are reusable overlays attached through `TooltipTarget`; controls and
 manual regions that own mutable tooltip data also implement `TooltipAttachable`.
@@ -537,6 +568,7 @@ from `draw()`.
 - [Binding](docs/binding.md)
 - [Input System](docs/input-system.md)
 - [JSON Configuration](docs/json-configuration.md)
+- [Panel](docs/panel.md)
 - [Tooltip](docs/tooltip.md)
 - [Theme](docs/theme.md)
 - [Button](docs/button.md)

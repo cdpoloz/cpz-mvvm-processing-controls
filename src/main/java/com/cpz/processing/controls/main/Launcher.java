@@ -3,6 +3,7 @@ package com.cpz.processing.controls.main;
 import java.util.Locale;
 
 import com.cpz.processing.controls.examples.button.ButtonTest;
+import com.cpz.processing.controls.examples.panel.PanelVisualTest;
 import processing.core.PApplet;
 
 /**
@@ -83,6 +84,9 @@ public class Launcher {
         // Composition **********************************
         //PApplet.main(JsonMultiControlUnidirectionalBindingTest.class);
         //PApplet.main(JsonMultiControlBindingTest.class);
+
+        // Panel ***************************************
+        //PApplet.main(PanelVisualTest.class);
 
         // Theme ****************************************
         //PApplet.main(ThemeFacadeSketch.class);

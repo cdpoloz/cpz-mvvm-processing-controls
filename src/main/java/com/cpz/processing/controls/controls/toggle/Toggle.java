@@ -1,7 +1,7 @@
 package com.cpz.processing.controls.controls.toggle;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
-import com.cpz.processing.controls.controls.Control;
+import com.cpz.processing.controls.controls.PointerRoutableControl;
 import com.cpz.processing.controls.controls.toggle.input.ToggleInputAdapter;
 import com.cpz.processing.controls.controls.toggle.model.ToggleModel;
 import com.cpz.processing.controls.controls.toggle.style.ToggleStyle;
@@ -24,7 +24,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class Toggle implements Control, TooltipAttachable {
+public final class Toggle implements PointerRoutableControl, TooltipAttachable {
     private final ToggleModel model;
     private final ToggleViewModel viewModel;
     private final ToggleView view;

@@ -1,7 +1,8 @@
 package com.cpz.processing.controls.controls.textfield;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
-import com.cpz.processing.controls.controls.Control;
+import com.cpz.processing.controls.controls.KeyboardRoutableControl;
+import com.cpz.processing.controls.controls.PointerRoutableControl;
 import com.cpz.processing.controls.controls.textfield.input.TextFieldInputAdapter;
 import com.cpz.processing.controls.controls.textfield.model.TextFieldModel;
 import com.cpz.processing.controls.controls.textfield.style.TextFieldStyle;
@@ -27,7 +28,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class TextField implements Control, TooltipAttachable {
+public final class TextField implements PointerRoutableControl, KeyboardRoutableControl, TooltipAttachable {
     private final TextFieldModel model;
     private final TextFieldViewModel viewModel;
     private final TextFieldView view;
@@ -67,6 +68,17 @@ public final class TextField implements Control, TooltipAttachable {
 
     public void handleKeyboardEvent(KeyboardEvent event) {
         this.keyboardInputAdapter.handleKeyboardEvent(event);
+    }
+
+    public boolean canConsumePointerEvent(PointerEvent event) {
+        return event != null
+                && event.getType() != PointerEvent.Type.WHEEL
+                && this.isVisible()
+                && this.view.contains(event.getX(), event.getY());
+    }
+
+    public boolean canConsumeKeyboardEvent(KeyboardEvent event) {
+        return event != null && this.isFocused() && this.isVisible() && this.isEnabled();
     }
 
     public String getCode() {

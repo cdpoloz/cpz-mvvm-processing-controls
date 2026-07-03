@@ -56,8 +56,14 @@ This surface is intentionally small:
 - `TextField`
 - `NumericField`
 - `DropDown`
+- `Panel`
 
 Each concrete control still owns its specific public API for text, value, selection, listeners, style, and any other domain-specific behavior.
+
+`Panel` is a container facade. It implements `Control`, groups child controls,
+and interprets child coordinates as local to the panel position. Input for a
+panel is routed through `PanelInputLayer`, not through the base `Control`
+contract.
 
 Facade styles can share a sketch-owned `ThemeManager`, which keeps theming on the public facade side without exposing MVVM internals.
 
@@ -100,6 +106,7 @@ They are intentionally separate:
 ## See Also
 
 - [Architecture](architecture.md)
+- [Panel](panel.md)
 - [JSON Configuration](json-configuration.md)
 - [Tooltip](tooltip.md)
 - [Theme](theme.md)

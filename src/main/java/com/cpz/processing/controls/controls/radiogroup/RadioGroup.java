@@ -1,7 +1,8 @@
 package com.cpz.processing.controls.controls.radiogroup;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
-import com.cpz.processing.controls.controls.Control;
+import com.cpz.processing.controls.controls.KeyboardRoutableControl;
+import com.cpz.processing.controls.controls.PointerRoutableControl;
 import com.cpz.processing.controls.controls.radiogroup.input.RadioGroupInputAdapter;
 import com.cpz.processing.controls.controls.radiogroup.model.RadioGroupModel;
 import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupStyle;
@@ -28,7 +29,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class RadioGroup implements Control, TooltipAttachable {
+public final class RadioGroup implements PointerRoutableControl, KeyboardRoutableControl, TooltipAttachable {
     private final RadioGroupModel model;
     private final RadioGroupViewModel viewModel;
     private final RadioGroupView view;
@@ -75,6 +76,17 @@ public final class RadioGroup implements Control, TooltipAttachable {
 
     public void handleKeyboardEvent(KeyboardEvent event) {
         this.keyboardInputAdapter.handleKeyboardEvent(event);
+    }
+
+    public boolean canConsumePointerEvent(PointerEvent event) {
+        return event != null
+                && event.getType() != PointerEvent.Type.WHEEL
+                && this.isVisible()
+                && this.view.contains(event.getX(), event.getY());
+    }
+
+    public boolean canConsumeKeyboardEvent(KeyboardEvent event) {
+        return event != null && this.viewModel.isFocused() && this.isVisible() && this.isEnabled();
     }
 
     public String getCode() {
