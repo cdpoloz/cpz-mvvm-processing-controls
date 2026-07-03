@@ -1,8 +1,5 @@
 package com.cpz.processing.controls.main;
 
-import com.cpz.processing.controls.examples.button.ButtonJsonTest;
-import com.cpz.processing.controls.examples.button.ButtonRelativeTest;
-import com.cpz.processing.controls.examples.button.ButtonJsonRelativeTest;
 import com.cpz.processing.controls.examples.button.ButtonTest;
 import processing.core.PApplet;
 
