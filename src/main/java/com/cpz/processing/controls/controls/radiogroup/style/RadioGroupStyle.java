@@ -190,4 +190,36 @@ public final class RadioGroupStyle {
    public ThemeSnapshot getThemeSnapshot() {
       return this.themeProvider.getSnapshot();
    }
+
+   public RadioGroupStyleConfig getRadioGroupStyleConfig() {
+      return this.config;
+   }
+
+   public RadioGroupStyle copy() {
+      return new RadioGroupStyle(copyConfig(this.config), this.renderer);
+   }
+
+   private static RadioGroupStyleConfig copyConfig(RadioGroupStyleConfig config) {
+      RadioGroupStyleConfig copy = new RadioGroupStyleConfig();
+      copy.textOverride = config.textOverride;
+      copy.indicatorOverride = config.indicatorOverride;
+      copy.backgroundOverride = config.backgroundOverride;
+      copy.hoveredBackgroundOverride = config.hoveredBackgroundOverride;
+      copy.pressedBackgroundOverride = config.pressedBackgroundOverride;
+      copy.selectedDotOverride = config.selectedDotOverride;
+      copy.itemHeight = config.itemHeight;
+      copy.itemSpacing = config.itemSpacing;
+      copy.minimumItemHeight = config.minimumItemHeight;
+      copy.indicatorOffsetX = config.indicatorOffsetX;
+      copy.textOffsetX = config.textOffsetX;
+      copy.indicatorOuterDiameter = config.indicatorOuterDiameter;
+      copy.indicatorInnerDiameter = config.indicatorInnerDiameter;
+      copy.strokeWeight = config.strokeWeight;
+      copy.textSize = config.textSize;
+      copy.cornerRadius = config.cornerRadius;
+      copy.disabledAlpha = config.disabledAlpha;
+      copy.font = config.font;
+      copy.themeProvider = config.themeProvider;
+      return copy;
+   }
 }

@@ -2,7 +2,11 @@ package com.cpz.processing.controls.controls.panel;
 
 import com.cpz.processing.controls.controls.Control;
 import com.cpz.processing.controls.controls.KeyboardRoutableControl;
+import com.cpz.processing.controls.controls.ParentSizeAwareControl;
 import com.cpz.processing.controls.controls.PointerRoutableControl;
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
+import com.cpz.processing.controls.controls.geometry.ResolvedBounds;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
@@ -29,16 +33,19 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class Panel implements PointerRoutableControl, KeyboardRoutableControl {
+public final class Panel implements PointerRoutableControl, KeyboardRoutableControl, ParentSizeAwareControl {
     private final PApplet sketch;
     private final String code;
     private final List<Control> children = new ArrayList<>();
     private final Map<Control, Boolean> childVisibleBeforePanelHide = new IdentityHashMap<>();
     private final Map<Control, Boolean> childEnabledBeforePanelDisable = new IdentityHashMap<>();
+    private ControlBounds bounds;
     private float x;
     private float y;
     private float width;
     private float height;
+    private Float parentWidth;
+    private Float parentHeight;
     private boolean visible = true;
     private boolean enabled = true;
     private boolean pointerPressedInside;
@@ -48,18 +55,25 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
     }
 
     public Panel(PApplet sketch, String code, float x, float y, float width, float height) {
+        this(sketch, code, ControlBounds.absolute(x, y, width, height));
+    }
+
+    public Panel(PApplet sketch, ControlBounds bounds) {
+        this(sketch, ControlCode.auto("panel"), bounds);
+    }
+
+    public Panel(PApplet sketch, String code, ControlBounds bounds) {
         this.sketch = Objects.requireNonNull(sketch, "sketch");
         this.code = Objects.requireNonNull(code, "code");
-        this.x = x;
-        this.y = y;
-        this.width = Math.max(0.0F, width);
-        this.height = Math.max(0.0F, height);
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        this.applyResolvedBounds();
     }
 
     public Panel add(Control child) {
         Control requiredChild = Objects.requireNonNull(child, "child");
         if (!this.children.contains(requiredChild)) {
             this.children.add(requiredChild);
+            this.applyParentSizeTo(requiredChild);
             this.applyCurrentAvailabilityTo(requiredChild);
         }
         return this;
@@ -69,6 +83,7 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
         if (child == null || !this.children.remove(child)) {
             return false;
         }
+        this.clearParentSizeFrom(child);
         this.restoreChildAvailability(child);
         return true;
     }
@@ -98,10 +113,12 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
             return;
         }
 
+        this.applyResolvedBounds();
         this.sketch.pushMatrix();
         try {
             this.sketch.translate(this.x, this.y);
             for (Control child : this.children) {
+                this.applyParentSizeTo(child);
                 if (child.isVisible()) {
                     child.draw();
                 }
@@ -115,6 +132,7 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
         if (event == null || !this.visible || !this.enabled || event.getType() == PointerEvent.Type.WHEEL) {
             return;
         }
+        this.applyResolvedBounds();
         boolean inside = this.contains(event.getX(), event.getY());
         switch (event.getType()) {
             case PRESS:
@@ -137,6 +155,7 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
 
         PointerEvent localEvent = this.toLocalEvent(event);
         for (Control child : this.children) {
+            this.applyParentSizeTo(child);
             if (child instanceof PointerRoutableControl) {
                 ((PointerRoutableControl) child).handlePointerEvent(localEvent);
             }
@@ -147,6 +166,7 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
     }
 
     public boolean canConsumePointerEvent(PointerEvent event) {
+        this.applyResolvedBounds();
         return event != null
                 && event.getType() != PointerEvent.Type.WHEEL
                 && this.visible
@@ -158,8 +178,10 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
             return;
         }
 
+        this.applyResolvedBounds();
         for (int i = this.children.size() - 1; i >= 0; i--) {
             Control child = this.children.get(i);
+            this.applyParentSizeTo(child);
             if (child instanceof KeyboardRoutableControl) {
                 KeyboardRoutableControl routable = (KeyboardRoutableControl) child;
                 if (routable.canConsumeKeyboardEvent(event)) {
@@ -175,7 +197,9 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
             return false;
         }
 
+        this.applyResolvedBounds();
         for (Control child : this.children) {
+            this.applyParentSizeTo(child);
             if (child instanceof KeyboardRoutableControl
                     && ((KeyboardRoutableControl) child).canConsumeKeyboardEvent(event)) {
                 return true;
@@ -185,6 +209,7 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
     }
 
     public boolean contains(float pointX, float pointY) {
+        this.applyResolvedBounds();
         return pointX >= this.x
                 && pointX <= this.x + this.width
                 && pointY >= this.y
@@ -238,28 +263,49 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
     }
 
     public void setPosition(float x, float y) {
-        this.x = x;
-        this.y = y;
+        this.bounds = this.bounds.withPosition(ControlMeasure.absolute(x), ControlMeasure.absolute(y));
+        this.applyResolvedBounds();
     }
 
     public void setSize(float width, float height) {
-        this.width = Math.max(0.0F, width);
-        this.height = Math.max(0.0F, height);
+        this.bounds = this.bounds.withSize(ControlMeasure.absolute(width), ControlMeasure.absolute(height));
+        this.applyResolvedBounds();
+    }
+
+    public void setBounds(ControlBounds bounds) {
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        this.applyResolvedBounds();
+    }
+
+    public void setParentSize(float width, float height) {
+        this.parentWidth = width;
+        this.parentHeight = height;
+        this.applyResolvedBounds();
+    }
+
+    public void clearParentSize() {
+        this.parentWidth = null;
+        this.parentHeight = null;
+        this.applyResolvedBounds();
     }
 
     public float getX() {
+        this.applyResolvedBounds();
         return this.x;
     }
 
     public float getY() {
+        this.applyResolvedBounds();
         return this.y;
     }
 
     public float getWidth() {
+        this.applyResolvedBounds();
         return this.width;
     }
 
     public float getHeight() {
+        this.applyResolvedBounds();
         return this.height;
     }
 
@@ -275,6 +321,34 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
                 event.isControlDown(),
                 event.isAltDown()
         );
+    }
+
+    private void applyResolvedBounds() {
+        ResolvedBounds resolvedBounds = this.bounds.resolve(this.parentWidth(), this.parentHeight());
+        this.x = resolvedBounds.x();
+        this.y = resolvedBounds.y();
+        this.width = Math.max(0.0F, resolvedBounds.width());
+        this.height = Math.max(0.0F, resolvedBounds.height());
+    }
+
+    private float parentWidth() {
+        return this.parentWidth != null ? this.parentWidth : this.sketch.width;
+    }
+
+    private float parentHeight() {
+        return this.parentHeight != null ? this.parentHeight : this.sketch.height;
+    }
+
+    private void applyParentSizeTo(Control child) {
+        if (child instanceof ParentSizeAwareControl) {
+            ((ParentSizeAwareControl) child).setParentSize(this.width, this.height);
+        }
+    }
+
+    private void clearParentSizeFrom(Control child) {
+        if (child instanceof ParentSizeAwareControl) {
+            ((ParentSizeAwareControl) child).clearParentSize();
+        }
     }
 
     private void applyCurrentAvailabilityTo(Control child) {
@@ -339,6 +413,10 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
         }
 
         public TooltipBounds getTooltipBounds() {
+            Panel.this.applyResolvedBounds();
+            if (this.delegate instanceof Control) {
+                Panel.this.applyParentSizeTo((Control) this.delegate);
+            }
             TooltipBounds bounds = this.delegate.getTooltipBounds();
             if (bounds == null) {
                 return new TooltipBounds(Panel.this.x, Panel.this.y, 0.0F, 0.0F);

@@ -1,12 +1,18 @@
 package com.cpz.processing.controls.controls.button;
 
+import com.cpz.processing.controls.controls.ParentSizeAwareControl;
 import com.cpz.processing.controls.controls.PointerRoutableControl;
+import com.cpz.processing.controls.controls.button.config.ButtonStyleConfig;
 import com.cpz.processing.controls.controls.button.input.ButtonInputAdapter;
 import com.cpz.processing.controls.controls.button.model.ButtonModel;
 import com.cpz.processing.controls.controls.button.style.ButtonStyle;
+import com.cpz.processing.controls.controls.button.style.DefaultButtonStyle;
 import com.cpz.processing.controls.controls.button.util.ButtonListener;
 import com.cpz.processing.controls.controls.button.view.ButtonView;
 import com.cpz.processing.controls.controls.button.viewmodel.ButtonViewModel;
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
+import com.cpz.processing.controls.controls.geometry.ResolvedBounds;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
@@ -36,12 +42,18 @@ import processing.core.PFont;
  *
  * @author CPZ
  */
-public final class Button implements PointerRoutableControl, TooltipAttachable {
+public final class Button implements PointerRoutableControl, ParentSizeAwareControl, TooltipAttachable {
+    private final PApplet sketch;
     private final ButtonModel model;
     private final ButtonViewModel viewModel;
     private final ButtonView view;
     private final ButtonInputAdapter inputAdapter;
     private final TooltipSupport tooltipSupport;
+    private ControlBounds bounds;
+    private ControlMeasure textSize;
+    private boolean textSizeStyleIsolated;
+    private Float parentWidth;
+    private Float parentHeight;
 
     /**
      * Creates a button with the default internal MVVM composition.
@@ -58,10 +70,27 @@ public final class Button implements PointerRoutableControl, TooltipAttachable {
     }
 
     public Button(PApplet sketch, String code, String text, float x, float y, float width, float height) {
-        Objects.requireNonNull(sketch, "sketch");
+        this(sketch, code, text, ControlBounds.absolute(x, y, width, height));
+    }
+
+    public Button(PApplet sketch, String text, ControlBounds bounds) {
+        this(sketch, ControlCode.auto("button"), text, bounds);
+    }
+
+    public Button(PApplet sketch, String code, String text, ControlBounds bounds) {
+        this.sketch = Objects.requireNonNull(sketch, "sketch");
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        ResolvedBounds resolvedBounds = this.resolveBounds();
         this.model = new ButtonModel(code, text);
         this.viewModel = new ButtonViewModel(this.model);
-        this.view = new ButtonView(sketch, this.viewModel, x, y, width, height);
+        this.view = new ButtonView(
+                sketch,
+                this.viewModel,
+                resolvedBounds.x(),
+                resolvedBounds.y(),
+                resolvedBounds.width(),
+                resolvedBounds.height()
+        );
         this.inputAdapter = new ButtonInputAdapter(this.view, this.viewModel);
         this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible);
     }
@@ -70,6 +99,7 @@ public final class Button implements PointerRoutableControl, TooltipAttachable {
      * Draws the button through its view.
      */
     public void draw() {
+        this.applyResolvedGeometryAndTextSize();
         this.view.draw();
     }
 
@@ -79,6 +109,7 @@ public final class Button implements PointerRoutableControl, TooltipAttachable {
      * @param event pointer event to route into the button input adapter
      */
     public void handlePointerEvent(PointerEvent event) {
+        this.applyResolvedGeometryAndTextSize();
         if (event != null) {
             switch (event.getType()) {
                 case MOVE:
@@ -95,6 +126,7 @@ public final class Button implements PointerRoutableControl, TooltipAttachable {
     }
 
     public boolean canConsumePointerEvent(PointerEvent event) {
+        this.applyResolvedGeometryAndTextSize();
         return event != null
                 && event.getType() != PointerEvent.Type.WHEEL
                 && this.isVisible()
@@ -136,14 +168,44 @@ public final class Button implements PointerRoutableControl, TooltipAttachable {
 
     public void setStyle(ButtonStyle style) {
         this.view.setStyle(style);
+        this.textSizeStyleIsolated = false;
+        this.applyResolvedTextSize();
+    }
+
+    public void setTextSize(float textSize) {
+        this.setTextSize(ControlMeasure.absolute(textSize));
+    }
+
+    public void setTextSize(ControlMeasure textSize) {
+        this.textSize = Objects.requireNonNull(textSize, "textSize");
+        this.applyResolvedTextSize();
     }
 
     public void setPosition(float x, float y) {
-        this.view.setPosition(x, y);
+        this.bounds = this.bounds.withPosition(ControlMeasure.absolute(x), ControlMeasure.absolute(y));
+        this.applyResolvedGeometryAndTextSize();
     }
 
     public void setSize(float width, float height) {
-        this.view.setSize(width, height);
+        this.bounds = this.bounds.withSize(ControlMeasure.absolute(width), ControlMeasure.absolute(height));
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void setBounds(ControlBounds bounds) {
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void setParentSize(float width, float height) {
+        this.parentWidth = width;
+        this.parentHeight = height;
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void clearParentSize() {
+        this.parentWidth = null;
+        this.parentHeight = null;
+        this.applyResolvedGeometryAndTextSize();
     }
 
     public Button setTooltip(String text) {
@@ -207,6 +269,7 @@ public final class Button implements PointerRoutableControl, TooltipAttachable {
     }
 
     public TooltipBounds getTooltipBounds() {
+        this.applyResolvedGeometryAndTextSize();
         return this.tooltipSupport.getTooltipBounds();
     }
 
@@ -220,6 +283,47 @@ public final class Button implements PointerRoutableControl, TooltipAttachable {
 
     public boolean isTooltipTargetEnabled() {
         return this.tooltipSupport.isTooltipTargetEnabled();
+    }
+
+    private ResolvedBounds resolveBounds() {
+        return this.bounds.resolve(this.parentWidth(), this.parentHeight());
+    }
+
+    private float parentWidth() {
+        return this.parentWidth != null ? this.parentWidth : this.sketch.width;
+    }
+
+    private float parentHeight() {
+        return this.parentHeight != null ? this.parentHeight : this.sketch.height;
+    }
+
+    private void applyResolvedGeometryAndTextSize() {
+        ResolvedBounds resolvedBounds = this.resolveBounds();
+        this.view.setPosition(resolvedBounds.x(), resolvedBounds.y());
+        this.view.setSize(resolvedBounds.width(), resolvedBounds.height());
+        this.applyResolvedTextSize();
+    }
+
+    private void applyResolvedTextSize() {
+        if (this.textSize == null) {
+            return;
+        }
+        this.ensureTextSizeStyleIsolated();
+        ButtonStyleConfig styleConfig = this.view.getStyle().getButtonStyleConfig();
+        if (styleConfig != null) {
+            styleConfig.textSize = this.textSize.resolve(this.parentHeight());
+        }
+    }
+
+    private void ensureTextSizeStyleIsolated() {
+        if (this.textSizeStyleIsolated) {
+            return;
+        }
+        ButtonStyle style = this.view.getStyle();
+        if (style instanceof DefaultButtonStyle) {
+            this.view.setStyle(((DefaultButtonStyle) style).copy());
+        }
+        this.textSizeStyleIsolated = true;
     }
     // </editor-fold>
 }

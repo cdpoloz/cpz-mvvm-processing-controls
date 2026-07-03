@@ -119,6 +119,10 @@ public final class TextFieldView implements ControlView, PointerInteractable {
 
    }
 
+   public TextFieldStyle getStyle() {
+      return this.style;
+   }
+
    /**
     * Performs contains.
     *

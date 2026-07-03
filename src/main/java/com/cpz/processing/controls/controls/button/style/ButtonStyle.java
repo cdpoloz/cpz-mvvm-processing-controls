@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.controls.button.style;
 
+import com.cpz.processing.controls.controls.button.config.ButtonStyleConfig;
 import com.cpz.processing.controls.controls.button.state.ButtonViewState;
 import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import processing.core.PApplet;
@@ -23,4 +24,8 @@ public interface ButtonStyle {
    void render(PApplet sketch, ButtonViewState state, ThemeSnapshot snapshot);
 
    ThemeSnapshot getThemeSnapshot();
+
+   default ButtonStyleConfig getButtonStyleConfig() {
+      return null;
+   }
 }

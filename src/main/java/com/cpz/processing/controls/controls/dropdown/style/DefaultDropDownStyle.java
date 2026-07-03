@@ -232,4 +232,36 @@ public final class DefaultDropDownStyle {
    public ThemeSnapshot getThemeSnapshot() {
       return this.themeProvider.getSnapshot();
    }
+
+   public DropDownStyleConfig getDropDownStyleConfig() {
+      return this.config;
+   }
+
+   public DefaultDropDownStyle copy() {
+      return new DefaultDropDownStyle(copyConfig(this.config), this.renderer);
+   }
+
+   private static DropDownStyleConfig copyConfig(DropDownStyleConfig config) {
+      DropDownStyleConfig copy = new DropDownStyleConfig();
+      copy.baseFillOverride = config.baseFillOverride;
+      copy.listFillOverride = config.listFillOverride;
+      copy.textOverride = config.textOverride;
+      copy.borderOverride = config.borderOverride;
+      copy.hoverItemOverlayOverride = config.hoverItemOverlayOverride;
+      copy.selectedItemOverlayOverride = config.selectedItemOverlayOverride;
+      copy.focusedBorderOverride = config.focusedBorderOverride;
+      copy.cornerRadius = config.cornerRadius;
+      copy.listCornerRadius = config.listCornerRadius;
+      copy.strokeWeight = config.strokeWeight;
+      copy.focusedStrokeWeight = config.focusedStrokeWeight;
+      copy.textSize = config.textSize;
+      copy.itemHeight = config.itemHeight;
+      copy.textPadding = config.textPadding;
+      copy.arrowPadding = config.arrowPadding;
+      copy.maxVisibleItems = config.maxVisibleItems;
+      copy.disabledAlpha = config.disabledAlpha;
+      copy.font = config.font;
+      copy.themeProvider = config.themeProvider;
+      return copy;
+   }
 }

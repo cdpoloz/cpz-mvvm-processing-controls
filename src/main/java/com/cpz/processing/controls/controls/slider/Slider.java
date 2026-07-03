@@ -1,7 +1,12 @@
 package com.cpz.processing.controls.controls.slider;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
+import com.cpz.processing.controls.controls.ParentSizeAwareControl;
 import com.cpz.processing.controls.controls.PointerRoutableControl;
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
+import com.cpz.processing.controls.controls.geometry.ResolvedBounds;
+import com.cpz.processing.controls.controls.slider.config.SliderStyleConfig;
 import com.cpz.processing.controls.controls.slider.input.SliderInputAdapter;
 import com.cpz.processing.controls.controls.slider.model.SliderModel;
 import com.cpz.processing.controls.controls.slider.model.SliderOrientation;
@@ -28,12 +33,18 @@ import java.util.function.Function;
  *
  * @author CPZ
  */
-public final class Slider implements PointerRoutableControl, TooltipAttachable {
+public final class Slider implements PointerRoutableControl, ParentSizeAwareControl, TooltipAttachable {
+    private final PApplet sketch;
     private final SliderModel model;
     private final SliderViewModel viewModel;
     private final SliderView view;
     private final SliderInputAdapter inputAdapter;
     private final TooltipSupport tooltipSupport;
+    private ControlBounds bounds;
+    private ControlMeasure textSize;
+    private boolean textSizeStyleIsolated;
+    private Float parentWidth;
+    private Float parentHeight;
 
     public Slider(PApplet sketch, float x, float y, float width, float height) {
         this(
@@ -114,23 +125,88 @@ public final class Slider implements PointerRoutableControl, TooltipAttachable {
             SliderOrientation orientation,
             SnapMode snapMode
     ) {
-        Objects.requireNonNull(sketch, "sketch");
+        this(
+                sketch,
+                code,
+                min,
+                max,
+                step,
+                value,
+                ControlBounds.absolute(x, y, width, height),
+                orientation,
+                snapMode
+        );
+    }
+
+    public Slider(PApplet sketch, ControlBounds bounds) {
+        this(
+                sketch,
+                ControlCode.auto("slider"),
+                BigDecimal.ZERO,
+                BigDecimal.ONE,
+                new BigDecimal("0.01"),
+                BigDecimal.ZERO,
+                bounds,
+                SliderOrientation.HORIZONTAL,
+                SnapMode.ALWAYS
+        );
+    }
+
+    public Slider(PApplet sketch, String code, ControlBounds bounds) {
+        this(
+                sketch,
+                code,
+                BigDecimal.ZERO,
+                BigDecimal.ONE,
+                new BigDecimal("0.01"),
+                BigDecimal.ZERO,
+                bounds,
+                SliderOrientation.HORIZONTAL,
+                SnapMode.ALWAYS
+        );
+    }
+
+    public Slider(
+            PApplet sketch,
+            String code,
+            BigDecimal min,
+            BigDecimal max,
+            BigDecimal step,
+            BigDecimal value,
+            ControlBounds bounds,
+            SliderOrientation orientation,
+            SnapMode snapMode
+    ) {
+        this.sketch = Objects.requireNonNull(sketch, "sketch");
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        ResolvedBounds resolvedBounds = this.resolveBounds();
         this.model = new SliderModel(code, min, max, step, value, snapMode);
         this.viewModel = new SliderViewModel(this.model);
-        this.view = new SliderView(sketch, this.viewModel, x, y, width, height, orientation);
+        this.view = new SliderView(
+                sketch,
+                this.viewModel,
+                resolvedBounds.x(),
+                resolvedBounds.y(),
+                resolvedBounds.width(),
+                resolvedBounds.height(),
+                orientation
+        );
         this.inputAdapter = new SliderInputAdapter(this.view, this.viewModel);
         this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible);
     }
 
     public void draw() {
+        this.applyResolvedGeometryAndTextSize();
         this.view.draw();
     }
 
     public void handlePointerEvent(PointerEvent event) {
+        this.applyResolvedGeometryAndTextSize();
         this.inputAdapter.handlePointerEvent(event);
     }
 
     public boolean canConsumePointerEvent(PointerEvent event) {
+        this.applyResolvedGeometryAndTextSize();
         if (event == null || !this.viewModel.isVisible()) {
             return false;
         }
@@ -238,14 +314,44 @@ public final class Slider implements PointerRoutableControl, TooltipAttachable {
 
     public void setStyle(SliderStyle style) {
         this.view.setStyle(style);
+        this.textSizeStyleIsolated = false;
+        this.applyResolvedTextSize();
+    }
+
+    public void setTextSize(float textSize) {
+        this.setTextSize(ControlMeasure.absolute(textSize));
+    }
+
+    public void setTextSize(ControlMeasure textSize) {
+        this.textSize = Objects.requireNonNull(textSize, "textSize");
+        this.applyResolvedTextSize();
     }
 
     public void setPosition(float x, float y) {
-        this.view.setPosition(x, y);
+        this.bounds = this.bounds.withPosition(ControlMeasure.absolute(x), ControlMeasure.absolute(y));
+        this.applyResolvedGeometryAndTextSize();
     }
 
     public void setSize(float width, float height) {
-        this.view.setSize(width, height);
+        this.bounds = this.bounds.withSize(ControlMeasure.absolute(width), ControlMeasure.absolute(height));
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void setBounds(ControlBounds bounds) {
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void setParentSize(float width, float height) {
+        this.parentWidth = width;
+        this.parentHeight = height;
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void clearParentSize() {
+        this.parentWidth = null;
+        this.parentHeight = null;
+        this.applyResolvedGeometryAndTextSize();
     }
 
     public Slider setTooltip(String text) {
@@ -309,6 +415,7 @@ public final class Slider implements PointerRoutableControl, TooltipAttachable {
     }
 
     public TooltipBounds getTooltipBounds() {
+        this.applyResolvedGeometryAndTextSize();
         return this.tooltipSupport.getTooltipBounds();
     }
 
@@ -322,5 +429,46 @@ public final class Slider implements PointerRoutableControl, TooltipAttachable {
 
     public boolean isTooltipTargetEnabled() {
         return this.tooltipSupport.isTooltipTargetEnabled();
+    }
+
+    private ResolvedBounds resolveBounds() {
+        return this.bounds.resolve(this.parentWidth(), this.parentHeight());
+    }
+
+    private float parentWidth() {
+        return this.parentWidth != null ? this.parentWidth : this.sketch.width;
+    }
+
+    private float parentHeight() {
+        return this.parentHeight != null ? this.parentHeight : this.sketch.height;
+    }
+
+    private void applyResolvedGeometryAndTextSize() {
+        ResolvedBounds resolvedBounds = this.resolveBounds();
+        this.view.setPosition(resolvedBounds.x(), resolvedBounds.y());
+        this.view.setSize(resolvedBounds.width(), resolvedBounds.height());
+        this.applyResolvedTextSize();
+    }
+
+    private void applyResolvedTextSize() {
+        if (this.textSize == null) {
+            return;
+        }
+        this.ensureTextSizeStyleIsolated();
+        SliderStyleConfig styleConfig = this.view.getStyle().getSliderStyleConfig();
+        if (styleConfig != null) {
+            styleConfig.textSize = this.textSize.resolve(this.parentHeight());
+        }
+    }
+
+    private void ensureTextSizeStyleIsolated() {
+        if (this.textSizeStyleIsolated) {
+            return;
+        }
+        SliderStyle style = this.view.getStyle();
+        if (style != null) {
+            this.view.setStyle(style.copy());
+        }
+        this.textSizeStyleIsolated = true;
     }
 }

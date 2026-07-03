@@ -1,12 +1,16 @@
 package com.cpz.processing.controls.controls.checkbox;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
+import com.cpz.processing.controls.controls.ParentSizeAwareControl;
 import com.cpz.processing.controls.controls.PointerRoutableControl;
 import com.cpz.processing.controls.controls.checkbox.input.CheckboxInputAdapter;
 import com.cpz.processing.controls.controls.checkbox.model.CheckboxModel;
 import com.cpz.processing.controls.controls.checkbox.style.CheckboxStyle;
 import com.cpz.processing.controls.controls.checkbox.view.CheckboxView;
 import com.cpz.processing.controls.controls.checkbox.viewmodel.CheckboxViewModel;
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
+import com.cpz.processing.controls.controls.geometry.ResolvedBounds;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
@@ -24,12 +28,16 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class Checkbox implements PointerRoutableControl, TooltipAttachable {
+public final class Checkbox implements PointerRoutableControl, ParentSizeAwareControl, TooltipAttachable {
+    private final PApplet sketch;
     private final CheckboxModel model;
     private final CheckboxViewModel viewModel;
     private final CheckboxView view;
     private final CheckboxInputAdapter inputAdapter;
     private final TooltipSupport tooltipSupport;
+    private ControlBounds bounds;
+    private Float parentWidth;
+    private Float parentHeight;
     private ValueListener<Boolean> changeListener;
 
     public Checkbox(PApplet sketch, boolean checked, float x, float y, float size) {
@@ -45,25 +53,45 @@ public final class Checkbox implements PointerRoutableControl, TooltipAttachable
     }
 
     public Checkbox(PApplet sketch, String code, boolean checked, float x, float y, float width, float height) {
-        Objects.requireNonNull(sketch, "sketch");
+        this(sketch, code, checked, ControlBounds.absolute(x, y, width, height));
+    }
+
+    public Checkbox(PApplet sketch, boolean checked, ControlBounds bounds) {
+        this(sketch, ControlCode.auto("checkbox"), checked, bounds);
+    }
+
+    public Checkbox(PApplet sketch, String code, boolean checked, ControlBounds bounds) {
+        this.sketch = Objects.requireNonNull(sketch, "sketch");
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        ResolvedBounds resolvedBounds = this.resolveBounds();
         this.model = new CheckboxModel(code, checked);
         this.viewModel = new CheckboxViewModel(this.model);
-        this.view = new CheckboxView(sketch, this.viewModel, x, y, width, height);
+        this.view = new CheckboxView(
+                sketch,
+                this.viewModel,
+                resolvedBounds.x(),
+                resolvedBounds.y(),
+                resolvedBounds.width(),
+                resolvedBounds.height()
+        );
         this.inputAdapter = new CheckboxInputAdapter(this.view, this.viewModel);
         this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible);
     }
 
     public void draw() {
+        this.applyResolvedBounds();
         this.view.draw();
     }
 
     public void handlePointerEvent(PointerEvent event) {
+        this.applyResolvedBounds();
         boolean before = this.viewModel.isChecked();
         this.inputAdapter.handlePointerEvent(event);
         this.notifyChangeIfNeeded(before);
     }
 
     public boolean canConsumePointerEvent(PointerEvent event) {
+        this.applyResolvedBounds();
         return event != null
                 && event.getType() != PointerEvent.Type.WHEEL
                 && this.isVisible()
@@ -110,15 +138,35 @@ public final class Checkbox implements PointerRoutableControl, TooltipAttachable
     }
 
     public void setPosition(float x, float y) {
-        this.view.setPosition(x, y);
+        this.bounds = this.bounds.withPosition(ControlMeasure.absolute(x), ControlMeasure.absolute(y));
+        this.applyResolvedBounds();
     }
 
     public void setSize(float size) {
-        this.view.setSize(size);
+        this.bounds = this.bounds.withSize(ControlMeasure.absolute(size), ControlMeasure.absolute(size));
+        this.applyResolvedBounds();
     }
 
     public void setSize(float width, float height) {
-        this.view.setSize(width, height);
+        this.bounds = this.bounds.withSize(ControlMeasure.absolute(width), ControlMeasure.absolute(height));
+        this.applyResolvedBounds();
+    }
+
+    public void setBounds(ControlBounds bounds) {
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        this.applyResolvedBounds();
+    }
+
+    public void setParentSize(float width, float height) {
+        this.parentWidth = width;
+        this.parentHeight = height;
+        this.applyResolvedBounds();
+    }
+
+    public void clearParentSize() {
+        this.parentWidth = null;
+        this.parentHeight = null;
+        this.applyResolvedBounds();
     }
 
     private void notifyChangeIfNeeded(boolean previousValue) {
@@ -189,6 +237,7 @@ public final class Checkbox implements PointerRoutableControl, TooltipAttachable
     }
 
     public TooltipBounds getTooltipBounds() {
+        this.applyResolvedBounds();
         return this.tooltipSupport.getTooltipBounds();
     }
 
@@ -202,6 +251,18 @@ public final class Checkbox implements PointerRoutableControl, TooltipAttachable
 
     public boolean isTooltipTargetEnabled() {
         return this.tooltipSupport.isTooltipTargetEnabled();
+    }
+
+    private ResolvedBounds resolveBounds() {
+        float width = this.parentWidth != null ? this.parentWidth : this.sketch.width;
+        float height = this.parentHeight != null ? this.parentHeight : this.sketch.height;
+        return this.bounds.resolve(width, height);
+    }
+
+    private void applyResolvedBounds() {
+        ResolvedBounds resolvedBounds = this.resolveBounds();
+        this.view.setPosition(resolvedBounds.x(), resolvedBounds.y());
+        this.view.setSize(resolvedBounds.width(), resolvedBounds.height());
     }
     // </editor-fold>
 }

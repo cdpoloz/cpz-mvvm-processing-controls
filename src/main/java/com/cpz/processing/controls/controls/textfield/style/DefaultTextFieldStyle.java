@@ -136,4 +136,33 @@ public final class DefaultTextFieldStyle implements TextFieldStyle {
    public ThemeSnapshot getThemeSnapshot() {
       return this.themeProvider.getSnapshot();
    }
+
+   @Override
+   public TextFieldStyleConfig getTextFieldStyleConfig() {
+      return this.config;
+   }
+
+   public DefaultTextFieldStyle copy() {
+      return new DefaultTextFieldStyle(copyConfig(this.config), this.renderer);
+   }
+
+   private static TextFieldStyleConfig copyConfig(TextFieldStyleConfig config) {
+      TextFieldStyleConfig copy = new TextFieldStyleConfig();
+      copy.backgroundOverride = config.backgroundOverride;
+      copy.borderOverride = config.borderOverride;
+      copy.textOverride = config.textOverride;
+      copy.cursorOverride = config.cursorOverride;
+      copy.selectionOverride = config.selectionOverride;
+      copy.selectionTextOverride = config.selectionTextOverride;
+      copy.backgroundColor = config.backgroundColor;
+      copy.borderColor = config.borderColor;
+      copy.textColor = config.textColor;
+      copy.cursorColor = config.cursorColor;
+      copy.selectionColor = config.selectionColor;
+      copy.selectionTextColor = config.selectionTextColor;
+      copy.textSize = config.textSize;
+      copy.font = config.font;
+      copy.themeProvider = config.themeProvider;
+      return copy;
+   }
 }

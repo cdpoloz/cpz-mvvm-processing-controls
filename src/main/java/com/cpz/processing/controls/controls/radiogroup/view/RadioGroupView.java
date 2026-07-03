@@ -142,6 +142,10 @@ public final class RadioGroupView implements ControlView, PointerInteractable {
 
    }
 
+   public RadioGroupStyle getStyle() {
+      return this.style;
+   }
+
    /**
     * Performs contains.
     *

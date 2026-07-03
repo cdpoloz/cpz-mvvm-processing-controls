@@ -90,6 +90,50 @@ regions can use `TooltipArea` without implementing `Control`.
 
 ---
 
+## Explicit Relative Measures
+
+Relative coordinates are opt-in. The library does not infer that numeric values
+between `0` and `1` are relative.
+
+Use `ControlBounds` and `ControlMeasure` when a supported facade should resolve
+geometry or text size against its parent:
+
+```java
+Panel panel = new Panel(this, "pnlSettings",
+        ControlBounds.relative(0.1f, 0.1f, 0.4f, 0.3f));
+
+Button button = new Button(this, "btnSave", "Save",
+        ControlBounds.relative(0.5f, 0.5f, 0.3f, 0.12f));
+
+Label label = new Label(this, "lblTitle", "Settings",
+        ControlBounds.relative(0.08f, 0.12f, 0.6f, 0.1f));
+label.setTextSize(ControlMeasure.relative(0.06f));
+```
+
+Relative bounds are supported by `Panel`, `Button`, `Label`, `Checkbox`,
+`Toggle`, `Slider`, `TextField`, `NumericField`, `RadioGroup`, and `DropDown`.
+For `RadioGroup`, the bounds height maps to item height because the group
+height is derived from options and spacing.
+
+Existing constructors and `setPosition(...)` / `setSize(...)` remain absolute
+by default. JSON configuration does not support these relative measures yet.
+
+Relative text size is also opt-in. `setTextSize(float)` is absolute; use
+`setTextSize(ControlMeasure.relative(factor))` when the text should scale from
+the parent height:
+
+```java
+Button save = new Button(this, "btnSave", "Save", 120, 80, 160, 44);
+save.setTextSize(ControlMeasure.relative(0.04f));
+```
+
+Relative text size is supported by `Button`, `Label`, `TextField`,
+`NumericField`, `RadioGroup`, `DropDown`, and the value text rendered by
+`Slider`. `Checkbox` and `Toggle` do not expose text rendering in their public
+facades.
+
+---
+
 ## Distinction From ControlView
 
 `Control` belongs to the public facade layer.

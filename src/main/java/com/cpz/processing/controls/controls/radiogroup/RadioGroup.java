@@ -2,7 +2,12 @@ package com.cpz.processing.controls.controls.radiogroup;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
 import com.cpz.processing.controls.controls.KeyboardRoutableControl;
+import com.cpz.processing.controls.controls.ParentSizeAwareControl;
 import com.cpz.processing.controls.controls.PointerRoutableControl;
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
+import com.cpz.processing.controls.controls.geometry.ResolvedBounds;
+import com.cpz.processing.controls.controls.radiogroup.config.RadioGroupStyleConfig;
 import com.cpz.processing.controls.controls.radiogroup.input.RadioGroupInputAdapter;
 import com.cpz.processing.controls.controls.radiogroup.model.RadioGroupModel;
 import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupStyle;
@@ -29,7 +34,8 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class RadioGroup implements PointerRoutableControl, KeyboardRoutableControl, TooltipAttachable {
+public final class RadioGroup implements PointerRoutableControl, KeyboardRoutableControl, ParentSizeAwareControl, TooltipAttachable {
+    private final PApplet sketch;
     private final RadioGroupModel model;
     private final RadioGroupViewModel viewModel;
     private final RadioGroupView view;
@@ -37,6 +43,12 @@ public final class RadioGroup implements PointerRoutableControl, KeyboardRoutabl
     private final RadioGroupInputAdapter inputAdapter;
     private final KeyboardInputAdapter keyboardInputAdapter;
     private final TooltipSupport tooltipSupport;
+    private ControlBounds bounds;
+    private ControlMeasure textSize;
+    private boolean textSizeStyleIsolated;
+    private Float parentWidth;
+    private Float parentHeight;
+    private boolean resolveItemHeightFromBounds;
 
     public RadioGroup(PApplet sketch, List<String> options, float x, float y, float width) {
         this(sketch, ControlCode.auto("radiogroup"), options, -1, x, y, width);
@@ -51,10 +63,41 @@ public final class RadioGroup implements PointerRoutableControl, KeyboardRoutabl
     }
 
     public RadioGroup(PApplet sketch, String code, List<String> options, int selectedIndex, float x, float y, float width) {
-        Objects.requireNonNull(sketch, "sketch");
+        this(sketch, code, options, selectedIndex, ControlBounds.of(
+                ControlMeasure.absolute(x),
+                ControlMeasure.absolute(y),
+                ControlMeasure.absolute(width),
+                ControlMeasure.absolute(0.0F)
+        ), false);
+    }
+
+    public RadioGroup(PApplet sketch, List<String> options, ControlBounds bounds) {
+        this(sketch, ControlCode.auto("radiogroup"), options, -1, bounds);
+    }
+
+    public RadioGroup(PApplet sketch, List<String> options, int selectedIndex, ControlBounds bounds) {
+        this(sketch, ControlCode.auto("radiogroup"), options, selectedIndex, bounds);
+    }
+
+    public RadioGroup(PApplet sketch, String code, List<String> options, ControlBounds bounds) {
+        this(sketch, code, options, -1, bounds);
+    }
+
+    public RadioGroup(PApplet sketch, String code, List<String> options, int selectedIndex, ControlBounds bounds) {
+        this(sketch, code, options, selectedIndex, bounds, true);
+    }
+
+    private RadioGroup(PApplet sketch, String code, List<String> options, int selectedIndex, ControlBounds bounds, boolean resolveItemHeightFromBounds) {
+        this.sketch = Objects.requireNonNull(sketch, "sketch");
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        this.resolveItemHeightFromBounds = resolveItemHeightFromBounds;
+        ResolvedBounds resolvedBounds = this.resolveBounds();
         this.model = new RadioGroupModel(code, options, selectedIndex);
         this.viewModel = new RadioGroupViewModel(this.model);
-        this.view = new RadioGroupView(sketch, this.viewModel, x, y, width);
+        this.view = new RadioGroupView(sketch, this.viewModel, resolvedBounds.x(), resolvedBounds.y(), resolvedBounds.width());
+        if (this.resolveItemHeightFromBounds) {
+            this.view.setItemHeight(resolvedBounds.height());
+        }
         this.focusManager = new FocusManager();
         this.inputAdapter = new RadioGroupInputAdapter(this.view, this.viewModel, this.focusManager);
         this.keyboardInputAdapter = new KeyboardInputAdapter(this.focusManager);
@@ -62,10 +105,12 @@ public final class RadioGroup implements PointerRoutableControl, KeyboardRoutabl
     }
 
     public void draw() {
+        this.applyResolvedGeometryAndTextSize();
         this.view.draw();
     }
 
     public void handlePointerEvent(PointerEvent event) {
+        this.applyResolvedGeometryAndTextSize();
         if (event != null) {
             this.inputAdapter.handlePointerEvent(event);
             if (event.getType() == PointerEvent.Type.PRESS && !this.view.contains(event.getX(), event.getY())) {
@@ -79,6 +124,7 @@ public final class RadioGroup implements PointerRoutableControl, KeyboardRoutabl
     }
 
     public boolean canConsumePointerEvent(PointerEvent event) {
+        this.applyResolvedGeometryAndTextSize();
         return event != null
                 && event.getType() != PointerEvent.Type.WHEEL
                 && this.isVisible()
@@ -137,22 +183,55 @@ public final class RadioGroup implements PointerRoutableControl, KeyboardRoutabl
 
     public void setStyle(RadioGroupStyle style) {
         this.view.setStyle(style);
+        this.textSizeStyleIsolated = false;
+        this.applyResolvedTextSize();
+    }
+
+    public void setTextSize(float textSize) {
+        this.setTextSize(ControlMeasure.absolute(textSize));
+    }
+
+    public void setTextSize(ControlMeasure textSize) {
+        this.textSize = Objects.requireNonNull(textSize, "textSize");
+        this.applyResolvedTextSize();
     }
 
     public void setPosition(float x, float y) {
-        this.view.setPosition(x, y);
+        this.bounds = this.bounds.withPosition(ControlMeasure.absolute(x), ControlMeasure.absolute(y));
+        this.applyResolvedGeometryAndTextSize();
     }
 
     public void setWidth(float width) {
-        this.view.setWidth(width);
+        this.bounds = this.bounds.withSize(ControlMeasure.absolute(width), this.bounds.height());
+        this.applyResolvedGeometryAndTextSize();
     }
 
     public void setItemHeight(float itemHeight) {
-        this.view.setItemHeight(itemHeight);
+        this.resolveItemHeightFromBounds = true;
+        this.bounds = this.bounds.withSize(this.bounds.width(), ControlMeasure.absolute(itemHeight));
+        this.applyResolvedGeometryAndTextSize();
     }
 
     public void setItemSpacing(float itemSpacing) {
         this.view.setItemSpacing(itemSpacing);
+    }
+
+    public void setBounds(ControlBounds bounds) {
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        this.resolveItemHeightFromBounds = true;
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void setParentSize(float width, float height) {
+        this.parentWidth = width;
+        this.parentHeight = height;
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void clearParentSize() {
+        this.parentWidth = null;
+        this.parentHeight = null;
+        this.applyResolvedGeometryAndTextSize();
     }
 
     public RadioGroup setTooltip(String text) {
@@ -216,6 +295,7 @@ public final class RadioGroup implements PointerRoutableControl, KeyboardRoutabl
     }
 
     public TooltipBounds getTooltipBounds() {
+        this.applyResolvedGeometryAndTextSize();
         return this.tooltipSupport.getTooltipBounds();
     }
 
@@ -229,5 +309,49 @@ public final class RadioGroup implements PointerRoutableControl, KeyboardRoutabl
 
     public boolean isTooltipTargetEnabled() {
         return this.tooltipSupport.isTooltipTargetEnabled();
+    }
+
+    private ResolvedBounds resolveBounds() {
+        return this.bounds.resolve(this.parentWidth(), this.parentHeight());
+    }
+
+    private float parentWidth() {
+        return this.parentWidth != null ? this.parentWidth : this.sketch.width;
+    }
+
+    private float parentHeight() {
+        return this.parentHeight != null ? this.parentHeight : this.sketch.height;
+    }
+
+    private void applyResolvedGeometryAndTextSize() {
+        ResolvedBounds resolvedBounds = this.resolveBounds();
+        this.view.setPosition(resolvedBounds.x(), resolvedBounds.y());
+        this.view.setWidth(resolvedBounds.width());
+        if (this.resolveItemHeightFromBounds) {
+            this.view.setItemHeight(resolvedBounds.height());
+        }
+        this.applyResolvedTextSize();
+    }
+
+    private void applyResolvedTextSize() {
+        if (this.textSize == null) {
+            return;
+        }
+        this.ensureTextSizeStyleIsolated();
+        RadioGroupStyleConfig styleConfig = this.view.getStyle().getRadioGroupStyleConfig();
+        if (styleConfig != null) {
+            styleConfig.textSize = this.textSize.resolve(this.parentHeight());
+        }
+    }
+
+    private void ensureTextSizeStyleIsolated() {
+        if (this.textSizeStyleIsolated) {
+            return;
+        }
+        RadioGroupStyle style = this.view.getStyle();
+        if (style != null) {
+            this.view.setStyle(style.copy());
+        }
+        this.textSizeStyleIsolated = true;
     }
 }

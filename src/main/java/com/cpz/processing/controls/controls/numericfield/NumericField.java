@@ -2,7 +2,12 @@ package com.cpz.processing.controls.controls.numericfield;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
 import com.cpz.processing.controls.controls.KeyboardRoutableControl;
+import com.cpz.processing.controls.controls.ParentSizeAwareControl;
 import com.cpz.processing.controls.controls.PointerRoutableControl;
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
+import com.cpz.processing.controls.controls.geometry.ResolvedBounds;
+import com.cpz.processing.controls.controls.numericfield.config.NumericFieldStyleConfig;
 import com.cpz.processing.controls.controls.numericfield.input.NumericFieldInputAdapter;
 import com.cpz.processing.controls.controls.numericfield.model.NumericFieldModel;
 import com.cpz.processing.controls.controls.numericfield.style.NumericFieldStyle;
@@ -29,12 +34,13 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class NumericField implements PointerRoutableControl, KeyboardRoutableControl, TooltipAttachable {
+public final class NumericField implements PointerRoutableControl, KeyboardRoutableControl, ParentSizeAwareControl, TooltipAttachable {
     private static final BigDecimal DEFAULT_MIN = null;
     private static final BigDecimal DEFAULT_MAX = null;
     private static final BigDecimal DEFAULT_STEP = BigDecimal.ONE;
     private static final int DEFAULT_SCALE = 8;
 
+    private final PApplet sketch;
     private final NumericFieldModel model;
     private final NumericFieldViewModel viewModel;
     private final NumericFieldView view;
@@ -42,17 +48,39 @@ public final class NumericField implements PointerRoutableControl, KeyboardRouta
     private final NumericFieldInputAdapter inputAdapter;
     private final KeyboardInputAdapter keyboardInputAdapter;
     private final TooltipSupport tooltipSupport;
+    private ControlBounds bounds;
+    private ControlMeasure textSize;
+    private boolean textSizeStyleIsolated;
+    private Float parentWidth;
+    private Float parentHeight;
 
     public NumericField(PApplet sketch, String text, float x, float y, float width, float height) {
         this(sketch, ControlCode.auto("numericfield"), text, x, y, width, height);
     }
 
     public NumericField(PApplet sketch, String code, String text, float x, float y, float width, float height) {
-        Objects.requireNonNull(sketch, "sketch");
+        this(sketch, code, text, ControlBounds.absolute(x, y, width, height));
+    }
+
+    public NumericField(PApplet sketch, String text, ControlBounds bounds) {
+        this(sketch, ControlCode.auto("numericfield"), text, bounds);
+    }
+
+    public NumericField(PApplet sketch, String code, String text, ControlBounds bounds) {
+        this.sketch = Objects.requireNonNull(sketch, "sketch");
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        ResolvedBounds resolvedBounds = this.resolveBounds();
         this.model = new NumericFieldModel(code, BigDecimal.ZERO, DEFAULT_MIN, DEFAULT_MAX, DEFAULT_STEP, true, true, DEFAULT_SCALE);
         this.viewModel = new NumericFieldViewModel(this.model);
         this.viewModel.setText(text == null ? "" : text);
-        this.view = new NumericFieldView(sketch, this.viewModel, x, y, width, height);
+        this.view = new NumericFieldView(
+                sketch,
+                this.viewModel,
+                resolvedBounds.x(),
+                resolvedBounds.y(),
+                resolvedBounds.width(),
+                resolvedBounds.height()
+        );
         this.focusManager = new FocusManager();
         this.inputAdapter = new NumericFieldInputAdapter(this.view, this.viewModel, this.focusManager);
         this.keyboardInputAdapter = new KeyboardInputAdapter(this.focusManager);
@@ -60,10 +88,12 @@ public final class NumericField implements PointerRoutableControl, KeyboardRouta
     }
 
     public void draw() {
+        this.applyResolvedGeometryAndTextSize();
         this.view.draw();
     }
 
     public void handlePointerEvent(PointerEvent event) {
+        this.applyResolvedGeometryAndTextSize();
         if (event != null) {
             this.inputAdapter.handlePointerEvent(event);
         }
@@ -74,6 +104,7 @@ public final class NumericField implements PointerRoutableControl, KeyboardRouta
     }
 
     public boolean canConsumePointerEvent(PointerEvent event) {
+        this.applyResolvedGeometryAndTextSize();
         return event != null
                 && event.getType() != PointerEvent.Type.WHEEL
                 && this.isVisible()
@@ -145,14 +176,44 @@ public final class NumericField implements PointerRoutableControl, KeyboardRouta
 
     public void setStyle(NumericFieldStyle style) {
         this.view.setStyle(style);
+        this.textSizeStyleIsolated = false;
+        this.applyResolvedTextSize();
+    }
+
+    public void setTextSize(float textSize) {
+        this.setTextSize(ControlMeasure.absolute(textSize));
+    }
+
+    public void setTextSize(ControlMeasure textSize) {
+        this.textSize = Objects.requireNonNull(textSize, "textSize");
+        this.applyResolvedTextSize();
     }
 
     public void setPosition(float x, float y) {
-        this.view.setPosition(x, y);
+        this.bounds = this.bounds.withPosition(ControlMeasure.absolute(x), ControlMeasure.absolute(y));
+        this.applyResolvedGeometryAndTextSize();
     }
 
     public void setSize(float width, float height) {
-        this.view.setSize(width, height);
+        this.bounds = this.bounds.withSize(ControlMeasure.absolute(width), ControlMeasure.absolute(height));
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void setBounds(ControlBounds bounds) {
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void setParentSize(float width, float height) {
+        this.parentWidth = width;
+        this.parentHeight = height;
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void clearParentSize() {
+        this.parentWidth = null;
+        this.parentHeight = null;
+        this.applyResolvedGeometryAndTextSize();
     }
 
     public NumericField setTooltip(String text) {
@@ -216,6 +277,7 @@ public final class NumericField implements PointerRoutableControl, KeyboardRouta
     }
 
     public TooltipBounds getTooltipBounds() {
+        this.applyResolvedGeometryAndTextSize();
         return this.tooltipSupport.getTooltipBounds();
     }
 
@@ -229,5 +291,46 @@ public final class NumericField implements PointerRoutableControl, KeyboardRouta
 
     public boolean isTooltipTargetEnabled() {
         return this.tooltipSupport.isTooltipTargetEnabled();
+    }
+
+    private ResolvedBounds resolveBounds() {
+        return this.bounds.resolve(this.parentWidth(), this.parentHeight());
+    }
+
+    private float parentWidth() {
+        return this.parentWidth != null ? this.parentWidth : this.sketch.width;
+    }
+
+    private float parentHeight() {
+        return this.parentHeight != null ? this.parentHeight : this.sketch.height;
+    }
+
+    private void applyResolvedGeometryAndTextSize() {
+        ResolvedBounds resolvedBounds = this.resolveBounds();
+        this.view.setPosition(resolvedBounds.x(), resolvedBounds.y());
+        this.view.setSize(resolvedBounds.width(), resolvedBounds.height());
+        this.applyResolvedTextSize();
+    }
+
+    private void applyResolvedTextSize() {
+        if (this.textSize == null) {
+            return;
+        }
+        this.ensureTextSizeStyleIsolated();
+        NumericFieldStyleConfig styleConfig = this.view.getStyle().getNumericFieldStyleConfig();
+        if (styleConfig != null) {
+            styleConfig.textSize = this.textSize.resolve(this.parentHeight());
+        }
+    }
+
+    private void ensureTextSizeStyleIsolated() {
+        if (this.textSizeStyleIsolated) {
+            return;
+        }
+        NumericFieldStyle style = this.view.getStyle();
+        if (style != null) {
+            this.view.setStyle(style.copy());
+        }
+        this.textSizeStyleIsolated = true;
     }
 }

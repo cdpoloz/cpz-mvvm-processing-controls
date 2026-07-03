@@ -119,6 +119,10 @@ public final class NumericFieldView implements ControlView, PointerInteractable 
 
    }
 
+   public NumericFieldStyle getStyle() {
+      return this.style;
+   }
+
    /**
     * Performs contains.
     *

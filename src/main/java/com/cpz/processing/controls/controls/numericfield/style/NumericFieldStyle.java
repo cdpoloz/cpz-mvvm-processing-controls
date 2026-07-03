@@ -131,4 +131,32 @@ public final class NumericFieldStyle {
    public ThemeSnapshot getThemeSnapshot() {
       return this.themeProvider.getSnapshot();
    }
+
+   public NumericFieldStyleConfig getNumericFieldStyleConfig() {
+      return this.config;
+   }
+
+   public NumericFieldStyle copy() {
+      return new NumericFieldStyle(copyConfig(this.config), this.renderer);
+   }
+
+   private static NumericFieldStyleConfig copyConfig(NumericFieldStyleConfig config) {
+      NumericFieldStyleConfig copy = new NumericFieldStyleConfig();
+      copy.backgroundOverride = config.backgroundOverride;
+      copy.borderOverride = config.borderOverride;
+      copy.textOverride = config.textOverride;
+      copy.cursorOverride = config.cursorOverride;
+      copy.selectionOverride = config.selectionOverride;
+      copy.selectionTextOverride = config.selectionTextOverride;
+      copy.backgroundColor = config.backgroundColor;
+      copy.borderColor = config.borderColor;
+      copy.textColor = config.textColor;
+      copy.cursorColor = config.cursorColor;
+      copy.selectionColor = config.selectionColor;
+      copy.selectionTextColor = config.selectionTextColor;
+      copy.textSize = config.textSize;
+      copy.font = config.font;
+      copy.themeProvider = config.themeProvider;
+      return copy;
+   }
 }

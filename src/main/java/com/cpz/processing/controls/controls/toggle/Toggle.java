@@ -1,7 +1,11 @@
 package com.cpz.processing.controls.controls.toggle;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
+import com.cpz.processing.controls.controls.ParentSizeAwareControl;
 import com.cpz.processing.controls.controls.PointerRoutableControl;
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
+import com.cpz.processing.controls.controls.geometry.ResolvedBounds;
 import com.cpz.processing.controls.controls.toggle.input.ToggleInputAdapter;
 import com.cpz.processing.controls.controls.toggle.model.ToggleModel;
 import com.cpz.processing.controls.controls.toggle.style.ToggleStyle;
@@ -24,12 +28,16 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class Toggle implements PointerRoutableControl, TooltipAttachable {
+public final class Toggle implements PointerRoutableControl, ParentSizeAwareControl, TooltipAttachable {
+    private final PApplet sketch;
     private final ToggleModel model;
     private final ToggleViewModel viewModel;
     private final ToggleView view;
     private final ToggleInputAdapter inputAdapter;
     private final TooltipSupport tooltipSupport;
+    private ControlBounds bounds;
+    private Float parentWidth;
+    private Float parentHeight;
     private ValueListener<Integer> changeListener;
 
     public Toggle(PApplet sketch, float x, float y, float size) {
@@ -53,10 +61,31 @@ public final class Toggle implements PointerRoutableControl, TooltipAttachable {
     }
 
     public Toggle(PApplet sketch, String code, int initialState, int totalStates, float x, float y, float width, float height) {
-        Objects.requireNonNull(sketch, "sketch");
+        this(sketch, code, initialState, totalStates, ControlBounds.absolute(x, y, width, height));
+    }
+
+    public Toggle(PApplet sketch, ControlBounds bounds) {
+        this(sketch, ControlCode.auto("toggle"), 0, 2, bounds);
+    }
+
+    public Toggle(PApplet sketch, String code, ControlBounds bounds) {
+        this(sketch, code, 0, 2, bounds);
+    }
+
+    public Toggle(PApplet sketch, String code, int initialState, int totalStates, ControlBounds bounds) {
+        this.sketch = Objects.requireNonNull(sketch, "sketch");
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        ResolvedBounds resolvedBounds = this.resolveBounds();
         this.model = new ToggleModel(code);
         this.viewModel = new ToggleViewModel(this.model);
-        this.view = new ToggleView(sketch, this.viewModel, x, y, width, height);
+        this.view = new ToggleView(
+                sketch,
+                this.viewModel,
+                resolvedBounds.x(),
+                resolvedBounds.y(),
+                resolvedBounds.width(),
+                resolvedBounds.height()
+        );
         this.inputAdapter = new ToggleInputAdapter(this.view, this.viewModel);
         this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible);
         this.setTotalStates(totalStates);
@@ -64,16 +93,19 @@ public final class Toggle implements PointerRoutableControl, TooltipAttachable {
     }
 
     public void draw() {
+        this.applyResolvedBounds();
         this.view.draw();
     }
 
     public void handlePointerEvent(PointerEvent event) {
+        this.applyResolvedBounds();
         int before = this.viewModel.getState();
         this.inputAdapter.handlePointerEvent(event);
         this.notifyChangeIfNeeded(before);
     }
 
     public boolean canConsumePointerEvent(PointerEvent event) {
+        this.applyResolvedBounds();
         return event != null
                 && event.getType() != PointerEvent.Type.WHEEL
                 && this.isVisible()
@@ -136,15 +168,35 @@ public final class Toggle implements PointerRoutableControl, TooltipAttachable {
     }
 
     public void setPosition(float x, float y) {
-        this.view.setPosition(x, y);
+        this.bounds = this.bounds.withPosition(ControlMeasure.absolute(x), ControlMeasure.absolute(y));
+        this.applyResolvedBounds();
     }
 
     public void setSize(float size) {
-        this.view.setSize(size);
+        this.bounds = this.bounds.withSize(ControlMeasure.absolute(size), ControlMeasure.absolute(size));
+        this.applyResolvedBounds();
     }
 
     public void setSize(float width, float height) {
-        this.view.setSize(width, height);
+        this.bounds = this.bounds.withSize(ControlMeasure.absolute(width), ControlMeasure.absolute(height));
+        this.applyResolvedBounds();
+    }
+
+    public void setBounds(ControlBounds bounds) {
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        this.applyResolvedBounds();
+    }
+
+    public void setParentSize(float width, float height) {
+        this.parentWidth = width;
+        this.parentHeight = height;
+        this.applyResolvedBounds();
+    }
+
+    public void clearParentSize() {
+        this.parentWidth = null;
+        this.parentHeight = null;
+        this.applyResolvedBounds();
     }
 
     private void notifyChangeIfNeeded(int previousState) {
@@ -215,6 +267,7 @@ public final class Toggle implements PointerRoutableControl, TooltipAttachable {
     }
 
     public TooltipBounds getTooltipBounds() {
+        this.applyResolvedBounds();
         return this.tooltipSupport.getTooltipBounds();
     }
 
@@ -228,5 +281,17 @@ public final class Toggle implements PointerRoutableControl, TooltipAttachable {
 
     public boolean isTooltipTargetEnabled() {
         return this.tooltipSupport.isTooltipTargetEnabled();
+    }
+
+    private ResolvedBounds resolveBounds() {
+        float width = this.parentWidth != null ? this.parentWidth : this.sketch.width;
+        float height = this.parentHeight != null ? this.parentHeight : this.sketch.height;
+        return this.bounds.resolve(width, height);
+    }
+
+    private void applyResolvedBounds() {
+        ResolvedBounds resolvedBounds = this.resolveBounds();
+        this.view.setPosition(resolvedBounds.x(), resolvedBounds.y());
+        this.view.setSize(resolvedBounds.width(), resolvedBounds.height());
     }
 }

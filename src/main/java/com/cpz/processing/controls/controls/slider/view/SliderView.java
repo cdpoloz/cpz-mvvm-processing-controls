@@ -136,6 +136,10 @@ public final class SliderView implements ControlView, PointerInteractable {
 
    }
 
+   public SliderStyle getStyle() {
+      return this.style;
+   }
+
    /**
     * Returns orientation.
     *

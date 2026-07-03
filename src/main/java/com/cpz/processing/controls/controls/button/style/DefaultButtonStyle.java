@@ -104,4 +104,37 @@ public final class DefaultButtonStyle implements ButtonStyle {
    public ThemeSnapshot getThemeSnapshot() {
       return this.themeProvider.getSnapshot();
    }
+
+   @Override
+   public ButtonStyleConfig getButtonStyleConfig() {
+      return this.config;
+   }
+
+   public DefaultButtonStyle copy() {
+      return new DefaultButtonStyle(copyConfig(this.config), this.renderer);
+   }
+
+   private static ButtonStyleConfig copyConfig(ButtonStyleConfig config) {
+      if (config == null) {
+         return null;
+      }
+      ButtonStyleConfig copy = new ButtonStyleConfig();
+      copy.fillOverride = config.fillOverride;
+      copy.textOverride = config.textOverride;
+      copy.strokeOverride = config.strokeOverride;
+      copy.baseColor = config.baseColor;
+      copy.textColor = config.textColor;
+      copy.strokeColor = config.strokeColor;
+      copy.strokeWeight = config.strokeWeight;
+      copy.strokeWeightHover = config.strokeWeightHover;
+      copy.cornerRadius = config.cornerRadius;
+      copy.disabledAlpha = config.disabledAlpha;
+      copy.hoverBlendWithWhite = config.hoverBlendWithWhite;
+      copy.pressedBlendWithBlack = config.pressedBlendWithBlack;
+      copy.renderer = config.renderer;
+      copy.themeProvider = config.themeProvider;
+      copy.font = config.font;
+      copy.textSize = config.textSize;
+      return copy;
+   }
 }

@@ -117,4 +117,54 @@ public final class SliderStyle {
    public ThemeSnapshot getThemeSnapshot() {
       return this.themeProvider.getSnapshot();
    }
+
+   public SliderStyleConfig getSliderStyleConfig() {
+      return this.config;
+   }
+
+   public SliderStyle copy() {
+      return new SliderStyle(copyConfig(this.config), this.renderer);
+   }
+
+   private static SliderStyleConfig copyConfig(SliderStyleConfig config) {
+      SliderStyleConfig copy = new SliderStyleConfig();
+      copy.trackOverride = config.trackOverride;
+      copy.trackHoverOverride = config.trackHoverOverride;
+      copy.trackPressedOverride = config.trackPressedOverride;
+      copy.progressOverride = config.progressOverride;
+      copy.progressHoverOverride = config.progressHoverOverride;
+      copy.progressPressedOverride = config.progressPressedOverride;
+      copy.thumbOverride = config.thumbOverride;
+      copy.thumbHoverOverride = config.thumbHoverOverride;
+      copy.thumbPressedOverride = config.thumbPressedOverride;
+      copy.trackStrokeOverride = config.trackStrokeOverride;
+      copy.thumbStrokeOverride = config.thumbStrokeOverride;
+      copy.textOverride = config.textOverride;
+      copy.trackColor = config.trackColor;
+      copy.trackHoverColor = config.trackHoverColor;
+      copy.trackPressedColor = config.trackPressedColor;
+      copy.trackStrokeColor = config.trackStrokeColor;
+      copy.trackStrokeWeight = config.trackStrokeWeight;
+      copy.trackStrokeWeightHover = config.trackStrokeWeightHover;
+      copy.trackThickness = config.trackThickness;
+      copy.activeTrackColor = config.activeTrackColor;
+      copy.activeTrackHoverColor = config.activeTrackHoverColor;
+      copy.activeTrackPressedColor = config.activeTrackPressedColor;
+      copy.thumbColor = config.thumbColor;
+      copy.thumbHoverColor = config.thumbHoverColor;
+      copy.thumbPressedColor = config.thumbPressedColor;
+      copy.thumbStrokeColor = config.thumbStrokeColor;
+      copy.thumbStrokeWeight = config.thumbStrokeWeight;
+      copy.thumbStrokeWeightHover = config.thumbStrokeWeightHover;
+      copy.thumbSize = config.thumbSize;
+      copy.textColor = config.textColor;
+      copy.disabledAlpha = config.disabledAlpha;
+      copy.showValueText = config.showValueText;
+      copy.svgColorMode = config.svgColorMode;
+      copy.thumbShape = config.thumbShape;
+      copy.themeProvider = config.themeProvider;
+      copy.font = config.font;
+      copy.textSize = config.textSize;
+      return copy;
+   }
 }

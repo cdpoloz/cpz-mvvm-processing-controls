@@ -38,6 +38,56 @@ not rewrite child positions.
 
 ---
 
+## Explicit Relative Bounds
+
+Controls that implement the relative geometry API can opt into explicit
+relative bounds with `ControlBounds.relative(...)`. This includes `Panel`,
+`Button`, `Label`, `Checkbox`, `Toggle`, `Slider`, `TextField`,
+`NumericField`, and `RadioGroup`. `DropDown` can use relative bounds as a
+root control, but full `DropDown` support inside a panel remains outside the
+panel MVP because its expanded list uses a global overlay.
+
+Absolute constructors and setters remain the default behavior.
+
+```java
+Panel panel = new Panel(this, "pnlSettings",
+        ControlBounds.relative(0.1f, 0.1f, 0.45f, 0.35f));
+
+Button save = new Button(this, "btnSave", "Save",
+        ControlBounds.relative(0.5f, 0.5f, 0.3f, 0.12f));
+
+Label title = new Label(this, "lblTitle", "Settings",
+        ControlBounds.relative(0.08f, 0.12f, 0.6f, 0.1f));
+title.setTextSize(ControlMeasure.relative(0.06f));
+
+panel.add(title).add(save);
+```
+
+Resolution rules are explicit:
+
+- relative `x` uses `parentWidth * factor`
+- relative `y` uses `parentHeight * factor`
+- relative `width` uses `parentHeight * factor`
+- relative `height` uses `parentHeight * factor`
+- relative text size uses `parentHeight * factor`
+
+For root controls, the parent is the sketch canvas. For children inside a
+panel, the parent is the panel's resolved width and height. The resolved child
+coordinates are still local to the panel. Child text controls that support
+`setTextSize(ControlMeasure.relative(...))` also resolve text size against the
+panel height.
+
+Relative text size is supported by `Button`, `Label`, `TextField`,
+`NumericField`, `RadioGroup`, `DropDown`, and the value text rendered by
+`Slider`. `DropDown` is still not supported as an interactive panel child.
+
+For `RadioGroup`, relative bounds height maps to the item height; the total
+group height is still derived from options and item spacing.
+
+JSON does not support relative bounds yet.
+
+---
+
 ## Drawing
 
 `Panel.draw()` uses the Processing matrix stack:
@@ -74,6 +124,26 @@ subtracts its own `x` and `y` before routing the event to compatible children.
 Keyboard routing is available for children that implement the optional
 `KeyboardRoutableControl` contract, such as `TextField`, `NumericField`, and
 `RadioGroup`.
+
+---
+
+## Supported Children
+
+The current panel input route supports these child controls:
+
+- `Panel`
+- `Button`
+- `Checkbox`
+- `Toggle`
+- `Slider`
+- `TextField`
+- `NumericField`
+- `RadioGroup`
+- non-interactive `Control` children such as `Label`
+
+`DropDown` is not supported as an interactive panel child yet. Its collapsed
+control can use relative bounds as a root control, but its expanded list is
+managed through a global overlay and is not translated through `PanelInputLayer`.
 
 ---
 
@@ -181,7 +251,6 @@ The MVP intentionally does not include:
 
 - JSON creation or hierarchical JSON
 - automatic layout
-- relative positions or relative sizes
 - clipping
 - formal background, border, or padding API
 - full `DropDown` support inside a panel

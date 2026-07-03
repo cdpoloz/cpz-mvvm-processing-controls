@@ -133,6 +133,10 @@ public final class DropDownView implements ControlView, PointerInteractable {
 
    }
 
+   public DefaultDropDownStyle getStyle() {
+      return this.style;
+   }
+
    /**
     * Performs contains.
     *

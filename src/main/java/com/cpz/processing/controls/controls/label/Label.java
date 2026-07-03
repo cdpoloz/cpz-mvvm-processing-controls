@@ -1,8 +1,12 @@
 package com.cpz.processing.controls.controls.label;
 
-import com.cpz.processing.controls.controls.Control;
+import com.cpz.processing.controls.controls.ParentSizeAwareControl;
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
+import com.cpz.processing.controls.controls.geometry.ResolvedBounds;
 import com.cpz.processing.controls.controls.label.config.LabelStyleConfig;
 import com.cpz.processing.controls.controls.label.model.LabelModel;
+import com.cpz.processing.controls.controls.label.style.DefaultLabelStyle;
 import com.cpz.processing.controls.controls.label.style.LabelStyle;
 import com.cpz.processing.controls.controls.label.view.LabelView;
 import com.cpz.processing.controls.controls.label.viewmodel.LabelViewModel;
@@ -22,11 +26,17 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class Label implements Control, TooltipAttachable {
+public final class Label implements ParentSizeAwareControl, TooltipAttachable {
+    private final PApplet sketch;
     private final LabelModel model;
     private final LabelViewModel viewModel;
     private final LabelView view;
     private final TooltipSupport tooltipSupport;
+    private ControlBounds bounds;
+    private ControlMeasure textSize;
+    private boolean textSizeStyleIsolated;
+    private Float parentWidth;
+    private Float parentHeight;
 
     public Label(PApplet sketch, String text, float x, float y) {
         this(sketch, ControlCode.auto("label"), text, x, y, 0.0f, 0.0f);
@@ -41,15 +51,33 @@ public final class Label implements Control, TooltipAttachable {
     }
 
     public Label(PApplet sketch, String code, String text, float x, float y, float width, float height) {
-        Objects.requireNonNull(sketch, "sketch");
+        this(sketch, code, text, ControlBounds.absolute(x, y, width, height));
+    }
+
+    public Label(PApplet sketch, String text, ControlBounds bounds) {
+        this(sketch, ControlCode.auto("label"), text, bounds);
+    }
+
+    public Label(PApplet sketch, String code, String text, ControlBounds bounds) {
+        this.sketch = Objects.requireNonNull(sketch, "sketch");
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        ResolvedBounds resolvedBounds = this.resolveBounds();
         this.model = new LabelModel(code);
         this.viewModel = new LabelViewModel(this.model);
         this.viewModel.setText(text);
-        this.view = new LabelView(sketch, this.viewModel, x, y, width, height);
+        this.view = new LabelView(
+                sketch,
+                this.viewModel,
+                resolvedBounds.x(),
+                resolvedBounds.y(),
+                resolvedBounds.width(),
+                resolvedBounds.height()
+        );
         this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible);
     }
 
     public void draw() {
+        this.applyResolvedGeometryAndTextSize();
         this.view.draw();
     }
 
@@ -83,6 +111,8 @@ public final class Label implements Control, TooltipAttachable {
 
     public void setStyle(LabelStyle style) {
         this.view.setStyle(style);
+        this.textSizeStyleIsolated = false;
+        this.applyResolvedTextSize();
     }
 
     public LabelStyle getStyle() {
@@ -90,15 +120,44 @@ public final class Label implements Control, TooltipAttachable {
     }
 
     public LabelStyleConfig getStyleConfig() {
+        this.applyResolvedTextSize();
         return this.view.getStyle().getLabelStyleConfig();
     }
 
     public void setPosition(float x, float y) {
-        this.view.setPosition(x, y);
+        this.bounds = this.bounds.withPosition(ControlMeasure.absolute(x), ControlMeasure.absolute(y));
+        this.applyResolvedGeometryAndTextSize();
     }
 
     public void setSize(float width, float height) {
-        this.view.setSize(width, height);
+        this.bounds = this.bounds.withSize(ControlMeasure.absolute(width), ControlMeasure.absolute(height));
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void setBounds(ControlBounds bounds) {
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void setTextSize(float textSize) {
+        this.setTextSize(ControlMeasure.absolute(textSize));
+    }
+
+    public void setTextSize(ControlMeasure textSize) {
+        this.textSize = Objects.requireNonNull(textSize, "textSize");
+        this.applyResolvedTextSize();
+    }
+
+    public void setParentSize(float width, float height) {
+        this.parentWidth = width;
+        this.parentHeight = height;
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void clearParentSize() {
+        this.parentWidth = null;
+        this.parentHeight = null;
+        this.applyResolvedGeometryAndTextSize();
     }
 
     public Label setTooltip(String text) {
@@ -162,6 +221,7 @@ public final class Label implements Control, TooltipAttachable {
     }
 
     public TooltipBounds getTooltipBounds() {
+        this.applyResolvedGeometryAndTextSize();
         return this.tooltipSupport.getTooltipBounds();
     }
 
@@ -175,5 +235,46 @@ public final class Label implements Control, TooltipAttachable {
 
     public boolean isTooltipTargetEnabled() {
         return this.tooltipSupport.isTooltipTargetEnabled();
+    }
+
+    private ResolvedBounds resolveBounds() {
+        return this.bounds.resolve(this.parentWidth(), this.parentHeight());
+    }
+
+    private float parentWidth() {
+        return this.parentWidth != null ? this.parentWidth : this.sketch.width;
+    }
+
+    private float parentHeight() {
+        return this.parentHeight != null ? this.parentHeight : this.sketch.height;
+    }
+
+    private void applyResolvedGeometryAndTextSize() {
+        ResolvedBounds resolvedBounds = this.resolveBounds();
+        this.view.setPosition(resolvedBounds.x(), resolvedBounds.y());
+        this.view.setSize(resolvedBounds.width(), resolvedBounds.height());
+        this.applyResolvedTextSize();
+    }
+
+    private void applyResolvedTextSize() {
+        if (this.textSize == null) {
+            return;
+        }
+        this.ensureTextSizeStyleIsolated();
+        LabelStyleConfig styleConfig = this.view.getStyle().getLabelStyleConfig();
+        if (styleConfig != null) {
+            styleConfig.textSize = this.textSize.resolve(this.parentHeight());
+        }
+    }
+
+    private void ensureTextSizeStyleIsolated() {
+        if (this.textSizeStyleIsolated) {
+            return;
+        }
+        LabelStyle style = this.view.getStyle();
+        if (style instanceof DefaultLabelStyle) {
+            this.view.setStyle(((DefaultLabelStyle) style).copy());
+        }
+        this.textSizeStyleIsolated = true;
     }
 }

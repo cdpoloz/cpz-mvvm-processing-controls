@@ -137,6 +137,10 @@ public final class ButtonView implements ControlView, PointerInteractable {
 
    }
 
+   public ButtonStyle getStyle() {
+      return this.style;
+   }
+
    /**
     * Updates hit test.
     *

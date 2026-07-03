@@ -105,4 +105,24 @@ public final class DefaultLabelStyle implements LabelStyle {
       return config;
    }
 
+   public DefaultLabelStyle copy() {
+      return new DefaultLabelStyle(copyConfig(this.config), this.renderer);
+   }
+
+   private static LabelStyleConfig copyConfig(LabelStyleConfig config) {
+      if (config == null) {
+         return null;
+      }
+      LabelStyleConfig copy = new LabelStyleConfig();
+      copy.font = config.font;
+      copy.textSize = config.textSize;
+      copy.textColor = config.textColor;
+      copy.lineSpacingMultiplier = config.lineSpacingMultiplier;
+      copy.alignX = config.alignX;
+      copy.alignY = config.alignY;
+      copy.disabledAlpha = config.disabledAlpha;
+      copy.themeProvider = config.themeProvider;
+      return copy;
+   }
+
 }
