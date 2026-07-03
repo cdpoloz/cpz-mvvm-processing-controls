@@ -1,5 +1,7 @@
 package com.cpz.processing.controls.controls.slider.config;
 
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.controls.slider.model.SliderOrientation;
 import com.cpz.processing.controls.controls.slider.model.SnapMode;
 import com.cpz.processing.controls.controls.slider.style.SvgColorMode;
@@ -23,6 +25,8 @@ public final class SliderConfig {
     private final float y;
     private final float width;
     private final float height;
+    private final ControlBounds bounds;
+    private final ControlMeasure textSize;
     private final SliderOrientation orientation;
     private final SnapMode snapMode;
     private final boolean enabled;
@@ -66,15 +70,35 @@ public final class SliderConfig {
             StyleConfig style,
             TooltipConfig tooltip
     ) {
+        this(code, min, max, step, value, ControlBounds.absolute(x, y, width, height), null, orientation, snapMode, enabled, visible, style, tooltip);
+    }
+
+    public SliderConfig(
+            String code,
+            BigDecimal min,
+            BigDecimal max,
+            BigDecimal step,
+            BigDecimal value,
+            ControlBounds bounds,
+            ControlMeasure textSize,
+            SliderOrientation orientation,
+            SnapMode snapMode,
+            boolean enabled,
+            boolean visible,
+            StyleConfig style,
+            TooltipConfig tooltip
+    ) {
         this.code = Objects.requireNonNull(code, "code");
         this.min = Objects.requireNonNull(min, "min");
         this.max = Objects.requireNonNull(max, "max");
         this.step = Objects.requireNonNull(step, "step");
         this.value = Objects.requireNonNull(value, "value");
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        this.x = bounds.x().value();
+        this.y = bounds.y().value();
+        this.width = bounds.width().value();
+        this.height = bounds.height().value();
+        this.textSize = textSize;
         this.orientation = Objects.requireNonNull(orientation, "orientation");
         this.snapMode = Objects.requireNonNull(snapMode, "snapMode");
         this.enabled = enabled;
@@ -117,6 +141,14 @@ public final class SliderConfig {
 
     public float getHeight() {
         return this.height;
+    }
+
+    public ControlBounds getBounds() {
+        return this.bounds;
+    }
+
+    public ControlMeasure getTextSizeMeasure() {
+        return this.textSize;
     }
 
     public SliderOrientation getOrientation() {

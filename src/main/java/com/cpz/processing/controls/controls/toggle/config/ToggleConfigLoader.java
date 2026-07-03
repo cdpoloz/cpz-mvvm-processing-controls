@@ -41,11 +41,6 @@ public final class ToggleConfigLoader {
     }
 
     public ToggleConfig loadFromJson(JSONObject root, String path) {
-        float width = root.getFloat("width");
-        float height = root.getFloat("height");
-        JsonConfigSupport.validatePositiveDimension("width", width, path);
-        JsonConfigSupport.validatePositiveDimension("height", height, path);
-
         int totalStates = root.getInt("totalStates", 2);
         if (totalStates <= 0) {
             throw new IllegalArgumentException("Invalid 'totalStates' value in " + path + ": " + totalStates + ". Expected an integer greater than 0.");
@@ -60,10 +55,7 @@ public final class ToggleConfigLoader {
                 JsonConfigSupport.getRequiredString(root, "code", path, "toggle"),
                 state,
                 totalStates,
-                root.getFloat("x"),
-                root.getFloat("y"),
-                width,
-                height,
+                JsonConfigSupport.getControlBounds(root, path, "toggle"),
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
                 this.readStyle(root, path),

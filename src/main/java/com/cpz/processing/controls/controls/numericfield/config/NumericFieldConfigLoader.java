@@ -40,21 +40,14 @@ public final class NumericFieldConfigLoader {
     }
 
     public NumericFieldConfig loadFromJson(JSONObject root, String path) {
-        float width = root.getFloat("width");
-        float height = root.getFloat("height");
-        JsonConfigSupport.validatePositiveDimension("width", width, path);
-        JsonConfigSupport.validatePositiveDimension("height", height, path);
-
         String text = root.getString("text", "");
         validateText(text, path);
 
         return new NumericFieldConfig(
                 JsonConfigSupport.getRequiredString(root, "code", path, "numericfield"),
                 text,
-                root.getFloat("x"),
-                root.getFloat("y"),
-                width,
-                height,
+                JsonConfigSupport.getControlBounds(root, path, "numericfield"),
+                JsonConfigSupport.getOptionalControlMeasure(root, "textSize", path, "numericfield"),
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
                 this.readStyle(root, path),

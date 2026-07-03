@@ -23,16 +23,16 @@ public final class TextFieldFactory {
                 sketch,
                 config.getCode(),
                 config.getText(),
-                config.getX(),
-                config.getY(),
-                config.getWidth(),
-                config.getHeight()
+                config.getBounds()
         );
         textField.setEnabled(config.isEnabled());
         textField.setVisible(config.isVisible());
 
         if (config.getStyle() != null) {
             textField.setStyle(new DefaultTextFieldStyle(toStyleConfig(sketch, config.getStyle())));
+        }
+        if (config.getTextSizeMeasure() != null) {
+            textField.setTextSize(config.getTextSizeMeasure());
         }
         textField.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
 

@@ -43,11 +43,6 @@ public final class DropDownConfigLoader {
     }
 
     public DropDownConfig loadFromJson(JSONObject root, String path) {
-        float width = root.getFloat("width");
-        float height = root.getFloat("height");
-        JsonConfigSupport.validatePositiveDimension("width", width, path);
-        JsonConfigSupport.validatePositiveDimension("height", height, path);
-
         List<String> items = this.readItems(root, path);
         if (items.isEmpty()) {
             throw new IllegalArgumentException("Invalid 'items' value in " + path + ": expected at least one item.");
@@ -62,10 +57,8 @@ public final class DropDownConfigLoader {
                 JsonConfigSupport.getRequiredString(root, "code", path, "dropdown"),
                 items,
                 selectedIndex,
-                root.getFloat("x"),
-                root.getFloat("y"),
-                width,
-                height,
+                JsonConfigSupport.getControlBounds(root, path, "dropdown"),
+                JsonConfigSupport.getOptionalControlMeasure(root, "textSize", path, "dropdown"),
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
                 this.readStyle(root, path),

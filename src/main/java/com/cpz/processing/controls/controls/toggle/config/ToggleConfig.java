@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.controls.toggle.config;
 
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipConfig;
 
 import java.util.Objects;
@@ -17,6 +18,7 @@ public final class ToggleConfig {
     private final float y;
     private final float width;
     private final float height;
+    private final ControlBounds bounds;
     private final boolean enabled;
     private final boolean visible;
     private final StyleConfig style;
@@ -27,13 +29,18 @@ public final class ToggleConfig {
     }
 
     public ToggleConfig(String code, int state, int totalStates, float x, float y, float width, float height, boolean enabled, boolean visible, StyleConfig style, TooltipConfig tooltip) {
+        this(code, state, totalStates, ControlBounds.absolute(x, y, width, height), enabled, visible, style, tooltip);
+    }
+
+    public ToggleConfig(String code, int state, int totalStates, ControlBounds bounds, boolean enabled, boolean visible, StyleConfig style, TooltipConfig tooltip) {
         this.code = Objects.requireNonNull(code, "code");
         this.state = state;
         this.totalStates = totalStates;
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        this.x = bounds.x().value();
+        this.y = bounds.y().value();
+        this.width = bounds.width().value();
+        this.height = bounds.height().value();
         this.enabled = enabled;
         this.visible = visible;
         this.style = style;
@@ -66,6 +73,10 @@ public final class ToggleConfig {
 
     public float getHeight() {
         return this.height;
+    }
+
+    public ControlBounds getBounds() {
+        return this.bounds;
     }
 
     public boolean isEnabled() {

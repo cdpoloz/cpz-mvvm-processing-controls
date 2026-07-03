@@ -43,9 +43,6 @@ public final class RadioGroupConfigLoader {
     }
 
     public RadioGroupConfig loadFromJson(JSONObject root, String path) {
-        float width = root.getFloat("width");
-        JsonConfigSupport.validatePositiveDimension("width", width, path);
-
         List<String> options = this.readOptions(root, path);
         if (options.isEmpty()) {
             throw new IllegalArgumentException("Invalid 'options' value in " + path + ": expected at least one option.");
@@ -56,16 +53,18 @@ public final class RadioGroupConfigLoader {
             throw new IllegalArgumentException("Invalid 'selectedIndex' value in " + path + ": " + selectedIndex + ". Expected -1 or a value between 0 and " + (options.size() - 1) + ".");
         }
 
+        boolean explicitBounds = JsonConfigSupport.hasExplicitBounds(root);
+        RadioGroupConfig.StyleConfig style = this.readStyle(root, path);
         return new RadioGroupConfig(
                 JsonConfigSupport.getRequiredString(root, "code", path, "radiogroup"),
                 options,
                 selectedIndex,
-                root.getFloat("x"),
-                root.getFloat("y"),
-                width,
+                JsonConfigSupport.getControlBounds(root, path, "radiogroup", style != null && style.getItemHeight() != null ? style.getItemHeight() : 0.0F),
+                explicitBounds,
+                JsonConfigSupport.getOptionalControlMeasure(root, "textSize", path, "radiogroup"),
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
-                this.readStyle(root, path),
+                style,
                 TooltipJsonSupport.readTooltip(this.sketch, root, path, this.tooltipStyles)
         );
     }

@@ -25,10 +25,7 @@ public final class ToggleFactory {
                 config.getCode(),
                 config.getState(),
                 config.getTotalStates(),
-                config.getX(),
-                config.getY(),
-                config.getWidth(),
-                config.getHeight()
+                config.getBounds()
         );
         toggle.setEnabled(config.isEnabled());
         toggle.setVisible(config.isVisible());

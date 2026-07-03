@@ -21,12 +21,15 @@ public final class ButtonFactory {
         Objects.requireNonNull(sketch, "sketch");
         Objects.requireNonNull(config, "config");
 
-        Button button = new Button(sketch, config.getCode(), config.getText(), config.getX(), config.getY(), config.getWidth(), config.getHeight());
+        Button button = new Button(sketch, config.getCode(), config.getText(), config.getBounds());
         button.setEnabled(config.isEnabled());
         button.setVisible(config.isVisible());
 
         if (config.getStyle() != null) {
             button.setStyle(new DefaultButtonStyle(toStyleConfig(sketch, config.getStyle())));
+        }
+        if (config.getTextSizeMeasure() != null) {
+            button.setTextSize(config.getTextSizeMeasure());
         }
         button.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
 

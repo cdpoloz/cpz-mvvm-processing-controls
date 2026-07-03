@@ -25,16 +25,16 @@ public final class LabelFactory {
                 sketch,
                 config.getCode(),
                 config.getText(),
-                config.getX(),
-                config.getY(),
-                config.getWidth(),
-                config.getHeight()
+                config.getBounds()
         );
         label.setEnabled(config.isEnabled());
         label.setVisible(config.isVisible());
 
         if (config.getStyle() != null) {
             label.setStyle(new DefaultLabelStyle(toStyleConfig(sketch, config.getStyle())));
+        }
+        if (config.getTextSizeMeasure() != null) {
+            label.setTextSize(config.getTextSizeMeasure());
         }
         label.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
 

@@ -116,7 +116,49 @@ For `RadioGroup`, the bounds height maps to item height because the group
 height is derived from options and spacing.
 
 Existing constructors and `setPosition(...)` / `setSize(...)` remain absolute
-by default. JSON configuration does not support these relative measures yet.
+by default.
+
+JSON keeps the legacy absolute geometry format:
+
+```json
+{
+  "type": "button",
+  "code": "btnSave",
+  "text": "Save",
+  "x": 100,
+  "y": 50,
+  "width": 200,
+  "height": 40
+}
+```
+
+The recommended explicit format is:
+
+```json
+{
+  "type": "button",
+  "code": "btnSave",
+  "text": "Save",
+  "bounds": {
+    "mode": "relative",
+    "x": 0.1,
+    "y": 0.2,
+    "width": 0.35,
+    "height": 0.08
+  },
+  "textSize": {
+    "mode": "relative",
+    "value": 0.035
+  }
+}
+```
+
+Use `"mode": "absolute"` with the same object shape for explicit absolute JSON.
+The `mode` field is required for `bounds` and top-level `textSize`; accepted
+values are `absolute` and `relative`, matched case-insensitively after trimming.
+The loader never infers relative values from numbers between `0` and `1`. If
+both `bounds` and legacy `x` / `y` / `width` / `height` are present, `bounds`
+is the source of geometry.
 
 Relative text size is also opt-in. `setTextSize(float)` is absolute; use
 `setTextSize(ControlMeasure.relative(factor))` when the text should scale from
@@ -131,6 +173,17 @@ Relative text size is supported by `Button`, `Label`, `TextField`,
 `NumericField`, `RadioGroup`, `DropDown`, and the value text rendered by
 `Slider`. `Checkbox` and `Toggle` do not expose text rendering in their public
 facades.
+
+For minimal visual examples of relative bounds, see
+`src/main/java/com/cpz/processing/controls/examples/button/ButtonRelativeTest.java`
+for the Java API and
+`src/main/java/com/cpz/processing/controls/examples/button/ButtonJsonRelativeTest.java`
+with `data/config/button-relative.json` for JSON loading.
+
+In JSON, legacy `style.textSize` remains an absolute style value for existing
+config files. The top-level `textSize` object shown above is the relative-aware
+control measure and takes effect through the public facade. If both are present,
+top-level `textSize` is applied after the style and therefore takes precedence.
 
 ---
 

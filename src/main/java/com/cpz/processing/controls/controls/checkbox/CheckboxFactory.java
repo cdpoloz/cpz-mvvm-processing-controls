@@ -19,7 +19,7 @@ public final class CheckboxFactory {
         Objects.requireNonNull(sketch, "sketch");
         Objects.requireNonNull(config, "config");
 
-        Checkbox checkbox = new Checkbox(sketch, config.getCode(), config.isChecked(), config.getX(), config.getY(), config.getWidth(), config.getHeight());
+        Checkbox checkbox = new Checkbox(sketch, config.getCode(), config.isChecked(), config.getBounds());
         checkbox.setEnabled(config.isEnabled());
         checkbox.setVisible(config.isVisible());
 

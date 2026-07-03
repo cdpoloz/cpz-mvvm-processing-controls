@@ -1,5 +1,7 @@
 package com.cpz.processing.controls.controls.dropdown.config;
 
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipConfig;
 
 import java.util.List;
@@ -18,6 +20,8 @@ public final class DropDownConfig {
     private final float y;
     private final float width;
     private final float height;
+    private final ControlBounds bounds;
+    private final ControlMeasure textSize;
     private final boolean enabled;
     private final boolean visible;
     private final StyleConfig style;
@@ -28,13 +32,19 @@ public final class DropDownConfig {
     }
 
     public DropDownConfig(String code, List<String> items, int selectedIndex, float x, float y, float width, float height, boolean enabled, boolean visible, StyleConfig style, TooltipConfig tooltip) {
+        this(code, items, selectedIndex, ControlBounds.absolute(x, y, width, height), null, enabled, visible, style, tooltip);
+    }
+
+    public DropDownConfig(String code, List<String> items, int selectedIndex, ControlBounds bounds, ControlMeasure textSize, boolean enabled, boolean visible, StyleConfig style, TooltipConfig tooltip) {
         this.code = Objects.requireNonNull(code, "code");
         this.items = List.copyOf(Objects.requireNonNull(items, "items"));
         this.selectedIndex = selectedIndex;
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        this.x = bounds.x().value();
+        this.y = bounds.y().value();
+        this.width = bounds.width().value();
+        this.height = bounds.height().value();
+        this.textSize = textSize;
         this.enabled = enabled;
         this.visible = visible;
         this.style = style;
@@ -67,6 +77,14 @@ public final class DropDownConfig {
 
     public float getHeight() {
         return this.height;
+    }
+
+    public ControlBounds getBounds() {
+        return this.bounds;
+    }
+
+    public ControlMeasure getTextSizeMeasure() {
+        return this.textSize;
     }
 
     public boolean isEnabled() {

@@ -41,18 +41,11 @@ public final class ButtonConfigLoader {
     }
 
     public ButtonConfig loadFromJson(JSONObject root, String path) {
-        float width = root.getFloat("width");
-        float height = root.getFloat("height");
-        JsonConfigSupport.validatePositiveDimension("width", width, path);
-        JsonConfigSupport.validatePositiveDimension("height", height, path);
-
         return new ButtonConfig(
                 JsonConfigSupport.getRequiredString(root, "code", path, "button"),
                 root.getString("text"),
-                root.getFloat("x"),
-                root.getFloat("y"),
-                width,
-                height,
+                JsonConfigSupport.getControlBounds(root, path, "button"),
+                JsonConfigSupport.getOptionalControlMeasure(root, "textSize", path, "button"),
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
                 this.readStyle(root, path),

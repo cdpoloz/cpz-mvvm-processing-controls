@@ -1,5 +1,7 @@
 package com.cpz.processing.controls.controls.radiogroup.config;
 
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipConfig;
 
 import java.util.List;
@@ -17,6 +19,9 @@ public final class RadioGroupConfig {
     private final float x;
     private final float y;
     private final float width;
+    private final ControlBounds bounds;
+    private final boolean explicitBounds;
+    private final ControlMeasure textSize;
     private final boolean enabled;
     private final boolean visible;
     private final StyleConfig style;
@@ -27,12 +32,19 @@ public final class RadioGroupConfig {
     }
 
     public RadioGroupConfig(String code, List<String> options, int selectedIndex, float x, float y, float width, boolean enabled, boolean visible, StyleConfig style, TooltipConfig tooltip) {
+        this(code, options, selectedIndex, ControlBounds.absolute(x, y, width, 0.0F), false, null, enabled, visible, style, tooltip);
+    }
+
+    public RadioGroupConfig(String code, List<String> options, int selectedIndex, ControlBounds bounds, boolean explicitBounds, ControlMeasure textSize, boolean enabled, boolean visible, StyleConfig style, TooltipConfig tooltip) {
         this.code = Objects.requireNonNull(code, "code");
         this.options = List.copyOf(Objects.requireNonNull(options, "options"));
         this.selectedIndex = selectedIndex;
-        this.x = x;
-        this.y = y;
-        this.width = width;
+        this.bounds = Objects.requireNonNull(bounds, "bounds");
+        this.explicitBounds = explicitBounds;
+        this.x = bounds.x().value();
+        this.y = bounds.y().value();
+        this.width = bounds.width().value();
+        this.textSize = textSize;
         this.enabled = enabled;
         this.visible = visible;
         this.style = style;
@@ -61,6 +73,18 @@ public final class RadioGroupConfig {
 
     public float getWidth() {
         return this.width;
+    }
+
+    public ControlBounds getBounds() {
+        return this.bounds;
+    }
+
+    public boolean hasExplicitBounds() {
+        return this.explicitBounds;
+    }
+
+    public ControlMeasure getTextSizeMeasure() {
+        return this.textSize;
     }
 
     public boolean isEnabled() {

@@ -1,5 +1,7 @@
 package com.cpz.processing.controls.core.util;
 
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.utils.color.Colors;
 import processing.core.PApplet;
 import processing.data.JSONArray;
@@ -127,6 +129,62 @@ public final class JsonConfigSupport {
         return json.getFloat(key);
     }
 
+    public static boolean hasExplicitBounds(JSONObject json) {
+        return json.hasKey("bounds") && !json.isNull("bounds");
+    }
+
+    public static ControlBounds getControlBounds(JSONObject json, String path, String context) {
+        if (hasExplicitBounds(json)) {
+            return getExplicitBounds(json, path, context);
+        }
+
+        float width = json.getFloat("width");
+        float height = json.getFloat("height");
+        validatePositiveDimension("width", width, path);
+        validatePositiveDimension("height", height, path);
+        return ControlBounds.absolute(
+                json.getFloat("x"),
+                json.getFloat("y"),
+                width,
+                height
+        );
+    }
+
+    public static ControlBounds getControlBounds(JSONObject json, String path, String context, float legacyHeight) {
+        if (hasExplicitBounds(json)) {
+            return getExplicitBounds(json, path, context);
+        }
+
+        float width = json.getFloat("width");
+        validatePositiveDimension("width", width, path);
+        return ControlBounds.absolute(
+                json.getFloat("x"),
+                json.getFloat("y"),
+                width,
+                legacyHeight
+        );
+    }
+
+    public static ControlMeasure getOptionalControlMeasure(JSONObject json, String key, String path, String context) {
+        if (!json.hasKey(key) || json.isNull(key)) {
+            return null;
+        }
+
+        Object value = json.get(key);
+        if (!(value instanceof JSONObject)) {
+            throw new IllegalArgumentException(
+                    "Invalid '" + key + "' value in " + path + " for " + context
+                            + ": expected an object with explicit 'mode' and 'value'."
+            );
+        }
+
+        JSONObject measure = (JSONObject) value;
+        String measurePath = path + " -> " + key;
+        String rawMode = getRequiredString(measure, "mode", measurePath, key);
+        float rawValue = measure.getFloat("value");
+        return toControlMeasure(rawMode, rawValue, key, measurePath, context);
+    }
+
     public static String getOptionalNonBlankString(JSONObject json, String key, String path, String context) {
         if (!json.hasKey(key) || json.isNull(key)) {
             return null;
@@ -206,5 +264,43 @@ public final class JsonConfigSupport {
         }
 
         throw new IllegalArgumentException("Unsupported color format for key '" + key + "' in " + path + ": " + value + ". Expected #RRGGBB or #AARRGGBB.");
+    }
+
+    private static ControlBounds getExplicitBounds(JSONObject json, String path, String context) {
+        Object value = json.get("bounds");
+        if (!(value instanceof JSONObject)) {
+            throw new IllegalArgumentException(
+                    "Invalid 'bounds' value in " + path + " for " + context
+                            + ": expected an object with explicit 'mode', 'x', 'y', 'width', and 'height'."
+            );
+        }
+
+        JSONObject bounds = (JSONObject) value;
+        String boundsPath = path + " -> bounds";
+        String rawMode = getRequiredString(bounds, "mode", boundsPath, context + " bounds");
+        float width = bounds.getFloat("width");
+        float height = bounds.getFloat("height");
+        validatePositiveDimension("width", width, boundsPath);
+        validatePositiveDimension("height", height, boundsPath);
+
+        ControlMeasure x = toControlMeasure(rawMode, bounds.getFloat("x"), "bounds.mode", boundsPath, context);
+        ControlMeasure y = toControlMeasure(rawMode, bounds.getFloat("y"), "bounds.mode", boundsPath, context);
+        ControlMeasure w = toControlMeasure(rawMode, width, "bounds.mode", boundsPath, context);
+        ControlMeasure h = toControlMeasure(rawMode, height, "bounds.mode", boundsPath, context);
+        return ControlBounds.of(x, y, w, h);
+    }
+
+    private static ControlMeasure toControlMeasure(String rawMode, float value, String key, String path, String context) {
+        String normalizedMode = rawMode.trim().toLowerCase(Locale.ROOT);
+        if ("absolute".equals(normalizedMode)) {
+            return ControlMeasure.absolute(value);
+        }
+        if ("relative".equals(normalizedMode)) {
+            return ControlMeasure.relative(value);
+        }
+        throw new IllegalArgumentException(
+                "Invalid '" + key + "' value in " + path + " for " + context + ": " + rawMode
+                        + ". Expected 'absolute' or 'relative'."
+        );
     }
 }

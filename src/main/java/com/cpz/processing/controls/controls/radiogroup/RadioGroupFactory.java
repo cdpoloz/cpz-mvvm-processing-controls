@@ -19,7 +19,15 @@ public final class RadioGroupFactory {
         Objects.requireNonNull(sketch, "sketch");
         Objects.requireNonNull(config, "config");
 
-        RadioGroup radioGroup = new RadioGroup(
+        RadioGroup radioGroup = config.hasExplicitBounds()
+                ? new RadioGroup(
+                sketch,
+                config.getCode(),
+                config.getOptions(),
+                config.getSelectedIndex(),
+                config.getBounds()
+        )
+                : new RadioGroup(
                 sketch,
                 config.getCode(),
                 config.getOptions(),
@@ -33,6 +41,12 @@ public final class RadioGroupFactory {
 
         if (config.getStyle() != null) {
             radioGroup.setStyle(new RadioGroupStyle(toStyleConfig(sketch, config.getStyle())));
+        }
+        if (config.hasExplicitBounds()) {
+            radioGroup.setBounds(config.getBounds());
+        }
+        if (config.getTextSizeMeasure() != null) {
+            radioGroup.setTextSize(config.getTextSizeMeasure());
         }
         radioGroup.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
 

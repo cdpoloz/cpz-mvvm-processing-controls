@@ -28,10 +28,7 @@ public final class SliderFactory {
                 config.getMax(),
                 config.getStep(),
                 config.getValue(),
-                config.getX(),
-                config.getY(),
-                config.getWidth(),
-                config.getHeight(),
+                config.getBounds(),
                 config.getOrientation(),
                 config.getSnapMode()
         );
@@ -40,6 +37,9 @@ public final class SliderFactory {
 
         if (config.getStyle() != null) {
             slider.setStyle(new SliderStyle(toStyleConfig(sketch, config.getStyle())));
+        }
+        if (config.getTextSizeMeasure() != null) {
+            slider.setTextSize(config.getTextSizeMeasure());
         }
         slider.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
 

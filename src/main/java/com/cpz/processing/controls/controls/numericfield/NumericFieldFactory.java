@@ -23,16 +23,16 @@ public final class NumericFieldFactory {
                 sketch,
                 config.getCode(),
                 config.getText(),
-                config.getX(),
-                config.getY(),
-                config.getWidth(),
-                config.getHeight()
+                config.getBounds()
         );
         numericField.setEnabled(config.isEnabled());
         numericField.setVisible(config.isVisible());
 
         if (config.getStyle() != null) {
             numericField.setStyle(new NumericFieldStyle(toStyleConfig(sketch, config.getStyle())));
+        }
+        if (config.getTextSizeMeasure() != null) {
+            numericField.setTextSize(config.getTextSizeMeasure());
         }
         numericField.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
 

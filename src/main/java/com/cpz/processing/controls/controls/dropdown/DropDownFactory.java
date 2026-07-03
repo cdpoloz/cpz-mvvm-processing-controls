@@ -30,15 +30,15 @@ public final class DropDownFactory {
                 config.getCode(),
                 config.getItems(),
                 config.getSelectedIndex(),
-                config.getX(),
-                config.getY(),
-                config.getWidth(),
-                config.getHeight()
+                config.getBounds()
         );
         dropDown.setEnabled(config.isEnabled());
         dropDown.setVisible(config.isVisible());
         if (config.getStyle() != null) {
             dropDown.setStyle(new DefaultDropDownStyle(toStyleConfig(sketch, config.getStyle())));
+        }
+        if (config.getTextSizeMeasure() != null) {
+            dropDown.setTextSize(config.getTextSizeMeasure());
         }
         dropDown.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));
         return dropDown;

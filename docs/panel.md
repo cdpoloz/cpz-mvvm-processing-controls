@@ -84,7 +84,10 @@ Relative text size is supported by `Button`, `Label`, `TextField`,
 For `RadioGroup`, relative bounds height maps to the item height; the total
 group height is still derived from options and item spacing.
 
-JSON does not support relative bounds yet.
+JSON supports relative bounds for the registered root controls, including
+controls that can later be added to a panel from Java. `Panel` itself is not a
+JSON control type yet, and JSON does not define `Panel.children` in this
+iteration.
 
 ---
 

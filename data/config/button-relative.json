@@ -1,0 +1,35 @@
+{
+  "controls": [
+    {
+      "type": "button",
+      "code": "btnJsonRelative",
+      "text": "Relative JSON Button",
+      "bounds": {
+        "mode": "relative",
+        "x": 0.5,
+        "y": 0.4166667,
+        "width": 0.6666667,
+        "height": 0.2
+      },
+      "textSize": {
+        "mode": "relative",
+        "value": 0.0533333
+      },
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "baseColor": "#3062DB",
+        "textColor": "#FFFFFF",
+        "font": "data/font/JetBrainsMono.ttf",
+        "textSize": 16.0,
+        "strokeColor": "#FFFFFF",
+        "strokeWeight": 2.0,
+        "strokeWeightHover": 4.0,
+        "cornerRadius": 18.0,
+        "disabledAlpha": 90,
+        "hoverBlendWithWhite": 0.12,
+        "pressedBlendWithBlack": 0.25
+      }
+    }
+  ]
+}

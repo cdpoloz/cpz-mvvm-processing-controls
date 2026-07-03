@@ -45,11 +45,6 @@ public final class SliderConfigLoader {
     }
 
     public SliderConfig loadFromJson(JSONObject root, String path) {
-        float width = root.getFloat("width");
-        float height = root.getFloat("height");
-        JsonConfigSupport.validatePositiveDimension("width", width, path);
-        JsonConfigSupport.validatePositiveDimension("height", height, path);
-
         BigDecimal min = getRequiredBigDecimal(root, "min", path);
         BigDecimal max = getRequiredBigDecimal(root, "max", path);
         if (min.compareTo(max) >= 0) {
@@ -72,10 +67,8 @@ public final class SliderConfigLoader {
                 max,
                 step,
                 value,
-                root.getFloat("x"),
-                root.getFloat("y"),
-                width,
-                height,
+                JsonConfigSupport.getControlBounds(root, path, "slider"),
+                JsonConfigSupport.getOptionalControlMeasure(root, "textSize", path, "slider"),
                 readOrientation(root, path),
                 readSnapMode(root, path),
                 root.getBoolean("enabled", true),

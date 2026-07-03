@@ -40,18 +40,11 @@ public final class TextFieldConfigLoader {
     }
 
     public TextFieldConfig loadFromJson(JSONObject root, String path) {
-        float width = root.getFloat("width");
-        float height = root.getFloat("height");
-        JsonConfigSupport.validatePositiveDimension("width", width, path);
-        JsonConfigSupport.validatePositiveDimension("height", height, path);
-
         return new TextFieldConfig(
                 JsonConfigSupport.getRequiredString(root, "code", path, "textfield"),
                 root.getString("text", ""),
-                root.getFloat("x"),
-                root.getFloat("y"),
-                width,
-                height,
+                JsonConfigSupport.getControlBounds(root, path, "textfield"),
+                JsonConfigSupport.getOptionalControlMeasure(root, "textSize", path, "textfield"),
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
                 this.readStyle(root, path),

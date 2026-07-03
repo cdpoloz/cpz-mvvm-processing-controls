@@ -41,18 +41,10 @@ public final class CheckboxConfigLoader {
     }
 
     public CheckboxConfig loadFromJson(JSONObject root, String path) {
-        float width = root.getFloat("width");
-        float height = root.getFloat("height");
-        JsonConfigSupport.validatePositiveDimension("width", width, path);
-        JsonConfigSupport.validatePositiveDimension("height", height, path);
-
         return new CheckboxConfig(
                 JsonConfigSupport.getRequiredString(root, "code", path, "checkbox"),
                 root.getBoolean("checked", false),
-                root.getFloat("x"),
-                root.getFloat("y"),
-                width,
-                height,
+                JsonConfigSupport.getControlBounds(root, path, "checkbox"),
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
                 this.readStyle(root, path),

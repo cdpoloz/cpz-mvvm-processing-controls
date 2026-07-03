@@ -1,10 +1,12 @@
 package com.cpz.processing.controls.main;
 
-import java.util.Locale;
-
+import com.cpz.processing.controls.examples.button.ButtonJsonTest;
+import com.cpz.processing.controls.examples.button.ButtonRelativeTest;
+import com.cpz.processing.controls.examples.button.ButtonJsonRelativeTest;
 import com.cpz.processing.controls.examples.button.ButtonTest;
-import com.cpz.processing.controls.examples.panel.PanelVisualTest;
 import processing.core.PApplet;
+
+import java.util.Locale;
 
 /**
  * Entry point for launching development sketches.
@@ -36,6 +38,8 @@ public class Launcher {
 
         // Button *****************************************
         PApplet.main(ButtonTest.class);
+        //PApplet.main(ButtonRelativeTest.class);
+        //PApplet.main(ButtonJsonRelativeTest.class);
         //PApplet.main(ButtonSvgTest.class);
         //PApplet.main(ButtonJsonTest.class);
         //PApplet.main(ButtonSvgJsonTest.class);
@@ -85,7 +89,7 @@ public class Launcher {
         //PApplet.main(JsonMultiControlUnidirectionalBindingTest.class);
         //PApplet.main(JsonMultiControlBindingTest.class);
 
-        // Panel ***************************************
+        // Panel ****************************************
         //PApplet.main(PanelVisualTest.class);
 
         // Theme ****************************************

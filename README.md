@@ -63,11 +63,11 @@ to your Maven project:
 <dependency>
     <groupId>io.github.cdpoloz</groupId>
     <artifactId>cpz-mvvm-processing-controls</artifactId>
-    <version>0.5.1</version>
+    <version>0.6.0</version>
 </dependency>
 ```
 
-Version `0.5.1` will be available from Maven Central after its release is
+Version `0.6.0` will be available from Maven Central after its release is
 published. Processing Core (`org.processing:core:4.5.2`) and `cpz-utils`
 (`io.github.cdpoloz:cpz-utils:0.2.3`) are resolved transitively by Maven; do
 not add them as manually copied JARs.
@@ -214,6 +214,87 @@ public void draw() {
 Moving the panel with `setPosition(...)` moves the group visually and
 interactively without rewriting child coordinates. See [Panel](docs/panel.md)
 and `src/main/java/com/cpz/processing/controls/examples/panel/PanelVisualTest.java`.
+
+---
+
+## Relative Bounds And Text Size
+
+Relative measures are explicit. The loader does not infer that values between
+`0` and `1` are relative.
+
+- relative `x` uses `parentWidth * factor`
+- relative `y` uses `parentHeight * factor`
+- relative `width` uses `parentHeight * factor`
+- relative `height` uses `parentHeight * factor`
+- relative `textSize` uses `parentHeight * factor`
+
+Legacy absolute JSON remains valid:
+
+```json
+{
+  "x": 100,
+  "y": 50,
+  "width": 200,
+  "height": 40
+}
+```
+
+The explicit JSON format is:
+
+```json
+{
+  "type": "button",
+  "code": "btnSave",
+  "text": "Save",
+  "bounds": {
+    "mode": "relative",
+    "x": 0.1,
+    "y": 0.2,
+    "width": 0.35,
+    "height": 0.08
+  },
+  "textSize": {
+    "mode": "relative",
+    "value": 0.035
+  }
+}
+```
+
+Precedence rules:
+
+- `bounds` wins over legacy `x` / `y` / `width` / `height`
+- top-level `textSize` wins over legacy `style.textSize`
+
+Current limitations:
+
+- `Panel.children` JSON is still pending
+- `DropDown` inside a `Panel` is still not supported interactively
+
+See `src/main/java/com/cpz/processing/controls/examples/button/ButtonRelativeTest.java`
+for a minimal `ControlBounds.relative(...)` sketch and
+`src/main/java/com/cpz/processing/controls/examples/button/ButtonJsonRelativeTest.java`
+with `data/config/button-relative.json` for the equivalent JSON example.
+
+---
+
+## Release 0.6.0
+
+Version `0.6.0` includes:
+
+- `Panel` as a control container with local coordinates for child controls
+- optional `PointerRoutableControl` and `KeyboardRoutableControl` routing hooks
+- `ControlBounds` and `ControlMeasure` with `ABSOLUTE` and `RELATIVE` modes
+- relative bounds for the main controls API
+- relative `textSize` for controls with public text rendering
+- JSON support for relative `bounds` and `textSize` with legacy compatibility
+- `ButtonRelativeTest` as a minimal runnable relative-bounds reference
+- `ButtonJsonRelativeTest` and `data/config/button-relative.json` as minimal
+  runnable JSON-relative references
+
+Known limitations in `0.6.0`:
+
+- `Panel.children` from JSON is still pending
+- `DropDown` inside a `Panel` is not supported interactively yet
 
 ---
 
