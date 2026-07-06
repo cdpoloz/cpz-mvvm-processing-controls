@@ -57,6 +57,7 @@ This surface is intentionally small:
 - `NumericField`
 - `DropDown`
 - `Panel`
+- `Indicator`
 
 Each concrete control still owns its specific public API for text, value, selection, listeners, style, and any other domain-specific behavior.
 
@@ -64,6 +65,11 @@ Each concrete control still owns its specific public API for text, value, select
 and interprets child coordinates as local to the panel position. Input for a
 panel is routed through `PanelInputLayer`, not through the base `Control`
 contract.
+
+`Indicator` is a non-interactive status facade. It implements `Control`,
+`ParentSizeAwareControl`, and `TooltipAttachable`, supports JSON and SVG
+configuration, and does not implement `PointerRoutableControl` or
+`KeyboardRoutableControl`.
 
 Facade styles can share a sketch-owned `ThemeManager`, which keeps theming on the public facade side without exposing MVVM internals.
 
@@ -111,7 +117,8 @@ label.setTextSize(ControlMeasure.relative(0.06f));
 ```
 
 Relative bounds are supported by `Panel`, `Button`, `Label`, `Checkbox`,
-`Toggle`, `Slider`, `TextField`, `NumericField`, `RadioGroup`, and `DropDown`.
+`Toggle`, `Slider`, `TextField`, `NumericField`, `RadioGroup`, `DropDown`, and
+`Indicator`.
 For `RadioGroup`, the bounds height maps to item height because the group
 height is derived from options and spacing.
 
@@ -204,6 +211,7 @@ They are intentionally separate:
 
 - [Architecture](architecture.md)
 - [Panel](panel.md)
+- [Indicator](indicator.md)
 - [JSON Configuration](json-configuration.md)
 - [Tooltip](tooltip.md)
 - [Theme](theme.md)

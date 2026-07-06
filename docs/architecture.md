@@ -26,7 +26,7 @@ The controls project has two dependency levels:
 
 - CPZ dependency: `io.github.cdpoloz:cpz-utils:0.2.3`, controlled by the author and
   versioned as a normal Maven dependency
-- external dependency: `org.processing:core:4.5.2`, resolved by Maven and
+- external dependency: `org.processing:core:4.5.5`, resolved by Maven and
   distributed under its own license
 
 Both dependencies are resolved transitively from Maven Central when this

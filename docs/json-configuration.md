@@ -86,6 +86,7 @@ The current registry supports:
 - `textfield`
 - `numericfield`
 - `dropdown`
+- `indicator`
 
 `dropdown` requires `OverlayManager` and `InputManager` when the main loader is used, because those are already required by the public `DropDown` facade.
 
@@ -293,6 +294,78 @@ typography property in their own `style` block. They can still use
 `tooltip.style.font`, because tooltip text belongs to the reusable tooltip
 overlay, not to the control renderer.
 
+`indicator` does not render text. Its status colors are accepted as top-level
+`onColor` and `offColor` fields, and also as `style.onColor` and
+`style.offColor` aliases for consistency with the style-oriented JSON shape.
+When both are present, the top-level fields take precedence.
+
+Indicator properties:
+
+- `type`: must be `"indicator"`
+- `code`: unique control code
+- `x`, `y`, `width`, `height`: legacy absolute bounds
+- `bounds`: explicit `absolute` or `relative` bounds object
+- `on`: optional boolean state, default `false`
+- `onColor`: optional active color
+- `offColor`: optional inactive color
+- `tooltip`: optional tooltip object or text shorthand
+- `style.onColor` / `style.offColor`: optional color aliases
+- `style.renderer`: optional renderer object; SVG uses
+  `{"type":"svg","path":"..."}`
+
+Minimal indicator entry:
+
+```json
+{
+  "type": "indicator",
+  "code": "indStatus",
+  "bounds": {
+    "mode": "relative",
+    "x": 0.1,
+    "y": 0.1,
+    "width": 0.05,
+    "height": 0.05
+  },
+  "on": true,
+  "onColor": "#FF2ECC71",
+  "offColor": "#FF30343A",
+  "tooltip": "Status"
+}
+```
+
+SVG indicator entry:
+
+```json
+{
+  "type": "indicator",
+  "code": "indSvg",
+  "bounds": {
+    "mode": "relative",
+    "x": 0.1,
+    "y": 0.1,
+    "width": 0.08,
+    "height": 0.08
+  },
+  "on": true,
+  "onColor": "#FF2ECC71",
+  "offColor": "#FF30343A",
+  "style": {
+    "renderer": {
+      "type": "svg",
+      "path": "data/img/test.svg"
+    }
+  },
+  "tooltip": "SVG indicator"
+}
+```
+
+`on` defaults to `false`. `onColor` defaults to green and `offColor` defaults
+to dark gray when omitted. Relative `bounds` follows the same explicit
+`absolute` / `relative` mode rules as the other controls; `bounds` takes
+precedence over legacy `x` / `y` / `width` / `height`. SVG uses the same
+`style.renderer` object as Button and Toggle. Supported renderer values in this
+iteration are `{"type":"svg","path":"..."}`.
+
 ```json
 {
   "type": "label",
@@ -400,6 +473,20 @@ Every supported control type accepts an optional top-level `tooltip` block:
 }
 ```
 
+For simple text-only tooltips, the shorthand form is also accepted:
+
+```json
+{
+  "type": "indicator",
+  "code": "indStatus",
+  "x": 40.0,
+  "y": 40.0,
+  "width": 24.0,
+  "height": 24.0,
+  "tooltip": "Status"
+}
+```
+
 Tooltip colors use the same color parsing as control styles: integer values,
 `#RRGGBB`, or `#AARRGGBB`. A missing or `null` tooltip leaves the created
 control unchanged.
@@ -494,4 +581,5 @@ It intentionally does not support:
 - [TextField](textfield.md)
 - [NumericField](numericfield.md)
 - [Dropdown](dropdown.md)
+- [Indicator](indicator.md)
 - [Tooltip](tooltip.md)

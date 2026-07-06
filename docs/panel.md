@@ -43,9 +43,9 @@ not rewrite child positions.
 Controls that implement the relative geometry API can opt into explicit
 relative bounds with `ControlBounds.relative(...)`. This includes `Panel`,
 `Button`, `Label`, `Checkbox`, `Toggle`, `Slider`, `TextField`,
-`NumericField`, and `RadioGroup`. `DropDown` can use relative bounds as a
-root control, but full `DropDown` support inside a panel remains outside the
-panel MVP because its expanded list uses a global overlay.
+`NumericField`, `RadioGroup`, and `Indicator`. `DropDown` can use relative
+bounds as a root control, but full `DropDown` support inside a panel remains
+outside the panel MVP because its expanded list uses a global overlay.
 
 Absolute constructors and setters remain the default behavior.
 
@@ -143,6 +143,7 @@ The current panel input route supports these child controls:
 - `NumericField`
 - `RadioGroup`
 - non-interactive `Control` children such as `Label`
+- non-interactive status controls such as `Indicator`
 
 `DropDown` is not supported as an interactive panel child yet. Its collapsed
 control can use relative bounds as a root control, but its expanded list is
@@ -196,6 +197,16 @@ Button childButton = new Button(this, "btnChild", "Save", 10, 20, 120, 40)
 
 panel.add(childButton);
 tooltips.registerTarget(panel.tooltipTarget(childButton));
+```
+
+Non-interactive tooltip targets such as `Indicator` use the same route:
+
+```java
+Indicator indicator = new Indicator(this, "indStatus",
+        ControlBounds.relative(0.1f, 0.1f, 0.08f, 0.08f));
+
+panel.add(indicator);
+tooltips.registerTarget(panel.tooltipTarget(indicator));
 ```
 
 ---

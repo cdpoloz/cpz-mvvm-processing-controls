@@ -1,0 +1,69 @@
+{
+  "tooltipStyles": {
+    "indicatorDark": {
+      "backgroundColor": "#F21B1F26",
+      "textColor": "#FFFFFFFF",
+      "borderColor": "#FF8A94A6",
+      "textSize": 14.0,
+      "textPadding": 10.0,
+      "offset": 10.0,
+      "cornerRadius": 8.0,
+      "strokeWeight": 1.0
+    }
+  },
+  "controls": [
+    {
+      "type": "indicator",
+      "code": "indOffJson",
+      "x": 120.0,
+      "y": 94.0,
+      "width": 44.0,
+      "height": 44.0,
+      "on": false,
+      "onColor": "#3062DB",
+      "offColor": "#464646",
+      "tooltip": {
+        "text": "JSON indicator off",
+        "styleRef": "indicatorDark"
+      }
+    },
+    {
+      "type": "indicator",
+      "code": "indOnJson",
+      "bounds": {
+        "mode": "absolute",
+        "x": 288.0,
+        "y": 94.0,
+        "width": 44.0,
+        "height": 44.0
+      },
+      "on": true,
+      "style": {
+        "onColor": "#3062DB",
+        "offColor": "#464646"
+      },
+      "tooltip": {
+        "text": "JSON indicator on",
+        "styleRef": "indicatorDark"
+      }
+    },
+    {
+      "type": "indicator",
+      "code": "indRuntimeJson",
+      "bounds": {
+        "mode": "relative",
+        "x": 0.735,
+        "y": 0.335,
+        "width": 0.157,
+        "height": 0.157
+      },
+      "on": true,
+      "onColor": "#3062DB",
+      "offColor": "#464646",
+      "tooltip": {
+        "text": "JSON runtime indicator",
+        "styleRef": "indicatorDark"
+      }
+    }
+  ]
+}

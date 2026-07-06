@@ -25,7 +25,16 @@ public final class TooltipJsonSupport {
             return null;
         }
 
-        return readTooltipObject(root.getJSONObject("tooltip"), path);
+        Object rawTooltip = root.get("tooltip");
+        if (rawTooltip instanceof String) {
+            return readTooltipText((String) rawTooltip);
+        }
+        if (!(rawTooltip instanceof JSONObject)) {
+            throw new IllegalArgumentException(
+                    "Invalid 'tooltip' value in " + path + ": expected a string or an object."
+            );
+        }
+        return readTooltipObject((JSONObject) rawTooltip, path);
     }
 
     public static TooltipConfig readTooltip(PApplet sketch, JSONObject root, String path, Map<String, TooltipStyleConfig> stylePresets) {
@@ -33,7 +42,16 @@ public final class TooltipJsonSupport {
             return null;
         }
 
-        return readTooltipObject(sketch, root.getJSONObject("tooltip"), path, stylePresets);
+        Object rawTooltip = root.get("tooltip");
+        if (rawTooltip instanceof String) {
+            return readTooltipText((String) rawTooltip);
+        }
+        if (!(rawTooltip instanceof JSONObject)) {
+            throw new IllegalArgumentException(
+                    "Invalid 'tooltip' value in " + path + ": expected a string or an object."
+            );
+        }
+        return readTooltipObject(sketch, (JSONObject) rawTooltip, path, stylePresets);
     }
 
     public static TooltipConfig readTooltipDocument(PApplet sketch, JSONObject root, String path) {
@@ -133,6 +151,10 @@ public final class TooltipJsonSupport {
                 JsonConfigSupport.getOptionalNonBlankString(tooltip, "styleRef", path, "tooltip"),
                 null
         );
+    }
+
+    private static TooltipConfig readTooltipText(String text) {
+        return new TooltipConfig(text, true, null, null, null);
     }
 
     private static TooltipConfig readTooltipObject(PApplet sketch, JSONObject tooltip, String path, Map<String, TooltipStyleConfig> stylePresets) {

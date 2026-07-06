@@ -89,6 +89,12 @@ public class Launcher {
         // Panel ****************************************
         //PApplet.main(PanelVisualTest.class);
 
+        // Indicator ************************************
+        //PApplet.main(IndicatorTest.class);
+        //PApplet.main(IndicatorJsonTest.class);
+        //PApplet.main(IndicatorSvgTest.class);
+        //PApplet.main(IndicatorSvgJsonTest.class);
+
         // Theme ****************************************
         //PApplet.main(ThemeFacadeSketch.class);
     }

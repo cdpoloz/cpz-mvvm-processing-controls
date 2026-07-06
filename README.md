@@ -1,6 +1,7 @@
 # CPZ MVVM Processing Controls
 ![Java](https://img.shields.io/badge/Java-17+-orange)
 ![Processing](https://img.shields.io/badge/Processing-4.5.x-blue)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.cdpoloz/cpz-mvvm-processing-controls?label=Maven%20Central&color=1f6feb)](https://central.sonatype.com/artifact/io.github.cdpoloz/cpz-mvvm-processing-controls)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![License](https://img.shields.io/badge/license-Apache--2.0-lightgrey)
 [![GitHub](https://img.shields.io/badge/GitHub-cdpoloz-181717?logo=github)](https://github.com/cdpoloz)
@@ -49,7 +50,7 @@ CPZ dependencies:
 
 External dependencies:
 
-- `org.processing:core:4.5.2`
+- `org.processing:core:4.5.5`
 - resolved by Maven from configured repositories
 - provides Processing rendering APIs and keeps its own license, separate from
   this project's Apache 2.0 license
@@ -63,12 +64,12 @@ to your Maven project:
 <dependency>
     <groupId>io.github.cdpoloz</groupId>
     <artifactId>cpz-mvvm-processing-controls</artifactId>
-    <version>0.6.0</version>
+    <version>0.7.0</version>
 </dependency>
 ```
 
-Version `0.6.0` will be available from Maven Central after its release is
-published. Processing Core (`org.processing:core:4.5.2`) and `cpz-utils`
+Version `0.7.0` will be available from Maven Central after its release is
+published. Processing Core (`org.processing:core:4.5.5`) and `cpz-utils`
 (`io.github.cdpoloz:cpz-utils:0.2.3`) are resolved transitively by Maven; do
 not add them as manually copied JARs.
 
@@ -277,6 +278,33 @@ with `data/config/button-relative.json` for the equivalent JSON example.
 
 ---
 
+## Release 0.7.0
+
+Version `0.7.0` adds `Indicator`, a simple non-interactive LED-style control.
+
+`Indicator` supports:
+
+- programmatic on/off state
+- runtime `onColor` and `offColor`
+- absolute and relative `ControlBounds`
+- SVG rendering through the same style renderer convention used by Button and Toggle
+- tooltips, including runtime tooltip text updates
+- JSON loading through `type: "indicator"`
+- use as a child of `Panel`
+
+`Indicator` does not consume pointer or keyboard input in this version. See
+[Indicator](docs/indicator.md) and the examples under
+`src/main/java/com/cpz/processing/controls/examples/indicator`.
+
+```java
+Indicator indicator = new Indicator(this, "indStatus", 40, 40, 24, 24)
+        .setTooltip("Status");
+indicator.setOn(true);
+indicator.setOnColor(0xFF2ECC71);
+```
+
+---
+
 ## Release 0.6.0
 
 Version `0.6.0` includes:
@@ -339,7 +367,7 @@ TooltipAttachable / TooltipTarget → TooltipOverlayController → OverlayManage
 
 This project is a UI framework intended for Processing sketches and for other host environments that can provide normalized input events.
 
-The public control layer is exposed through closed ergonomic facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, `DropDown`, and `Panel`.
+The public control layer is exposed through closed ergonomic facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, `DropDown`, `Panel`, and `Indicator`.
 
 Those facades also share a lightweight public contract, `Control`, for the small transversal surface that is common across the controls without exposing MVVM internals.
 

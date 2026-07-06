@@ -7,6 +7,8 @@ import com.cpz.processing.controls.controls.checkbox.CheckboxFactory;
 import com.cpz.processing.controls.controls.checkbox.config.CheckboxConfigLoader;
 import com.cpz.processing.controls.controls.dropdown.DropDownFactory;
 import com.cpz.processing.controls.controls.dropdown.config.DropDownConfigLoader;
+import com.cpz.processing.controls.controls.indicator.IndicatorFactory;
+import com.cpz.processing.controls.controls.indicator.config.IndicatorConfigLoader;
 import com.cpz.processing.controls.controls.label.LabelFactory;
 import com.cpz.processing.controls.controls.label.config.LabelConfigLoader;
 import com.cpz.processing.controls.controls.numericfield.NumericFieldFactory;
@@ -68,6 +70,7 @@ final class ControlFactoryRegistry {
         TextFieldConfigLoader textFieldLoader = new TextFieldConfigLoader(sketch, sharedTooltipStyles);
         NumericFieldConfigLoader numericFieldLoader = new NumericFieldConfigLoader(sketch, sharedTooltipStyles);
         DropDownConfigLoader dropDownLoader = new DropDownConfigLoader(sketch, sharedTooltipStyles);
+        IndicatorConfigLoader indicatorLoader = new IndicatorConfigLoader(sketch, sharedTooltipStyles);
 
         Map<String, ControlEntryFactory> entries = new LinkedHashMap<>();
         entries.put("button", (json, path) -> ButtonFactory.create(sketch, buttonLoader.loadFromJson(json, path)));
@@ -87,6 +90,7 @@ final class ControlFactoryRegistry {
             }
             return DropDownFactory.create(sketch, overlayManager, inputManager, dropDownLoader.loadFromJson(json, path));
         });
+        entries.put("indicator", (json, path) -> IndicatorFactory.create(sketch, indicatorLoader.loadFromJson(json, path)));
         this.factories = Collections.unmodifiableMap(entries);
     }
 
