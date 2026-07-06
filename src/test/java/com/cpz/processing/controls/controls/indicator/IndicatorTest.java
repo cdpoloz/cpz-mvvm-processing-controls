@@ -47,6 +47,34 @@ class IndicatorTest {
     }
 
     @Test
+    void defaultsToConfiguredStrokeDefaults() {
+        Indicator indicator = new Indicator(sketch(800, 600), 40.0F, 50.0F, 24.0F, 24.0F);
+
+        assertEquals(Indicator.DEFAULT_BORDER_COLOR, indicator.getStrokeColor());
+        assertEquals(1.0F, indicator.getStrokeWeight());
+    }
+
+    @Test
+    void strokeSettersUpdateRuntimeStroke() {
+        Indicator indicator = new Indicator(sketch(800, 600), 40.0F, 50.0F, 24.0F, 24.0F);
+
+        indicator.setStrokeColor(0xFFFFFFFF);
+        indicator.setStrokeWeight(2.5F);
+
+        assertEquals(0xFFFFFFFF, indicator.getStrokeColor());
+        assertEquals(2.5F, indicator.getStrokeWeight());
+    }
+
+    @Test
+    void negativeStrokeWeightIsClampedToZero() {
+        Indicator indicator = new Indicator(sketch(800, 600), 40.0F, 50.0F, 24.0F, 24.0F);
+
+        indicator.setStrokeWeight(-2.0F);
+
+        assertEquals(0.0F, indicator.getStrokeWeight());
+    }
+
+    @Test
     void drawUsesOffColorWhenOff() {
         RecordingApplet sketch = recordingSketch(800, 600);
         Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 30.0F);
@@ -59,6 +87,33 @@ class IndicatorTest {
         assertEquals(52.0F, sketch.lastCircleX);
         assertEquals(65.0F, sketch.lastCircleY);
         assertEquals(24.0F, sketch.lastCircleDiameter);
+    }
+
+    @Test
+    void drawUsesConfiguredStroke() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 30.0F);
+        indicator.setStrokeColor(0xFFFFFFFF);
+        indicator.setStrokeWeight(2.5F);
+
+        indicator.draw();
+
+        assertEquals(0xFFFFFFFF, sketch.lastStrokeColor);
+        assertEquals(2.5F, sketch.lastStrokeWeight);
+        assertEquals(1, sketch.strokeCalls);
+        assertEquals(0, sketch.noStrokeCalls);
+    }
+
+    @Test
+    void zeroStrokeWeightDisablesStroke() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 30.0F);
+        indicator.setStrokeWeight(0.0F);
+
+        indicator.draw();
+
+        assertEquals(1, sketch.noStrokeCalls);
+        assertEquals(0, sketch.strokeCalls);
     }
 
     @Test
@@ -78,6 +133,8 @@ class IndicatorTest {
         RecordingApplet sketch = recordingSketch(800, 600);
         Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 30.0F, "data/img/test.svg");
         indicator.setOnColor(0xFF00AA00);
+        indicator.setStrokeColor(0xFFFFFFFF);
+        indicator.setStrokeWeight(2.0F);
         indicator.setOn(true);
 
         indicator.draw();
@@ -85,6 +142,8 @@ class IndicatorTest {
         assertEquals(1, sketch.loadShapeCalls);
         assertEquals("data/img/test.svg", sketch.lastLoadShapePath);
         assertEquals(0xFF00AA00, sketch.lastFillColor);
+        assertEquals(0xFFFFFFFF, sketch.lastStrokeColor);
+        assertEquals(2.0F, sketch.lastStrokeWeight);
         assertEquals(0, sketch.circleCalls);
         assertEquals(1, sketch.shapeCalls);
         assertEquals(52.0F, sketch.lastShapeX);
@@ -136,6 +195,8 @@ class IndicatorTest {
         indicator.draw();
 
         assertEquals(0, sketch.circleCalls);
+        assertEquals(0, sketch.strokeCalls);
+        assertEquals(0, sketch.noStrokeCalls);
     }
 
     @Test
@@ -146,6 +207,20 @@ class IndicatorTest {
         indicator.setEnabled(false);
 
         assertTrue(indicator.isOn());
+    }
+
+    @Test
+    void disabledIndicatorDoesNotChangeStroke() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 24.0F);
+        indicator.setStrokeColor(0xFFFFFFFF);
+        indicator.setStrokeWeight(3.0F);
+
+        indicator.setEnabled(false);
+        indicator.draw();
+
+        assertEquals(0xFFFFFFFF, sketch.lastStrokeColor);
+        assertEquals(3.0F, sketch.lastStrokeWeight);
     }
 
     @Test
@@ -298,9 +373,12 @@ class IndicatorTest {
 
     private static final class RecordingApplet extends PApplet {
         private int lastFillColor;
+        private int lastStrokeColor;
         private int circleCalls;
         private int shapeCalls;
         private int loadShapeCalls;
+        private int strokeCalls;
+        private int noStrokeCalls;
         private float lastCircleX;
         private float lastCircleY;
         private float lastCircleDiameter;
@@ -308,6 +386,7 @@ class IndicatorTest {
         private float lastShapeY;
         private float lastShapeWidth;
         private float lastShapeHeight;
+        private float lastStrokeWeight;
         private String lastLoadShapePath;
         private boolean returnNullShape;
 
@@ -329,10 +408,18 @@ class IndicatorTest {
 
         @Override
         public void stroke(int rgb) {
+            this.strokeCalls++;
+            this.lastStrokeColor = rgb;
         }
 
         @Override
         public void strokeWeight(float weight) {
+            this.lastStrokeWeight = weight;
+        }
+
+        @Override
+        public void noStroke() {
+            this.noStrokeCalls++;
         }
 
         @Override

@@ -22,6 +22,10 @@
       "on": false,
       "onColor": "#3062DB",
       "offColor": "#464646",
+      "style": {
+        "strokeColor": "#FFFFFF",
+        "strokeWeight": 2.0
+      },
       "tooltip": {
         "text": "JSON indicator off",
         "styleRef": "indicatorDark"
@@ -40,7 +44,9 @@
       "on": true,
       "style": {
         "onColor": "#3062DB",
-        "offColor": "#464646"
+        "offColor": "#464646",
+        "strokeColor": "#FFFFFF",
+        "strokeWeight": 2.0
       },
       "tooltip": {
         "text": "JSON indicator on",
@@ -60,6 +66,10 @@
       "on": true,
       "onColor": "#3062DB",
       "offColor": "#464646",
+      "style": {
+        "strokeColor": "#FFFFFF",
+        "strokeWeight": 3.0
+      },
       "tooltip": {
         "text": "JSON runtime indicator",
         "styleRef": "indicatorDark"

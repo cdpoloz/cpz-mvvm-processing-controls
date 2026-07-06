@@ -29,6 +29,8 @@ public final class IndicatorFactory {
         indicator.setOn(config.isOn());
         indicator.setOnColor(config.getOnColor());
         indicator.setOffColor(config.getOffColor());
+        indicator.setStrokeColor(config.getStrokeColor());
+        indicator.setStrokeWeight(config.getStrokeWeight());
         indicator.setEnabled(config.isEnabled());
         indicator.setVisible(config.isVisible());
         indicator.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));

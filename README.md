@@ -286,6 +286,7 @@ Version `0.7.0` adds `Indicator`, a simple non-interactive LED-style control.
 
 - programmatic on/off state
 - runtime `onColor` and `offColor`
+- runtime `strokeColor` and `strokeWeight`
 - absolute and relative `ControlBounds`
 - SVG rendering through the same style renderer convention used by Button and Toggle
 - tooltips, including runtime tooltip text updates

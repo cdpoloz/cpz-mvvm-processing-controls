@@ -310,6 +310,9 @@ Indicator properties:
 - `offColor`: optional inactive color
 - `tooltip`: optional tooltip object or text shorthand
 - `style.onColor` / `style.offColor`: optional color aliases
+- `style.strokeColor`: optional visual border color
+- `style.strokeWeight`: optional visual border width; `0` disables the stroke
+- `style.strokeWidth`: optional alias used only when `strokeWeight` is absent
 - `style.renderer`: optional renderer object; SVG uses
   `{"type":"svg","path":"..."}`
 
@@ -329,6 +332,10 @@ Minimal indicator entry:
   "on": true,
   "onColor": "#FF2ECC71",
   "offColor": "#FF30343A",
+  "style": {
+    "strokeColor": "#FFFFFFFF",
+    "strokeWeight": 2.0
+  },
   "tooltip": "Status"
 }
 ```
@@ -350,6 +357,8 @@ SVG indicator entry:
   "onColor": "#FF2ECC71",
   "offColor": "#FF30343A",
   "style": {
+    "strokeColor": "#FFFFFFFF",
+    "strokeWeight": 2.0,
     "renderer": {
       "type": "svg",
       "path": "data/img/test.svg"
@@ -360,7 +369,11 @@ SVG indicator entry:
 ```
 
 `on` defaults to `false`. `onColor` defaults to green and `offColor` defaults
-to dark gray when omitted. Relative `bounds` follows the same explicit
+to dark gray when omitted. `style.strokeColor` defaults to the indicator border
+color and `style.strokeWeight` defaults to `1.0`. `style.strokeWeight` is the
+canonical border-width property; `style.strokeWidth` is accepted only as an
+alias for Toggle terminology. `borderColor` is not an Indicator visual border
+property; it belongs to tooltip style blocks. Relative `bounds` follows the same explicit
 `absolute` / `relative` mode rules as the other controls; `bounds` takes
 precedence over legacy `x` / `y` / `width` / `height`. SVG uses the same
 `style.renderer` object as Button and Toggle. Supported renderer values in this

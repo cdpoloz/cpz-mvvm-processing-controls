@@ -40,6 +40,8 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
     private boolean on;
     private int onColor = DEFAULT_ON_COLOR;
     private int offColor = DEFAULT_OFF_COLOR;
+    private int strokeColor = DEFAULT_BORDER_COLOR;
+    private float strokeWeight = 1.0F;
     private boolean enabled = true;
     private boolean visible = true;
 
@@ -96,8 +98,12 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
 
         this.sketch.pushStyle();
         try {
-            this.sketch.stroke(DEFAULT_BORDER_COLOR);
-            this.sketch.strokeWeight(1.0F);
+            if (this.strokeWeight <= 0.0F) {
+                this.sketch.noStroke();
+            } else {
+                this.sketch.stroke(this.strokeColor);
+                this.sketch.strokeWeight(this.strokeWeight);
+            }
             this.sketch.fill(this.on ? this.onColor : this.offColor);
             if (this.svgMode) {
                 if (this.svgShape != null) {
@@ -139,6 +145,22 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
 
     public void setOffColor(int color) {
         this.offColor = color;
+    }
+
+    public int getStrokeColor() {
+        return this.strokeColor;
+    }
+
+    public void setStrokeColor(int color) {
+        this.strokeColor = color;
+    }
+
+    public float getStrokeWeight() {
+        return this.strokeWeight;
+    }
+
+    public void setStrokeWeight(float weight) {
+        this.strokeWeight = Math.max(0.0F, weight);
     }
 
     public boolean isEnabled() {

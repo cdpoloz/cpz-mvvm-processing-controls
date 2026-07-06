@@ -48,12 +48,16 @@ public class IndicatorSvgTest extends PApplet {
                 .setTooltip("SVG indicator off")
                 .setTooltipStyle(tooltipStyle);
         this.offIndicator.setOffColor(Colors.gray(70));
+        this.offIndicator.setStrokeColor(Colors.gray(210));
+        this.offIndicator.setStrokeWeight(2.0F);
 
         this.onIndicator = new Indicator(this, "indSvgOn", 284.0F, 90.0F, 52.0F, 52.0F, SVG_PATH)
                 .setTooltip("SVG indicator on")
                 .setTooltipStyle(tooltipStyle);
         this.onIndicator.setOffColor(Colors.gray(70));
         this.onIndicator.setOnColor(Colors.rgb(48, 98, 219));
+        this.onIndicator.setStrokeColor(Colors.gray(210));
+        this.onIndicator.setStrokeWeight(2.0F);
         this.onIndicator.setOn(true);
 
         this.runtimeIndicator = new Indicator(this, "indSvgRuntime",
@@ -62,6 +66,8 @@ public class IndicatorSvgTest extends PApplet {
                 .setTooltipStyle(tooltipStyle);
         this.runtimeIndicator.setOffColor(Colors.gray(70));
         this.runtimeIndicator.setOnColor(Colors.rgb(48, 98, 219));
+        this.runtimeIndicator.setStrokeColor(Colors.rgb(255, 255, 255));
+        this.runtimeIndicator.setStrokeWeight(3.0F);
 
         this.tooltips.registerTarget(this.offIndicator);
         this.tooltips.registerTarget(this.onIndicator);

@@ -14,6 +14,8 @@ public final class IndicatorConfig {
     private final boolean on;
     private final int onColor;
     private final int offColor;
+    private final int strokeColor;
+    private final float strokeWeight;
     private final ControlBounds bounds;
     private final boolean enabled;
     private final boolean visible;
@@ -25,6 +27,8 @@ public final class IndicatorConfig {
             boolean on,
             int onColor,
             int offColor,
+            int strokeColor,
+            float strokeWeight,
             ControlBounds bounds,
             boolean enabled,
             boolean visible,
@@ -35,6 +39,8 @@ public final class IndicatorConfig {
         this.on = on;
         this.onColor = onColor;
         this.offColor = offColor;
+        this.strokeColor = strokeColor;
+        this.strokeWeight = Math.max(0.0F, strokeWeight);
         this.bounds = Objects.requireNonNull(bounds, "bounds");
         this.enabled = enabled;
         this.visible = visible;
@@ -56,6 +62,14 @@ public final class IndicatorConfig {
 
     public int getOffColor() {
         return this.offColor;
+    }
+
+    public int getStrokeColor() {
+        return this.strokeColor;
+    }
+
+    public float getStrokeWeight() {
+        return this.strokeWeight;
     }
 
     public ControlBounds getBounds() {

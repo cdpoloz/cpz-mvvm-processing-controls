@@ -46,6 +46,8 @@ public final class IndicatorConfigLoader {
                 root.getBoolean("on", false),
                 this.readColor(root, "onColor", Indicator.DEFAULT_ON_COLOR, path),
                 this.readColor(root, "offColor", Indicator.DEFAULT_OFF_COLOR, path),
+                this.readStyleColor(root, "strokeColor", Indicator.DEFAULT_BORDER_COLOR, path),
+                this.readStrokeWeight(root),
                 JsonConfigSupport.getControlBounds(root, path, "indicator"),
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
@@ -64,6 +66,26 @@ public final class IndicatorConfigLoader {
         }
         Integer styled = JsonConfigSupport.getOptionalColor(root.getJSONObject("style"), key, path);
         return styled != null ? styled : defaultColor;
+    }
+
+    private int readStyleColor(JSONObject root, String key, int defaultColor, String path) {
+        if (!root.hasKey("style") || root.isNull("style")) {
+            return defaultColor;
+        }
+        Integer styled = JsonConfigSupport.getOptionalColor(root.getJSONObject("style"), key, path);
+        return styled != null ? styled : defaultColor;
+    }
+
+    private float readStrokeWeight(JSONObject root) {
+        if (!root.hasKey("style") || root.isNull("style")) {
+            return 1.0F;
+        }
+        JSONObject style = root.getJSONObject("style");
+        Float strokeWeight = JsonConfigSupport.getOptionalFloat(style, "strokeWeight");
+        if (strokeWeight == null) {
+            strokeWeight = JsonConfigSupport.getOptionalFloat(style, "strokeWidth");
+        }
+        return strokeWeight != null ? Math.max(0.0F, strokeWeight) : 1.0F;
     }
 
     private IndicatorConfig.RendererConfig readRenderer(JSONObject root, String path) {

@@ -23,6 +23,8 @@
       "onColor": "#3062DB",
       "offColor": "#464646",
       "style": {
+        "strokeColor": "#D2D2D2",
+        "strokeWeight": 2.0,
         "renderer": {
           "type": "svg",
           "path": "data/img/test.svg"
@@ -47,6 +49,8 @@
       "style": {
         "onColor": "#3062DB",
         "offColor": "#464646",
+        "strokeColor": "#D2D2D2",
+        "strokeWeight": 2.0,
         "renderer": {
           "type": "svg",
           "path": "data/img/test.svg"
@@ -71,6 +75,8 @@
       "onColor": "#3062DB",
       "offColor": "#464646",
       "style": {
+        "strokeColor": "#FFFFFF",
+        "strokeWeight": 3.0,
         "renderer": {
           "type": "svg",
           "path": "data/img/test.svg"

@@ -35,6 +35,8 @@ boolean on = indicator.isOn();
 
 indicator.setOnColor(0xFF2ECC71);
 indicator.setOffColor(0xFF30343A);
+indicator.setStrokeColor(0xFFFFFFFF);
+indicator.setStrokeWeight(2.0F);
 
 indicator.setTooltip("Server status");
 indicator.setTooltipText("Server online");
@@ -78,6 +80,10 @@ int getOnColor();
 void setOnColor(int color);
 int getOffColor();
 void setOffColor(int color);
+int getStrokeColor();
+void setStrokeColor(int color);
+float getStrokeWeight();
+void setStrokeWeight(float weight);
 ```
 
 The control also supports the common `Control` methods for code, drawing,
@@ -154,6 +160,48 @@ an SVG path continue to use the default circular LED rendering.
 
 ---
 
+## Stroke
+
+`Indicator` exposes a configurable visual stroke for the circular LED and SVG
+rendering modes:
+
+```java
+indicator.setStrokeColor(0xFFFFFFFF);
+indicator.setStrokeWeight(2.0F);
+```
+
+The defaults are:
+
+- `strokeColor = 0xFF1F2328`
+- `strokeWeight = 1.0F`
+
+`setStrokeWeight(...)` clamps negative values to `0.0F`. A stroke weight of
+`0.0F` disables the stroke with Processing `noStroke()`.
+
+The JSON property names follow Button's style naming:
+
+```json
+{
+  "type": "indicator",
+  "code": "indStatus",
+  "x": 40,
+  "y": 40,
+  "width": 24,
+  "height": 24,
+  "style": {
+    "strokeColor": "#FFFFFFFF",
+    "strokeWeight": 2.0
+  }
+}
+```
+
+`style.strokeWeight` is the canonical Indicator JSON key. `style.strokeWidth`
+is also accepted as an alias when `strokeWeight` is absent, for compatibility
+with Toggle terminology. Do not use `borderColor` for the Indicator visual
+border; `borderColor` belongs to tooltip styles.
+
+---
+
 ## Visibility And Enabled State
 
 `visible=false` prevents drawing and hides the indicator as a tooltip target.
@@ -209,6 +257,10 @@ Legacy absolute geometry is supported:
   "on": true,
   "onColor": "#FF2ECC71",
   "offColor": "#FF30343A",
+  "style": {
+    "strokeColor": "#FFFFFFFF",
+    "strokeWeight": 2.0
+  },
   "tooltip": "Server status"
 }
 ```
@@ -229,6 +281,10 @@ Relative bounds are also supported:
   "on": false,
   "onColor": "#FF2ECC71",
   "offColor": "#FF30343A",
+  "style": {
+    "strokeColor": "#FFFFFFFF",
+    "strokeWeight": 2.0
+  },
   "tooltip": {
     "text": "Server status",
     "styleRef": "indicatorDark"
@@ -253,6 +309,8 @@ SVG JSON uses the same renderer block used by Button and Toggle:
   "onColor": "#FF2ECC71",
   "offColor": "#FF30343A",
   "style": {
+    "strokeColor": "#FFFFFFFF",
+    "strokeWeight": 2.0,
     "renderer": {
       "type": "svg",
       "path": "data/img/test.svg"
@@ -271,6 +329,9 @@ Rules:
 - `onColor` defaults to green
 - `offColor` defaults to dark gray
 - colors use the shared parser: integer, `#RRGGBB`, or `#AARRGGBB`
+- `style.strokeColor` configures the visual border color
+- `style.strokeWeight` configures the visual border width
+- `style.strokeWidth` is accepted as an alias only when `strokeWeight` is absent
 - `tooltip` uses the same object block as other tooltip-capable controls
 - `tooltip` may also be a string shorthand for tooltip text
 - SVG uses `style.renderer.type = "svg"` and `style.renderer.path`

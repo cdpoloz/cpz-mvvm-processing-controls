@@ -59,6 +59,14 @@ class IndicatorJsonConfigTest {
     }
 
     @Test
+    void strokeDefaultsMatchIndicatorDefaults() {
+        IndicatorConfig config = indicatorConfig("{\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30}");
+
+        assertEquals(Indicator.DEFAULT_BORDER_COLOR, config.getStrokeColor());
+        assertEquals(1.0F, config.getStrokeWeight());
+    }
+
+    @Test
     void onTrueLoadsFromJson() {
         IndicatorConfig config = indicatorConfig("{\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30,\"on\":true}");
 
@@ -72,6 +80,40 @@ class IndicatorJsonConfigTest {
 
         assertEquals(0xFF00AA00, config.getOnColor());
         assertEquals(0xFF111111, config.getOffColor());
+    }
+
+    @Test
+    void styleStrokeLoadsFromJson() {
+        IndicatorConfig config = indicatorConfig("{\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
+                + "\"style\":{\"strokeColor\":\"#FFFFFFFF\",\"strokeWeight\":2.5}}");
+
+        assertEquals(0xFFFFFFFF, config.getStrokeColor());
+        assertEquals(2.5F, config.getStrokeWeight());
+    }
+
+    @Test
+    void styleStrokeWidthAliasLoadsWhenStrokeWeightIsAbsent() {
+        IndicatorConfig config = indicatorConfig("{\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
+                + "\"style\":{\"strokeColor\":\"#FFFFFFFF\",\"strokeWidth\":3.0}}");
+
+        assertEquals(0xFFFFFFFF, config.getStrokeColor());
+        assertEquals(3.0F, config.getStrokeWeight());
+    }
+
+    @Test
+    void styleStrokeWeightTakesPrecedenceOverStrokeWidthAlias() {
+        IndicatorConfig config = indicatorConfig("{\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
+                + "\"style\":{\"strokeWeight\":2.0,\"strokeWidth\":3.0}}");
+
+        assertEquals(2.0F, config.getStrokeWeight());
+    }
+
+    @Test
+    void negativeStyleStrokeWeightIsClampedToZero() {
+        IndicatorConfig config = indicatorConfig("{\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
+                + "\"style\":{\"strokeWeight\":-2.0}}");
+
+        assertEquals(0.0F, config.getStrokeWeight());
     }
 
     @Test
@@ -148,6 +190,7 @@ class IndicatorJsonConfigTest {
     void factoryAppliesStateColorsVisibilityEnabledAndTooltip() {
         IndicatorConfig config = indicatorConfig("{\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
                 + "\"on\":true,\"onColor\":\"#FF00AA00\",\"offColor\":\"#FF111111\","
+                + "\"style\":{\"strokeColor\":\"#FFFFFFFF\",\"strokeWeight\":2.5},"
                 + "\"enabled\":false,\"visible\":false,\"tooltip\":{\"text\":\"runtime status\"}}");
 
         Indicator indicator = IndicatorFactory.create(sketch(800, 600), config);
@@ -155,6 +198,8 @@ class IndicatorJsonConfigTest {
         assertTrue(indicator.isOn());
         assertEquals(0xFF00AA00, indicator.getOnColor());
         assertEquals(0xFF111111, indicator.getOffColor());
+        assertEquals(0xFFFFFFFF, indicator.getStrokeColor());
+        assertEquals(2.5F, indicator.getStrokeWeight());
         assertFalse(indicator.isEnabled());
         assertFalse(indicator.isVisible());
         assertEquals("runtime status", indicator.getTooltip().getText());
@@ -186,6 +231,7 @@ class IndicatorJsonConfigTest {
         JSONObject root = JSONObject.parse("{\"tooltipStyles\":{\"indicatorDark\":{"
                 + "\"backgroundColor\":\"#F21B1F26\",\"textColor\":\"#FFFFFFFF\",\"borderColor\":\"#FF8A94A6\"}},"
                 + "\"controls\":[{\"type\":\"indicator\",\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
+                + "\"style\":{\"strokeColor\":\"#FFFFFFFF\"},"
                 + "\"tooltip\":{\"text\":\"status\",\"styleRef\":\"indicatorDark\"}}]}");
         JsonApplet sketch = new JsonApplet(root);
 
@@ -196,6 +242,7 @@ class IndicatorJsonConfigTest {
         assertEquals(0xF21B1F26, indicator.getTooltip().getStyleConfig().backgroundOverride);
         assertEquals(0xFFFFFFFF, indicator.getTooltip().getStyleConfig().textOverride);
         assertEquals(0xFF8A94A6, indicator.getTooltip().getStyleConfig().borderOverride);
+        assertEquals(0xFFFFFFFF, indicator.getStrokeColor());
     }
 
     @Test
@@ -203,7 +250,8 @@ class IndicatorJsonConfigTest {
         JSONObject root = JSONObject.parse("{\"controls\":[{\"type\":\"indicator\",\"code\":\"ind\","
                 + "\"bounds\":{\"mode\":\"relative\",\"x\":0.1,\"y\":0.2,\"width\":0.05,\"height\":0.1},"
                 + "\"on\":true,\"onColor\":\"#FF00AA00\",\"offColor\":\"#FF111111\","
-                + "\"style\":{\"renderer\":{\"type\":\"svg\",\"path\":\"data/img/test.svg\"}},"
+                + "\"style\":{\"strokeColor\":\"#FFFFFFFF\",\"strokeWeight\":2.0,"
+                + "\"renderer\":{\"type\":\"svg\",\"path\":\"data/img/test.svg\"}},"
                 + "\"tooltip\":\"SVG indicator\"}]}");
         JsonApplet sketch = new JsonApplet(root);
         sketch.width = 800;
@@ -218,6 +266,8 @@ class IndicatorJsonConfigTest {
         assertTrue(indicator.isOn());
         assertEquals(0xFF00AA00, indicator.getOnColor());
         assertEquals(0xFF111111, indicator.getOffColor());
+        assertEquals(0xFFFFFFFF, indicator.getStrokeColor());
+        assertEquals(2.0F, indicator.getStrokeWeight());
         assertEquals("SVG indicator", indicator.getTooltip().getText());
         assertEquals(80.0F, bounds.x());
         assertEquals(120.0F, bounds.y());
