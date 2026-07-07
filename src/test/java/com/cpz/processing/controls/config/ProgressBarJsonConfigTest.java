@@ -5,6 +5,7 @@ import com.cpz.processing.controls.controls.config.ControlConfigLoader;
 import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.controls.geometry.MeasureMode;
 import com.cpz.processing.controls.controls.progressbar.ProgressBar;
+import com.cpz.processing.controls.controls.progressbar.ProgressBarFillDirection;
 import com.cpz.processing.controls.controls.progressbar.ProgressBarFactory;
 import com.cpz.processing.controls.controls.progressbar.config.ProgressBarConfig;
 import com.cpz.processing.controls.controls.progressbar.config.ProgressBarConfigLoader;
@@ -70,6 +71,7 @@ class ProgressBarJsonConfigTest {
         assertEquals(0xFF00AA00, config.getFillColor());
         assertEquals(0xFFFFFFFF, config.getStrokeColor());
         assertEquals(2.5F, config.getStrokeWeight());
+        assertEquals(ProgressBarFillDirection.LEFT_TO_RIGHT, config.getFillDirection());
     }
 
     @Test
@@ -100,11 +102,51 @@ class ProgressBarJsonConfigTest {
     }
 
     @Test
+    void fillDirectionDefaultsToLeftToRightWhenMissing() {
+        ProgressBarConfig config = progressBarConfig("{\"code\":\"bar\",\"x\":40,\"y\":50,\"width\":200,\"height\":20}");
+
+        assertEquals(ProgressBarFillDirection.LEFT_TO_RIGHT, config.getFillDirection());
+    }
+
+    @Test
+    void fillDirectionLoadsFromStyleJson() {
+        assertFillDirection("left-to-right", ProgressBarFillDirection.LEFT_TO_RIGHT);
+        assertFillDirection("right-to-left", ProgressBarFillDirection.RIGHT_TO_LEFT);
+        assertFillDirection("bottom-to-top", ProgressBarFillDirection.BOTTOM_TO_TOP);
+        assertFillDirection("top-to-bottom", ProgressBarFillDirection.TOP_TO_BOTTOM);
+    }
+
+    @Test
+    void fillDirectionAcceptsTrimCaseAndSeparatorVariants() {
+        ProgressBarConfig config = progressBarConfig("{\"code\":\"bar\",\"x\":40,\"y\":50,\"width\":200,\"height\":20,"
+                + "\"style\":{\"fillDirection\":\"  Bottom To Top  \"}}");
+
+        assertEquals(ProgressBarFillDirection.BOTTOM_TO_TOP, config.getFillDirection());
+    }
+
+    @Test
+    void topLevelFillDirectionTakesPrecedenceOverStyleFillDirection() {
+        ProgressBarConfig config = progressBarConfig("{\"code\":\"bar\",\"x\":40,\"y\":50,\"width\":200,\"height\":20,"
+                + "\"fillDirection\":\"RIGHT_TO_LEFT\","
+                + "\"style\":{\"fillDirection\":\"top-to-bottom\"}}");
+
+        assertEquals(ProgressBarFillDirection.RIGHT_TO_LEFT, config.getFillDirection());
+    }
+
+    @Test
+    void invalidFillDirectionUsesDefaultDirection() {
+        ProgressBarConfig config = progressBarConfig("{\"code\":\"bar\",\"x\":40,\"y\":50,\"width\":200,\"height\":20,"
+                + "\"style\":{\"fillDirection\":\"diagonal\"}}");
+
+        assertEquals(ProgressBarFillDirection.LEFT_TO_RIGHT, config.getFillDirection());
+    }
+
+    @Test
     void factoryAppliesValuesColorsVisibilityEnabledAndTooltip() {
         ProgressBarConfig config = progressBarConfig("{\"code\":\"bar\",\"x\":40,\"y\":50,\"width\":200,\"height\":20,"
                 + "\"min\":10,\"max\":30,\"value\":20,"
                 + "\"trackColor\":\"#FF111111\",\"fillColor\":\"#FF00AA00\","
-                + "\"style\":{\"strokeColor\":\"#FFFFFFFF\",\"strokeWeight\":2.5},"
+                + "\"style\":{\"strokeColor\":\"#FFFFFFFF\",\"strokeWeight\":2.5,\"fillDirection\":\"bottom-to-top\"},"
                 + "\"enabled\":false,\"visible\":false,\"tooltip\":{\"text\":\"progress status\"}}");
 
         ProgressBar progressBar = ProgressBarFactory.create(sketch(800, 600), config);
@@ -121,6 +163,8 @@ class ProgressBarJsonConfigTest {
         assertEquals(0xFF00AA00, progressBar.getStyle().getFillColor());
         assertEquals(0xFFFFFFFF, progressBar.getStyle().getStrokeColor());
         assertEquals(2.5F, progressBar.getStyle().getStrokeWeight());
+        assertEquals(ProgressBarFillDirection.BOTTOM_TO_TOP, progressBar.getFillDirection());
+        assertEquals(ProgressBarFillDirection.BOTTOM_TO_TOP, progressBar.getStyle().getFillDirection());
         assertFalse(progressBar.isEnabled());
         assertFalse(progressBar.isVisible());
         assertEquals("progress status", progressBar.getTooltip().getText());
@@ -149,6 +193,13 @@ class ProgressBarJsonConfigTest {
 
     private static ProgressBarConfig progressBarConfig(String json) {
         return new ProgressBarConfigLoader(new PApplet()).loadFromJson(JSONObject.parse(json), "progressbar.json");
+    }
+
+    private static void assertFillDirection(String raw, ProgressBarFillDirection expected) {
+        ProgressBarConfig config = progressBarConfig("{\"code\":\"bar\",\"x\":40,\"y\":50,\"width\":200,\"height\":20,"
+                + "\"style\":{\"fillDirection\":\"" + raw + "\"}}");
+
+        assertEquals(expected, config.getFillDirection());
     }
 
     private static void assertMeasure(ControlMeasure measure, MeasureMode mode, float value) {

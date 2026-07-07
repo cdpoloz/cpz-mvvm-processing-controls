@@ -388,7 +388,8 @@ precedence over legacy `x` / `y` / `width` / `height`. SVG uses the same
 `{"type":"svg","path":"..."}`.
 
 `progressbar` does not render text and is non-interactive. It displays a
-horizontal determinate value. Its visual colors are applied to the control's
+determinate value horizontally or vertically according to `fillDirection`. Its
+visual colors and fill direction are applied to the control's
 `ProgressBarStyle` and are accepted as top-level
 `trackColor` and `fillColor` fields, and also as `style.trackColor` and
 `style.fillColor` aliases for consistency with the style-oriented JSON shape.
@@ -405,10 +406,12 @@ ProgressBar properties:
 - `value`: optional value, default `0.0`
 - `trackColor`: optional track color
 - `fillColor`: optional fill color
+- `fillDirection`: optional top-level fill direction alias
 - `tooltip`: optional tooltip object or text shorthand
 - `style.trackColor` / `style.fillColor`: optional color aliases
 - `style.strokeColor`: optional outer stroke color
 - `style.strokeWeight`: optional outer stroke width; `0` disables the stroke
+- `style.fillDirection`: optional fill direction, default `"left-to-right"`
 
 Minimal progress bar entry:
 
@@ -430,7 +433,8 @@ Minimal progress bar entry:
   "fillColor": "#FF2F80ED",
   "style": {
     "strokeColor": "#FFFFFFFF",
-    "strokeWeight": 1.5
+    "strokeWeight": 1.5,
+    "fillDirection": "left-to-right"
   },
   "tooltip": "Loading"
 }
@@ -443,6 +447,10 @@ canonical border-width property. `borderColor` is not a ProgressBar visual
 border property; it belongs to tooltip style blocks. Relative `bounds` follows
 the same explicit `absolute` / `relative` mode rules as the other controls;
 `bounds` takes precedence over legacy `x` / `y` / `width` / `height`.
+Supported fill direction values are `left-to-right`, `right-to-left`,
+`bottom-to-top`, and `top-to-bottom`. Values are trimmed and case-insensitive;
+hyphen, underscore, and space separators are accepted. Invalid values use the
+default `LEFT_TO_RIGHT` direction.
 
 ```json
 {

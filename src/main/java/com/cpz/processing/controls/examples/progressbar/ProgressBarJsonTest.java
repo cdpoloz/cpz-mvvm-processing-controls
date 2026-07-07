@@ -33,7 +33,7 @@ public class ProgressBarJsonTest extends PApplet {
     }
 
     public void settings() {
-        size(640, 280);
+        size(720, 360);
         smooth(8);
     }
 
@@ -98,11 +98,12 @@ public class ProgressBarJsonTest extends PApplet {
 
     private void drawLabels() {
         fill(220);
-        text("JSON fixed", 84.0F, 88.0F);
-        text("JSON runtime", 84.0F, 142.0F);
-        text("JSON disabled", 84.0F, 196.0F);
+        text("JSON left to right", 104.0F, 82.0F);
+        text("JSON right to left", 104.0F, 136.0F);
+        text("JSON bottom to top", 263.0F, 316.0F);
+        text("JSON top to bottom", 455.0F, 316.0F);
         fill(150);
-        text("Loaded from data/config/progressbar.json", width * 0.5F, 238.0F);
+        text("Loaded from data/config/progressbar.json", width * 0.5F, 342.0F);
     }
 
     private void drawActiveOverlays() {

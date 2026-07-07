@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.progressbar.config;
 
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.controls.progressbar.ProgressBarFillDirection;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipConfig;
 import java.util.Objects;
 
@@ -18,6 +19,7 @@ public final class ProgressBarConfig {
     private final int fillColor;
     private final int strokeColor;
     private final float strokeWeight;
+    private final ProgressBarFillDirection fillDirection;
     private final ControlBounds bounds;
     private final boolean enabled;
     private final boolean visible;
@@ -32,6 +34,7 @@ public final class ProgressBarConfig {
             int fillColor,
             int strokeColor,
             float strokeWeight,
+            ProgressBarFillDirection fillDirection,
             ControlBounds bounds,
             boolean enabled,
             boolean visible,
@@ -50,6 +53,7 @@ public final class ProgressBarConfig {
         this.fillColor = fillColor;
         this.strokeColor = strokeColor;
         this.strokeWeight = Math.max(0.0F, strokeWeight);
+        this.fillDirection = fillDirection == null ? ProgressBarFillDirection.LEFT_TO_RIGHT : fillDirection;
         this.bounds = Objects.requireNonNull(bounds, "bounds");
         this.enabled = enabled;
         this.visible = visible;
@@ -86,6 +90,10 @@ public final class ProgressBarConfig {
 
     public float getStrokeWeight() {
         return this.strokeWeight;
+    }
+
+    public ProgressBarFillDirection getFillDirection() {
+        return this.fillDirection;
     }
 
     public ControlBounds getBounds() {

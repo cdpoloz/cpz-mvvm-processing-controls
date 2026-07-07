@@ -1,6 +1,6 @@
 # ProgressBar
 
-`ProgressBar` is a public non-interactive horizontal control for displaying an
+`ProgressBar` is a public non-interactive control for displaying an
 application-driven numeric progress value.
 
 This document describes the control as implemented on `main` for the upcoming
@@ -22,7 +22,8 @@ Use `ProgressBar` when a sketch needs to show determinate progress:
 - an application value normalized to a visual range
 
 `ProgressBar` is not interactive. The sketch updates its value with
-`setValue(float)`.
+`setValue(float)`. Use `ProgressBar` instead of `Slider` when no input should
+be consumed.
 
 ---
 
@@ -34,7 +35,8 @@ ProgressBarStyle style = new ProgressBarStyle()
         .setTrackColor(0xFF30343A)
         .setFillColor(0xFF2F80ED)
         .setStrokeColor(0xFFFFFFFF)
-        .setStrokeWeight(1.5F);
+        .setStrokeWeight(1.5F)
+        .setFillDirection(ProgressBarFillDirection.LEFT_TO_RIGHT);
 
 progressBar.setStyle(style);
 progressBar.setRange(0.0F, 100.0F);
@@ -64,6 +66,8 @@ float getMax();
 void setMax(float max);
 void setRange(float min, float max);
 float getProgress();
+ProgressBarFillDirection getFillDirection();
+void setFillDirection(ProgressBarFillDirection direction);
 int getTrackColor();
 void setTrackColor(int color);
 int getFillColor();
@@ -109,8 +113,8 @@ ProgressBar progressBar = new ProgressBar(this, 40, 40, 240, 20);
 ```
 
 The full bounds rectangle is the logical area used for layout and tooltips.
-The current implementation draws a horizontal bar only. The fill grows from
-left to right inside the full bounds.
+The fill direction determines whether the bar is horizontal or vertical. The
+full bounds are used for both orientations.
 
 Relative bounds use the same `ControlBounds` rules as other relative-aware
 controls:
@@ -143,6 +147,7 @@ The defaults are:
 - `fillColor = 0xFF2F80ED`
 - `strokeColor = 0xFF1F2328`
 - `strokeWeight = 1.0F`
+- `fillDirection = LEFT_TO_RIGHT`
 
 These values are stored in the control's `ProgressBarStyle`. The direct color
 and stroke setters remain available and update the current style object.
@@ -155,16 +160,24 @@ ProgressBarStyle style = new ProgressBarStyle()
         .setTrackColor(0xFF30343A)
         .setFillColor(0xFF2F80ED)
         .setStrokeColor(0xFFFFFFFF)
-        .setStrokeWeight(1.5F);
+        .setStrokeWeight(1.5F)
+        .setFillDirection(ProgressBarFillDirection.LEFT_TO_RIGHT);
 
 progressBar.setStyle(style);
 ```
 
+Supported fill directions:
+
+- `LEFT_TO_RIGHT`: horizontal fill from left to right
+- `RIGHT_TO_LEFT`: horizontal fill from right to left
+- `BOTTOM_TO_TOP`: vertical fill from bottom to top
+- `TOP_TO_BOTTOM`: vertical fill from top to bottom
+
 `setStrokeWeight(...)` clamps negative values to `0.0F`. A stroke weight of
 `0.0F` disables the outer stroke with Processing `noStroke()`.
 
-No animation, text, stripes, indeterminate state, vertical orientation, or
-events are included in this first version.
+No animation, text, stripes, indeterminate state, or events are included in
+this version.
 
 ---
 
@@ -218,7 +231,8 @@ legacy `x` / `y` / `width` / `height`:
   "fillColor": "#FF2F80ED",
   "style": {
     "strokeColor": "#FFFFFFFF",
-    "strokeWeight": 1.5
+    "strokeWeight": 1.5,
+    "fillDirection": "left-to-right"
   },
   "tooltip": "Loading"
 }
@@ -238,12 +252,18 @@ Supported properties:
 - `style.trackColor` / `style.fillColor`: optional color aliases
 - `style.strokeColor`: optional outer stroke color
 - `style.strokeWeight`: optional outer stroke width; `0` disables the stroke
+- `style.fillDirection`: optional fill direction, default `"left-to-right"`
+- `fillDirection`: top-level fill direction alias; takes precedence over `style.fillDirection`
 - `enabled`: optional enabled flag, default `true`
 - `visible`: optional visible flag, default `true`
 - `tooltip`: optional tooltip object or text shorthand
 
 `style.strokeWeight` is the canonical border-width property. `borderColor` is
 not a `ProgressBar` visual border property; it belongs to tooltip style blocks.
+Supported JSON fill direction values are `"left-to-right"`,
+`"right-to-left"`, `"bottom-to-top"`, and `"top-to-bottom"`. Values are trimmed
+and case-insensitive; hyphen, underscore, and space separators are accepted.
+Invalid values use the default `LEFT_TO_RIGHT` direction.
 
 ---
 

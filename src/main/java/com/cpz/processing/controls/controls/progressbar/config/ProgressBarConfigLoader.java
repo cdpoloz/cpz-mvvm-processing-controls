@@ -1,10 +1,12 @@
 package com.cpz.processing.controls.controls.progressbar.config;
 
 import com.cpz.processing.controls.controls.progressbar.ProgressBar;
+import com.cpz.processing.controls.controls.progressbar.ProgressBarFillDirection;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipJsonSupport;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.JsonConfigSupport;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import processing.core.PApplet;
@@ -53,6 +55,7 @@ public final class ProgressBarConfigLoader {
                 this.readColor(root, "fillColor", ProgressBar.DEFAULT_FILL_COLOR, path),
                 this.readStyleColor(root, "strokeColor", ProgressBar.DEFAULT_STROKE_COLOR, path),
                 this.readStrokeWeight(root),
+                this.readFillDirection(root),
                 JsonConfigSupport.getControlBounds(root, path, "progressbar"),
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),
@@ -86,5 +89,37 @@ public final class ProgressBarConfigLoader {
         }
         Float strokeWeight = JsonConfigSupport.getOptionalFloat(root.getJSONObject("style"), "strokeWeight");
         return strokeWeight != null ? Math.max(0.0F, strokeWeight) : 1.0F;
+    }
+
+    private ProgressBarFillDirection readFillDirection(JSONObject root) {
+        Object raw = this.readTopLevelOrStyleValue(root, "fillDirection");
+        return parseFillDirection(raw);
+    }
+
+    private Object readTopLevelOrStyleValue(JSONObject root, String key) {
+        if (root.hasKey(key) && !root.isNull(key)) {
+            return root.get(key);
+        }
+        if (!root.hasKey("style") || root.isNull("style")) {
+            return null;
+        }
+        JSONObject style = root.getJSONObject("style");
+        return style.hasKey(key) && !style.isNull(key) ? style.get(key) : null;
+    }
+
+    private static ProgressBarFillDirection parseFillDirection(Object raw) {
+        if (raw == null) {
+            return ProgressBar.DEFAULT_FILL_DIRECTION;
+        }
+        String normalized = String.valueOf(raw)
+                .trim()
+                .toUpperCase(Locale.ROOT)
+                .replace('-', '_')
+                .replace(' ', '_');
+        try {
+            return ProgressBarFillDirection.valueOf(normalized);
+        } catch (IllegalArgumentException ex) {
+            return ProgressBar.DEFAULT_FILL_DIRECTION;
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.cpz.processing.controls.controls.progressbar.style;
 
+import com.cpz.processing.controls.controls.progressbar.ProgressBarFillDirection;
+
 /**
  * Visual style for the non-interactive progress bar facade.
  *
@@ -9,11 +11,13 @@ public final class ProgressBarStyle {
     public static final int DEFAULT_TRACK_COLOR = 0xFF30343A;
     public static final int DEFAULT_FILL_COLOR = 0xFF2F80ED;
     public static final int DEFAULT_STROKE_COLOR = 0xFF1F2328;
+    public static final ProgressBarFillDirection DEFAULT_FILL_DIRECTION = ProgressBarFillDirection.LEFT_TO_RIGHT;
 
     private int trackColor = DEFAULT_TRACK_COLOR;
     private int fillColor = DEFAULT_FILL_COLOR;
     private int strokeColor = DEFAULT_STROKE_COLOR;
     private float strokeWeight = 1.0F;
+    private ProgressBarFillDirection fillDirection = DEFAULT_FILL_DIRECTION;
 
     public ProgressBarStyle() {
     }
@@ -24,6 +28,7 @@ public final class ProgressBarStyle {
             this.fillColor = source.fillColor;
             this.strokeColor = source.strokeColor;
             this.strokeWeight = source.strokeWeight;
+            this.fillDirection = source.fillDirection;
         }
     }
 
@@ -60,6 +65,15 @@ public final class ProgressBarStyle {
 
     public ProgressBarStyle setStrokeWeight(float weight) {
         this.strokeWeight = Math.max(0.0F, weight);
+        return this;
+    }
+
+    public ProgressBarFillDirection getFillDirection() {
+        return this.fillDirection;
+    }
+
+    public ProgressBarStyle setFillDirection(ProgressBarFillDirection direction) {
+        this.fillDirection = direction == null ? DEFAULT_FILL_DIRECTION : direction;
         return this;
     }
 }

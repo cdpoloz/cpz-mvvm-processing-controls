@@ -102,6 +102,7 @@ class ProgressBarTest {
         assertEquals(ProgressBar.DEFAULT_FILL_COLOR, progressBar.getStyle().getFillColor());
         assertEquals(ProgressBar.DEFAULT_STROKE_COLOR, progressBar.getStyle().getStrokeColor());
         assertEquals(1.0F, progressBar.getStyle().getStrokeWeight());
+        assertEquals(ProgressBarFillDirection.LEFT_TO_RIGHT, progressBar.getStyle().getFillDirection());
     }
 
     @Test
@@ -111,7 +112,8 @@ class ProgressBarTest {
                 .setTrackColor(0xFF111111)
                 .setFillColor(0xFF00AA00)
                 .setStrokeColor(0xFFFFFFFF)
-                .setStrokeWeight(2.5F);
+                .setStrokeWeight(2.5F)
+                .setFillDirection(ProgressBarFillDirection.BOTTOM_TO_TOP);
 
         progressBar.setStyle(style);
 
@@ -120,6 +122,7 @@ class ProgressBarTest {
         assertEquals(0xFF00AA00, progressBar.getFillColor());
         assertEquals(0xFFFFFFFF, progressBar.getStrokeColor());
         assertEquals(2.5F, progressBar.getStrokeWeight());
+        assertEquals(ProgressBarFillDirection.BOTTOM_TO_TOP, progressBar.getFillDirection());
     }
 
     @Test
@@ -133,6 +136,7 @@ class ProgressBarTest {
         assertEquals(ProgressBar.DEFAULT_FILL_COLOR, progressBar.getFillColor());
         assertEquals(ProgressBar.DEFAULT_STROKE_COLOR, progressBar.getStrokeColor());
         assertEquals(1.0F, progressBar.getStrokeWeight());
+        assertEquals(ProgressBarFillDirection.LEFT_TO_RIGHT, progressBar.getFillDirection());
     }
 
     @Test
@@ -143,11 +147,23 @@ class ProgressBarTest {
         progressBar.setFillColor(0xFF00AA00);
         progressBar.setStrokeColor(0xFFFFFFFF);
         progressBar.setStrokeWeight(2.5F);
+        progressBar.setFillDirection(ProgressBarFillDirection.RIGHT_TO_LEFT);
 
         assertEquals(0xFF111111, progressBar.getStyle().getTrackColor());
         assertEquals(0xFF00AA00, progressBar.getStyle().getFillColor());
         assertEquals(0xFFFFFFFF, progressBar.getStyle().getStrokeColor());
         assertEquals(2.5F, progressBar.getStyle().getStrokeWeight());
+        assertEquals(ProgressBarFillDirection.RIGHT_TO_LEFT, progressBar.getStyle().getFillDirection());
+    }
+
+    @Test
+    void nullFillDirectionResetsToDefaultDirection() {
+        ProgressBar progressBar = new ProgressBar(sketch(800, 600), 40.0F, 50.0F, 200.0F, 20.0F);
+
+        progressBar.setFillDirection(ProgressBarFillDirection.TOP_TO_BOTTOM);
+        progressBar.setFillDirection(null);
+
+        assertEquals(ProgressBarFillDirection.LEFT_TO_RIGHT, progressBar.getFillDirection());
     }
 
     @Test
@@ -183,10 +199,60 @@ class ProgressBarTest {
         assertEquals(50.0F, sketch.rectY[0]);
         assertEquals(200.0F, sketch.rectWidth[0]);
         assertEquals(20.0F, sketch.rectHeight[0]);
+        assertEquals(40.0F, sketch.rectX[1]);
+        assertEquals(50.0F, sketch.rectY[1]);
         assertEquals(50.0F, sketch.rectWidth[1]);
         assertEquals(20.0F, sketch.rectHeight[1]);
         assertEquals(0xFFFFFFFF, sketch.lastStrokeColor);
         assertEquals(2.5F, sketch.lastStrokeWeight);
+    }
+
+    @Test
+    void drawUsesRightToLeftFillDirection() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        ProgressBar progressBar = new ProgressBar(sketch, 40.0F, 50.0F, 200.0F, 20.0F);
+
+        progressBar.setValue(0.25F);
+        progressBar.setFillDirection(ProgressBarFillDirection.RIGHT_TO_LEFT);
+        progressBar.draw();
+
+        assertEquals(3, sketch.rectCalls);
+        assertEquals(190.0F, sketch.rectX[1]);
+        assertEquals(50.0F, sketch.rectY[1]);
+        assertEquals(50.0F, sketch.rectWidth[1]);
+        assertEquals(20.0F, sketch.rectHeight[1]);
+    }
+
+    @Test
+    void drawUsesBottomToTopFillDirection() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        ProgressBar progressBar = new ProgressBar(sketch, 40.0F, 50.0F, 20.0F, 200.0F);
+
+        progressBar.setValue(0.25F);
+        progressBar.setFillDirection(ProgressBarFillDirection.BOTTOM_TO_TOP);
+        progressBar.draw();
+
+        assertEquals(3, sketch.rectCalls);
+        assertEquals(40.0F, sketch.rectX[1]);
+        assertEquals(200.0F, sketch.rectY[1]);
+        assertEquals(20.0F, sketch.rectWidth[1]);
+        assertEquals(50.0F, sketch.rectHeight[1]);
+    }
+
+    @Test
+    void drawUsesTopToBottomFillDirection() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        ProgressBar progressBar = new ProgressBar(sketch, 40.0F, 50.0F, 20.0F, 200.0F);
+
+        progressBar.setValue(0.25F);
+        progressBar.setFillDirection(ProgressBarFillDirection.TOP_TO_BOTTOM);
+        progressBar.draw();
+
+        assertEquals(3, sketch.rectCalls);
+        assertEquals(40.0F, sketch.rectX[1]);
+        assertEquals(50.0F, sketch.rectY[1]);
+        assertEquals(20.0F, sketch.rectWidth[1]);
+        assertEquals(50.0F, sketch.rectHeight[1]);
     }
 
     @Test

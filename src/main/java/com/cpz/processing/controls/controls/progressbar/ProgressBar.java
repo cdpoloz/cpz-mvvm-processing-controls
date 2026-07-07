@@ -16,7 +16,7 @@ import processing.core.PApplet;
 import processing.core.PFont;
 
 /**
- * Public non-interactive horizontal progress bar facade.
+ * Public non-interactive progress bar facade.
  *
  * @author CPZ
  */
@@ -24,6 +24,7 @@ public final class ProgressBar implements ParentSizeAwareControl, TooltipAttacha
     public static final int DEFAULT_TRACK_COLOR = ProgressBarStyle.DEFAULT_TRACK_COLOR;
     public static final int DEFAULT_FILL_COLOR = ProgressBarStyle.DEFAULT_FILL_COLOR;
     public static final int DEFAULT_STROKE_COLOR = ProgressBarStyle.DEFAULT_STROKE_COLOR;
+    public static final ProgressBarFillDirection DEFAULT_FILL_DIRECTION = ProgressBarStyle.DEFAULT_FILL_DIRECTION;
 
     private final PApplet sketch;
     private final String code;
@@ -70,7 +71,6 @@ public final class ProgressBar implements ParentSizeAwareControl, TooltipAttacha
         this.applyResolvedBounds();
         float resolvedWidth = Math.max(0.0F, this.width);
         float resolvedHeight = Math.max(0.0F, this.height);
-        float fillWidth = resolvedWidth * this.getProgress();
 
         this.sketch.pushStyle();
         try {
@@ -78,10 +78,7 @@ public final class ProgressBar implements ParentSizeAwareControl, TooltipAttacha
             this.sketch.fill(this.style.getTrackColor());
             this.sketch.rect(this.x, this.y, resolvedWidth, resolvedHeight);
 
-            if (fillWidth > 0.0F) {
-                this.sketch.fill(this.style.getFillColor());
-                this.sketch.rect(this.x, this.y, fillWidth, resolvedHeight);
-            }
+            this.drawFill(resolvedWidth, resolvedHeight);
 
             if (this.style.getStrokeWeight() > 0.0F) {
                 this.sketch.noFill();
@@ -172,6 +169,14 @@ public final class ProgressBar implements ParentSizeAwareControl, TooltipAttacha
 
     public void setStrokeWeight(float weight) {
         this.style.setStrokeWeight(weight);
+    }
+
+    public ProgressBarFillDirection getFillDirection() {
+        return this.style.getFillDirection();
+    }
+
+    public void setFillDirection(ProgressBarFillDirection direction) {
+        this.style.setFillDirection(direction);
     }
 
     public ProgressBarStyle getStyle() {
@@ -304,6 +309,41 @@ public final class ProgressBar implements ParentSizeAwareControl, TooltipAttacha
 
     private float clampToRange(float rawValue) {
         return Math.max(this.min, Math.min(this.max, rawValue));
+    }
+
+    private void drawFill(float resolvedWidth, float resolvedHeight) {
+        float progress = this.getProgress();
+        if (progress <= 0.0F) {
+            return;
+        }
+
+        float fillX = this.x;
+        float fillY = this.y;
+        float fillWidth = resolvedWidth;
+        float fillHeight = resolvedHeight;
+
+        switch (this.style.getFillDirection()) {
+            case RIGHT_TO_LEFT:
+                fillWidth = resolvedWidth * progress;
+                fillX = this.x + resolvedWidth - fillWidth;
+                break;
+            case BOTTOM_TO_TOP:
+                fillHeight = resolvedHeight * progress;
+                fillY = this.y + resolvedHeight - fillHeight;
+                break;
+            case TOP_TO_BOTTOM:
+                fillHeight = resolvedHeight * progress;
+                break;
+            case LEFT_TO_RIGHT:
+            default:
+                fillWidth = resolvedWidth * progress;
+                break;
+        }
+
+        if (fillWidth > 0.0F && fillHeight > 0.0F) {
+            this.sketch.fill(this.style.getFillColor());
+            this.sketch.rect(fillX, fillY, fillWidth, fillHeight);
+        }
     }
 
     private TooltipBounds currentTooltipBounds() {

@@ -2,6 +2,7 @@ package com.cpz.processing.controls.examples.progressbar;
 
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.controls.progressbar.ProgressBar;
+import com.cpz.processing.controls.controls.progressbar.ProgressBarFillDirection;
 import com.cpz.processing.controls.controls.progressbar.style.ProgressBarStyle;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
@@ -22,16 +23,17 @@ public class ProgressBarTest extends PApplet {
     private InputManager inputManager;
     private OverlayManager overlayManager;
     private TooltipOverlayController tooltips;
-    private ProgressBar loadingBar;
-    private ProgressBar runtimeBar;
-    private ProgressBar disabledBar;
+    private ProgressBar leftToRightBar;
+    private ProgressBar rightToLeftBar;
+    private ProgressBar bottomToTopBar;
+    private ProgressBar topToBottomBar;
 
     public static void main(String[] args) {
         PApplet.main(ProgressBarTest.class);
     }
 
     public void settings() {
-        size(640, 280);
+        size(720, 360);
         smooth(8);
     }
 
@@ -44,35 +46,48 @@ public class ProgressBarTest extends PApplet {
                 .setTrackColor(Colors.gray(58))
                 .setStrokeColor(Colors.gray(220))
                 .setStrokeWeight(1.5F);
-        ProgressBarStyle loadingStyle = new ProgressBarStyle(baseProgressStyle)
-                .setFillColor(Colors.rgb(47, 128, 237));
-        ProgressBarStyle runtimeStyle = new ProgressBarStyle(baseProgressStyle)
-                .setFillColor(Colors.rgb(46, 204, 113));
-        ProgressBarStyle disabledStyle = new ProgressBarStyle(baseProgressStyle)
-                .setFillColor(Colors.rgb(154, 125, 255));
+        ProgressBarStyle leftToRightStyle = new ProgressBarStyle(baseProgressStyle)
+                .setFillColor(Colors.rgb(47, 128, 237))
+                .setFillDirection(ProgressBarFillDirection.LEFT_TO_RIGHT);
+        ProgressBarStyle rightToLeftStyle = new ProgressBarStyle(baseProgressStyle)
+                .setFillColor(Colors.rgb(46, 204, 113))
+                .setFillDirection(ProgressBarFillDirection.RIGHT_TO_LEFT);
+        ProgressBarStyle bottomToTopStyle = new ProgressBarStyle(baseProgressStyle)
+                .setFillColor(Colors.rgb(242, 153, 74))
+                .setFillDirection(ProgressBarFillDirection.BOTTOM_TO_TOP);
+        ProgressBarStyle topToBottomStyle = new ProgressBarStyle(baseProgressStyle)
+                .setFillColor(Colors.rgb(154, 125, 255))
+                .setFillDirection(ProgressBarFillDirection.TOP_TO_BOTTOM);
 
-        this.loadingBar = new ProgressBar(this, "pbLoading", 120.0F, 76.0F, 400.0F, 24.0F)
-                .setTooltip("Loading progress")
+        this.leftToRightBar = new ProgressBar(this, "pbLeftToRight", 170.0F, 70.0F, 420.0F, 24.0F)
+                .setTooltip("Left to right progress")
                 .setTooltipStyle(tooltipStyle);
-        this.loadingBar.setValue(0.35F);
-        this.loadingBar.setStyle(loadingStyle);
+        this.leftToRightBar.setValue(0.35F);
+        this.leftToRightBar.setStyle(leftToRightStyle);
 
-        this.runtimeBar = new ProgressBar(this, "pbRuntime",
-                ControlBounds.relative(0.188F, 0.464F, 0.625F, 0.086F))
-                .setTooltip("Runtime progress")
+        this.rightToLeftBar = new ProgressBar(this, "pbRightToLeft",
+                ControlBounds.relative(0.236F, 0.342F, 0.583F, 0.067F))
+                .setTooltip("Right to left progress")
                 .setTooltipStyle(tooltipStyle);
-        this.runtimeBar.setStyle(runtimeStyle);
+        this.rightToLeftBar.setValue(0.65F);
+        this.rightToLeftBar.setStyle(rightToLeftStyle);
 
-        this.disabledBar = new ProgressBar(this, "pbDisabled", 120.0F, 184.0F, 400.0F, 24.0F)
-                .setTooltip("Disabled still exposes tooltip")
+        this.bottomToTopBar = new ProgressBar(this, "pbBottomToTop", 242.0F, 182.0F, 42.0F, 118.0F)
+                .setTooltip("Bottom to top progress")
                 .setTooltipStyle(tooltipStyle);
-        this.disabledBar.setValue(0.7F);
-        this.disabledBar.setEnabled(false);
-        this.disabledBar.setStyle(disabledStyle);
+        this.bottomToTopBar.setValue(0.72F);
+        this.bottomToTopBar.setStyle(bottomToTopStyle);
 
-        this.tooltips.registerTarget(this.loadingBar);
-        this.tooltips.registerTarget(this.runtimeBar);
-        this.tooltips.registerTarget(this.disabledBar);
+        this.topToBottomBar = new ProgressBar(this, "pbTopToBottom", 434.0F, 182.0F, 42.0F, 118.0F)
+                .setTooltip("Top to bottom progress")
+                .setTooltipStyle(tooltipStyle);
+        this.topToBottomBar.setValue(0.48F);
+        this.topToBottomBar.setStyle(topToBottomStyle);
+
+        this.tooltips.registerTarget(this.leftToRightBar);
+        this.tooltips.registerTarget(this.rightToLeftBar);
+        this.tooltips.registerTarget(this.bottomToTopBar);
+        this.tooltips.registerTarget(this.topToBottomBar);
         this.inputManager.registerLayer(new TooltipInputLayer(1000, this.tooltips));
 
         textAlign(CENTER, CENTER);
@@ -82,9 +97,10 @@ public class ProgressBarTest extends PApplet {
         background(28);
         this.updateRuntimeBar();
 
-        this.loadingBar.draw();
-        this.runtimeBar.draw();
-        this.disabledBar.draw();
+        this.leftToRightBar.draw();
+        this.rightToLeftBar.draw();
+        this.bottomToTopBar.draw();
+        this.topToBottomBar.draw();
         this.drawLabels();
         this.drawActiveOverlays();
     }
@@ -117,8 +133,8 @@ public class ProgressBarTest extends PApplet {
 
     private void updateRuntimeBar() {
         float progress = (sin(millis() * 0.002F) + 1.0F) * 0.5F;
-        this.runtimeBar.setValue(progress);
-        this.runtimeBar.setTooltipText("Runtime progress: " + nf(progress * 100.0F, 0, 0) + "%");
+        this.rightToLeftBar.setValue(progress);
+        this.rightToLeftBar.setTooltipText("Right to left: " + nf(progress * 100.0F, 0, 0) + "%");
         this.tooltips.refresh();
     }
 
@@ -136,11 +152,12 @@ public class ProgressBarTest extends PApplet {
 
     private void drawLabels() {
         fill(220);
-        text("fixed", 84.0F, 88.0F);
-        text("runtime", 84.0F, 142.0F);
-        text("disabled", 84.0F, 196.0F);
+        text("left to right", 104.0F, 82.0F);
+        text("right to left", 104.0F, 136.0F);
+        text("bottom to top", 263.0F, 316.0F);
+        text("top to bottom", 455.0F, 316.0F);
         fill(150);
-        text("Hover the bars for tooltips.", width * 0.5F, 238.0F);
+        text("Hover the bars for tooltips.", width * 0.5F, 342.0F);
     }
 
     private void drawActiveOverlays() {

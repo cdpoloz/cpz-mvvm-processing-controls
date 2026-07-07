@@ -25,6 +25,7 @@ public final class ProgressBarFactory {
         progressBar.setFillColor(config.getFillColor());
         progressBar.setStrokeColor(config.getStrokeColor());
         progressBar.setStrokeWeight(config.getStrokeWeight());
+        progressBar.setFillDirection(config.getFillDirection());
         progressBar.setEnabled(config.isEnabled());
         progressBar.setVisible(config.isVisible());
         progressBar.setTooltip(TooltipFactory.create(sketch, config.getTooltip()));

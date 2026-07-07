@@ -1,6 +1,8 @@
 package com.cpz.processing.controls.main;
 
 import com.cpz.processing.controls.examples.button.ButtonTest;
+import com.cpz.processing.controls.examples.progressbar.ProgressBarJsonTest;
+import com.cpz.processing.controls.examples.progressbar.ProgressBarTest;
 import processing.core.PApplet;
 
 import java.util.Locale;
@@ -97,7 +99,7 @@ public class Launcher {
 
         // ProgressBar ************************************
         //PApplet.main(ProgressBarTest.class);
-        //PApplet.main(ProgressBarJsonTest.class);
+        PApplet.main(ProgressBarJsonTest.class);
 
         // Theme ****************************************
         //PApplet.main(ThemeFacadeSketch.class);
