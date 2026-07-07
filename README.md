@@ -68,14 +68,10 @@ to your Maven project:
 </dependency>
 ```
 
-Version `0.7.1` is the current stable release available from Maven Central.
+Version `0.8.0` is the current stable release available from Maven Central.
 Processing Core (`org.processing:core:4.5.5`) and `cpz-utils`
 (`io.github.cdpoloz:cpz-utils:0.2.3`) are resolved transitively by Maven; do
 not add them as manually copied JARs.
-
-The `main` branch is currently developing `0.8.0-SNAPSHOT`. Documentation in
-this branch may mention `ProgressBar`, but that control is not part of the
-published Maven Central release `0.7.1`; it is planned for `0.8.0`.
 
 ### Local development
 
