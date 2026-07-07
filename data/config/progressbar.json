@@ -1,0 +1,80 @@
+{
+  "tooltipStyles": {
+    "progressDark": {
+      "backgroundColor": "#F21B1F26",
+      "textColor": "#FFFFFFFF",
+      "borderColor": "#FF8A94A6",
+      "textSize": 14.0,
+      "textPadding": 10.0,
+      "offset": 10.0,
+      "cornerRadius": 8.0,
+      "strokeWeight": 1.0
+    }
+  },
+  "controls": [
+    {
+      "type": "progressbar",
+      "code": "pbFixedJson",
+      "x": 120.0,
+      "y": 76.0,
+      "width": 400.0,
+      "height": 24.0,
+      "value": 0.35,
+      "trackColor": "#FF3A3A3A",
+      "fillColor": "#FF2F80ED",
+      "style": {
+        "strokeColor": "#FFDCDCDC",
+        "strokeWeight": 1.5
+      },
+      "tooltip": {
+        "text": "JSON loading progress",
+        "styleRef": "progressDark"
+      }
+    },
+    {
+      "type": "progressbar",
+      "code": "pbRuntimeJson",
+      "bounds": {
+        "mode": "relative",
+        "x": 0.188,
+        "y": 0.464,
+        "width": 0.625,
+        "height": 0.086
+      },
+      "value": 0.0,
+      "style": {
+        "trackColor": "#FF3A3A3A",
+        "fillColor": "#FF2ECC71",
+        "strokeColor": "#FFDCDCDC",
+        "strokeWeight": 1.5
+      },
+      "tooltip": {
+        "text": "JSON runtime progress",
+        "styleRef": "progressDark"
+      }
+    },
+    {
+      "type": "progressbar",
+      "code": "pbDisabledJson",
+      "bounds": {
+        "mode": "absolute",
+        "x": 120.0,
+        "y": 184.0,
+        "width": 400.0,
+        "height": 24.0
+      },
+      "value": 0.7,
+      "enabled": false,
+      "trackColor": "#FF3A3A3A",
+      "fillColor": "#FF9A7DFF",
+      "style": {
+        "strokeColor": "#FFDCDCDC",
+        "strokeWeight": 1.5
+      },
+      "tooltip": {
+        "text": "Disabled JSON bar still exposes tooltip",
+        "styleRef": "progressDark"
+      }
+    }
+  ]
+}

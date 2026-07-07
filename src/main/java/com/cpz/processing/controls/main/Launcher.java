@@ -95,6 +95,10 @@ public class Launcher {
         //PApplet.main(IndicatorSvgTest.class);
         //PApplet.main(IndicatorSvgJsonTest.class);
 
+        // ProgressBar ************************************
+        //PApplet.main(ProgressBarTest.class);
+        //PApplet.main(ProgressBarJsonTest.class);
+
         // Theme ****************************************
         //PApplet.main(ThemeFacadeSketch.class);
     }

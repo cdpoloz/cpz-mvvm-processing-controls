@@ -87,8 +87,12 @@ The current registry supports:
 - `numericfield`
 - `dropdown`
 - `indicator`
+- `progressbar`
 
 `dropdown` requires `OverlayManager` and `InputManager` when the main loader is used, because those are already required by the public `DropDown` facade.
+
+`progressbar` is part of the current `main` branch development for `0.8.0`.
+The latest stable Maven Central release remains `0.7.1`.
 
 ---
 
@@ -231,6 +235,8 @@ The framework still includes control-specific loaders such as:
 - `TextFieldConfigLoader`
 - `NumericFieldConfigLoader`
 - `DropDownConfigLoader`
+- `IndicatorConfigLoader`
+- `ProgressBarConfigLoader`
 
 They remain useful for simple single-control examples.
 
@@ -378,6 +384,62 @@ property; it belongs to tooltip style blocks. Relative `bounds` follows the same
 precedence over legacy `x` / `y` / `width` / `height`. SVG uses the same
 `style.renderer` object as Button and Toggle. Supported renderer values in this
 iteration are `{"type":"svg","path":"..."}`.
+
+`progressbar` does not render text and is non-interactive. It displays a
+horizontal determinate value. Its visual colors are accepted as top-level
+`trackColor` and `fillColor` fields, and also as `style.trackColor` and
+`style.fillColor` aliases for consistency with the style-oriented JSON shape.
+When both are present, the top-level fields take precedence.
+
+ProgressBar properties:
+
+- `type`: must be `"progressbar"`
+- `code`: unique control code
+- `x`, `y`, `width`, `height`: legacy absolute bounds
+- `bounds`: explicit `absolute` or `relative` bounds object
+- `min`: optional minimum, default `0.0`
+- `max`: optional maximum, default `1.0`
+- `value`: optional value, default `0.0`
+- `trackColor`: optional track color
+- `fillColor`: optional fill color
+- `tooltip`: optional tooltip object or text shorthand
+- `style.trackColor` / `style.fillColor`: optional color aliases
+- `style.strokeColor`: optional outer stroke color
+- `style.strokeWeight`: optional outer stroke width; `0` disables the stroke
+
+Minimal progress bar entry:
+
+```json
+{
+  "type": "progressbar",
+  "code": "pbLoad",
+  "bounds": {
+    "mode": "relative",
+    "x": 0.1,
+    "y": 0.1,
+    "width": 0.5,
+    "height": 0.04
+  },
+  "min": 0.0,
+  "max": 100.0,
+  "value": 35.0,
+  "trackColor": "#FF30343A",
+  "fillColor": "#FF2F80ED",
+  "style": {
+    "strokeColor": "#FFFFFFFF",
+    "strokeWeight": 1.5
+  },
+  "tooltip": "Loading"
+}
+```
+
+`value` is clamped to `[min, max]`. If `min > max`, the loader stores the
+sorted range. If `min == max`, normalized progress avoids division by zero and
+reports full progress after normal clamping. `style.strokeWeight` is the
+canonical border-width property. `borderColor` is not a ProgressBar visual
+border property; it belongs to tooltip style blocks. Relative `bounds` follows
+the same explicit `absolute` / `relative` mode rules as the other controls;
+`bounds` takes precedence over legacy `x` / `y` / `width` / `height`.
 
 ```json
 {
@@ -595,4 +657,5 @@ It intentionally does not support:
 - [NumericField](numericfield.md)
 - [Dropdown](dropdown.md)
 - [Indicator](indicator.md)
+- [ProgressBar](progressbar.md)
 - [Tooltip](tooltip.md)

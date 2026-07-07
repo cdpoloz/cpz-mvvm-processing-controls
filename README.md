@@ -68,10 +68,14 @@ to your Maven project:
 </dependency>
 ```
 
-Version `0.7.1` will be available from Maven Central after its release is
-published. Processing Core (`org.processing:core:4.5.5`) and `cpz-utils`
+Version `0.7.1` is the current stable release available from Maven Central.
+Processing Core (`org.processing:core:4.5.5`) and `cpz-utils`
 (`io.github.cdpoloz:cpz-utils:0.2.3`) are resolved transitively by Maven; do
 not add them as manually copied JARs.
+
+The `main` branch is currently developing `0.8.0-SNAPSHOT`. Documentation in
+this branch may mention `ProgressBar`, but that control is not part of the
+published Maven Central release `0.7.1`; it is planned for `0.8.0`.
 
 ### Local development
 
@@ -368,7 +372,11 @@ TooltipAttachable / TooltipTarget → TooltipOverlayController → OverlayManage
 
 This project is a UI framework intended for Processing sketches and for other host environments that can provide normalized input events.
 
-The public control layer is exposed through closed ergonomic facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, `DropDown`, `Panel`, and `Indicator`.
+The public control layer is exposed through closed ergonomic facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, `DropDown`, `Panel`, `Indicator`, and `ProgressBar`.
+
+`ProgressBar` belongs to the current `0.8.0-SNAPSHOT` development line on
+`main` and will be published with `0.8.0`. The latest stable Maven Central
+release remains `0.7.1`.
 
 Those facades also share a lightweight public contract, `Control`, for the small transversal surface that is common across the controls without exposing MVVM internals.
 

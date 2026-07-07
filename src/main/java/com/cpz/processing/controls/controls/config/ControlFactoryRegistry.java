@@ -13,6 +13,8 @@ import com.cpz.processing.controls.controls.label.LabelFactory;
 import com.cpz.processing.controls.controls.label.config.LabelConfigLoader;
 import com.cpz.processing.controls.controls.numericfield.NumericFieldFactory;
 import com.cpz.processing.controls.controls.numericfield.config.NumericFieldConfigLoader;
+import com.cpz.processing.controls.controls.progressbar.ProgressBarFactory;
+import com.cpz.processing.controls.controls.progressbar.config.ProgressBarConfigLoader;
 import com.cpz.processing.controls.controls.radiogroup.RadioGroupFactory;
 import com.cpz.processing.controls.controls.radiogroup.config.RadioGroupConfigLoader;
 import com.cpz.processing.controls.controls.slider.SliderFactory;
@@ -71,6 +73,7 @@ final class ControlFactoryRegistry {
         NumericFieldConfigLoader numericFieldLoader = new NumericFieldConfigLoader(sketch, sharedTooltipStyles);
         DropDownConfigLoader dropDownLoader = new DropDownConfigLoader(sketch, sharedTooltipStyles);
         IndicatorConfigLoader indicatorLoader = new IndicatorConfigLoader(sketch, sharedTooltipStyles);
+        ProgressBarConfigLoader progressBarLoader = new ProgressBarConfigLoader(sketch, sharedTooltipStyles);
 
         Map<String, ControlEntryFactory> entries = new LinkedHashMap<>();
         entries.put("button", (json, path) -> ButtonFactory.create(sketch, buttonLoader.loadFromJson(json, path)));
@@ -91,6 +94,7 @@ final class ControlFactoryRegistry {
             return DropDownFactory.create(sketch, overlayManager, inputManager, dropDownLoader.loadFromJson(json, path));
         });
         entries.put("indicator", (json, path) -> IndicatorFactory.create(sketch, indicatorLoader.loadFromJson(json, path)));
+        entries.put("progressbar", (json, path) -> ProgressBarFactory.create(sketch, progressBarLoader.loadFromJson(json, path)));
         this.factories = Collections.unmodifiableMap(entries);
     }
 

@@ -58,6 +58,7 @@ This surface is intentionally small:
 - `DropDown`
 - `Panel`
 - `Indicator`
+- `ProgressBar`
 
 Each concrete control still owns its specific public API for text, value, selection, listeners, style, and any other domain-specific behavior.
 
@@ -68,6 +69,11 @@ contract.
 
 `Indicator` is a non-interactive status facade. It implements `Control`,
 `ParentSizeAwareControl`, and `TooltipAttachable`, supports JSON and SVG
+configuration, and does not implement `PointerRoutableControl` or
+`KeyboardRoutableControl`.
+
+`ProgressBar` is a non-interactive horizontal progress facade. It implements
+`Control`, `ParentSizeAwareControl`, and `TooltipAttachable`, supports JSON
 configuration, and does not implement `PointerRoutableControl` or
 `KeyboardRoutableControl`.
 
@@ -117,8 +123,8 @@ label.setTextSize(ControlMeasure.relative(0.06f));
 ```
 
 Relative bounds are supported by `Panel`, `Button`, `Label`, `Checkbox`,
-`Toggle`, `Slider`, `TextField`, `NumericField`, `RadioGroup`, `DropDown`, and
-`Indicator`.
+`Toggle`, `Slider`, `TextField`, `NumericField`, `RadioGroup`, `DropDown`,
+`Indicator`, and `ProgressBar`.
 For `RadioGroup`, the bounds height maps to item height because the group
 height is derived from options and spacing.
 
@@ -212,6 +218,7 @@ They are intentionally separate:
 - [Architecture](architecture.md)
 - [Panel](panel.md)
 - [Indicator](indicator.md)
+- [ProgressBar](progressbar.md)
 - [JSON Configuration](json-configuration.md)
 - [Tooltip](tooltip.md)
 - [Theme](theme.md)
