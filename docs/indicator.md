@@ -29,14 +29,15 @@ Absolute setup:
 
 ```java
 Indicator indicator = new Indicator(this, "indServer", 40, 40, 24, 24);
+IndicatorStyle style = new IndicatorStyle()
+        .setOnColor(0xFF2ECC71)
+        .setOffColor(0xFF30343A)
+        .setStrokeColor(0xFFFFFFFF)
+        .setStrokeWeight(2.0F);
 
+indicator.setStyle(style);
 indicator.setOn(true);
 boolean on = indicator.isOn();
-
-indicator.setOnColor(0xFF2ECC71);
-indicator.setOffColor(0xFF30343A);
-indicator.setStrokeColor(0xFFFFFFFF);
-indicator.setStrokeWeight(2.0F);
 
 indicator.setTooltip("Server status");
 indicator.setTooltipText("Server online");
@@ -84,6 +85,8 @@ int getStrokeColor();
 void setStrokeColor(int color);
 float getStrokeWeight();
 void setStrokeWeight(float weight);
+IndicatorStyle getStyle();
+void setStyle(IndicatorStyle style);
 ```
 
 The control also supports the common `Control` methods for code, drawing,
@@ -140,10 +143,15 @@ svgIndicator.setOnColor(0xFF2ECC71);
 svgIndicator.setOffColor(0xFF30343A);
 ```
 
-The SVG is loaded once when the indicator is created. The path resolution
-matches the existing Button/Toggle SVG renderers: first the configured path is
-loaded, then a second attempt is made without the leading `data/` prefix when
-the original path starts with `data/`.
+The SVG is loaded when the indicator receives an SVG renderer path, either
+through the SVG constructor overloads or through `IndicatorStyle`. The path
+resolution matches the existing Button/Toggle SVG renderers: first the
+configured path is loaded, then a second attempt is made without the leading
+`data/` prefix when the original path starts with `data/`.
+
+The SVG renderer selection is represented on `IndicatorStyle` through the
+renderer type and path. The control still owns the loaded `PShape`, so existing
+constructors and JSON behavior remain compatible.
 
 The SVG is drawn centered and scaled to the full indicator bounds with
 Processing `shapeMode(CENTER)`, matching the Button/Toggle SVG behavior. The
@@ -160,7 +168,23 @@ an SVG path continue to use the default circular LED rendering.
 
 ---
 
-## Stroke
+## Style And Stroke
+
+`Indicator` stores its visual values in an `IndicatorStyle`. The direct color
+and stroke setters remain available and update the current style object.
+Passing `null` to `setStyle(...)` restores a default style.
+
+Recommended style setup:
+
+```java
+IndicatorStyle style = new IndicatorStyle()
+        .setOnColor(0xFF2ECC71)
+        .setOffColor(0xFF30343A)
+        .setStrokeColor(0xFFFFFFFF)
+        .setStrokeWeight(2.0F);
+
+indicator.setStyle(style);
+```
 
 `Indicator` exposes a configurable visual stroke for the circular LED and SVG
 rendering modes:
@@ -208,8 +232,7 @@ border; `borderColor` belongs to tooltip styles.
 
 `enabled=false` does not change the logical `on` state and does not block
 tooltips. In this first version, `Indicator` keeps the same simple visual
-appearance when disabled because there is no dedicated indicator style or
-interaction state.
+appearance when disabled because there is no dedicated disabled visual state.
 
 ---
 

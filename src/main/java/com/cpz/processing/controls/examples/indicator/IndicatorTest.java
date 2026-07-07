@@ -9,6 +9,7 @@ import com.cpz.processing.controls.core.overlay.OverlayManager;
 import com.cpz.processing.controls.core.overlay.tooltip.input.TooltipInputLayer;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.overlay.tooltip.util.TooltipOverlayController;
+import com.cpz.processing.controls.controls.indicator.style.IndicatorStyle;
 import com.cpz.utils.color.Colors;
 import processing.core.PApplet;
 
@@ -39,31 +40,32 @@ public class IndicatorTest extends PApplet {
         this.overlayManager = new OverlayManager();
         this.tooltips = new TooltipOverlayController(this, this.overlayManager);
         TooltipStyleConfig tooltipStyle = readableTooltipStyle();
+        IndicatorStyle defaultIndicatorStyle = new IndicatorStyle()
+                .setOffColor(Colors.gray(70))
+                .setStrokeColor(Colors.gray(210))
+                .setStrokeWeight(2.0F);
+        IndicatorStyle onIndicatorStyle = new IndicatorStyle(defaultIndicatorStyle)
+                .setOnColor(Colors.rgb(48, 98, 219));
+        IndicatorStyle runtimeIndicatorStyle = new IndicatorStyle(onIndicatorStyle)
+                .setStrokeColor(Colors.rgb(255, 255, 255))
+                .setStrokeWeight(3.0F);
 
         this.offIndicator = new Indicator(this, "indOff", 120.0F, 94.0F, 44.0F, 44.0F)
                 .setTooltip("Indicator off")
                 .setTooltipStyle(tooltipStyle);
-        this.offIndicator.setOffColor(Colors.gray(70));
-        this.offIndicator.setStrokeColor(Colors.gray(210));
-        this.offIndicator.setStrokeWeight(2.0F);
+        this.offIndicator.setStyle(defaultIndicatorStyle);
 
         this.onIndicator = new Indicator(this, "indOn", 288.0F, 94.0F, 44.0F, 44.0F)
                 .setTooltip("Indicator on")
                 .setTooltipStyle(tooltipStyle);
-        this.onIndicator.setOffColor(Colors.gray(70));
-        this.onIndicator.setOnColor(Colors.rgb(48, 98, 219));
-        this.onIndicator.setStrokeColor(Colors.gray(210));
-        this.onIndicator.setStrokeWeight(2.0F);
+        this.onIndicator.setStyle(onIndicatorStyle);
         this.onIndicator.setOn(true);
 
         this.runtimeIndicator = new Indicator(this, "indRuntime",
                 ControlBounds.relative(0.735F, 0.336F, 0.157F, 0.157F))
                 .setTooltip("Runtime state and color")
                 .setTooltipStyle(tooltipStyle);
-        this.runtimeIndicator.setOffColor(Colors.gray(70));
-        this.runtimeIndicator.setOnColor(Colors.rgb(48, 98, 219));
-        this.runtimeIndicator.setStrokeColor(Colors.rgb(255, 255, 255));
-        this.runtimeIndicator.setStrokeWeight(3.0F);
+        this.runtimeIndicator.setStyle(runtimeIndicatorStyle);
 
         this.tooltips.registerTarget(this.offIndicator);
         this.tooltips.registerTarget(this.onIndicator);

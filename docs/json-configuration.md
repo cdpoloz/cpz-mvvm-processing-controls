@@ -375,18 +375,21 @@ SVG indicator entry:
 ```
 
 `on` defaults to `false`. `onColor` defaults to green and `offColor` defaults
-to dark gray when omitted. `style.strokeColor` defaults to the indicator border
-color and `style.strokeWeight` defaults to `1.0`. `style.strokeWeight` is the
+to dark gray when omitted. These visual values are applied to the control's
+`IndicatorStyle`. `style.strokeColor` defaults to the indicator border color
+and `style.strokeWeight` defaults to `1.0`. `style.strokeWeight` is the
 canonical border-width property; `style.strokeWidth` is accepted only as an
 alias for Toggle terminology. `borderColor` is not an Indicator visual border
 property; it belongs to tooltip style blocks. Relative `bounds` follows the same explicit
 `absolute` / `relative` mode rules as the other controls; `bounds` takes
 precedence over legacy `x` / `y` / `width` / `height`. SVG uses the same
-`style.renderer` object as Button and Toggle. Supported renderer values in this
-iteration are `{"type":"svg","path":"..."}`.
+`style.renderer` object as Button and Toggle and is represented by
+`IndicatorStyle`. Supported renderer values in this iteration are
+`{"type":"svg","path":"..."}`.
 
 `progressbar` does not render text and is non-interactive. It displays a
-horizontal determinate value. Its visual colors are accepted as top-level
+horizontal determinate value. Its visual colors are applied to the control's
+`ProgressBarStyle` and are accepted as top-level
 `trackColor` and `fillColor` fields, and also as `style.trackColor` and
 `style.fillColor` aliases for consistency with the style-oriented JSON shape.
 When both are present, the top-level fields take precedence.

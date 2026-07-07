@@ -200,6 +200,10 @@ class IndicatorJsonConfigTest {
         assertEquals(0xFF111111, indicator.getOffColor());
         assertEquals(0xFFFFFFFF, indicator.getStrokeColor());
         assertEquals(2.5F, indicator.getStrokeWeight());
+        assertEquals(0xFF00AA00, indicator.getStyle().getOnColor());
+        assertEquals(0xFF111111, indicator.getStyle().getOffColor());
+        assertEquals(0xFFFFFFFF, indicator.getStyle().getStrokeColor());
+        assertEquals(2.5F, indicator.getStyle().getStrokeWeight());
         assertFalse(indicator.isEnabled());
         assertFalse(indicator.isVisible());
         assertEquals("runtime status", indicator.getTooltip().getText());
@@ -268,6 +272,8 @@ class IndicatorJsonConfigTest {
         assertEquals(0xFF111111, indicator.getOffColor());
         assertEquals(0xFFFFFFFF, indicator.getStrokeColor());
         assertEquals(2.0F, indicator.getStrokeWeight());
+        assertTrue(indicator.getStyle().isSvgRenderer());
+        assertEquals("data/img/test.svg", indicator.getStyle().getRendererPath());
         assertEquals("SVG indicator", indicator.getTooltip().getText());
         assertEquals(80.0F, bounds.x());
         assertEquals(120.0F, bounds.y());

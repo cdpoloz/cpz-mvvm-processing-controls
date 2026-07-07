@@ -117,6 +117,10 @@ class ProgressBarJsonConfigTest {
         assertEquals(0xFF00AA00, progressBar.getFillColor());
         assertEquals(0xFFFFFFFF, progressBar.getStrokeColor());
         assertEquals(2.5F, progressBar.getStrokeWeight());
+        assertEquals(0xFF111111, progressBar.getStyle().getTrackColor());
+        assertEquals(0xFF00AA00, progressBar.getStyle().getFillColor());
+        assertEquals(0xFFFFFFFF, progressBar.getStyle().getStrokeColor());
+        assertEquals(2.5F, progressBar.getStyle().getStrokeWeight());
         assertFalse(progressBar.isEnabled());
         assertFalse(progressBar.isVisible());
         assertEquals("progress status", progressBar.getTooltip().getText());

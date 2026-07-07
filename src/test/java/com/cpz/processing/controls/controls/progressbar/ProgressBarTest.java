@@ -5,6 +5,7 @@ import com.cpz.processing.controls.controls.PointerRoutableControl;
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.controls.panel.Panel;
+import com.cpz.processing.controls.controls.progressbar.style.ProgressBarStyle;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,8 @@ import processing.core.PApplet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProgressBarTest {
@@ -88,6 +91,63 @@ class ProgressBarTest {
         progressBar.setStrokeWeight(-2.0F);
 
         assertEquals(0.0F, progressBar.getStrokeWeight());
+    }
+
+    @Test
+    void hasDefaultStyle() {
+        ProgressBar progressBar = new ProgressBar(sketch(800, 600), 40.0F, 50.0F, 200.0F, 20.0F);
+
+        assertNotNull(progressBar.getStyle());
+        assertEquals(ProgressBar.DEFAULT_TRACK_COLOR, progressBar.getStyle().getTrackColor());
+        assertEquals(ProgressBar.DEFAULT_FILL_COLOR, progressBar.getStyle().getFillColor());
+        assertEquals(ProgressBar.DEFAULT_STROKE_COLOR, progressBar.getStyle().getStrokeColor());
+        assertEquals(1.0F, progressBar.getStyle().getStrokeWeight());
+    }
+
+    @Test
+    void setStyleUpdatesVisualProperties() {
+        ProgressBar progressBar = new ProgressBar(sketch(800, 600), 40.0F, 50.0F, 200.0F, 20.0F);
+        ProgressBarStyle style = new ProgressBarStyle()
+                .setTrackColor(0xFF111111)
+                .setFillColor(0xFF00AA00)
+                .setStrokeColor(0xFFFFFFFF)
+                .setStrokeWeight(2.5F);
+
+        progressBar.setStyle(style);
+
+        assertSame(style, progressBar.getStyle());
+        assertEquals(0xFF111111, progressBar.getTrackColor());
+        assertEquals(0xFF00AA00, progressBar.getFillColor());
+        assertEquals(0xFFFFFFFF, progressBar.getStrokeColor());
+        assertEquals(2.5F, progressBar.getStrokeWeight());
+    }
+
+    @Test
+    void nullStyleResetsToDefaultStyle() {
+        ProgressBar progressBar = new ProgressBar(sketch(800, 600), 40.0F, 50.0F, 200.0F, 20.0F);
+
+        progressBar.setStyle(null);
+
+        assertNotNull(progressBar.getStyle());
+        assertEquals(ProgressBar.DEFAULT_TRACK_COLOR, progressBar.getTrackColor());
+        assertEquals(ProgressBar.DEFAULT_FILL_COLOR, progressBar.getFillColor());
+        assertEquals(ProgressBar.DEFAULT_STROKE_COLOR, progressBar.getStrokeColor());
+        assertEquals(1.0F, progressBar.getStrokeWeight());
+    }
+
+    @Test
+    void directSettersDelegateToStyle() {
+        ProgressBar progressBar = new ProgressBar(sketch(800, 600), 40.0F, 50.0F, 200.0F, 20.0F);
+
+        progressBar.setTrackColor(0xFF111111);
+        progressBar.setFillColor(0xFF00AA00);
+        progressBar.setStrokeColor(0xFFFFFFFF);
+        progressBar.setStrokeWeight(2.5F);
+
+        assertEquals(0xFF111111, progressBar.getStyle().getTrackColor());
+        assertEquals(0xFF00AA00, progressBar.getStyle().getFillColor());
+        assertEquals(0xFFFFFFFF, progressBar.getStyle().getStrokeColor());
+        assertEquals(2.5F, progressBar.getStyle().getStrokeWeight());
     }
 
     @Test

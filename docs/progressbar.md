@@ -30,17 +30,18 @@ Use `ProgressBar` when a sketch needs to show determinate progress:
 
 ```java
 ProgressBar progressBar = new ProgressBar(this, "pbLoad", 40, 40, 240, 20);
+ProgressBarStyle style = new ProgressBarStyle()
+        .setTrackColor(0xFF30343A)
+        .setFillColor(0xFF2F80ED)
+        .setStrokeColor(0xFFFFFFFF)
+        .setStrokeWeight(1.5F);
 
+progressBar.setStyle(style);
 progressBar.setRange(0.0F, 100.0F);
 progressBar.setValue(35.0F);
 
 float value = progressBar.getValue();
 float progress = progressBar.getProgress();
-
-progressBar.setTrackColor(0xFF30343A);
-progressBar.setFillColor(0xFF2F80ED);
-progressBar.setStrokeColor(0xFFFFFFFF);
-progressBar.setStrokeWeight(1.5F);
 
 progressBar.setTooltip("Loading");
 ```
@@ -71,6 +72,8 @@ int getStrokeColor();
 void setStrokeColor(int color);
 float getStrokeWeight();
 void setStrokeWeight(float weight);
+ProgressBarStyle getStyle();
+void setStyle(ProgressBarStyle style);
 ```
 
 ---
@@ -140,6 +143,22 @@ The defaults are:
 - `fillColor = 0xFF2F80ED`
 - `strokeColor = 0xFF1F2328`
 - `strokeWeight = 1.0F`
+
+These values are stored in the control's `ProgressBarStyle`. The direct color
+and stroke setters remain available and update the current style object.
+Passing `null` to `setStyle(...)` restores a default style.
+
+Recommended style setup:
+
+```java
+ProgressBarStyle style = new ProgressBarStyle()
+        .setTrackColor(0xFF30343A)
+        .setFillColor(0xFF2F80ED)
+        .setStrokeColor(0xFFFFFFFF)
+        .setStrokeWeight(1.5F);
+
+progressBar.setStyle(style);
+```
 
 `setStrokeWeight(...)` clamps negative values to `0.0F`. A stroke weight of
 `0.0F` disables the outer stroke with Processing `noStroke()`.

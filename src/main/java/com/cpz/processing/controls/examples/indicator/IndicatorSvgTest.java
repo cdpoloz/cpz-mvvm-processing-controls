@@ -2,6 +2,7 @@ package com.cpz.processing.controls.examples.indicator;
 
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.controls.indicator.Indicator;
+import com.cpz.processing.controls.controls.indicator.style.IndicatorStyle;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
@@ -43,31 +44,33 @@ public class IndicatorSvgTest extends PApplet {
         this.overlayManager = new OverlayManager();
         this.tooltips = new TooltipOverlayController(this, this.overlayManager);
         TooltipStyleConfig tooltipStyle = readableTooltipStyle();
+        IndicatorStyle svgIndicatorStyle = new IndicatorStyle()
+                .setOffColor(Colors.gray(70))
+                .setStrokeColor(Colors.gray(210))
+                .setStrokeWeight(2.0F)
+                .setRenderer("svg", SVG_PATH);
+        IndicatorStyle svgOnIndicatorStyle = new IndicatorStyle(svgIndicatorStyle)
+                .setOnColor(Colors.rgb(48, 98, 219));
+        IndicatorStyle svgRuntimeIndicatorStyle = new IndicatorStyle(svgOnIndicatorStyle)
+                .setStrokeColor(Colors.rgb(255, 255, 255))
+                .setStrokeWeight(3.0F);
 
         this.offIndicator = new Indicator(this, "indSvgOff", 116.0F, 90.0F, 52.0F, 52.0F, SVG_PATH)
                 .setTooltip("SVG indicator off")
                 .setTooltipStyle(tooltipStyle);
-        this.offIndicator.setOffColor(Colors.gray(70));
-        this.offIndicator.setStrokeColor(Colors.gray(210));
-        this.offIndicator.setStrokeWeight(2.0F);
+        this.offIndicator.setStyle(svgIndicatorStyle);
 
         this.onIndicator = new Indicator(this, "indSvgOn", 284.0F, 90.0F, 52.0F, 52.0F, SVG_PATH)
                 .setTooltip("SVG indicator on")
                 .setTooltipStyle(tooltipStyle);
-        this.onIndicator.setOffColor(Colors.gray(70));
-        this.onIndicator.setOnColor(Colors.rgb(48, 98, 219));
-        this.onIndicator.setStrokeColor(Colors.gray(210));
-        this.onIndicator.setStrokeWeight(2.0F);
+        this.onIndicator.setStyle(svgOnIndicatorStyle);
         this.onIndicator.setOn(true);
 
         this.runtimeIndicator = new Indicator(this, "indSvgRuntime",
                 ControlBounds.relative(0.729F, 0.321F, 0.186F, 0.186F), SVG_PATH)
                 .setTooltip("SVG runtime state and color")
                 .setTooltipStyle(tooltipStyle);
-        this.runtimeIndicator.setOffColor(Colors.gray(70));
-        this.runtimeIndicator.setOnColor(Colors.rgb(48, 98, 219));
-        this.runtimeIndicator.setStrokeColor(Colors.rgb(255, 255, 255));
-        this.runtimeIndicator.setStrokeWeight(3.0F);
+        this.runtimeIndicator.setStyle(svgRuntimeIndicatorStyle);
 
         this.tooltips.registerTarget(this.offIndicator);
         this.tooltips.registerTarget(this.onIndicator);

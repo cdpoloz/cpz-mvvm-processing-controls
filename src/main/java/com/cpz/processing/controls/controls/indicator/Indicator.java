@@ -4,6 +4,7 @@ import com.cpz.processing.controls.controls.ParentSizeAwareControl;
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.controls.geometry.ResolvedBounds;
+import com.cpz.processing.controls.controls.indicator.style.IndicatorStyle;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
@@ -21,9 +22,9 @@ import processing.core.PShape;
  * @author CPZ
  */
 public final class Indicator implements ParentSizeAwareControl, TooltipAttachable {
-    public static final int DEFAULT_ON_COLOR = 0xFF2ECC71;
-    public static final int DEFAULT_OFF_COLOR = 0xFF30343A;
-    public static final int DEFAULT_BORDER_COLOR = 0xFF1F2328;
+    public static final int DEFAULT_ON_COLOR = IndicatorStyle.DEFAULT_ON_COLOR;
+    public static final int DEFAULT_OFF_COLOR = IndicatorStyle.DEFAULT_OFF_COLOR;
+    public static final int DEFAULT_BORDER_COLOR = IndicatorStyle.DEFAULT_STROKE_COLOR;
 
     private final PApplet sketch;
     private final String code;
@@ -31,17 +32,15 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
     private ControlBounds bounds;
     private Float parentWidth;
     private Float parentHeight;
-    private final boolean svgMode;
-    private final PShape svgShape;
+    private PShape svgShape;
+    private String loadedRendererType;
+    private String loadedRendererPath;
     private float x;
     private float y;
     private float width;
     private float height;
     private boolean on;
-    private int onColor = DEFAULT_ON_COLOR;
-    private int offColor = DEFAULT_OFF_COLOR;
-    private int strokeColor = DEFAULT_BORDER_COLOR;
-    private float strokeWeight = 1.0F;
+    private IndicatorStyle style = new IndicatorStyle();
     private boolean enabled = true;
     private boolean visible = true;
 
@@ -77,11 +76,10 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
         this.sketch = Objects.requireNonNull(sketch, "sketch");
         this.code = Objects.requireNonNull(code, "code");
         this.bounds = Objects.requireNonNull(bounds, "bounds");
-        this.svgMode = svgPath != null;
-        this.svgShape = this.svgMode ? loadShape(sketch, svgPath) : null;
-        if (this.svgShape != null) {
-            this.svgShape.disableStyle();
+        if (svgPath != null) {
+            this.style.setRenderer("svg", svgPath);
         }
+        this.syncStyleRenderer();
         this.tooltipSupport = new TooltipSupport(this::currentTooltipBounds, this::isVisible);
         this.applyResolvedBounds();
     }
@@ -92,20 +90,21 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
         }
 
         this.applyResolvedBounds();
+        this.syncStyleRenderer();
         float diameter = Math.max(0.0F, Math.min(this.width, this.height));
         float centerX = this.x + this.width * 0.5F;
         float centerY = this.y + this.height * 0.5F;
 
         this.sketch.pushStyle();
         try {
-            if (this.strokeWeight <= 0.0F) {
+            if (this.style.getStrokeWeight() <= 0.0F) {
                 this.sketch.noStroke();
             } else {
-                this.sketch.stroke(this.strokeColor);
-                this.sketch.strokeWeight(this.strokeWeight);
+                this.sketch.stroke(this.style.getStrokeColor());
+                this.sketch.strokeWeight(this.style.getStrokeWeight());
             }
-            this.sketch.fill(this.on ? this.onColor : this.offColor);
-            if (this.svgMode) {
+            this.sketch.fill(this.on ? this.style.getOnColor() : this.style.getOffColor());
+            if (this.style.isSvgRenderer()) {
                 if (this.svgShape != null) {
                     this.sketch.shapeMode(PApplet.CENTER);
                     this.sketch.shape(this.svgShape, centerX, centerY, this.width, this.height);
@@ -132,35 +131,44 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
     }
 
     public int getOnColor() {
-        return this.onColor;
+        return this.style.getOnColor();
     }
 
     public void setOnColor(int color) {
-        this.onColor = color;
+        this.style.setOnColor(color);
     }
 
     public int getOffColor() {
-        return this.offColor;
+        return this.style.getOffColor();
     }
 
     public void setOffColor(int color) {
-        this.offColor = color;
+        this.style.setOffColor(color);
     }
 
     public int getStrokeColor() {
-        return this.strokeColor;
+        return this.style.getStrokeColor();
     }
 
     public void setStrokeColor(int color) {
-        this.strokeColor = color;
+        this.style.setStrokeColor(color);
     }
 
     public float getStrokeWeight() {
-        return this.strokeWeight;
+        return this.style.getStrokeWeight();
     }
 
     public void setStrokeWeight(float weight) {
-        this.strokeWeight = Math.max(0.0F, weight);
+        this.style.setStrokeWeight(weight);
+    }
+
+    public IndicatorStyle getStyle() {
+        return this.style;
+    }
+
+    public void setStyle(IndicatorStyle style) {
+        this.style = style == null ? new IndicatorStyle() : style;
+        this.syncStyleRenderer();
     }
 
     public boolean isEnabled() {
@@ -301,6 +309,21 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
 
     private float parentHeight() {
         return this.parentHeight != null ? this.parentHeight : this.sketch.height;
+    }
+
+    private void syncStyleRenderer() {
+        String rendererType = this.style.getRendererType();
+        String rendererPath = this.style.getRendererPath();
+        if (Objects.equals(rendererType, this.loadedRendererType) && Objects.equals(rendererPath, this.loadedRendererPath)) {
+            return;
+        }
+
+        this.loadedRendererType = rendererType;
+        this.loadedRendererPath = rendererPath;
+        this.svgShape = this.style.isSvgRenderer() ? loadShape(this.sketch, rendererPath) : null;
+        if (this.svgShape != null) {
+            this.svgShape.disableStyle();
+        }
     }
 
     private static PShape loadShape(PApplet sketch, String path) {

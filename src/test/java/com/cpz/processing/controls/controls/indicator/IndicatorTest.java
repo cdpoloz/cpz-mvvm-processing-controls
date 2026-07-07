@@ -4,6 +4,7 @@ import com.cpz.processing.controls.controls.KeyboardRoutableControl;
 import com.cpz.processing.controls.controls.PointerRoutableControl;
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.controls.geometry.ControlMeasure;
+import com.cpz.processing.controls.controls.indicator.style.IndicatorStyle;
 import com.cpz.processing.controls.controls.panel.Panel;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
@@ -14,6 +15,8 @@ import processing.core.PShape;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class IndicatorTest {
@@ -72,6 +75,63 @@ class IndicatorTest {
         indicator.setStrokeWeight(-2.0F);
 
         assertEquals(0.0F, indicator.getStrokeWeight());
+    }
+
+    @Test
+    void hasDefaultStyle() {
+        Indicator indicator = new Indicator(sketch(800, 600), 40.0F, 50.0F, 24.0F, 24.0F);
+
+        assertNotNull(indicator.getStyle());
+        assertEquals(Indicator.DEFAULT_ON_COLOR, indicator.getStyle().getOnColor());
+        assertEquals(Indicator.DEFAULT_OFF_COLOR, indicator.getStyle().getOffColor());
+        assertEquals(Indicator.DEFAULT_BORDER_COLOR, indicator.getStyle().getStrokeColor());
+        assertEquals(1.0F, indicator.getStyle().getStrokeWeight());
+    }
+
+    @Test
+    void setStyleUpdatesVisualProperties() {
+        Indicator indicator = new Indicator(sketch(800, 600), 40.0F, 50.0F, 24.0F, 24.0F);
+        IndicatorStyle style = new IndicatorStyle()
+                .setOnColor(0xFF00AA00)
+                .setOffColor(0xFF111111)
+                .setStrokeColor(0xFFFFFFFF)
+                .setStrokeWeight(2.5F);
+
+        indicator.setStyle(style);
+
+        assertSame(style, indicator.getStyle());
+        assertEquals(0xFF00AA00, indicator.getOnColor());
+        assertEquals(0xFF111111, indicator.getOffColor());
+        assertEquals(0xFFFFFFFF, indicator.getStrokeColor());
+        assertEquals(2.5F, indicator.getStrokeWeight());
+    }
+
+    @Test
+    void nullStyleResetsToDefaultStyle() {
+        Indicator indicator = new Indicator(sketch(800, 600), 40.0F, 50.0F, 24.0F, 24.0F);
+
+        indicator.setStyle(null);
+
+        assertNotNull(indicator.getStyle());
+        assertEquals(Indicator.DEFAULT_ON_COLOR, indicator.getOnColor());
+        assertEquals(Indicator.DEFAULT_OFF_COLOR, indicator.getOffColor());
+        assertEquals(Indicator.DEFAULT_BORDER_COLOR, indicator.getStrokeColor());
+        assertEquals(1.0F, indicator.getStrokeWeight());
+    }
+
+    @Test
+    void directSettersDelegateToStyle() {
+        Indicator indicator = new Indicator(sketch(800, 600), 40.0F, 50.0F, 24.0F, 24.0F);
+
+        indicator.setOnColor(0xFF00AA00);
+        indicator.setOffColor(0xFF111111);
+        indicator.setStrokeColor(0xFFFFFFFF);
+        indicator.setStrokeWeight(2.5F);
+
+        assertEquals(0xFF00AA00, indicator.getStyle().getOnColor());
+        assertEquals(0xFF111111, indicator.getStyle().getOffColor());
+        assertEquals(0xFFFFFFFF, indicator.getStyle().getStrokeColor());
+        assertEquals(2.5F, indicator.getStyle().getStrokeWeight());
     }
 
     @Test

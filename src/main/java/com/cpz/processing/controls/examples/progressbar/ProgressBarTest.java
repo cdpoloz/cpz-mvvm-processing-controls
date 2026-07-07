@@ -2,6 +2,7 @@ package com.cpz.processing.controls.examples.progressbar;
 
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.controls.progressbar.ProgressBar;
+import com.cpz.processing.controls.controls.progressbar.style.ProgressBarStyle;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
@@ -39,34 +40,35 @@ public class ProgressBarTest extends PApplet {
         this.overlayManager = new OverlayManager();
         this.tooltips = new TooltipOverlayController(this, this.overlayManager);
         TooltipStyleConfig tooltipStyle = readableTooltipStyle();
+        ProgressBarStyle baseProgressStyle = new ProgressBarStyle()
+                .setTrackColor(Colors.gray(58))
+                .setStrokeColor(Colors.gray(220))
+                .setStrokeWeight(1.5F);
+        ProgressBarStyle loadingStyle = new ProgressBarStyle(baseProgressStyle)
+                .setFillColor(Colors.rgb(47, 128, 237));
+        ProgressBarStyle runtimeStyle = new ProgressBarStyle(baseProgressStyle)
+                .setFillColor(Colors.rgb(46, 204, 113));
+        ProgressBarStyle disabledStyle = new ProgressBarStyle(baseProgressStyle)
+                .setFillColor(Colors.rgb(154, 125, 255));
 
         this.loadingBar = new ProgressBar(this, "pbLoading", 120.0F, 76.0F, 400.0F, 24.0F)
                 .setTooltip("Loading progress")
                 .setTooltipStyle(tooltipStyle);
         this.loadingBar.setValue(0.35F);
-        this.loadingBar.setTrackColor(Colors.gray(58));
-        this.loadingBar.setFillColor(Colors.rgb(47, 128, 237));
-        this.loadingBar.setStrokeColor(Colors.gray(220));
-        this.loadingBar.setStrokeWeight(1.5F);
+        this.loadingBar.setStyle(loadingStyle);
 
         this.runtimeBar = new ProgressBar(this, "pbRuntime",
                 ControlBounds.relative(0.188F, 0.464F, 0.625F, 0.086F))
                 .setTooltip("Runtime progress")
                 .setTooltipStyle(tooltipStyle);
-        this.runtimeBar.setTrackColor(Colors.gray(58));
-        this.runtimeBar.setFillColor(Colors.rgb(46, 204, 113));
-        this.runtimeBar.setStrokeColor(Colors.gray(220));
-        this.runtimeBar.setStrokeWeight(1.5F);
+        this.runtimeBar.setStyle(runtimeStyle);
 
         this.disabledBar = new ProgressBar(this, "pbDisabled", 120.0F, 184.0F, 400.0F, 24.0F)
                 .setTooltip("Disabled still exposes tooltip")
                 .setTooltipStyle(tooltipStyle);
         this.disabledBar.setValue(0.7F);
         this.disabledBar.setEnabled(false);
-        this.disabledBar.setTrackColor(Colors.gray(58));
-        this.disabledBar.setFillColor(Colors.rgb(154, 125, 255));
-        this.disabledBar.setStrokeColor(Colors.gray(220));
-        this.disabledBar.setStrokeWeight(1.5F);
+        this.disabledBar.setStyle(disabledStyle);
 
         this.tooltips.registerTarget(this.loadingBar);
         this.tooltips.registerTarget(this.runtimeBar);

@@ -4,6 +4,7 @@ import com.cpz.processing.controls.controls.ParentSizeAwareControl;
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.controls.geometry.ResolvedBounds;
+import com.cpz.processing.controls.controls.progressbar.style.ProgressBarStyle;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
@@ -20,9 +21,9 @@ import processing.core.PFont;
  * @author CPZ
  */
 public final class ProgressBar implements ParentSizeAwareControl, TooltipAttachable {
-    public static final int DEFAULT_TRACK_COLOR = 0xFF30343A;
-    public static final int DEFAULT_FILL_COLOR = 0xFF2F80ED;
-    public static final int DEFAULT_STROKE_COLOR = 0xFF1F2328;
+    public static final int DEFAULT_TRACK_COLOR = ProgressBarStyle.DEFAULT_TRACK_COLOR;
+    public static final int DEFAULT_FILL_COLOR = ProgressBarStyle.DEFAULT_FILL_COLOR;
+    public static final int DEFAULT_STROKE_COLOR = ProgressBarStyle.DEFAULT_STROKE_COLOR;
 
     private final PApplet sketch;
     private final String code;
@@ -37,10 +38,7 @@ public final class ProgressBar implements ParentSizeAwareControl, TooltipAttacha
     private float min;
     private float max = 1.0F;
     private float value;
-    private int trackColor = DEFAULT_TRACK_COLOR;
-    private int fillColor = DEFAULT_FILL_COLOR;
-    private int strokeColor = DEFAULT_STROKE_COLOR;
-    private float strokeWeight = 1.0F;
+    private ProgressBarStyle style = new ProgressBarStyle();
     private boolean enabled = true;
     private boolean visible = true;
 
@@ -77,18 +75,18 @@ public final class ProgressBar implements ParentSizeAwareControl, TooltipAttacha
         this.sketch.pushStyle();
         try {
             this.sketch.noStroke();
-            this.sketch.fill(this.trackColor);
+            this.sketch.fill(this.style.getTrackColor());
             this.sketch.rect(this.x, this.y, resolvedWidth, resolvedHeight);
 
             if (fillWidth > 0.0F) {
-                this.sketch.fill(this.fillColor);
+                this.sketch.fill(this.style.getFillColor());
                 this.sketch.rect(this.x, this.y, fillWidth, resolvedHeight);
             }
 
-            if (this.strokeWeight > 0.0F) {
+            if (this.style.getStrokeWeight() > 0.0F) {
                 this.sketch.noFill();
-                this.sketch.stroke(this.strokeColor);
-                this.sketch.strokeWeight(this.strokeWeight);
+                this.sketch.stroke(this.style.getStrokeColor());
+                this.sketch.strokeWeight(this.style.getStrokeWeight());
                 this.sketch.rect(this.x, this.y, resolvedWidth, resolvedHeight);
             } else {
                 this.sketch.noStroke();
@@ -145,35 +143,43 @@ public final class ProgressBar implements ParentSizeAwareControl, TooltipAttacha
     }
 
     public int getTrackColor() {
-        return this.trackColor;
+        return this.style.getTrackColor();
     }
 
     public void setTrackColor(int color) {
-        this.trackColor = color;
+        this.style.setTrackColor(color);
     }
 
     public int getFillColor() {
-        return this.fillColor;
+        return this.style.getFillColor();
     }
 
     public void setFillColor(int color) {
-        this.fillColor = color;
+        this.style.setFillColor(color);
     }
 
     public int getStrokeColor() {
-        return this.strokeColor;
+        return this.style.getStrokeColor();
     }
 
     public void setStrokeColor(int color) {
-        this.strokeColor = color;
+        this.style.setStrokeColor(color);
     }
 
     public float getStrokeWeight() {
-        return this.strokeWeight;
+        return this.style.getStrokeWeight();
     }
 
     public void setStrokeWeight(float weight) {
-        this.strokeWeight = Math.max(0.0F, weight);
+        this.style.setStrokeWeight(weight);
+    }
+
+    public ProgressBarStyle getStyle() {
+        return this.style;
+    }
+
+    public void setStyle(ProgressBarStyle style) {
+        this.style = style == null ? new ProgressBarStyle() : style;
     }
 
     public boolean isEnabled() {
