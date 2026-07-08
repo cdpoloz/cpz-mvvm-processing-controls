@@ -8,18 +8,16 @@ import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
 import com.cpz.processing.controls.core.overlay.notification.NotificationManager;
-import com.cpz.processing.controls.core.overlay.notification.NotificationPlacement;
-import com.cpz.processing.controls.core.overlay.notification.NotificationSeverity;
-import com.cpz.processing.controls.core.overlay.notification.NotificationStyle;
+import com.cpz.processing.controls.core.overlay.notification.config.NotificationConfigLoader;
 import com.cpz.utils.color.Colors;
 import processing.core.PApplet;
 
 /**
- * Visual example for toast-style notification overlays.
+ * Visual example for notification manager/style JSON configuration.
  *
  * @author CPZ
  */
-public class NotificationTest extends PApplet {
+public class NotificationJsonTest extends PApplet {
     private InputManager inputManager;
     private OverlayManager overlayManager;
     private NotificationManager notifications;
@@ -29,7 +27,7 @@ public class NotificationTest extends PApplet {
     private Button errorButton;
 
     public static void main(String[] args) {
-        PApplet.main(NotificationTest.class);
+        PApplet.main(NotificationJsonTest.class);
     }
 
     public void settings() {
@@ -41,31 +39,17 @@ public class NotificationTest extends PApplet {
         this.inputManager = new InputManager();
         this.overlayManager = new OverlayManager();
         this.notifications = new NotificationManager(this, this.overlayManager);
-        this.notifications.setPlacement(NotificationPlacement.TOP_RIGHT);
-        this.notifications.setDefaultDurationMillis(3000L);
-        this.notifications.setSeverityDurationMillis(NotificationSeverity.WARNING, 4500L);
-        this.notifications.setSeverityDurationMillis(NotificationSeverity.ERROR, 6000L);
-        this.notifications.setMaxVisible(4);
-        this.notifications.setStyle(new NotificationStyle()
-                .setWidth(340.0F)
-                .setMargin(18.0F)
-                .setGap(8.0F)
-                .setTextSize(14.0F)
-                .setTextPadding(12.0F)
-                .setMinHeight(48.0F)
-                .setAccentWidth(5.0F)
-                .setCornerRadius(8.0F)
-                .setStrokeWeight(1.0F));
+        NotificationConfigLoader.apply(this, "config/notification.json", this.notifications);
 
         this.infoButton = createButton("btnInfo", "Info", 100.0F, 96.0F);
         this.successButton = createButton("btnSuccess", "Success", 100.0F, 154.0F);
         this.warningButton = createButton("btnWarning", "Warning", 100.0F, 212.0F);
         this.errorButton = createButton("btnError", "Error", 100.0F, 270.0F);
 
-        this.infoButton.setClickListener(() -> this.notifications.info("Information message shown from a runtime event."));
+        this.infoButton.setClickListener(() -> this.notifications.info("Information message configured by standalone JSON."));
         this.successButton.setClickListener(() -> this.notifications.success("Operation completed successfully."));
-        this.warningButton.setClickListener(() -> this.notifications.warning("Warning: review the current settings before continuing."));
-        this.errorButton.setClickListener(() -> this.notifications.error("Error: the requested operation could not be completed."));
+        this.warningButton.setClickListener(() -> this.notifications.warning("Warning duration and color come from notification.json."));
+        this.errorButton.setClickListener(() -> this.notifications.error("Error duration and color come from notification.json."));
 
         this.inputManager.registerLayer(new ButtonInputLayer(
                 0,
@@ -103,8 +87,12 @@ public class NotificationTest extends PApplet {
     }
 
     public void exit() {
-        if (this.notifications != null) this.notifications.dispose();
-        if (this.overlayManager != null) this.overlayManager.clearAll();
+        if (this.notifications != null) {
+            this.notifications.dispose();
+        }
+        if (this.overlayManager != null) {
+            this.overlayManager.clearAll();
+        }
         super.exit();
     }
 
@@ -118,14 +106,17 @@ public class NotificationTest extends PApplet {
         fill(Colors.gray(230));
         textAlign(LEFT, TOP);
         textSize(22.0F);
-        text("Notification overlay", 64.0F, 42.0F);
+        text("Notification JSON config", 64.0F, 42.0F);
         fill(Colors.gray(160));
         textSize(14.0F);
-        text("Click buttons while notifications are visible; input remains routed to controls.", 250.0F, 104.0F);
+        text("Standalone JSON config controls placement, durations, and style only.", 250.0F, 104.0F);
+        text("Messages remain runtime events from button callbacks.", 250.0F, 128.0F);
     }
 
     private void drawActiveOverlays() {
-        overlayManager.getActiveOverlays().forEach(entry -> entry.getRender().run());
+        for (OverlayEntry entry : this.overlayManager.getActiveOverlays()) {
+            entry.getRender().run();
+        }
     }
 
     private void dispatchPointer(PointerEvent.Type type) {

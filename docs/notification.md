@@ -140,6 +140,10 @@ placements stack upward.
 When the visible limit is exceeded, the oldest notification is dropped. There
 is no queue or backlog in `0.9.0`.
 
+Placement is defined by `NotificationPlacement`. Notification is an overlay
+anchored to predefined screen regions, so it does not expose formal relative
+positioning, relative sizing, or manual x/y placement APIs in this release.
+
 ---
 
 ## Styling
@@ -189,13 +193,85 @@ Visible notifications do not block normal control input.
 
 ## JSON
 
-Notification is programmatic runtime UI. It is not configured inside
-`controls[]`, is not created by `ControlConfigLoader`, and is not registered in
+Notification is runtime UI. It is not configured inside `controls[]`, is not
+created by `ControlConfigLoader`, and is not registered in
 `ControlFactoryRegistry`.
 
-JSON continues to describe durable control facades. Notification messages are
-runtime events owned by the sketch. JSON support for manager or style presets
-may be considered later, but is not part of `0.9.0`.
+`0.9.0` includes a standalone notification JSON loader for manager/style
+defaults only. It does not define messages, trigger notifications, register
+input, or create controls:
+
+```java
+OverlayManager overlayManager = new OverlayManager();
+NotificationManager notifications = new NotificationManager(this, overlayManager);
+
+NotificationConfig config =
+        NotificationConfigLoader.load(this, "config/notification.json");
+
+config.applyTo(notifications);
+```
+
+The convenience form is also available:
+
+```java
+NotificationConfigLoader.apply(this, "config/notification.json", notifications);
+```
+
+Supported standalone JSON fields:
+
+```json
+{
+  "placement": "top-right",
+  "maxVisible": 4,
+  "defaultDurationMillis": 3000,
+  "severityDurations": {
+    "info": 3000,
+    "success": 3000,
+    "warning": 4500,
+    "error": 6000
+  },
+  "style": {
+    "backgroundColor": "#202020",
+    "textColor": "#FFFFFF",
+    "borderColor": "#404040",
+    "strokeWeight": 1.0,
+    "cornerRadius": 8.0,
+    "textSize": 14.0,
+    "textPadding": 12.0,
+    "gap": 8.0,
+    "margin": 24.0,
+    "width": 320.0,
+    "minHeight": 48.0,
+    "accentWidth": 5.0,
+    "infoAccentColor": "#3B82F6",
+    "successAccentColor": "#22C55E",
+    "warningAccentColor": "#F59E0B",
+    "errorAccentColor": "#EF4444"
+  }
+}
+```
+
+Missing fields preserve the manager/style values already in use. Unknown fields
+are ignored. `placement` and severity keys are case-insensitive and accept
+hyphens, underscores, or spaces. Invalid placement falls back to `TOP_RIGHT`;
+unknown severity keys and invalid or non-positive JSON duration values are
+ignored.
+
+`defaultDurationMillis` is applied before `severityDurations`, so a JSON file
+can set a global duration and then override warning or error durations.
+
+Colors use the same JSON color parsing convention as other controls: integer
+ARGB values or hexadecimal strings in `#RRGGBB` / `#AARRGGBB` form.
+
+`PFont` remains programmatic in `0.9.0`; the standalone notification JSON style
+does not load fonts.
+
+Notification messages are still runtime events owned by the sketch:
+
+```java
+notifications.success("Saved");
+notifications.error("Save failed");
+```
 
 ---
 
@@ -205,4 +281,6 @@ See:
 
 ```text
 src/main/java/com/cpz/processing/controls/examples/notification/NotificationTest.java
+src/main/java/com/cpz/processing/controls/examples/notification/NotificationJsonTest.java
+data/config/notification.json
 ```

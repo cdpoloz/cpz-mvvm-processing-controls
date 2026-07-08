@@ -154,6 +154,8 @@ Notifications are toast-style runtime overlays, not controls.
 - notifications do not register pointer or keyboard input layers
 - notifications do not receive focus and are not modal
 - notification messages are not part of `controls[]` JSON configuration
+- `NotificationConfigLoader` can load standalone manager/style defaults, but
+  it does not create controls, define messages, or trigger notifications
 
 This keeps transient status feedback separate from durable control facades and
 from blocking dialog/modal behavior.

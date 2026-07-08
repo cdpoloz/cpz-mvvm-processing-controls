@@ -96,8 +96,13 @@ programmatic runtime UI events, not durable control facades. They are not
 loaded from `controls[]`, are not created by `ControlConfigLoader`, and are not
 registered in `ControlFactoryRegistry`.
 
-`progressbar` is part of the current `main` branch development for `0.8.0`.
-The latest stable Maven Central release remains `0.7.1`.
+Notification manager/style defaults can be loaded from a standalone JSON file
+with `NotificationConfigLoader`. That file is separate from the controls JSON
+document and supports only notification-system settings such as placement,
+visible count, durations, severity durations, and visual style. It does not
+define notification messages or trigger runtime notifications.
+
+`progressbar` is a regular control JSON type. `notification` is not.
 
 ---
 
