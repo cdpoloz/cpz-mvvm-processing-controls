@@ -143,6 +143,21 @@ contract.
 This keeps tooltip behavior reusable for both MVVM controls and non-control
 sketch content.
 
+## Notification Overlay
+
+Notifications are toast-style runtime overlays, not controls.
+
+- `NotificationManager` owns one render-only `OverlayEntry`
+- `Notification` items are runtime events with message, severity, creation
+  time, and duration
+- `NotificationStyle` owns the visual surface for the toast stack
+- notifications do not register pointer or keyboard input layers
+- notifications do not receive focus and are not modal
+- notification messages are not part of `controls[]` JSON configuration
+
+This keeps transient status feedback separate from durable control facades and
+from blocking dialog/modal behavior.
+
 ## Binding
 
 Binding is intentionally explicit.
@@ -161,6 +176,7 @@ See [Binding](binding.md).
 - [JSON Configuration](json-configuration.md)
 - [Theme](theme.md)
 - [Tooltip](tooltip.md)
+- [Notification](notification.md)
 - [README](../README.md)
 - [Input System](input-system.md)
 - [Binding](binding.md)

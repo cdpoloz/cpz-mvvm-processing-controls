@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.main;
 
 import com.cpz.processing.controls.examples.button.ButtonTest;
+import com.cpz.processing.controls.examples.notification.NotificationTest;
 import processing.core.PApplet;
 
 import java.util.Locale;
@@ -34,7 +35,7 @@ public class Launcher {
         // You can choose an example from the list below
 
         // Button *****************************************
-        PApplet.main(ButtonTest.class);
+        //PApplet.main(ButtonTest.class);
         //PApplet.main(ButtonRelativeTest.class);
         //PApplet.main(ButtonJsonRelativeTest.class);
         //PApplet.main(ButtonSvgTest.class);
@@ -98,6 +99,9 @@ public class Launcher {
         // ProgressBar ************************************
         //PApplet.main(ProgressBarTest.class);
         //PApplet.main(ProgressBarJsonTest.class);
+
+        // Notification ***********************************
+        PApplet.main(NotificationTest.class);
 
         // Theme ****************************************
         //PApplet.main(ThemeFacadeSketch.class);

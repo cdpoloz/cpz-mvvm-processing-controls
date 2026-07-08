@@ -91,6 +91,11 @@ The current registry supports:
 
 `dropdown` requires `OverlayManager` and `InputManager` when the main loader is used, because those are already required by the public `DropDown` facade.
 
+`Notification` is intentionally not listed here. Notifications are
+programmatic runtime UI events, not durable control facades. They are not
+loaded from `controls[]`, are not created by `ControlConfigLoader`, and are not
+registered in `ControlFactoryRegistry`.
+
 `progressbar` is part of the current `main` branch development for `0.8.0`.
 The latest stable Maven Central release remains `0.7.1`.
 
@@ -670,3 +675,4 @@ It intentionally does not support:
 - [Indicator](indicator.md)
 - [ProgressBar](progressbar.md)
 - [Tooltip](tooltip.md)
+- [Notification](notification.md)

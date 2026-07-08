@@ -360,6 +360,9 @@ Model → ViewModel → View → ViewState → Style → Renderer
 
 Tooltips:
 TooltipAttachable / TooltipTarget → TooltipOverlayController → OverlayManager
+
+Notifications:
+NotificationManager → OverlayManager
 ```
 
 ---
@@ -369,6 +372,11 @@ TooltipAttachable / TooltipTarget → TooltipOverlayController → OverlayManage
 This project is a UI framework intended for Processing sketches and for other host environments that can provide normalized input events.
 
 The public control layer is exposed through closed ergonomic facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, `DropDown`, `Panel`, `Indicator`, and `ProgressBar`.
+
+`Notification` is a toast-style runtime overlay feature, not a `Control`. It is
+created programmatically through `NotificationManager`, does not consume
+pointer or keyboard input in `0.9.0`, and is not configured inside
+`controls[]`.
 
 `ProgressBar` belongs to the current `0.8.0-SNAPSHOT` development line on
 `main` and will be published with `0.8.0`. The latest stable Maven Central
@@ -395,6 +403,10 @@ Control JSON can include tooltip blocks, reusable root `tooltipStyles`, and
 `styleRef` references. Standalone tooltips can also be loaded with
 `TooltipFactory.loadFromJson(...)` and assigned to manual `TooltipArea`
 targets.
+
+Notifications are runtime status messages owned by the sketch. Use them for
+non-blocking info, success, warning, and error feedback. Use a future
+dialog/modal feature, not `Notification`, for blocking user decisions.
 
 The JSON layer can also create one or more controls from a single document and returns them as `Map<String, Control>`. JSON remains structural only: binding and behavior wiring stay in sketch code.
 
@@ -684,6 +696,7 @@ from `draw()`.
 - [JSON Configuration](docs/json-configuration.md)
 - [Panel](docs/panel.md)
 - [Tooltip](docs/tooltip.md)
+- [Notification](docs/notification.md)
 - [Theme](docs/theme.md)
 - [Button](docs/button.md)
 - [Checkbox](docs/checkbox.md)

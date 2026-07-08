@@ -2,7 +2,6 @@ package com.cpz.processing.controls.core.overlay;
 
 import com.cpz.processing.controls.core.focus.FocusManager;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,13 +99,15 @@ public class OverlayManager {
    /**
     * Returns active overlays.
     *
-    * @return current active overlays
+    * @return snapshot of current active overlays
     *
     * Behavior:
     * - Returns the current value without applying side effects.
+    * - Uses a snapshot so overlays can safely register or unregister while a
+    *   caller renders the returned entries.
     */
    public List<OverlayEntry> getActiveOverlays() {
-      return Collections.unmodifiableList(this.overlays);
+      return List.copyOf(this.overlays);
    }
 
    /**
