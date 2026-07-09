@@ -15,6 +15,7 @@ import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
+import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import com.cpz.processing.controls.core.util.ControlCode;
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -122,6 +123,19 @@ public final class Label implements ParentSizeAwareControl, TooltipAttachable {
     public LabelStyleConfig getStyleConfig() {
         this.applyResolvedTextSize();
         return this.view.getStyle().getLabelStyleConfig();
+    }
+
+    public void setTextColor(int color) {
+        this.requireStyleConfig().textColor = color;
+    }
+
+    public int getTextColor() {
+        LabelStyleConfig styleConfig = this.requireStyleConfig();
+        if (styleConfig.textColor != null) {
+            return styleConfig.textColor;
+        }
+        ThemeSnapshot snapshot = this.view.getStyle().getThemeSnapshot();
+        return snapshot.tokens.onSurface;
     }
 
     public void setPosition(float x, float y) {
@@ -276,5 +290,13 @@ public final class Label implements ParentSizeAwareControl, TooltipAttachable {
             this.view.setStyle(((DefaultLabelStyle) style).copy());
         }
         this.textSizeStyleIsolated = true;
+    }
+
+    private LabelStyleConfig requireStyleConfig() {
+        LabelStyleConfig styleConfig = this.getStyleConfig();
+        if (styleConfig == null) {
+            throw new IllegalStateException("Label style does not expose LabelStyleConfig");
+        }
+        return styleConfig;
     }
 }

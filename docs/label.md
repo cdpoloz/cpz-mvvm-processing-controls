@@ -67,6 +67,16 @@ Null text is normalized internally to an empty string.
 
 Multi-line text is supported by passing line breaks in the string.
 
+Runtime text color also has dedicated facade methods:
+
+```java
+label.setTextColor(0xFF50DC78);
+int currentColor = label.getTextColor();
+```
+
+Use these methods as the public runtime API instead of mutating
+`label.getStyleConfig().textColor` directly.
+
 ---
 
 ## Visibility and enabled state
@@ -112,6 +122,10 @@ This configuration controls the visual appearance:
 - `alignX` controls horizontal alignment
 - `alignY` controls vertical alignment
 - `disabledAlpha` controls disabled transparency
+
+`style.textColor` remains the initialization path for the text color when you
+construct the label programmatically or from JSON. For runtime changes, prefer
+`label.setTextColor(...)`.
 
 The sketch owns programmatic resource loading. When a custom font is needed, load it with Processing's `createFont(...)` and assign the resulting `PFont` to `LabelStyleConfig.font`.
 
@@ -178,6 +192,24 @@ public void setup() {
     LabelConfigLoader loader = new LabelConfigLoader(this);
     LabelConfig config = loader.load(LABEL_CONFIG_PATH);
     label = LabelFactory.create(this, config);
+}
+```
+
+Runtime update example:
+
+```java
+Label statusLabel = new Label(this, "status", "OK", 40f, 40f, 160f, 32f);
+
+statusLabel.setTextColor(Colors.argb(255, 80, 220, 120));
+
+if (warning) {
+    statusLabel.setText("WARNING");
+    statusLabel.setTextColor(Colors.argb(255, 255, 180, 40));
+}
+
+if (error) {
+    statusLabel.setText("ERROR");
+    statusLabel.setTextColor(Colors.argb(255, 255, 80, 80));
 }
 ```
 
