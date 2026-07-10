@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
+import processing.core.PApplet;
+import processing.core.PFont;
 
 /**
  * Optional standalone configuration for {@link NotificationManager}.
@@ -63,6 +65,10 @@ public final class NotificationConfig {
     }
 
     public void applyTo(NotificationManager manager) {
+        this.applyTo(null, manager);
+    }
+
+    public void applyTo(PApplet sketch, NotificationManager manager) {
         Objects.requireNonNull(manager, "manager");
 
         if (this.placement != null) {
@@ -82,7 +88,7 @@ public final class NotificationConfig {
         }
         if (this.style != null) {
             NotificationStyle target = new NotificationStyle(manager.getStyle());
-            this.style.applyTo(target);
+            this.style.applyTo(target, sketch);
             manager.setStyle(target);
         }
     }
@@ -104,6 +110,9 @@ public final class NotificationConfig {
         private final Integer successAccentColor;
         private final Integer warningAccentColor;
         private final Integer errorAccentColor;
+        private final String fontPath;
+        private final String sourcePath;
+        private final FontResolver fontResolver;
 
         StyleConfig(
                 Integer backgroundColor,
@@ -121,7 +130,10 @@ public final class NotificationConfig {
                 Integer infoAccentColor,
                 Integer successAccentColor,
                 Integer warningAccentColor,
-                Integer errorAccentColor
+                Integer errorAccentColor,
+                String fontPath,
+                String sourcePath,
+                FontResolver fontResolver
         ) {
             this.backgroundColor = backgroundColor;
             this.textColor = textColor;
@@ -139,6 +151,9 @@ public final class NotificationConfig {
             this.successAccentColor = successAccentColor;
             this.warningAccentColor = warningAccentColor;
             this.errorAccentColor = errorAccentColor;
+            this.fontPath = fontPath;
+            this.sourcePath = sourcePath;
+            this.fontResolver = fontResolver;
         }
 
         public Integer getBackgroundColor() {
@@ -205,7 +220,15 @@ public final class NotificationConfig {
             return this.errorAccentColor;
         }
 
-        void applyTo(NotificationStyle target) {
+        public String getFontPath() {
+            return this.fontPath;
+        }
+
+        public String getSourcePath() {
+            return this.sourcePath;
+        }
+
+        void applyTo(NotificationStyle target, PApplet sketch) {
             if (this.backgroundColor != null) {
                 target.setBackgroundColor(this.backgroundColor);
             }
@@ -254,6 +277,27 @@ public final class NotificationConfig {
             if (this.errorAccentColor != null) {
                 target.setErrorAccentColor(this.errorAccentColor);
             }
+            if (this.fontPath != null) {
+                PFont resolvedFont = this.resolveFont(sketch, target.getTextSize());
+                if (resolvedFont != null) {
+                    target.setFont(resolvedFont);
+                }
+            }
+        }
+
+        private PFont resolveFont(PApplet sketch, float effectiveTextSize) {
+            if (sketch != null) {
+                return this.fontResolver == null ? null : this.fontResolver.load(sketch, effectiveTextSize);
+            }
+            return this.fontResolver == null ? null : this.fontResolver.load(effectiveTextSize);
+        }
+    }
+
+    interface FontResolver {
+        PFont load(float effectiveTextSize);
+
+        default PFont load(PApplet sketch, float effectiveTextSize) {
+            return this.load(effectiveTextSize);
         }
     }
 }

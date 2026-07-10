@@ -3,6 +3,7 @@ package com.cpz.processing.controls.core.overlay.notification.config;
 import com.cpz.processing.controls.core.overlay.notification.NotificationManager;
 import com.cpz.processing.controls.core.overlay.notification.NotificationPlacement;
 import com.cpz.processing.controls.core.overlay.notification.NotificationSeverity;
+import com.cpz.processing.controls.core.util.FontLoader;
 import com.cpz.processing.controls.core.util.JsonConfigSupport;
 import java.util.EnumMap;
 import java.util.Locale;
@@ -26,14 +27,27 @@ public final class NotificationConfigLoader {
     public static NotificationConfig load(PApplet sketch, String path) {
         Objects.requireNonNull(sketch, "sketch");
         Objects.requireNonNull(path, "path");
-        return loadFromJson(JsonConfigSupport.loadRequiredObject(sketch, path, "notification"), path);
+        return loadFromJson(sketch, JsonConfigSupport.loadRequiredObject(sketch, path, "notification"), path);
     }
 
     public static void apply(PApplet sketch, String path, NotificationManager manager) {
         load(sketch, path).applyTo(manager);
     }
 
+    public static NotificationConfig loadFromJson(PApplet sketch, JSONObject root, String path) {
+        Objects.requireNonNull(sketch, "sketch");
+        return loadFromJson(root, path, new BoundFontResolverFactory(sketch));
+    }
+
     public static NotificationConfig loadFromJson(JSONObject root, String path) {
+        return loadFromJson(root, path, DeferredFontResolverFactory.INSTANCE);
+    }
+
+    private static NotificationConfig loadFromJson(
+            JSONObject root,
+            String path,
+            FontResolverFactory fontResolverFactory
+    ) {
         Objects.requireNonNull(root, "root");
         Objects.requireNonNull(path, "path");
 
@@ -42,7 +56,7 @@ public final class NotificationConfigLoader {
                 readPositiveInt(root, "maxVisible"),
                 readPositiveLong(root, "defaultDurationMillis"),
                 readSeverityDurations(root),
-                readStyle(root, path)
+                readStyle(root, path, fontResolverFactory)
         );
     }
 
@@ -102,7 +116,11 @@ public final class NotificationConfigLoader {
         }
     }
 
-    private static NotificationConfig.StyleConfig readStyle(JSONObject root, String path) {
+    private static NotificationConfig.StyleConfig readStyle(
+            JSONObject root,
+            String path,
+            FontResolverFactory fontResolverFactory
+    ) {
         if (!root.hasKey("style") || root.isNull("style")) {
             return null;
         }
@@ -113,6 +131,7 @@ public final class NotificationConfigLoader {
         }
 
         JSONObject style = (JSONObject) rawStyle;
+        String fontPath = JsonConfigSupport.getOptionalNonBlankString(style, "font", path, "notification style");
         return new NotificationConfig.StyleConfig(
                 JsonConfigSupport.getOptionalColor(style, "backgroundColor", path),
                 JsonConfigSupport.getOptionalColor(style, "textColor", path),
@@ -129,7 +148,10 @@ public final class NotificationConfigLoader {
                 JsonConfigSupport.getOptionalColor(style, "infoAccentColor", path),
                 JsonConfigSupport.getOptionalColor(style, "successAccentColor", path),
                 JsonConfigSupport.getOptionalColor(style, "warningAccentColor", path),
-                JsonConfigSupport.getOptionalColor(style, "errorAccentColor", path)
+                JsonConfigSupport.getOptionalColor(style, "errorAccentColor", path),
+                fontPath,
+                path,
+                fontPath == null ? null : fontResolverFactory.create(fontPath, path)
         );
     }
 
@@ -162,5 +184,53 @@ public final class NotificationConfigLoader {
                 .toUpperCase(Locale.ROOT)
                 .replace('-', '_')
                 .replaceAll("\\s+", "_");
+    }
+
+    private interface FontResolverFactory {
+        NotificationConfig.FontResolver create(String fontPath, String sourcePath);
+    }
+
+    private static final class BoundFontResolverFactory implements FontResolverFactory {
+        private final PApplet sketch;
+
+        private BoundFontResolverFactory(PApplet sketch) {
+            this.sketch = sketch;
+        }
+
+        public NotificationConfig.FontResolver create(String fontPath, String sourcePath) {
+            return new NotificationConfig.FontResolver() {
+                public processing.core.PFont load(float effectiveTextSize) {
+                    return FontLoader.load(
+                            BoundFontResolverFactory.this.sketch,
+                            fontPath,
+                            effectiveTextSize,
+                            "notification",
+                            sourcePath
+                    );
+                }
+            };
+        }
+    }
+
+    private enum DeferredFontResolverFactory implements FontResolverFactory {
+        INSTANCE;
+
+        public NotificationConfig.FontResolver create(String fontPath, String sourcePath) {
+            return new NotificationConfig.FontResolver() {
+                public processing.core.PFont load(float effectiveTextSize) {
+                    return null;
+                }
+
+                public processing.core.PFont load(PApplet sketch, float effectiveTextSize) {
+                    return FontLoader.load(
+                            sketch,
+                            fontPath,
+                            effectiveTextSize,
+                            "notification",
+                            sourcePath
+                    );
+                }
+            };
+        }
     }
 }

@@ -2,10 +2,13 @@ package com.cpz.processing.controls.core.overlay.notification;
 
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
+import com.cpz.processing.controls.testsupport.ProcessingTestSupport;
 import com.cpz.utils.time.TimeSource;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import processing.core.PApplet;
+import processing.core.PFont;
+import processing.core.PGraphics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -403,6 +406,19 @@ class NotificationManagerTest {
     }
 
     @Test
+    void notificationStyleCopyConstructorPreservesFont() {
+        PFont font = ProcessingTestSupport.font("Monospaced", 18);
+        NotificationStyle source = new NotificationStyle()
+                .setFont(font)
+                .setTextSize(18.0F);
+
+        NotificationStyle copy = new NotificationStyle(source);
+
+        assertSame(font, copy.getFont());
+        assertEquals(18.0F, copy.getTextSize());
+    }
+
+    @Test
     void negativeStrokeWeightIsClampedToZero() {
         NotificationStyle style = new NotificationStyle();
 
@@ -422,6 +438,29 @@ class NotificationManagerTest {
 
         assertEquals(0, sketch.strokeCalls);
         assertTrue(sketch.noStrokeCalls > 0);
+    }
+
+    @Test
+    void renderAppliesTypographyBeforeMeasurementAndDrawing() {
+        TypographyRecordingApplet sketch = typographySketch();
+        NotificationManager manager = manager(sketch, new OverlayManager(), new FakeTimeSource(0L));
+        PFont font = ProcessingTestSupport.font("Monospaced", 18);
+        manager.setStyle(new NotificationStyle()
+                .setFont(font)
+                .setTextSize(18.0F)
+                .setWidth(180.0F)
+                .setTextPadding(12.0F)
+                .setAccentWidth(5.0F));
+        manager.show("This notification message must wrap across multiple lines to force measurement.");
+
+        manager.getOverlayEntry().getRender().run();
+
+        assertTrue(sketch.textWidthCalls > 0);
+        assertSame(font, sketch.fontDuringTextWidth);
+        assertEquals(18.0F, sketch.textSizeDuringTextWidth);
+        assertTrue(sketch.textCalls > 0);
+        assertSame(font, sketch.fontDuringTextDraw);
+        assertEquals(18.0F, sketch.textSizeDuringTextDraw);
     }
 
     private static NotificationManager manager(PApplet sketch, OverlayManager overlayManager, TimeSource clock) {
@@ -447,6 +486,14 @@ class NotificationManagerTest {
         RecordingApplet sketch = new RecordingApplet();
         sketch.width = 500;
         sketch.height = 400;
+        return sketch;
+    }
+
+    private static TypographyRecordingApplet typographySketch() {
+        TypographyRecordingApplet sketch = new TypographyRecordingApplet();
+        sketch.width = 500;
+        sketch.height = 400;
+        ProcessingTestSupport.graphics(sketch);
         return sketch;
     }
 
@@ -511,6 +558,68 @@ class NotificationManagerTest {
 
         @Override
         public void text(String str, float x, float y) {
+        }
+
+        @Override
+        public void rect(float a, float b, float c, float d, float r) {
+        }
+
+        @Override
+        public void rect(float a, float b, float c, float d, float tl, float tr, float br, float bl) {
+        }
+    }
+
+    private static final class TypographyRecordingApplet extends PApplet {
+        private int textWidthCalls;
+        private int textCalls;
+        private PFont fontDuringTextWidth;
+        private float textSizeDuringTextWidth;
+        private PFont fontDuringTextDraw;
+        private float textSizeDuringTextDraw;
+
+        @Override
+        public void pushStyle() {
+        }
+
+        @Override
+        public void popStyle() {
+        }
+
+        @Override
+        public void fill(int rgb) {
+        }
+
+        @Override
+        public void stroke(int rgb) {
+        }
+
+        @Override
+        public void strokeWeight(float weight) {
+        }
+
+        @Override
+        public void noStroke() {
+        }
+
+        @Override
+        public void textAlign(int alignX, int alignY) {
+        }
+
+        @Override
+        public float textWidth(String text) {
+            PGraphics graphics = this.getGraphics();
+            this.textWidthCalls++;
+            this.fontDuringTextWidth = graphics.textFont;
+            this.textSizeDuringTextWidth = graphics.textSize;
+            return text == null ? 0.0F : text.length() * 7.0F;
+        }
+
+        @Override
+        public void text(String str, float x, float y) {
+            PGraphics graphics = this.getGraphics();
+            this.textCalls++;
+            this.fontDuringTextDraw = graphics.textFont;
+            this.textSizeDuringTextDraw = graphics.textSize;
         }
 
         @Override

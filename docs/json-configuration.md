@@ -99,8 +99,20 @@ registered in `ControlFactoryRegistry`.
 Notification manager/style defaults can be loaded from a standalone JSON file
 with `NotificationConfigLoader`. That file is separate from the controls JSON
 document and supports only notification-system settings such as placement,
-visible count, durations, severity durations, and visual style. It does not
-define notification messages or trigger runtime notifications.
+visible count, durations, severity durations, and visual style. That standalone
+style also supports `style.font` for the manager-wide notification typography.
+It does not define notification messages or trigger runtime notifications.
+
+Example:
+
+```json
+{
+  "style": {
+    "font": "data/font/JetBrainsMono.ttf",
+    "textSize": 14.0
+  }
+}
+```
 
 `progressbar` is a regular control JSON type. `notification` is not.
 

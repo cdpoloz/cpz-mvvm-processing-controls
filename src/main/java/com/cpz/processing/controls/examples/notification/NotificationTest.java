@@ -13,6 +13,7 @@ import com.cpz.processing.controls.core.overlay.notification.NotificationSeverit
 import com.cpz.processing.controls.core.overlay.notification.NotificationStyle;
 import com.cpz.utils.color.Colors;
 import processing.core.PApplet;
+import processing.core.PFont;
 
 /**
  * Visual example for toast-style notification overlays.
@@ -46,10 +47,12 @@ public class NotificationTest extends PApplet {
         this.notifications.setSeverityDurationMillis(NotificationSeverity.WARNING, 4500L);
         this.notifications.setSeverityDurationMillis(NotificationSeverity.ERROR, 6000L);
         this.notifications.setMaxVisible(4);
+        PFont font = createFont("data/font/JetBrainsMono.ttf", 14.0F);
         this.notifications.setStyle(new NotificationStyle()
                 .setWidth(340.0F)
                 .setMargin(18.0F)
                 .setGap(8.0F)
+                .setFont(font)
                 .setTextSize(14.0F)
                 .setTextPadding(12.0F)
                 .setMinHeight(48.0F)

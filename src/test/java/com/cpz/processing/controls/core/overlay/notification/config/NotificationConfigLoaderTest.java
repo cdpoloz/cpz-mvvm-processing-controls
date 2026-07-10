@@ -6,11 +6,14 @@ import com.cpz.processing.controls.core.overlay.notification.NotificationManager
 import com.cpz.processing.controls.core.overlay.notification.NotificationPlacement;
 import com.cpz.processing.controls.core.overlay.notification.NotificationSeverity;
 import com.cpz.processing.controls.core.overlay.notification.NotificationStyle;
+import com.cpz.processing.controls.testsupport.ProcessingTestSupport;
 import org.junit.jupiter.api.Test;
 import processing.core.PApplet;
+import processing.core.PFont;
 import processing.data.JSONObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -179,6 +182,76 @@ class NotificationConfigLoaderTest {
     }
 
     @Test
+    void loadFromJsonReadsAndTrimsNotificationFontPathAndSourcePath() {
+        NotificationConfig config = config("{\"style\":{\"font\":\"  data/font/JetBrainsMono.ttf  \"}}");
+
+        assertEquals("data/font/JetBrainsMono.ttf", config.getStyle().getFontPath());
+        assertEquals("notification.json", config.getStyle().getSourcePath());
+    }
+
+    @Test
+    void loadWithSketchAppliesFontUsingConfiguredTextSize() {
+        PFont expected = ProcessingTestSupport.font("Monospaced", 16);
+        JsonFontApplet sketch = new JsonFontApplet(
+                JSONObject.parse("{\"style\":{\"font\":\"data/font/test.ttf\",\"textSize\":18.0}}"),
+                expected
+        );
+        NotificationManager manager = manager();
+
+        NotificationConfigLoader.load(sketch, "notification.json").applyTo(manager);
+
+        assertSame(expected, manager.getStyle().getFont());
+        assertEquals(18.0F, manager.getStyle().getTextSize());
+        assertEquals(1, sketch.getCreateFontCalls());
+        assertEquals(18.0F, sketch.getLastCreateFontSize());
+    }
+
+    @Test
+    void loadWithSketchUsesCurrentManagerTextSizeWhenJsonOmitsIt() {
+        PFont expected = ProcessingTestSupport.font("Dialog", 19);
+        JsonFontApplet sketch = new JsonFontApplet(
+                JSONObject.parse("{\"style\":{\"font\":\"data/font/test.ttf\"}}"),
+                expected
+        );
+        NotificationManager manager = manager();
+        manager.setStyle(new NotificationStyle().setTextSize(19.0F));
+
+        NotificationConfigLoader.load(sketch, "notification.json").applyTo(manager);
+
+        assertSame(expected, manager.getStyle().getFont());
+        assertEquals(19.0F, manager.getStyle().getTextSize());
+        assertEquals(19.0F, sketch.getLastCreateFontSize());
+    }
+
+    @Test
+    void parseOnlyLoadFromJsonCanApplyFontWhenSketchIsProvidedLater() {
+        PFont expected = ProcessingTestSupport.font("Dialog", 17);
+        NotificationConfig config = config("{\"style\":{\"font\":\"data/font/test.ttf\",\"textSize\":17.0}}");
+        JsonFontApplet sketch = new JsonFontApplet(JSONObject.parse("{}"), expected);
+        NotificationManager manager = manager();
+
+        config.applyTo(sketch, manager);
+
+        assertSame(expected, manager.getStyle().getFont());
+        assertEquals(17.0F, sketch.getLastCreateFontSize());
+    }
+
+    @Test
+    void applyLoadsAndAppliesNotificationFont() {
+        PFont expected = ProcessingTestSupport.font("Monospaced", 15);
+        JsonFontApplet sketch = new JsonFontApplet(
+                JSONObject.parse("{\"style\":{\"font\":\"data/font/test.ttf\",\"textSize\":15.0}}"),
+                expected
+        );
+        NotificationManager manager = manager();
+
+        NotificationConfigLoader.apply(sketch, "notification.json", manager);
+
+        assertSame(expected, manager.getStyle().getFont());
+        assertEquals(15.0F, sketch.getLastCreateFontSize());
+    }
+
+    @Test
     void missingStyleFieldsPreserveCurrentValues() {
         NotificationManager manager = manager();
         manager.setStyle(new NotificationStyle()
@@ -189,6 +262,33 @@ class NotificationConfigLoaderTest {
 
         assertEquals(0xFF333333, manager.getStyle().getBackgroundColor());
         assertEquals(0xFF222222, manager.getStyle().getTextColor());
+    }
+
+    @Test
+    void missingFontPreservesCurrentFont() {
+        PFont existing = ProcessingTestSupport.font("Dialog", 14);
+        NotificationManager manager = manager();
+        manager.setStyle(new NotificationStyle()
+                .setFont(existing)
+                .setTextSize(14.0F));
+
+        config("{\"style\":{\"backgroundColor\":\"#333333\"}}").applyTo(manager);
+
+        assertSame(existing, manager.getStyle().getFont());
+    }
+
+    @Test
+    void partialStyleUpdateDoesNotClearExistingFont() {
+        PFont existing = ProcessingTestSupport.font("Dialog", 14);
+        NotificationManager manager = manager();
+        manager.setStyle(new NotificationStyle()
+                .setFont(existing)
+                .setTextSize(14.0F));
+
+        config("{\"style\":{\"textSize\":20.0}}").applyTo(manager);
+
+        assertSame(existing, manager.getStyle().getFont());
+        assertEquals(20.0F, manager.getStyle().getTextSize());
     }
 
     @Test
@@ -231,6 +331,25 @@ class NotificationConfigLoaderTest {
     }
 
     @Test
+    void invalidNotificationFontPathUsesFontLoaderDiagnostics() {
+        JsonFontApplet sketch = new JsonFontApplet(
+                JSONObject.parse("{\"style\":{\"font\":\"missing.ttf\"}}"),
+                ProcessingTestSupport.font("Dialog", 14)
+        );
+        sketch.setResourceAvailable(false);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> NotificationConfigLoader.load(sketch, "notification.json").applyTo(manager())
+        );
+
+        assertTrue(exception.getMessage().contains("notification"));
+        assertTrue(exception.getMessage().contains("'font'"));
+        assertTrue(exception.getMessage().contains("notification.json"));
+        assertTrue(exception.getMessage().contains("missing.ttf"));
+    }
+
+    @Test
     void notificationIsNotCreatedByControlConfigLoader() {
         JSONObject root = JSONObject.parse("{\"controls\":[{\"type\":\"notification\",\"code\":\"toast\"}]}");
 
@@ -257,6 +376,20 @@ class NotificationConfigLoaderTest {
         private final JSONObject root;
 
         private JsonApplet(JSONObject root) {
+            this.root = root;
+        }
+
+        @Override
+        public JSONObject loadJSONObject(String filename) {
+            return this.root;
+        }
+    }
+
+    private static final class JsonFontApplet extends ProcessingTestSupport.FontApplet {
+        private final JSONObject root;
+
+        private JsonFontApplet(JSONObject root, PFont font) {
+            super(font);
             this.root = root;
         }
 

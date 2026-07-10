@@ -64,11 +64,11 @@ to your Maven project:
 <dependency>
     <groupId>io.github.cdpoloz</groupId>
     <artifactId>cpz-mvvm-processing-controls</artifactId>
-    <version>0.9.0</version>
+    <version>0.9.2</version>
 </dependency>
 ```
 
-Version `0.9.0` is the current stable release available from Maven Central.
+Version `0.9.2` is the current stable release available from Maven Central.
 Processing Core (`org.processing:core:4.5.5`) and `cpz-utils`
 (`io.github.cdpoloz:cpz-utils:0.2.3`) are resolved transitively by Maven; do
 not add them as manually copied JARs.
@@ -375,7 +375,7 @@ The public control layer is exposed through closed ergonomic facades such as `Bu
 
 `Notification` is a toast-style runtime overlay feature, not a `Control`. It is
 created programmatically through `NotificationManager`, does not consume
-pointer or keyboard input in `0.9.0`, and is not configured inside
+pointer or keyboard input in `0.9.2`, and is not configured inside
 `controls[]`.
 
 Notification manager/style defaults can be loaded from standalone JSON through
@@ -385,7 +385,7 @@ durations, max visible count, and visual style only. It does not define
 messages, trigger notifications, or register `Notification` as a control type.
 
 `ProgressBar` is the non-interactive progress display control introduced before
-the notification work and remains available in `0.9.0`.
+the notification work and remains available in `0.9.2`.
 
 Those facades also share a lightweight public contract, `Control`, for the small transversal surface that is common across the controls without exposing MVVM internals.
 

@@ -151,9 +151,12 @@ positioning, relative sizing, or manual x/y placement APIs in this release.
 `NotificationStyle` controls the visual surface:
 
 ```java
+PFont font = createFont("data/font/JetBrainsMono.ttf", 14.0F);
+
 NotificationStyle style = new NotificationStyle()
         .setWidth(340.0F)
         .setMargin(18.0F)
+        .setFont(font)
         .setTextSize(14.0F)
         .setTextPadding(12.0F)
         .setCornerRadius(8.0F)
@@ -168,6 +171,9 @@ The renderer draws:
 - optional border
 - severity accent strip
 - wrapped message text
+
+`NotificationStyle.setFont(PFont)` configures one global font for the
+`NotificationManager` style. It is not a per-message property.
 
 `setStyle(null)` restores the default style. Negative stroke weight is clamped
 to `0.0F`; `strokeWeight == 0.0F` disables border rendering.
@@ -236,6 +242,7 @@ Supported standalone JSON fields:
     "borderColor": "#404040",
     "strokeWeight": 1.0,
     "cornerRadius": 8.0,
+    "font": "data/font/JetBrainsMono.ttf",
     "textSize": 14.0,
     "textPadding": 12.0,
     "gap": 8.0,
@@ -263,8 +270,14 @@ can set a global duration and then override warning or error durations.
 Colors use the same JSON color parsing convention as other controls: integer
 ARGB values or hexadecimal strings in `#RRGGBB` / `#AARRGGBB` form.
 
-`PFont` remains programmatic in `0.9.0`; the standalone notification JSON style
-does not load fonts.
+`style.font` is optional. When present, `NotificationConfigLoader.load(...)`
+or `NotificationConfigLoader.apply(...)` loads the `PFont` once through the
+shared `FontLoader` and stores it in `NotificationStyle`. The font is global to
+the manager style, not per notification message.
+
+If `style.font` is omitted or `null`, the current/default manager font is
+preserved. Other missing style fields also preserve the values already present
+on the manager style.
 
 Notification messages are still runtime events owned by the sketch:
 

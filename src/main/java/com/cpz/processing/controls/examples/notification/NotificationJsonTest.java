@@ -109,7 +109,7 @@ public class NotificationJsonTest extends PApplet {
         text("Notification JSON config", 64.0F, 42.0F);
         fill(Colors.gray(160));
         textSize(14.0F);
-        text("Standalone JSON config controls placement, durations, and style only.", 250.0F, 104.0F);
+        text("Standalone JSON config controls placement, durations, style, and typography.", 250.0F, 104.0F);
         text("Messages remain runtime events from button callbacks.", 250.0F, 128.0F);
     }
 
