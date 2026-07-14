@@ -13,6 +13,8 @@ import com.cpz.processing.controls.controls.label.LabelFactory;
 import com.cpz.processing.controls.controls.label.config.LabelConfigLoader;
 import com.cpz.processing.controls.controls.numericfield.NumericFieldFactory;
 import com.cpz.processing.controls.controls.numericfield.config.NumericFieldConfigLoader;
+import com.cpz.processing.controls.controls.panel.PanelFactory;
+import com.cpz.processing.controls.controls.panel.config.PanelConfigLoader;
 import com.cpz.processing.controls.controls.progressbar.ProgressBarFactory;
 import com.cpz.processing.controls.controls.progressbar.config.ProgressBarConfigLoader;
 import com.cpz.processing.controls.controls.radiogroup.RadioGroupFactory;
@@ -71,6 +73,7 @@ final class ControlFactoryRegistry {
         RadioGroupConfigLoader radioGroupLoader = new RadioGroupConfigLoader(sketch, sharedTooltipStyles);
         TextFieldConfigLoader textFieldLoader = new TextFieldConfigLoader(sketch, sharedTooltipStyles);
         NumericFieldConfigLoader numericFieldLoader = new NumericFieldConfigLoader(sketch, sharedTooltipStyles);
+        PanelConfigLoader panelLoader = new PanelConfigLoader(sketch);
         DropDownConfigLoader dropDownLoader = new DropDownConfigLoader(sketch, sharedTooltipStyles);
         IndicatorConfigLoader indicatorLoader = new IndicatorConfigLoader(sketch, sharedTooltipStyles);
         ProgressBarConfigLoader progressBarLoader = new ProgressBarConfigLoader(sketch, sharedTooltipStyles);
@@ -84,6 +87,7 @@ final class ControlFactoryRegistry {
         entries.put("radiogroup", (json, path) -> RadioGroupFactory.create(sketch, radioGroupLoader.loadFromJson(json, path)));
         entries.put("textfield", (json, path) -> TextFieldFactory.create(sketch, textFieldLoader.loadFromJson(json, path)));
         entries.put("numericfield", (json, path) -> NumericFieldFactory.create(sketch, numericFieldLoader.loadFromJson(json, path)));
+        entries.put("panel", (json, path) -> PanelFactory.create(sketch, panelLoader.loadFromJson(json, path)));
         entries.put("dropdown", (json, path) -> {
             if (overlayManager == null || inputManager == null) {
                 throw new IllegalArgumentException(

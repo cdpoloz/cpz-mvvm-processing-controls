@@ -15,17 +15,13 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Utility component for drop down overlay controller.
+ * Coordinates drop-down overlay registration and overlay input capture.
  *
- * Responsibilities:
- * - Expose a public architectural role.
- * - Keep responsibilities explicit in the API surface.
- *
- * Behavior:
- * - Keeps the public role isolated from unrelated concerns.
- *
- * Notes:
- * - This type is part of the public project surface.
+ * <p>The controller keeps the expanded list registered with
+ * {@link OverlayManager} and registers a matching high-priority input layer
+ * with {@link InputManager} while the drop-down is expanded. The caller supplies
+ * geometry synchronization callbacks so a parent-aware drop-down can update its
+ * global overlay anchor without the parent knowing about this controller.</p>
  *
  * @author CPZ
  */
@@ -35,32 +31,37 @@ public final class DropDownOverlayController {
    private final DropDownViewModel viewModel;
    private final FocusManager focusManager;
    private final OverlayManager overlayManager;
-   private final InputManager inputManager;
-   private final int zIndex;
-   private final InputLayer inputLayer;
-   private final OverlayEntry overlayEntry;
-   private boolean registered;
+    private final InputManager inputManager;
+    private final int zIndex;
+    private final Runnable syncGlobalGeometry;
+    private final Runnable syncPresentationGeometry;
+    private final InputLayer inputLayer;
+    private final OverlayEntry overlayEntry;
+    private boolean registered;
 
    /**
-    * Creates a drop down overlay controller.
+    * Creates a controller for one drop-down overlay.
     *
-    * @param view parameter used by this operation
-    * @param viewModel parameter used by this operation
-    * @param focusManager parameter used by this operation
-    * @param overlayManager parameter used by this operation
-    * @param inputManager parameter used by this operation
-    * @param zIndex parameter used by this operation
-    *
-    * Behavior:
-    * - Initializes the public state required by this type.
+    * @param view view that renders and hit-tests the base and expanded list
+    * @param viewModel interaction state for the drop-down
+    * @param focusManager focus manager used by the facade
+    * @param overlayManager host-owned overlay manager
+    * @param inputManager host-owned input manager
+    * @param zIndex overlay and input-layer priority
+    * @param syncGlobalGeometry callback that synchronizes the view to global
+    *                           overlay coordinates
+    * @param syncPresentationGeometry callback that restores the collapsed-field
+    *                                 presentation coordinates
     */
-   public DropDownOverlayController(DropDownView view, DropDownViewModel viewModel, FocusManager focusManager, OverlayManager overlayManager, InputManager inputManager, int zIndex) {
+   public DropDownOverlayController(DropDownView view, DropDownViewModel viewModel, FocusManager focusManager, OverlayManager overlayManager, InputManager inputManager, int zIndex, Runnable syncGlobalGeometry, Runnable syncPresentationGeometry) {
       this.view = view;
       this.viewModel = viewModel;
       this.focusManager = focusManager;
       this.overlayManager = overlayManager;
       this.inputManager = inputManager;
       this.zIndex = zIndex;
+      this.syncGlobalGeometry = syncGlobalGeometry;
+      this.syncPresentationGeometry = syncPresentationGeometry;
       this.inputLayer = new OverlayInputLayer(zIndex);
       Objects.requireNonNull(view);
       this.overlayEntry = new OverlayEntry(zIndex, view::draw, this.inputLayer, this::closeOverlay);
@@ -68,10 +69,7 @@ public final class DropDownOverlayController {
    }
 
    /**
-    * Performs sync registration.
-    *
-    * Behavior:
-    * - Executes the public operation exposed by this type.
+    * Registers or unregisters overlay resources according to expanded state.
     */
    public void syncRegistration() {
       if (this.viewModel.isExpanded()) {
@@ -83,10 +81,8 @@ public final class DropDownOverlayController {
    }
 
    /**
-    * Performs dispose.
-    *
-    * Behavior:
-    * - Executes the public operation exposed by this type.
+    * Unregisters overlay resources and removes this controller from sibling
+    * transfer coordination.
     */
    public void dispose() {
       this.unregister();
@@ -94,15 +90,13 @@ public final class DropDownOverlayController {
    }
 
    /**
-    * Performs close overlay.
-    *
-    * Behavior:
-    * - Executes the public operation exposed by this type.
+    * Closes the expanded list and unregisters its overlay resources.
     */
    public void closeOverlay() {
       this.viewModel.close();
       this.view.clearHoverState();
       this.unregister();
+      this.syncPresentation();
       if (this.focusManager != null && this.focusManager.isFocused(this.viewModel)) {
          this.focusManager.clearFocus();
       }
@@ -126,7 +120,7 @@ public final class DropDownOverlayController {
 
    private boolean routePressToSibling(PointerEvent event) {
       for(DropDownOverlayController dropDownOverlayController : CONTROLLERS) {
-         if (dropDownOverlayController != this && dropDownOverlayController.viewModel.isVisible() && dropDownOverlayController.viewModel.isEnabled() && dropDownOverlayController.view.contains(event.getX(), event.getY())) {
+         if (dropDownOverlayController != this && dropDownOverlayController.containsGlobalBase(event.getX(), event.getY())) {
             this.closeOverlay();
             dropDownOverlayController.handleTransferredPress(event.getX(), event.getY());
             return true;
@@ -137,8 +131,32 @@ public final class DropDownOverlayController {
    }
 
    private void handleTransferredPress(float x, float y) {
+      this.syncGlobal();
       this.view.handleMousePress(x, y, this.focusManager);
       this.syncRegistration();
+      this.syncPresentation();
+   }
+
+   private boolean containsGlobalBase(float x, float y) {
+      if (!this.viewModel.isVisible() || !this.viewModel.isEnabled()) {
+         return false;
+      }
+      this.syncGlobal();
+      boolean contains = this.view.containsBaseBounds(x, y);
+      this.syncPresentation();
+      return contains;
+   }
+
+   private void syncGlobal() {
+      if (this.syncGlobalGeometry != null) {
+         this.syncGlobalGeometry.run();
+      }
+   }
+
+   private void syncPresentation() {
+      if (this.syncPresentationGeometry != null) {
+         this.syncPresentationGeometry.run();
+      }
    }
 
    private final class OverlayInputLayer extends DefaultInputLayer {

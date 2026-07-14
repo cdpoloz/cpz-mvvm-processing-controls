@@ -18,10 +18,12 @@ The first implementation is intentionally small:
 
 - it stores an ordered list of child `Control` instances
 - it draws children relative to the panel position
+- it can draw optional runtime-configurable background and border chrome
 - it routes pointer input from global coordinates into panel-local coordinates
 - it exposes group-level `visible`, `enabled`, and `setPosition(...)`
 
-It does not perform automatic layout or visual container rendering.
+It does not perform automatic layout, padding, clipping, scroll, headers, or
+titles.
 
 ---
 
@@ -43,10 +45,7 @@ not rewrite child positions.
 Controls that implement the relative geometry API can opt into explicit
 relative bounds with `ControlBounds.relative(...)`. This includes `Panel`,
 `Button`, `Label`, `Checkbox`, `Toggle`, `Slider`, `TextField`,
-`NumericField`, `RadioGroup`, `Indicator`, and `ProgressBar`. `DropDown` can
-use relative bounds as a root control, but full `DropDown` support inside a
-panel remains outside the panel MVP because its expanded list uses a global
-overlay.
+`NumericField`, `RadioGroup`, `Indicator`, `ProgressBar`, and `DropDown`.
 
 Absolute constructors and setters remain the default behavior.
 
@@ -80,15 +79,14 @@ panel height.
 
 Relative text size is supported by `Button`, `Label`, `TextField`,
 `NumericField`, `RadioGroup`, `DropDown`, and the value text rendered by
-`Slider`. `DropDown` is still not supported as an interactive panel child.
+`Slider`.
 
 For `RadioGroup`, relative bounds height maps to the item height; the total
 group height is still derived from options and item spacing.
 
 JSON supports relative bounds for the registered root controls, including
-controls that can later be added to a panel from Java. `Panel` itself is not a
-JSON control type yet, and JSON does not define `Panel.children` in this
-iteration.
+`Panel` and controls that can later be added to a panel from Java. JSON does
+not define `Panel.children` in this iteration.
 
 ---
 
@@ -106,8 +104,142 @@ popMatrix();
 The matrix is restored in a `finally` block, so one child draw failure cannot
 leave the sketch in a translated coordinate system.
 
-`Panel` currently does not draw a background, border, padding, or clipping
-region. A sketch can draw a simple frame behind it when needed.
+The visual chrome is drawn before the local child transform. Panel style does
+not add padding and does not change child coordinates.
+
+---
+
+## Runtime Style
+
+`Panel` supports visual styling through direct setters, a mutable `PanelStyle`
+object, or the JSON `style` block documented below:
+
+```java
+Panel panel = new Panel(this, "pnlSettings", 100, 80, 320, 220);
+
+panel.setBackgroundColor(0xFF20242A);
+panel.setBackgroundVisible(true);
+
+panel.setStrokeColor(0xFF6D7682);
+panel.setStrokeVisible(true);
+panel.setStrokeWeight(2.0f);
+
+panel.setCornerRadius(10.0f);
+```
+
+Equivalent style-object usage:
+
+```java
+PanelStyle style = new PanelStyle()
+        .setBackgroundColor(0xFF20242A)
+        .setBackgroundVisible(true)
+        .setStrokeColor(0xFF6D7682)
+        .setStrokeVisible(true)
+        .setStrokeWeight(2.0f)
+        .setCornerRadius(10.0f);
+
+panel.setStyle(style);
+```
+
+The available runtime properties are:
+
+- `backgroundColor`
+- `backgroundVisible`
+- `strokeColor`
+- `strokeVisible`
+- `strokeWeight`
+- `cornerRadius`
+
+Defaults preserve the previous panel appearance: background and stroke are both
+hidden. Default `strokeWeight` is `1.0f`; default `cornerRadius` is `0.0f`.
+
+Color getters return effective colors. If no explicit color was set, the panel
+resolves `backgroundColor` from the current theme `surface` token and
+`strokeColor` from the current theme `border` token. Visibility getters and
+numeric getters return the configured runtime values.
+
+`getStyle()` returns the live mutable `PanelStyle` instance, matching the simple
+style-object precedent used by controls such as `ProgressBar`. `setStyle(null)`
+resets the panel to a new default style.
+
+Negative `strokeWeight` and `cornerRadius` values are normalized to `0.0f`.
+`NaN` and infinite values throw `IllegalArgumentException`.
+
+Hiding the background or stroke only affects drawing:
+
+```java
+panel.setBackgroundVisible(false); // children and input still work
+panel.setStrokeVisible(false);     // background and children still draw
+```
+
+Style changes are applied on the next `draw()` call. They do not modify bounds,
+do not move children, do not affect panel input routing, and do not alter
+`DropDown` overlay positioning.
+
+JSON style initializes the same live `PanelStyle` instance used by the runtime
+API, so later setter calls override the loaded values without rebuilding the
+panel.
+
+---
+
+## JSON Style
+
+`Panel` JSON accepts an optional nested `style` block:
+
+```json
+{
+  "type": "panel",
+  "code": "settingsPanel",
+  "x": 100,
+  "y": 80,
+  "width": 320,
+  "height": 220,
+  "enabled": true,
+  "visible": true,
+  "style": {
+    "backgroundVisible": true,
+    "backgroundColor": "#20242A",
+    "strokeVisible": true,
+    "strokeColor": "#6D7682",
+    "strokeWeight": 2.0,
+    "cornerRadius": 10.0
+  }
+}
+```
+
+All style properties are optional. An empty style block preserves the same
+defaults as an omitted style block. A partial style is valid:
+
+```json
+{
+  "style": {
+    "backgroundVisible": true
+  }
+}
+```
+
+Supported properties:
+
+- `backgroundVisible`: whether the background is drawn
+- `backgroundColor`: background color using the common JSON color parser
+- `strokeVisible`: whether the border is drawn
+- `strokeColor`: border color using the common JSON color parser
+- `strokeWeight`: border thickness
+- `cornerRadius`: corner radius
+
+Missing color properties remain unset in `PanelStyle` and resolve dynamically
+from the current theme: `surface` for background and `border` for stroke.
+Explicit colors have priority over theme fallbacks. Missing visibility and
+numeric properties keep the `PanelStyle` defaults: hidden background, hidden
+stroke, `strokeWeight = 1.0f`, and `cornerRadius = 0.0f`.
+
+Colors use the same formats as other JSON styles, including integer values,
+`#RRGGBB`, and `#AARRGGBB`. Negative `strokeWeight` and `cornerRadius` values
+are normalized to `0.0f`; invalid types or color formats fail during
+configuration loading.
+
+JSON style does not add padding, layout, clipping, scroll, titles, shadows, or
+child declarations.
 
 ---
 
@@ -124,10 +256,80 @@ inputManager.registerLayer(new PanelInputLayer(0, panel));
 
 The layer receives normal sketch-space `PointerEvent` instances. The panel
 subtracts its own `x` and `y` before routing the event to compatible children.
+Children are consulted from last added to first added, so later children have
+the first chance to consume pointer input.
 
 Keyboard routing is available for children that implement the optional
 `KeyboardRoutableControl` contract, such as `TextField`, `NumericField`, and
 `RadioGroup`.
+
+`DropDown` can also be added programmatically as a panel child:
+
+```java
+Panel panel = new Panel(this, "pnlSettings", 100, 80, 320, 220);
+
+DropDown dropDown = new DropDown(
+        this,
+        overlayManager,
+        inputManager,
+        "ddSettings",
+        List.of("Low", "Medium", "High"),
+        0,
+        0,
+        160,
+        28
+);
+dropDown.setPosition(20, 40);
+
+panel.add(dropDown);
+```
+
+The drop-down base keeps its coordinates local to the panel, while the expanded
+list still renders through `OverlayManager` in sketch/global space. The
+expanded list also registers its normal overlay input layer with higher
+priority than the panel layer, so the panel does not block selection outside
+its bounds. Do not register a standalone `DropDownInputLayer` for the same
+instance after adding it to a panel; the panel routes the collapsed field and
+the dropdown keeps its own overlay input while expanded. JSON child definitions
+for `Panel` remain outside this feature.
+
+---
+
+## JSON Composition
+
+`Panel` can be loaded as a root control from `ControlConfigLoader`. The JSON
+entry supports `type`, `code`, bounds, `visible`, `enabled`, and the optional
+`style` block described above.
+
+`Panel.children` is not a JSON feature yet. For a JSON-driven panel/dropdown
+composition, load both controls from the same `controls[]` document and compose
+them in Java:
+
+```java
+ControlConfigLoader loader = new ControlConfigLoader(this, overlayManager, inputManager);
+Map<String, Control> controls = loader.load("data/config/panel-dropdown.json");
+
+Panel panel = (Panel) controls.get("pnlJsonDropDown");
+DropDown dropDown = (DropDown) controls.get("ddPanelMode");
+
+panel.add(dropDown);
+```
+
+Register input after composing the final tree:
+
+```java
+inputManager.registerLayer(new PanelInputLayer(0, panel));
+```
+
+If the document also contains an external control behind the panel, register it
+in its own lower-priority layer. Do not register the composed `DropDown` as a
+standalone input target as well.
+
+The `DropDown` coordinates from JSON become local to the panel after
+`panel.add(dropDown)`. Its expanded list remains a global overlay managed by
+`OverlayManager`, so it is not clipped by the panel bounds. The panel style in
+`data/config/panel-dropdown.json` is loaded from JSON; the parent-child
+relationship is still established in Java. See `PanelDropDownJsonTest`.
 
 ---
 
@@ -143,12 +345,9 @@ The current panel input route supports these child controls:
 - `TextField`
 - `NumericField`
 - `RadioGroup`
+- `DropDown` for runtime/programmatic composition
 - non-interactive `Control` children such as `Label`
 - non-interactive status/display controls such as `Indicator` and `ProgressBar`
-
-`DropDown` is not supported as an interactive panel child yet. Its collapsed
-control can use relative bounds as a root control, but its expanded list is
-managed through a global overlay and is not translated through `PanelInputLayer`.
 
 ---
 
@@ -165,6 +364,10 @@ click-through.
 When the panel is made visible or enabled again, child states that existed
 before the panel-level suppression are restored.
 
+For controls with parent-aware overlays, such as `DropDown`, hiding or
+disabling the panel suppresses the child and closes any active overlay through
+the child control's normal visibility/enabled lifecycle.
+
 ---
 
 ## Child Management
@@ -180,6 +383,13 @@ panel.children();
 ```
 
 `children()` returns an unmodifiable ordered view.
+
+Removing a child clears the parent context from controls that implement the
+optional parent-context contract and restores any visibility/enabled state that
+the panel had temporarily suppressed. `clear()` applies the same removal flow to
+all children. A removed child can be reused as a standalone control or added to
+another parent; parent-aware controls close active overlays when they are
+removed so no panel-owned overlay remains interactive.
 
 ---
 
@@ -272,16 +482,15 @@ the panel tooltip wrapper.
 
 ## Current Limitations
 
-The MVP intentionally does not include:
+The current implementation intentionally does not include:
 
-- JSON creation or hierarchical JSON
+- `Panel.children` in JSON
 - automatic layout
+- padding
 - clipping
-- formal background, border, or padding API
-- full `DropDown` support inside a panel
-
-`DropDown` uses overlay registration in sketch coordinates, so it remains
-outside the panel MVP.
+- scroll
+- headers or titles
+- shadows
 
 ---
 

@@ -1,0 +1,89 @@
+{
+  "controls": [
+    {
+      "type": "panel",
+      "code": "pnlJsonDropDown",
+      "x": 170.0,
+      "y": 110.0,
+      "width": 320.0,
+      "height": 150.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "backgroundVisible": true,
+        "backgroundColor": "#EA20242A",
+        "strokeVisible": true,
+        "strokeColor": "#FF6D7682",
+        "strokeWeight": 3.0,
+        "cornerRadius": 12.0
+      }
+    },
+    {
+      "type": "dropdown",
+      "code": "ddPanelMode",
+      "items": ["Sketch", "Preview", "Export", "Archive", "Inspect", "Review", "Ship"],
+      "selectedIndex": 1,
+      "x": 168.0,
+      "y": 42.0,
+      "width": 180.0,
+      "height": 30.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "baseFillOverride": "#EEF3F8",
+        "listFillOverride": "#FAFCFE",
+        "textOverride": "#1D2A38",
+        "borderOverride": "#54799A",
+        "focusedBorderOverride": "#2684D4",
+        "hoverItemOverlayOverride": "#302684D4",
+        "selectedItemOverlayOverride": "#482684D4",
+        "cornerRadius": 5.0,
+        "listCornerRadius": 7.0,
+        "textSize": 13.0,
+        "font": "data/font/JetBrainsMono.ttf",
+        "itemHeight": 24.0,
+        "maxVisibleItems": 7
+      }
+    },
+    {
+      "type": "button",
+      "code": "btnPanelApply",
+      "text": "Apply mode",
+      "x": 168.0,
+      "y": 108.0,
+      "width": 180.0,
+      "height": 34.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "baseColor": "#E8F0F6",
+        "textColor": "#1D2A38",
+        "strokeColor": "#54799A",
+        "hoverBlendWithWhite": 0.18,
+        "pressedBlendWithBlack": 0.12,
+        "textSize": 13.0,
+        "font": "data/font/JetBrainsMono.ttf"
+      }
+    },
+    {
+      "type": "button",
+      "code": "btnBehindPanel",
+      "text": "Behind overlay target",
+      "x": 325.0,
+      "y": 304.0,
+      "width": 240.0,
+      "height": 36.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "baseColor": "#2A3D54",
+        "textColor": "#F5FAFF",
+        "strokeColor": "#7CA8C8",
+        "hoverBlendWithWhite": 0.15,
+        "pressedBlendWithBlack": 0.18,
+        "textSize": 13.0,
+        "font": "data/font/JetBrainsMono.ttf"
+      }
+    }
+  ]
+}

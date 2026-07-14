@@ -85,11 +85,16 @@ The current registry supports:
 - `radiogroup`
 - `textfield`
 - `numericfield`
+- `panel`
 - `dropdown`
 - `indicator`
 - `progressbar`
 
 `dropdown` requires `OverlayManager` and `InputManager` when the main loader is used, because those are already required by the public `DropDown` facade.
+
+`panel` supports identity, bounds, visibility, enabled state, and an optional
+nested `style` block for background, border, stroke weight, and corner radius.
+It does not define declarative child composition.
 
 `Notification` is intentionally not listed here. Notifications are
 programmatic runtime UI events, not durable control facades. They are not
@@ -187,13 +192,155 @@ Multi-control document:
 
 The document defines structure only. Any listener wiring or binding still belongs to the sketch.
 
+Panel composition follows the same rule. JSON can define the independent
+controls:
+
+```json
+{
+  "controls": [
+    {
+      "type": "panel",
+      "code": "settingsPanel",
+      "x": 100,
+      "y": 80,
+      "width": 320,
+      "height": 220,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "backgroundVisible": true,
+        "backgroundColor": "#20242A",
+        "strokeVisible": true,
+        "strokeColor": "#6D7682",
+        "strokeWeight": 2.0,
+        "cornerRadius": 10.0
+      }
+    },
+    {
+      "type": "dropdown",
+      "code": "modeDropDown",
+      "items": ["Low", "Medium", "High"],
+      "selectedIndex": 1,
+      "x": 20,
+      "y": 40,
+      "width": 160,
+      "height": 28
+    }
+  ]
+}
+```
+
+The parent-child relationship is still resolved in Java:
+
+```java
+ControlConfigLoader loader = new ControlConfigLoader(this, overlayManager, inputManager);
+Map<String, Control> controls = loader.load("data/config/panel-dropdown.json");
+
+Panel panel = (Panel) controls.get("settingsPanel");
+DropDown dropDown = (DropDown) controls.get("modeDropDown");
+
+panel.add(dropDown);
+```
+
+Register input after the Java composition is complete:
+
+```java
+inputManager.registerLayer(new PanelInputLayer(0, panel));
+```
+
+After `panel.add(dropDown)`, the drop-down coordinates are interpreted as local
+to the panel. The expanded list continues to render through `OverlayManager` as
+a global overlay. Do not also register that same composed drop-down through a
+standalone `DropDownInputLayer`; standalone drop-down registration remains
+valid only for drop-downs that are not routed by a panel. `Panel.children` JSON
+is not part of this format yet.
+
+## Panel Style
+
+Panel visual style is configured through an optional nested `style` object:
+
+```json
+{
+  "type": "panel",
+  "code": "styledPanel",
+  "x": 100,
+  "y": 80,
+  "width": 320,
+  "height": 220,
+  "enabled": true,
+  "visible": true,
+  "style": {
+    "backgroundVisible": true,
+    "backgroundColor": "#EA20242A",
+    "strokeVisible": true,
+    "strokeColor": "#FF6D7682",
+    "strokeWeight": 3.0,
+    "cornerRadius": 12.0
+  }
+}
+```
+
+All properties are optional:
+
+- `backgroundVisible`
+- `backgroundColor`
+- `strokeVisible`
+- `strokeColor`
+- `strokeWeight`
+- `cornerRadius`
+
+A partial style keeps defaults for omitted properties:
+
+```json
+{
+  "style": {
+    "backgroundVisible": true
+  }
+}
+```
+
+An empty style block is also valid and keeps every `PanelStyle` default:
+
+```json
+{
+  "style": {}
+}
+```
+
+Defaults match `PanelStyle`: background hidden, stroke hidden,
+`strokeWeight = 1.0`, and `cornerRadius = 0.0`. If `backgroundColor` or
+`strokeColor` is omitted, the runtime style keeps the color unset and resolves
+the effective color from the active theme (`surface` for background, `border`
+for stroke). Explicit JSON colors keep priority over theme fallback colors.
+
+Colors use the common JSON color parser used by the other controls. Supported
+formats include integer colors, `#RRGGBB`, and `#AARRGGBB`. Negative
+`strokeWeight` and `cornerRadius` values are normalized to `0.0` by the runtime
+style. Invalid types, invalid colors, or a non-object `style` value fail during
+configuration loading.
+
+The loaded values initialize the same live `PanelStyle` used by the runtime
+API:
+
+```java
+Panel panel = (Panel) controls.get("styledPanel");
+panel.setStrokeVisible(false);
+panel.setCornerRadius(20.0f);
+```
+
+Panel JSON style does not define padding, layout, clipping, scroll, titles,
+shadows, or `Panel.children`. A `Panel + DropDown` composition still loads both
+controls independently from JSON and calls `panel.add(dropDown)` in Java.
+
 Canonical examples:
 
 - `JsonMultiControlUnidirectionalBindingTest`
 - `JsonMultiControlBindingTest`
+- `PanelDropDownJsonTest`
 - `data/config/json-multicontrol-binding-test.json`
+- `data/config/panel-dropdown.json`
 
-Those examples keep the scope intentionally small:
+The multi-control binding examples keep their scope intentionally small:
 
 - `Label` for title
 - `Label` for help text
@@ -211,7 +358,7 @@ They demonstrate:
 
 The unidirectional sketch is the base pattern: one slider listener updates the numeric field and label. The bidirectional sketch keeps the same JSON and composition, then adds one numeric-field listener, one extra sync routine, and a local anti-loop guard.
 
-Those examples are intentionally explicit:
+Those binding examples are intentionally explicit:
 
 - JSON defines the controls, layout, style, and base text
 - the sketch performs binding and derived-state updates
@@ -256,6 +403,7 @@ The framework still includes control-specific loaders such as:
 - `RadioGroupConfigLoader`
 - `TextFieldConfigLoader`
 - `NumericFieldConfigLoader`
+- `PanelConfigLoader`
 - `DropDownConfigLoader`
 - `IndicatorConfigLoader`
 - `ProgressBarConfigLoader`

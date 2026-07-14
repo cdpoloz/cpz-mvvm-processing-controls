@@ -4,12 +4,15 @@ import com.cpz.processing.controls.controls.Control;
 import com.cpz.processing.controls.controls.button.Button;
 import com.cpz.processing.controls.controls.button.input.ButtonInputLayer;
 import com.cpz.processing.controls.controls.panel.input.PanelInputLayer;
+import com.cpz.processing.controls.controls.panel.style.PanelStyle;
 import com.cpz.processing.controls.controls.textfield.TextField;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipTarget;
+import com.cpz.processing.controls.core.theme.LightTheme;
+import com.cpz.processing.controls.core.theme.ThemeSnapshot;
 import org.junit.jupiter.api.Test;
 import processing.core.PApplet;
 
@@ -17,7 +20,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PanelTest {
@@ -26,6 +31,176 @@ class PanelTest {
         Control panel = new Panel(new PApplet(), "panel", 100.0F, 80.0F, 240.0F, 160.0F);
 
         assertEquals("panel", panel.getCode());
+    }
+
+    @Test
+    void defaultStyleKeepsPanelVisuallyTransparent() {
+        ThemeSnapshot light = new ThemeSnapshot(new LightTheme());
+        Panel panel = new Panel(new PApplet(), "panel", 100.0F, 80.0F, 240.0F, 160.0F);
+
+        assertNotNull(panel.getStyle());
+        assertFalse(panel.isBackgroundVisible());
+        assertFalse(panel.isStrokeVisible());
+        assertEquals(PanelStyle.DEFAULT_STROKE_WEIGHT, panel.getStrokeWeight());
+        assertEquals(PanelStyle.DEFAULT_CORNER_RADIUS, panel.getCornerRadius());
+        assertEquals(light.tokens.surface, panel.getBackgroundColor());
+        assertEquals(light.tokens.border, panel.getStrokeColor());
+    }
+
+    @Test
+    void directStyleSettersUpdateRuntimeStyle() {
+        Panel panel = new Panel(new PApplet(), "panel", 100.0F, 80.0F, 240.0F, 160.0F);
+
+        panel.setBackgroundColor(0xFF20242A);
+        panel.setBackgroundVisible(true);
+        panel.setStrokeColor(0xFF6D7682);
+        panel.setStrokeVisible(true);
+        panel.setStrokeWeight(2.5F);
+        panel.setCornerRadius(10.0F);
+
+        assertEquals(0xFF20242A, panel.getBackgroundColor());
+        assertTrue(panel.isBackgroundVisible());
+        assertEquals(0xFF6D7682, panel.getStrokeColor());
+        assertTrue(panel.isStrokeVisible());
+        assertEquals(2.5F, panel.getStrokeWeight());
+        assertEquals(10.0F, panel.getCornerRadius());
+    }
+
+    @Test
+    void styleObjectCanBeAssignedAndNullResetsToDefaults() {
+        Panel panel = new Panel(new PApplet(), "panel", 100.0F, 80.0F, 240.0F, 160.0F);
+        PanelStyle style = new PanelStyle()
+                .setBackgroundColor(0xFF101820)
+                .setBackgroundVisible(true)
+                .setStrokeColor(0xFF80A0C0)
+                .setStrokeVisible(true)
+                .setStrokeWeight(3.0F)
+                .setCornerRadius(12.0F);
+
+        panel.setStyle(style);
+
+        assertSame(style, panel.getStyle());
+        assertEquals(0xFF101820, panel.getBackgroundColor());
+        assertEquals(0xFF80A0C0, panel.getStrokeColor());
+        assertEquals(3.0F, panel.getStrokeWeight());
+        assertEquals(12.0F, panel.getCornerRadius());
+
+        panel.setStyle(null);
+
+        assertNotNull(panel.getStyle());
+        assertFalse(panel.isBackgroundVisible());
+        assertFalse(panel.isStrokeVisible());
+        assertEquals(PanelStyle.DEFAULT_STROKE_WEIGHT, panel.getStrokeWeight());
+        assertEquals(PanelStyle.DEFAULT_CORNER_RADIUS, panel.getCornerRadius());
+    }
+
+    @Test
+    void invalidStyleNumbersAreHandledConsistently() {
+        Panel panel = new Panel(new PApplet(), "panel", 100.0F, 80.0F, 240.0F, 160.0F);
+
+        panel.setStrokeWeight(-2.0F);
+        panel.setCornerRadius(-4.0F);
+
+        assertEquals(0.0F, panel.getStrokeWeight());
+        assertEquals(0.0F, panel.getCornerRadius());
+        assertThrows(IllegalArgumentException.class, () -> panel.setStrokeWeight(Float.NaN));
+        assertThrows(IllegalArgumentException.class, () -> panel.setStrokeWeight(Float.POSITIVE_INFINITY));
+        assertThrows(IllegalArgumentException.class, () -> panel.setCornerRadius(Float.NaN));
+        assertThrows(IllegalArgumentException.class, () -> panel.setCornerRadius(Float.NEGATIVE_INFINITY));
+    }
+
+    @Test
+    void drawUsesConfiguredBackgroundStrokeWeightAndCornerRadius() {
+        RecordingApplet sketch = new RecordingApplet();
+        Panel panel = new Panel(sketch, "panel", 100.0F, 80.0F, 240.0F, 160.0F);
+        panel.setBackgroundColor(0xFF20242A);
+        panel.setBackgroundVisible(true);
+        panel.setStrokeColor(0xFF6D7682);
+        panel.setStrokeVisible(true);
+        panel.setStrokeWeight(2.0F);
+        panel.setCornerRadius(10.0F);
+
+        panel.draw();
+
+        assertEquals(1, sketch.pushStyleCalls);
+        assertEquals(1, sketch.popStyleCalls);
+        assertEquals(1, sketch.rectModeCalls);
+        assertEquals(1, sketch.fillCalls);
+        assertEquals(0xFF20242A, sketch.lastFillColor);
+        assertEquals(1, sketch.strokeCalls);
+        assertEquals(0xFF6D7682, sketch.lastStrokeColor);
+        assertEquals(2.0F, sketch.lastStrokeWeight);
+        assertEquals(1, sketch.rectCalls);
+        assertEquals(100.0F, sketch.lastRectX);
+        assertEquals(80.0F, sketch.lastRectY);
+        assertEquals(240.0F, sketch.lastRectWidth);
+        assertEquals(160.0F, sketch.lastRectHeight);
+        assertEquals(10.0F, sketch.lastRectRadius);
+        assertEquals(1, sketch.pushMatrixCalls);
+        assertEquals(1, sketch.popMatrixCalls);
+    }
+
+    @Test
+    void drawSupportsHiddenBackgroundOrHiddenStroke() {
+        RecordingApplet sketch = new RecordingApplet();
+        Panel panel = new Panel(sketch, "panel", 100.0F, 80.0F, 240.0F, 160.0F);
+
+        panel.setBackgroundVisible(false);
+        panel.setStrokeVisible(true);
+        panel.draw();
+
+        assertEquals(1, sketch.noFillCalls);
+        assertEquals(1, sketch.strokeCalls);
+
+        sketch.resetRenderCalls();
+        panel.setBackgroundVisible(true);
+        panel.setStrokeVisible(false);
+        panel.draw();
+
+        assertEquals(1, sketch.fillCalls);
+        assertEquals(1, sketch.noStrokeCalls);
+        assertEquals(0, sketch.strokeCalls);
+    }
+
+    @Test
+    void childrenDrawWhenBackgroundAndStrokeAreHidden() {
+        RecordingApplet sketch = new RecordingApplet();
+        Panel panel = new Panel(sketch, "panel", 100.0F, 80.0F, 240.0F, 160.0F);
+        RecordingControl child = new RecordingControl("child");
+        panel.add(child);
+
+        panel.setBackgroundVisible(false);
+        panel.setStrokeVisible(false);
+        panel.draw();
+
+        assertEquals(0, sketch.rectCalls);
+        assertEquals(0, sketch.pushStyleCalls);
+        assertEquals(1, child.drawCalls);
+        assertEquals(100.0F, sketch.lastTranslateX);
+        assertEquals(80.0F, sketch.lastTranslateY);
+    }
+
+    @Test
+    void styleChangesDoNotChangeBoundsOrChildCoordinates() {
+        RecordingApplet sketch = new RecordingApplet();
+        Panel panel = new Panel(sketch, "panel", 100.0F, 80.0F, 240.0F, 160.0F);
+        RecordingControl child = new RecordingControl("child");
+        panel.add(child);
+
+        panel.setBackgroundVisible(true);
+        panel.setStrokeVisible(true);
+        panel.setStrokeWeight(4.0F);
+        panel.setCornerRadius(16.0F);
+        panel.draw();
+
+        assertEquals(100.0F, panel.getX());
+        assertEquals(80.0F, panel.getY());
+        assertEquals(240.0F, panel.getWidth());
+        assertEquals(160.0F, panel.getHeight());
+        assertEquals(0, child.setPositionCalls);
+        assertEquals(1, child.drawCalls);
+        assertEquals(100.0F, sketch.lastTranslateX);
+        assertEquals(80.0F, sketch.lastTranslateY);
     }
 
     @Test
@@ -161,8 +336,24 @@ class PanelTest {
     private static final class RecordingApplet extends PApplet {
         private int pushMatrixCalls;
         private int popMatrixCalls;
+        private int pushStyleCalls;
+        private int popStyleCalls;
+        private int rectModeCalls;
+        private int rectCalls;
+        private int fillCalls;
+        private int noFillCalls;
+        private int strokeCalls;
+        private int noStrokeCalls;
         private float lastTranslateX;
         private float lastTranslateY;
+        private float lastRectX;
+        private float lastRectY;
+        private float lastRectWidth;
+        private float lastRectHeight;
+        private float lastRectRadius;
+        private int lastFillColor;
+        private int lastStrokeColor;
+        private float lastStrokeWeight;
 
         @Override
         public void pushMatrix() {
@@ -178,6 +369,72 @@ class PanelTest {
         public void translate(float x, float y) {
             this.lastTranslateX = x;
             this.lastTranslateY = y;
+        }
+
+        @Override
+        public void pushStyle() {
+            this.pushStyleCalls++;
+        }
+
+        @Override
+        public void popStyle() {
+            this.popStyleCalls++;
+        }
+
+        @Override
+        public void rectMode(int mode) {
+            this.rectModeCalls++;
+        }
+
+        @Override
+        public void fill(int rgb) {
+            this.fillCalls++;
+            this.lastFillColor = rgb;
+        }
+
+        @Override
+        public void noFill() {
+            this.noFillCalls++;
+        }
+
+        @Override
+        public void stroke(int rgb) {
+            this.strokeCalls++;
+            this.lastStrokeColor = rgb;
+        }
+
+        @Override
+        public void strokeWeight(float weight) {
+            this.lastStrokeWeight = weight;
+        }
+
+        @Override
+        public void noStroke() {
+            this.noStrokeCalls++;
+        }
+
+        @Override
+        public void rect(float a, float b, float c, float d, float r) {
+            this.rectCalls++;
+            this.lastRectX = a;
+            this.lastRectY = b;
+            this.lastRectWidth = c;
+            this.lastRectHeight = d;
+            this.lastRectRadius = r;
+        }
+
+        private void resetRenderCalls() {
+            this.pushStyleCalls = 0;
+            this.popStyleCalls = 0;
+            this.rectModeCalls = 0;
+            this.rectCalls = 0;
+            this.fillCalls = 0;
+            this.noFillCalls = 0;
+            this.strokeCalls = 0;
+            this.noStrokeCalls = 0;
+            this.lastFillColor = 0;
+            this.lastStrokeColor = 0;
+            this.lastStrokeWeight = 0.0F;
         }
     }
 

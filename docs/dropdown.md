@@ -115,6 +115,17 @@ Behavior:
 - while expanded, that overlay layer captures pointer events and prevents click-through to unrelated controls
 - when the user clicks another dropdown, the current overlay closes and the interaction is transferred internally
 
+When a `DropDown` is added to a `Panel`, do not also register a standalone
+`DropDownInputLayer` for that same instance. The panel routes input to the
+collapsed field, and the dropdown still registers its own overlay layer while
+expanded.
+
+The JSON-driven panel example follows this pattern: `PanelDropDownJsonTest`
+loads `Panel` and `DropDown` entries from `data/config/panel-dropdown.json`,
+then establishes the parent-child relationship with `panel.add(dropDown)`.
+The dropdown coordinates from JSON are interpreted as local after composition,
+while the expanded list remains a global overlay.
+
 ---
 
 ## Focus behavior

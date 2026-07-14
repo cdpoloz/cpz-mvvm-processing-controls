@@ -1,7 +1,9 @@
 package com.cpz.processing.controls.controls.dropdown;
 
 import com.cpz.processing.controls.common.binding.ValueListener;
+import com.cpz.processing.controls.controls.ParentContextAwareControl;
 import com.cpz.processing.controls.controls.ParentSizeAwareControl;
+import com.cpz.processing.controls.controls.PointerRoutableControl;
 import com.cpz.processing.controls.controls.dropdown.config.DropDownStyleConfig;
 import com.cpz.processing.controls.controls.dropdown.input.DropDownInputAdapter;
 import com.cpz.processing.controls.controls.dropdown.model.DropDownModel;
@@ -31,9 +33,19 @@ import java.util.Objects;
 /**
  * Convenience facade for the drop down control.
  *
+ * <p>Standalone usage routes the collapsed field through
+ * {@code DropDownInputLayer}. When the same facade is added to a {@code Panel},
+ * the panel routes pointer input to the collapsed field in panel-local
+ * coordinates. In both cases the expanded list remains a global overlay managed
+ * through the supplied {@code OverlayManager} and {@code InputManager}.</p>
+ *
+ * <p>The facade implements {@code ParentContextAwareControl} so a parent
+ * container can supply its resolved sketch-space offset without depending on
+ * drop-down-specific code.</p>
+ *
  * @author CPZ
  */
-public final class DropDown implements ParentSizeAwareControl, TooltipAttachable {
+public final class DropDown implements PointerRoutableControl, ParentSizeAwareControl, ParentContextAwareControl, TooltipAttachable {
     private static final int DEFAULT_OVERLAY_Z_INDEX = 100;
 
     private final PApplet sketch;
@@ -49,6 +61,12 @@ public final class DropDown implements ParentSizeAwareControl, TooltipAttachable
     private boolean textSizeStyleIsolated;
     private Float parentWidth;
     private Float parentHeight;
+    private float parentOffsetX;
+    private float parentOffsetY;
+    private float localX;
+    private float localY;
+    private float resolvedWidth;
+    private float resolvedHeight;
 
     public DropDown(PApplet sketch, OverlayManager overlayManager, InputManager inputManager, List<String> items, float x, float y, float width, float height) {
         this(sketch, overlayManager, inputManager, ControlCode.auto("dropdown"), items, -1, x, y, width, height);
@@ -95,14 +113,24 @@ public final class DropDown implements ParentSizeAwareControl, TooltipAttachable
                 resolvedBounds.height()
         );
         this.focusManager = new FocusManager();
-        this.overlayController = new DropDownOverlayController(this.view, this.viewModel, this.focusManager, overlayManager, inputManager, DEFAULT_OVERLAY_Z_INDEX);
+        this.overlayController = new DropDownOverlayController(
+                this.view,
+                this.viewModel,
+                this.focusManager,
+                overlayManager,
+                inputManager,
+                DEFAULT_OVERLAY_Z_INDEX,
+                this::applyGlobalGeometry,
+                this::syncViewGeometry
+        );
         this.inputAdapter = new DropDownInputAdapter(this.view, this.viewModel, this.focusManager, this.overlayController);
-        this.tooltipSupport = new TooltipSupport(this.view::getTooltipBounds, this::isVisible);
+        this.tooltipSupport = new TooltipSupport(this::getLocalTooltipBounds, this::isVisible);
+        this.captureResolvedGeometry(resolvedBounds);
     }
 
     public void draw() {
         this.applyResolvedGeometryAndTextSize();
-        this.overlayController.syncRegistration();
+        this.syncOverlayState();
         if (!this.viewModel.isExpanded()) {
             this.view.draw();
         }
@@ -112,8 +140,16 @@ public final class DropDown implements ParentSizeAwareControl, TooltipAttachable
         this.applyResolvedGeometryAndTextSize();
         if (event != null) {
             this.inputAdapter.handlePointerEvent(event);
-            this.overlayController.syncRegistration();
+            this.syncOverlayState();
         }
+    }
+
+    public boolean canConsumePointerEvent(PointerEvent event) {
+        this.applyResolvedGeometryAndTextSize();
+        return event != null
+                && event.getType() != PointerEvent.Type.WHEEL
+                && this.isVisible()
+                && this.containsLocalBase(event.getX(), event.getY());
     }
 
     public void dispose() {
@@ -130,7 +166,7 @@ public final class DropDown implements ParentSizeAwareControl, TooltipAttachable
 
     public void setItems(List<String> items) {
         this.viewModel.setItems(items);
-        this.overlayController.syncRegistration();
+        this.syncOverlayState();
     }
 
     public int getSelectedIndex() {
@@ -165,7 +201,7 @@ public final class DropDown implements ParentSizeAwareControl, TooltipAttachable
 
     public void setEnabled(boolean enabled) {
         this.viewModel.setEnabled(enabled);
-        this.overlayController.syncRegistration();
+        this.syncOverlayState();
     }
 
     public boolean isVisible() {
@@ -174,7 +210,7 @@ public final class DropDown implements ParentSizeAwareControl, TooltipAttachable
 
     public void setVisible(boolean visible) {
         this.viewModel.setVisible(visible);
-        this.overlayController.syncRegistration();
+        this.syncOverlayState();
     }
 
     public void setStyle(DefaultDropDownStyle style) {
@@ -217,6 +253,23 @@ public final class DropDown implements ParentSizeAwareControl, TooltipAttachable
         this.parentWidth = null;
         this.parentHeight = null;
         this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void setParentOffset(float x, float y) {
+        this.parentOffsetX = x;
+        this.parentOffsetY = y;
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void clearParentOffset() {
+        this.parentOffsetX = 0.0F;
+        this.parentOffsetY = 0.0F;
+        this.applyResolvedGeometryAndTextSize();
+    }
+
+    public void onRemovedFromParent() {
+        this.overlayController.closeOverlay();
+        this.syncViewGeometry();
     }
 
     public DropDown setTooltip(String text) {
@@ -310,9 +363,17 @@ public final class DropDown implements ParentSizeAwareControl, TooltipAttachable
 
     private void applyResolvedGeometryAndTextSize() {
         ResolvedBounds resolvedBounds = this.resolveBounds();
-        this.view.setPosition(resolvedBounds.x(), resolvedBounds.y());
-        this.view.setSize(resolvedBounds.width(), resolvedBounds.height());
+        this.captureResolvedGeometry(resolvedBounds);
+        this.syncViewGeometry();
         this.applyResolvedTextSize();
+    }
+
+    private void captureResolvedGeometry(ResolvedBounds resolvedBounds) {
+        this.localX = resolvedBounds.x();
+        this.localY = resolvedBounds.y();
+        this.resolvedWidth = resolvedBounds.width();
+        this.resolvedHeight = resolvedBounds.height();
+        this.view.setSize(this.resolvedWidth, this.resolvedHeight);
     }
 
     private void applyResolvedTextSize() {
@@ -335,5 +396,48 @@ public final class DropDown implements ParentSizeAwareControl, TooltipAttachable
             this.view.setStyle(style.copy());
         }
         this.textSizeStyleIsolated = true;
+    }
+
+    private void syncOverlayState() {
+        this.overlayController.syncRegistration();
+        this.syncViewGeometry();
+    }
+
+    private void syncViewGeometry() {
+        if (this.viewModel.isExpanded()) {
+            this.applyGlobalGeometry();
+        } else {
+            this.view.setPosition(this.localX, this.localY);
+        }
+    }
+
+    private void applyGlobalGeometry() {
+        this.view.setPosition(this.globalX(), this.globalY());
+    }
+
+    private float globalX() {
+        return this.localX + this.parentOffsetX;
+    }
+
+    private float globalY() {
+        return this.localY + this.parentOffsetY;
+    }
+
+    private boolean containsLocalBase(float x, float y) {
+        float halfWidth = this.resolvedWidth * 0.5F;
+        float halfHeight = this.resolvedHeight * 0.5F;
+        return x >= this.localX - halfWidth
+                && x <= this.localX + halfWidth
+                && y >= this.localY - halfHeight
+                && y <= this.localY + halfHeight;
+    }
+
+    private TooltipBounds getLocalTooltipBounds() {
+        return new TooltipBounds(
+                this.localX - this.resolvedWidth * 0.5F,
+                this.localY - this.resolvedHeight * 0.5F,
+                this.resolvedWidth,
+                this.resolvedHeight
+        );
     }
 }

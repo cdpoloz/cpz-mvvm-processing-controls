@@ -197,6 +197,8 @@ This example shows the core interaction flow:
 `Panel` groups child controls without changing the `Control` contract. Child
 coordinates are local to the panel. If the panel is at `(100, 80)` and a child
 button is at `(10, 20)`, the child is drawn and hit-tested at `(110, 100)`.
+Panels are transparent by default, but can draw optional background and stroke
+chrome through runtime `PanelStyle` setters or the JSON `style` block.
 
 ```java
 Panel panel = new Panel(this, "pnlSettings", 100, 80, 320, 220);
@@ -213,8 +215,15 @@ public void draw() {
 ```
 
 Moving the panel with `setPosition(...)` moves the group visually and
-interactively without rewriting child coordinates. See [Panel](docs/panel.md)
-and `src/main/java/com/cpz/processing/controls/examples/panel/PanelVisualTest.java`.
+interactively without rewriting child coordinates. `DropDown` can be added as
+a runtime child with `panel.add(dropDown)`: the collapsed field uses panel-local
+coordinates, while the expanded list remains a global overlay. JSON can
+configure both controls, but the parent-child relationship is still established
+in Java.
+
+See [Panel](docs/panel.md),
+`src/main/java/com/cpz/processing/controls/examples/panel/PanelVisualTest.java`,
+and `src/main/java/com/cpz/processing/controls/examples/panel/PanelDropDownJsonTest.java`.
 
 ---
 
@@ -268,8 +277,8 @@ Precedence rules:
 
 Current limitations:
 
-- `Panel.children` JSON is still pending
-- `DropDown` inside a `Panel` is still not supported interactively
+- `Panel.children` is not a JSON feature; compose panel children in Java
+- layout, padding, clipping, scroll, titles, and shadows are not part of `Panel`
 
 See `src/main/java/com/cpz/processing/controls/examples/button/ButtonRelativeTest.java`
 for a minimal `ControlBounds.relative(...)` sketch and
@@ -320,10 +329,14 @@ Version `0.6.0` includes:
 - `ButtonJsonRelativeTest` and `data/config/button-relative.json` as minimal
   runnable JSON-relative references
 
-Known limitations in `0.6.0`:
+Historical limitations in `0.6.0`:
 
-- `Panel.children` from JSON is still pending
-- `DropDown` inside a `Panel` is not supported interactively yet
+- `Panel.children` from JSON was not part of that release
+- `DropDown` inside a `Panel` was not supported interactively in that release
+
+Those bullets describe the `0.6.0` release state. In the current codebase,
+runtime `Panel + DropDown` composition is supported; `Panel.children` in JSON
+is still not implemented.
 
 ---
 
@@ -413,7 +426,7 @@ Notifications are runtime status messages owned by the sketch. Use them for
 non-blocking info, success, warning, and error feedback. Use a future
 dialog/modal feature, not `Notification`, for blocking user decisions.
 
-The JSON layer can also create one or more controls from a single document and returns them as `Map<String, Control>`. JSON remains structural only: binding and behavior wiring stay in sketch code.
+The JSON layer can also create one or more controls from a single document and returns them as `Map<String, Control>`. JSON can configure control layout and supported style blocks, including `Panel.style`; binding, behavior wiring, and `Panel` parent-child relationships stay in sketch code.
 
 The framework does not depend on Processing internally for input dispatch or interaction rules. It consumes framework-owned `PointerEvent` and `KeyboardEvent` instances that are expected to be produced by external adapters.
 

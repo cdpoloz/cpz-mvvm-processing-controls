@@ -2,11 +2,13 @@ package com.cpz.processing.controls.controls.panel;
 
 import com.cpz.processing.controls.controls.Control;
 import com.cpz.processing.controls.controls.KeyboardRoutableControl;
+import com.cpz.processing.controls.controls.ParentContextAwareControl;
 import com.cpz.processing.controls.controls.ParentSizeAwareControl;
 import com.cpz.processing.controls.controls.PointerRoutableControl;
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.controls.geometry.ResolvedBounds;
+import com.cpz.processing.controls.controls.panel.style.PanelStyle;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
@@ -26,10 +28,22 @@ import java.util.Objects;
 /**
  * Public container facade that groups controls in a local coordinate space.
  *
- * <p>The panel is intentionally minimal: it groups children, translates drawing
- * and pointer input, and exposes visibility, enabled state, and positioning as
- * a single {@link Control}. It does not perform layout, clipping, padding,
- * background rendering, or JSON loading.</p>
+ * <p>Child coordinates are interpreted as local to the panel. Drawing is
+ * translated by the panel position and pointer input is converted from sketch
+ * coordinates to child-local coordinates before routing.</p>
+ *
+ * <p>The panel can render optional visual chrome through its live
+ * {@link PanelStyle}. Panels are transparent by default to preserve the
+ * historical behavior. Style changes do not modify bounds, padding, child
+ * coordinates, or input routing.</p>
+ *
+ * <p>Controls that implement {@link ParentContextAwareControl}, such as
+ * {@code DropDown}, receive the resolved parent offset so global overlays can
+ * stay anchored to the effective sketch-space position without coupling this
+ * container to a concrete child implementation.</p>
+ *
+ * <p>The panel does not perform layout, clipping, padding, scroll, titles,
+ * shadows, or declarative child loading from JSON.</p>
  *
  * @author CPZ
  */
@@ -49,6 +63,7 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
     private boolean visible = true;
     private boolean enabled = true;
     private boolean pointerPressedInside;
+    private PanelStyle style = new PanelStyle();
 
     public Panel(PApplet sketch, float x, float y, float width, float height) {
         this(sketch, ControlCode.auto("panel"), x, y, width, height);
@@ -73,7 +88,8 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
         Control requiredChild = Objects.requireNonNull(child, "child");
         if (!this.children.contains(requiredChild)) {
             this.children.add(requiredChild);
-            this.applyParentSizeTo(requiredChild);
+            this.applyResolvedBounds();
+            this.applyParentContextTo(requiredChild);
             this.applyCurrentAvailabilityTo(requiredChild);
         }
         return this;
@@ -83,7 +99,7 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
         if (child == null || !this.children.remove(child)) {
             return false;
         }
-        this.clearParentSizeFrom(child);
+        this.clearParentContextFrom(child);
         this.restoreChildAvailability(child);
         return true;
     }
@@ -114,11 +130,13 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
         }
 
         this.applyResolvedBounds();
+        this.style.render(this.sketch, this.x, this.y, this.width, this.height);
+
         this.sketch.pushMatrix();
         try {
             this.sketch.translate(this.x, this.y);
             for (Control child : this.children) {
-                this.applyParentSizeTo(child);
+                this.applyParentContextTo(child);
                 if (child.isVisible()) {
                     child.draw();
                 }
@@ -154,10 +172,15 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
         }
 
         PointerEvent localEvent = this.toLocalEvent(event);
-        for (Control child : this.children) {
-            this.applyParentSizeTo(child);
+        for (int i = this.children.size() - 1; i >= 0; i--) {
+            Control child = this.children.get(i);
+            this.applyParentContextTo(child);
             if (child instanceof PointerRoutableControl) {
-                ((PointerRoutableControl) child).handlePointerEvent(localEvent);
+                PointerRoutableControl routable = (PointerRoutableControl) child;
+                routable.handlePointerEvent(localEvent);
+                if (routable.canConsumePointerEvent(localEvent)) {
+                    break;
+                }
             }
         }
         if (event.getType() == PointerEvent.Type.RELEASE) {
@@ -181,7 +204,7 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
         this.applyResolvedBounds();
         for (int i = this.children.size() - 1; i >= 0; i--) {
             Control child = this.children.get(i);
-            this.applyParentSizeTo(child);
+            this.applyParentContextTo(child);
             if (child instanceof KeyboardRoutableControl) {
                 KeyboardRoutableControl routable = (KeyboardRoutableControl) child;
                 if (routable.canConsumeKeyboardEvent(event)) {
@@ -199,7 +222,7 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
 
         this.applyResolvedBounds();
         for (Control child : this.children) {
-            this.applyParentSizeTo(child);
+            this.applyParentContextTo(child);
             if (child instanceof KeyboardRoutableControl
                     && ((KeyboardRoutableControl) child).canConsumeKeyboardEvent(event)) {
                 return true;
@@ -262,31 +285,119 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
         }
     }
 
+    /**
+     * Returns the live mutable panel style.
+     *
+     * <p>Mutating the returned instance affects the next {@link #draw()} call.</p>
+     *
+     * @return the current live style instance
+     */
+    public PanelStyle getStyle() {
+        return this.style;
+    }
+
+    /**
+     * Replaces the live panel style.
+     *
+     * <p>Passing {@code null} resets the panel to a new default transparent
+     * style.</p>
+     *
+     * @param style style to use, or {@code null} to reset defaults
+     */
+    public void setStyle(PanelStyle style) {
+        this.style = style == null ? new PanelStyle() : style;
+    }
+
+    /**
+     * Returns the effective background color, using the current theme fallback
+     * when no explicit background color was configured.
+     *
+     * @return effective background color
+     */
+    public int getBackgroundColor() {
+        return this.style.getBackgroundColor();
+    }
+
+    public void setBackgroundColor(int color) {
+        this.style.setBackgroundColor(color);
+    }
+
+    public boolean isBackgroundVisible() {
+        return this.style.isBackgroundVisible();
+    }
+
+    public void setBackgroundVisible(boolean visible) {
+        this.style.setBackgroundVisible(visible);
+    }
+
+    /**
+     * Returns the effective stroke color, using the current theme fallback when
+     * no explicit stroke color was configured.
+     *
+     * @return effective stroke color
+     */
+    public int getStrokeColor() {
+        return this.style.getStrokeColor();
+    }
+
+    public void setStrokeColor(int color) {
+        this.style.setStrokeColor(color);
+    }
+
+    public boolean isStrokeVisible() {
+        return this.style.isStrokeVisible();
+    }
+
+    public void setStrokeVisible(boolean visible) {
+        this.style.setStrokeVisible(visible);
+    }
+
+    public float getStrokeWeight() {
+        return this.style.getStrokeWeight();
+    }
+
+    public void setStrokeWeight(float weight) {
+        this.style.setStrokeWeight(weight);
+    }
+
+    public float getCornerRadius() {
+        return this.style.getCornerRadius();
+    }
+
+    public void setCornerRadius(float radius) {
+        this.style.setCornerRadius(radius);
+    }
+
     public void setPosition(float x, float y) {
         this.bounds = this.bounds.withPosition(ControlMeasure.absolute(x), ControlMeasure.absolute(y));
         this.applyResolvedBounds();
+        this.refreshChildContexts();
     }
 
     public void setSize(float width, float height) {
         this.bounds = this.bounds.withSize(ControlMeasure.absolute(width), ControlMeasure.absolute(height));
         this.applyResolvedBounds();
+        this.refreshChildContexts();
     }
 
     public void setBounds(ControlBounds bounds) {
         this.bounds = Objects.requireNonNull(bounds, "bounds");
         this.applyResolvedBounds();
+        this.refreshChildContexts();
     }
 
     public void setParentSize(float width, float height) {
         this.parentWidth = width;
         this.parentHeight = height;
         this.applyResolvedBounds();
+        this.refreshChildContexts();
     }
 
     public void clearParentSize() {
         this.parentWidth = null;
         this.parentHeight = null;
         this.applyResolvedBounds();
+        this.refreshChildContexts();
     }
 
     public float getX() {
@@ -339,15 +450,29 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
         return this.parentHeight != null ? this.parentHeight : this.sketch.height;
     }
 
-    private void applyParentSizeTo(Control child) {
+    private void applyParentContextTo(Control child) {
         if (child instanceof ParentSizeAwareControl) {
             ((ParentSizeAwareControl) child).setParentSize(this.width, this.height);
         }
+        if (child instanceof ParentContextAwareControl) {
+            ((ParentContextAwareControl) child).setParentOffset(this.x, this.y);
+        }
     }
 
-    private void clearParentSizeFrom(Control child) {
+    private void clearParentContextFrom(Control child) {
+        if (child instanceof ParentContextAwareControl) {
+            ParentContextAwareControl contextAwareControl = (ParentContextAwareControl) child;
+            contextAwareControl.onRemovedFromParent();
+            contextAwareControl.clearParentOffset();
+        }
         if (child instanceof ParentSizeAwareControl) {
             ((ParentSizeAwareControl) child).clearParentSize();
+        }
+    }
+
+    private void refreshChildContexts() {
+        for (Control child : this.children) {
+            this.applyParentContextTo(child);
         }
     }
 
@@ -415,7 +540,7 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
         public TooltipBounds getTooltipBounds() {
             Panel.this.applyResolvedBounds();
             if (this.delegate instanceof Control) {
-                Panel.this.applyParentSizeTo((Control) this.delegate);
+                Panel.this.applyParentContextTo((Control) this.delegate);
             }
             TooltipBounds bounds = this.delegate.getTooltipBounds();
             if (bounds == null) {

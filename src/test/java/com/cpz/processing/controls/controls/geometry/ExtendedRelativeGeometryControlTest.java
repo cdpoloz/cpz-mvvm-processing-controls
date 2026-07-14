@@ -208,7 +208,7 @@ class ExtendedRelativeGeometryControlTest {
     }
 
     @Test
-    void dropDownInsidePanelIsNotRoutedByPanelInputLayerYet() {
+    void dropDownInsidePanelIsRoutedByPanelInputLayer() {
         PApplet sketch = sketch(800, 600);
         InputManager inputManager = new InputManager();
         Panel panel = new Panel(sketch, "panel", 100.0F, 80.0F, 400.0F, 200.0F);
@@ -225,7 +225,7 @@ class ExtendedRelativeGeometryControlTest {
 
         inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, 300.0F, 180.0F));
 
-        assertFalse(dropDown.isExpanded());
+        assertTrue(dropDown.isExpanded());
     }
 
     private static void assertBounds(TooltipBounds bounds, float x, float y, float width, float height) {
