@@ -2,6 +2,8 @@ package com.cpz.processing.controls.main;
 
 import com.cpz.processing.controls.examples.button.ButtonSvgTest;
 import com.cpz.processing.controls.examples.button.ButtonTest;
+import com.cpz.processing.controls.examples.indicator.IndicatorGraphicJsonTest;
+import com.cpz.processing.controls.examples.indicator.IndicatorGraphicTest;
 import com.cpz.processing.controls.examples.indicator.IndicatorSvgTest;
 import com.cpz.processing.controls.examples.panel.PanelDropDownJsonTest;
 import processing.core.PApplet;
@@ -37,7 +39,7 @@ public class Launcher {
         // You can choose an example from the list below
 
         // Button *****************************************
-        PApplet.main(ButtonTest.class);
+        //PApplet.main(ButtonTest.class);
         //PApplet.main(ButtonRelativeTest.class);
         //PApplet.main(ButtonJsonRelativeTest.class);
         //PApplet.main(ButtonSvgTest.class);
@@ -100,6 +102,8 @@ public class Launcher {
         //PApplet.main(IndicatorJsonTest.class);
         //PApplet.main(IndicatorSvgTest.class);
         //PApplet.main(IndicatorSvgJsonTest.class);
+        PApplet.main(IndicatorGraphicTest.class);
+        //PApplet.main(IndicatorGraphicJsonTest.class);
 
         // ProgressBar ************************************
         //PApplet.main(ProgressBarTest.class);

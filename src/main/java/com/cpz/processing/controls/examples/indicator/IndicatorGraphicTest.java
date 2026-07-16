@@ -10,8 +10,9 @@ import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfi
 import com.cpz.processing.controls.core.overlay.tooltip.input.TooltipInputLayer;
 import com.cpz.processing.controls.core.overlay.tooltip.util.TooltipOverlayController;
 import com.cpz.utils.color.Colors;
-import java.io.File;
 import processing.core.PApplet;
+
+import java.io.File;
 
 /**
  * Visual example for circular, SVG, and PNG-mask indicator rendering.
@@ -20,7 +21,7 @@ import processing.core.PApplet;
  */
 public class IndicatorGraphicTest extends PApplet {
     private static final String SVG_PATH = "data" + File.separator + "img" + File.separator + "test.svg";
-    private static final String PNG_PATH = "data" + File.separator + "img" + File.separator + "indicator-mask.png";
+    private static final String PNG_PATH = "data" + File.separator + "img" + File.separator + "test.png";
 
     private InputManager inputManager;
     private OverlayManager overlayManager;
@@ -31,6 +32,18 @@ public class IndicatorGraphicTest extends PApplet {
 
     public static void main(String[] args) {
         PApplet.main(IndicatorGraphicTest.class);
+    }
+
+    private static TooltipStyleConfig readableTooltipStyle() {
+        return new TooltipStyleConfig()
+                .setBackgroundColor(0xF21B1F26)
+                .setTextColor(0xFFFFFFFF)
+                .setBorderColor(0xFF8A94A6)
+                .setTextSize(14.0F)
+                .setTextPadding(10.0F)
+                .setCornerRadius(8.0F)
+                .setOffset(10.0F)
+                .setStrokeWeight(1.0F);
     }
 
     public void settings() {
@@ -116,18 +129,6 @@ public class IndicatorGraphicTest extends PApplet {
         this.pngIndicator.setOn(runtimeOn);
         this.pngIndicator.setTooltipText(runtimeOn ? "PNG indicator on" : "PNG indicator off");
         this.tooltips.refresh();
-    }
-
-    private static TooltipStyleConfig readableTooltipStyle() {
-        return new TooltipStyleConfig()
-                .setBackgroundColor(0xF21B1F26)
-                .setTextColor(0xFFFFFFFF)
-                .setBorderColor(0xFF8A94A6)
-                .setTextSize(14.0F)
-                .setTextPadding(10.0F)
-                .setCornerRadius(8.0F)
-                .setOffset(10.0F)
-                .setStrokeWeight(1.0F);
     }
 
     private void drawLabels() {

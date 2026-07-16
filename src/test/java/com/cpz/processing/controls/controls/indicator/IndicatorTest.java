@@ -222,16 +222,16 @@ class IndicatorTest {
     void pngConstructorLoadsAndDrawsTintedMask() {
         RecordingApplet sketch = recordingSketch(800, 600);
         sketch.loadedImage = maskImage(2, 4);
-        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 40.0F, 40.0F, "data/img/indicator-mask.png");
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 40.0F, 40.0F, "src/test/resources/data/img/indicator-mask.png");
         indicator.setOnColor(0xFF00AA00);
         indicator.setOn(true);
 
         indicator.draw();
 
         assertEquals("png", indicator.getRendererType());
-        assertEquals("data/img/indicator-mask.png", indicator.getRendererPath());
+        assertEquals("src/test/resources/data/img/indicator-mask.png", indicator.getRendererPath());
         assertEquals(1, sketch.loadImageCalls);
-        assertEquals("data/img/indicator-mask.png", sketch.lastLoadImagePath);
+        assertEquals("src/test/resources/data/img/indicator-mask.png", sketch.lastLoadImagePath);
         assertEquals(0, sketch.circleCalls);
         assertEquals(0, sketch.shapeCalls);
         assertEquals(1, sketch.imageCalls);
@@ -247,7 +247,7 @@ class IndicatorTest {
     void pngExtensionIsCaseInsensitive() {
         RecordingApplet sketch = recordingSketch(800, 600);
         sketch.loadedImage = maskImage(2, 2);
-        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 24.0F, "data/img/indicator-mask.PNG");
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 24.0F, "src/test/resources/data/img/indicator-mask.PNG");
 
         indicator.draw();
 
@@ -277,7 +277,7 @@ class IndicatorTest {
 
     @Test
     void pngTestResourceContainsTransparentSemiTransparentAndOpaquePixels() throws IOException {
-        BufferedImage image = ImageIO.read(Path.of("data/img/indicator-mask.png").toFile());
+        BufferedImage image = ImageIO.read(Path.of("src/test/resources/data/img/indicator-mask.png").toFile());
 
         assertNotNull(image);
         assertEquals(4, image.getWidth());
@@ -292,7 +292,7 @@ class IndicatorTest {
     void pngTintUsesCurrentStateColor() {
         RecordingApplet sketch = recordingSketch(800, 600);
         sketch.loadedImage = maskImage(2, 2);
-        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 24.0F, "data/img/indicator-mask.png");
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 24.0F, "src/test/resources/data/img/indicator-mask.png");
         indicator.setOnColor(0xFF00AA00);
         indicator.setOffColor(0xFF111111);
 
@@ -308,7 +308,7 @@ class IndicatorTest {
     void pngResourceIsNotReloadedOnEveryFrame() {
         RecordingApplet sketch = recordingSketch(800, 600);
         sketch.loadedImage = maskImage(2, 2);
-        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 24.0F, "data/img/indicator-mask.png");
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 24.0F, "src/test/resources/data/img/indicator-mask.png");
 
         indicator.draw();
         PImage firstDrawImage = sketch.lastImage;
@@ -323,7 +323,7 @@ class IndicatorTest {
     void pngScalingPreservesAspectRatioAndCentersInBounds() {
         RecordingApplet sketch = recordingSketch(800, 600);
         sketch.loadedImage = maskImage(4, 2);
-        Indicator indicator = new Indicator(sketch, 10.0F, 20.0F, 40.0F, 40.0F, "data/img/indicator-mask.png");
+        Indicator indicator = new Indicator(sketch, 10.0F, 20.0F, 40.0F, 40.0F, "src/test/resources/data/img/indicator-mask.png");
 
         indicator.draw();
 
@@ -339,7 +339,7 @@ class IndicatorTest {
         sketch.loadedImage = maskImage(2, 2);
         Indicator indicator = new Indicator(sketch, 10.0F, 20.0F, 20.0F, 20.0F);
 
-        indicator.setRenderer("png", "data/img/indicator-mask.png");
+        indicator.setRenderer("png", "src/test/resources/data/img/indicator-mask.png");
         indicator.draw();
 
         assertEquals("png", indicator.getRendererType());
@@ -351,7 +351,7 @@ class IndicatorTest {
     void clearRendererReturnsToDefaultCircle() {
         RecordingApplet sketch = recordingSketch(800, 600);
         sketch.loadedImage = maskImage(2, 2);
-        Indicator indicator = new Indicator(sketch, 10.0F, 20.0F, 20.0F, 20.0F, "data/img/indicator-mask.png");
+        Indicator indicator = new Indicator(sketch, 10.0F, 20.0F, 20.0F, 20.0F, "src/test/resources/data/img/indicator-mask.png");
 
         indicator.clearRenderer();
         indicator.draw();
@@ -416,7 +416,7 @@ class IndicatorTest {
     void pngDrawRestoresTintForFollowingRenderers() {
         RecordingApplet sketch = recordingSketch(800, 600);
         sketch.loadedImage = maskImage(2, 2);
-        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 24.0F, "data/img/indicator-mask.png");
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 24.0F, "src/test/resources/data/img/indicator-mask.png");
 
         indicator.draw();
 

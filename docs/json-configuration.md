@@ -563,7 +563,7 @@ PNG indicator entry:
   "style": {
     "renderer": {
       "type": "png",
-      "path": "data/img/indicator-mask.png"
+      "path": "data/img/test.png"
     }
   },
   "tooltip": "PNG indicator"
@@ -580,11 +580,15 @@ property; it belongs to tooltip style blocks. Relative `bounds` follows the same
 `absolute` / `relative` mode rules as the other controls; `bounds` takes
 precedence over legacy `x` / `y` / `width` / `height`. SVG and PNG use the same
 `style.renderer` object as Button and Toggle and are represented by
-`IndicatorStyle`. Supported renderer values are `{"type":"svg","path":"..."}`
-and `{"type":"png","path":"..."}`. Renderer type and file extension are
-case-insensitive and must match. PNG is treated as a monochrome alpha mask:
-its alpha is preserved, its RGB values are ignored, and the final color comes
-from the indicator `onColor` / `offColor`.
+`IndicatorStyle`; there is no separate PNG-only JSON property. Supported
+renderer values are `{"type":"svg","path":"..."}` and
+`{"type":"png","path":"..."}`. The `path` must end in the compatible
+`.svg` or `.png` extension; renderer type and extension are case-insensitive
+and must match. Without `style.renderer`, Indicator draws its default circle.
+PNG is treated as a monochrome alpha mask: its alpha is preserved, its RGB
+values are ignored, and the final color comes from the indicator `onColor` /
+`offColor`. `data/img/test.png` is only the demonstrative resource and can be
+replaced with any valid PNG.
 
 `progressbar` does not render text and is non-interactive. It displays a
 determinate value horizontally or vertically according to `fillDirection`. Its

@@ -23,6 +23,21 @@ state programmatically with `setOn(boolean)`.
 
 ---
 
+## Representation Modes
+
+`Indicator` has three representation modes:
+
+1. no graphic renderer: the default centered circle is drawn;
+2. SVG renderer: a recoloreable SVG is drawn;
+3. PNG renderer: a recoloreable alpha-mask PNG is drawn.
+
+Graphic renderers support `.svg` and `.png` only. Renderer types and file
+extensions are case-insensitive; when both a type and path are supplied, they
+must agree. `clearRenderer()` removes either graphic renderer and restores the
+default circle.
+
+---
+
 ## Basic API
 
 Absolute setup:
@@ -74,7 +89,7 @@ Indicator svgIndicator = new Indicator(this, "indSvg",
 
 Indicator pngIndicator = new Indicator(this, "indPng",
         ControlBounds.relative(0.2f, 0.1f, 0.08f, 0.08f),
-        "data/img/indicator-mask.png");
+        "data/img/test.png");
 ```
 
 Minimum public state API:
@@ -184,7 +199,7 @@ an SVG path continue to use the default circular LED rendering.
 
 ```java
 Indicator pngIndicator = new Indicator(this, "indPng", 40, 40, 32, 32,
-        "data/img/indicator-mask.png");
+        "data/img/test.png");
 
 pngIndicator.setOnColor(0xFF2ECC71);
 pngIndicator.setOffColor(0xFF30343A);
@@ -194,24 +209,27 @@ pngIndicator.setOn(true);
 PNG paths use the same renderer API as SVG:
 
 ```java
-indicator.setRenderer("png", "data/img/indicator-mask.png");
-indicator.setRenderer("data/img/indicator-mask.png");
+indicator.setRenderer("png", "data/img/test.png");
+indicator.setRenderer("data/img/test.png");
 indicator.clearRenderer();
 ```
 
-The PNG is loaded and normalized only when the renderer resource changes. Each
-source pixel keeps its alpha channel, while visible pixels are converted to
-white. During drawing, Processing `tint(...)` applies the current state color:
-`onColor` when `on=true`, otherwise `offColor`. The PNG's original RGB values
-are ignored, so black, colored, and white source icons all adopt the indicator
-state color.
+The PNG is loaded through the same renderer system as SVG and normalized only
+when its renderer resource changes. It is interpreted as an alpha mask: each
+source pixel keeps its original alpha channel, its RGB values are discarded,
+and visible pixels are normalized internally to white. During drawing,
+Processing `tint(...)` applies the final state color: `onColor` when `on=true`
+and `offColor` when `on=false`. Thus the PNG changes color at runtime when the
+indicator changes between its `on` and `off` states, regardless of whether the
+source icon was black, colored, or white.
 
 The PNG is drawn centered inside the indicator bounds and scaled uniformly so
 it fits completely without deformation. After drawing, the control calls
 `noTint()` and the draw path remains wrapped in Processing style isolation.
 
-Use PNG for rasterized monochrome icons with transparent backgrounds. SVG is
-still preferable when vector scaling is required.
+Use PNG for rasterized icons with transparent backgrounds; transparency makes
+the alpha-mask silhouette explicit. SVG is still preferable when vector scaling
+is required.
 
 If a PNG cannot be loaded, the configured PNG renderer remains active but no
 image is drawn, matching the existing SVG failure behavior. Use
@@ -411,7 +429,7 @@ PNG renderer entry:
   "style": {
     "renderer": {
       "type": "png",
-      "path": "data/img/indicator-mask.png"
+      "path": "data/img/test.png"
     }
   }
 }
@@ -479,5 +497,5 @@ The combined circular, SVG, and PNG examples are:
 src/main/java/com/cpz/processing/controls/examples/indicator/IndicatorGraphicTest.java
 src/main/java/com/cpz/processing/controls/examples/indicator/IndicatorGraphicJsonTest.java
 data/config/indicator-graphic.json
-data/img/indicator-mask.png
+data/img/test.png
 ```

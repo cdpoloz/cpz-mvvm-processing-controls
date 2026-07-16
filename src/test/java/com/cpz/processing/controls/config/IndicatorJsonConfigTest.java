@@ -55,19 +55,19 @@ class IndicatorJsonConfigTest {
     @Test
     void pngRendererLoadsFromStyleRendererConfig() {
         IndicatorConfig config = indicatorConfig("{\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
-                + "\"style\":{\"renderer\":{\"type\":\"png\",\"path\":\"data/img/indicator-mask.png\"}}}");
+                + "\"style\":{\"renderer\":{\"type\":\"png\",\"path\":\"src/test/resources/data/img/indicator-mask.png\"}}}");
 
         assertEquals("png", config.getRenderer().getType());
-        assertEquals("data/img/indicator-mask.png", config.getRenderer().getPath());
+        assertEquals("src/test/resources/data/img/indicator-mask.png", config.getRenderer().getPath());
     }
 
     @Test
     void pngRendererExtensionIsCaseInsensitiveInJson() {
         IndicatorConfig config = indicatorConfig("{\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
-                + "\"style\":{\"renderer\":{\"type\":\"PNG\",\"path\":\"data/img/indicator-mask.PNG\"}}}");
+                + "\"style\":{\"renderer\":{\"type\":\"PNG\",\"path\":\"src/test/resources/data/img/indicator-mask.PNG\"}}}");
 
         assertEquals("png", config.getRenderer().getType());
-        assertEquals("data/img/indicator-mask.PNG", config.getRenderer().getPath());
+        assertEquals("src/test/resources/data/img/indicator-mask.PNG", config.getRenderer().getPath());
     }
 
     @Test
@@ -339,7 +339,7 @@ class IndicatorJsonConfigTest {
     void controlConfigLoaderCreatesPngIndicatorAndResolvesPath() {
         JSONObject root = JSONObject.parse("{\"controls\":[{\"type\":\"indicator\",\"code\":\"ind\","
                 + "\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
-                + "\"style\":{\"renderer\":{\"type\":\"png\",\"path\":\"data/img/indicator-mask.png\"}},"
+                + "\"style\":{\"renderer\":{\"type\":\"png\",\"path\":\"src/test/resources/data/img/indicator-mask.png\"}},"
                 + "\"tooltip\":\"PNG indicator\"}]}");
         JsonApplet sketch = new JsonApplet(root);
         sketch.loadedImage = maskImage();
@@ -348,9 +348,9 @@ class IndicatorJsonConfigTest {
         Indicator indicator = assertInstanceOf(Indicator.class, controls.get("ind"));
 
         assertEquals(1, sketch.loadImageCalls);
-        assertEquals("data/img/indicator-mask.png", sketch.lastImagePath);
+        assertEquals("src/test/resources/data/img/indicator-mask.png", sketch.lastImagePath);
         assertEquals("png", indicator.getStyle().getRendererType());
-        assertEquals("data/img/indicator-mask.png", indicator.getStyle().getRendererPath());
+        assertEquals("src/test/resources/data/img/indicator-mask.png", indicator.getStyle().getRendererPath());
         assertEquals("PNG indicator", indicator.getTooltip().getText());
     }
 

@@ -131,12 +131,9 @@ is visible and the pointer is inside its bounds.
 Use `TooltipArea` for content drawn directly in the sketch:
 
 ```java
-PImage serverImage;
 TooltipArea serverArea;
 
 public void setup() {
-    serverImage = loadImage("data/img/server.png");
-
     PFont jetBrainsMono = createFont("data/font/JetBrainsMono.ttf", 14);
     TooltipStyleConfig darkTooltipStyle = new TooltipStyleConfig()
             .setFont(jetBrainsMono)
@@ -151,9 +148,12 @@ public void setup() {
 }
 
 public void draw() {
-    image(serverImage, 100, 80, 160, 120);
+    rect(100, 80, 160, 120);
 }
 ```
+
+The rectangle can be replaced by any content drawn by the consumer; no image
+resource is required by `TooltipArea` itself.
 
 When the drawn region moves, update the bounds:
 

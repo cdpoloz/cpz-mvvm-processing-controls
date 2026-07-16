@@ -20,6 +20,10 @@ import processing.core.PShape;
 /**
  * Public non-interactive LED-style indicator facade.
  *
+ * <p>By default the indicator draws a circle. It can instead draw a
+ * recoloreable SVG or a PNG alpha mask. PNG alpha is retained while source RGB
+ * values are ignored; the on/off state supplies the final color.</p>
+ *
  * @author CPZ
  */
 public final class Indicator implements ParentSizeAwareControl, TooltipAttachable {
@@ -170,10 +174,22 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
         return this.style;
     }
 
+    /**
+     * Returns the configured renderer type, {@code svg} or {@code png}, or
+     * {@code null} when the default circular renderer is active.
+     *
+     * @return configured renderer type, or {@code null}
+     */
     public String getRendererType() {
         return this.style.getRendererType();
     }
 
+    /**
+     * Returns the configured Processing resource path, or {@code null} when
+     * the default circular renderer is active.
+     *
+     * @return configured renderer path, or {@code null}
+     */
     public String getRendererPath() {
         return this.style.getRendererPath();
     }
@@ -187,6 +203,8 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
      *
      * @param type renderer type, case-insensitive
      * @param path non-empty Processing resource path
+     * @throws IllegalArgumentException when either value is empty or unsupported,
+     *         or when the type and path extension do not match
      */
     public void setRenderer(String type, String path) {
         this.style.setRenderer(type, path);
@@ -198,6 +216,7 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
      * path extension.
      *
      * @param path non-empty Processing resource path ending in {@code .svg} or {@code .png}
+     * @throws IllegalArgumentException when the path is empty or has an unsupported extension
      */
     public void setRenderer(String path) {
         this.style.setRenderer(path);

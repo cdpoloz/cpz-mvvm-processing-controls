@@ -297,8 +297,7 @@ Version `0.7.0` adds `Indicator`, a simple non-interactive LED-style control.
 - runtime `onColor` and `offColor`
 - runtime `strokeColor` and `strokeWeight`
 - absolute and relative `ControlBounds`
-- SVG rendering through the same style renderer convention used by Button and Toggle
-- PNG alpha-mask rendering with state-based tinting
+- default circle, SVG, and alpha-mask PNG renderers through the same style renderer convention used by Button and Toggle
 - tooltips, including runtime tooltip text updates
 - JSON loading through `type: "indicator"`
 - use as a child of `Panel`

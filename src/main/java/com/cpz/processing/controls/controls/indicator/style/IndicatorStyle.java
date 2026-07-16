@@ -71,10 +71,22 @@ public final class IndicatorStyle {
         return this;
     }
 
+    /**
+     * Returns the normalized graphic renderer type, or {@code null} when this
+     * style uses the default indicator circle.
+     *
+     * @return {@code svg}, {@code png}, or {@code null}
+     */
     public String getRendererType() {
         return this.rendererType;
     }
 
+    /**
+     * Returns the configured Processing resource path, or {@code null} when
+     * this style uses the default indicator circle.
+     *
+     * @return renderer path, or {@code null}
+     */
     public String getRendererPath() {
         return this.rendererPath;
     }
@@ -82,13 +94,15 @@ public final class IndicatorStyle {
     /**
      * Configures an indicator graphic renderer.
      *
-     * <p>Supported renderer types are {@code svg} and {@code png}. PNG images
-     * are interpreted as alpha masks and recolored by the indicator state.</p>
+     * <p>Supported renderer types are {@code svg} and {@code png}; type and
+     * file extension are case-insensitive and must match. PNG images are
+     * interpreted as alpha masks and recolored by the indicator state.</p>
      *
      * @param type renderer type, case-insensitive
      * @param path non-empty Processing resource path
      * @return this style
-     * @throws IllegalArgumentException when type, path, or path extension is unsupported
+     * @throws IllegalArgumentException when type or path is empty or unsupported,
+     *         or when the type and path extension do not match
      */
     public IndicatorStyle setRenderer(String type, String path) {
         this.rendererType = normalizeRendererType(type, path);
@@ -102,6 +116,7 @@ public final class IndicatorStyle {
      *
      * @param path non-empty Processing resource path ending in {@code .svg} or {@code .png}
      * @return this style
+     * @throws IllegalArgumentException when the path is empty or has an unsupported extension
      */
     public IndicatorStyle setRenderer(String path) {
         return this.setRenderer(inferRendererType(path), path);
