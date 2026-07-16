@@ -1,0 +1,81 @@
+{
+  "tooltipStyles": {
+    "indicatorDark": {
+      "backgroundColor": "#F21B1F26",
+      "textColor": "#FFFFFFFF",
+      "borderColor": "#FF8A94A6",
+      "textSize": 14.0,
+      "textPadding": 10.0,
+      "offset": 10.0,
+      "cornerRadius": 8.0,
+      "strokeWeight": 1.0
+    }
+  },
+  "controls": [
+    {
+      "type": "indicator",
+      "code": "indGraphicCircleJson",
+      "x": 116.0,
+      "y": 90.0,
+      "width": 52.0,
+      "height": 52.0,
+      "on": false,
+      "onColor": "#3062DB",
+      "offColor": "#464646",
+      "style": {
+        "strokeColor": "#D2D2D2",
+        "strokeWeight": 2.0
+      },
+      "tooltip": {
+        "text": "JSON circular indicator",
+        "styleRef": "indicatorDark"
+      }
+    },
+    {
+      "type": "indicator",
+      "code": "indGraphicSvgJson",
+      "x": 284.0,
+      "y": 90.0,
+      "width": 52.0,
+      "height": 52.0,
+      "on": true,
+      "onColor": "#3062DB",
+      "offColor": "#464646",
+      "style": {
+        "strokeColor": "#D2D2D2",
+        "strokeWeight": 2.0,
+        "renderer": {
+          "type": "svg",
+          "path": "data/img/test.svg"
+        }
+      },
+      "tooltip": {
+        "text": "JSON SVG indicator",
+        "styleRef": "indicatorDark"
+      }
+    },
+    {
+      "type": "indicator",
+      "code": "indGraphicPngJson",
+      "x": 452.0,
+      "y": 90.0,
+      "width": 52.0,
+      "height": 52.0,
+      "on": true,
+      "onColor": "#3062DB",
+      "offColor": "#464646",
+      "style": {
+        "strokeColor": "#D2D2D2",
+        "strokeWeight": 2.0,
+        "renderer": {
+          "type": "png",
+          "path": "data/img/indicator-mask.png"
+        }
+      },
+      "tooltip": {
+        "text": "JSON PNG alpha-mask indicator",
+        "styleRef": "indicatorDark"
+      }
+    }
+  ]
+}

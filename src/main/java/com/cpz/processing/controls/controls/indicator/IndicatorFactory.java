@@ -21,11 +21,11 @@ public final class IndicatorFactory {
         Indicator indicator = new Indicator(
                 sketch,
                 config.getCode(),
-                config.getBounds(),
-                config.getRenderer() != null && "svg".equals(config.getRenderer().getType())
-                        ? config.getRenderer().getPath()
-                        : null
+                config.getBounds()
         );
+        if (config.getRenderer() != null) {
+            indicator.setRenderer(config.getRenderer().getType(), config.getRenderer().getPath());
+        }
         indicator.setOn(config.isOn());
         indicator.setOnColor(config.getOnColor());
         indicator.setOffColor(config.getOffColor());

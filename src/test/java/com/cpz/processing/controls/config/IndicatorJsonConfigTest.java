@@ -11,6 +11,7 @@ import com.cpz.processing.controls.controls.indicator.config.IndicatorConfigLoad
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import org.junit.jupiter.api.Test;
 import processing.core.PApplet;
+import processing.core.PImage;
 import processing.core.PShape;
 import processing.data.JSONObject;
 
@@ -49,6 +50,59 @@ class IndicatorJsonConfigTest {
 
         assertEquals("svg", config.getRenderer().getType());
         assertEquals("data/img/test.svg", config.getRenderer().getPath());
+    }
+
+    @Test
+    void pngRendererLoadsFromStyleRendererConfig() {
+        IndicatorConfig config = indicatorConfig("{\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
+                + "\"style\":{\"renderer\":{\"type\":\"png\",\"path\":\"data/img/indicator-mask.png\"}}}");
+
+        assertEquals("png", config.getRenderer().getType());
+        assertEquals("data/img/indicator-mask.png", config.getRenderer().getPath());
+    }
+
+    @Test
+    void pngRendererExtensionIsCaseInsensitiveInJson() {
+        IndicatorConfig config = indicatorConfig("{\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
+                + "\"style\":{\"renderer\":{\"type\":\"PNG\",\"path\":\"data/img/indicator-mask.PNG\"}}}");
+
+        assertEquals("png", config.getRenderer().getType());
+        assertEquals("data/img/indicator-mask.PNG", config.getRenderer().getPath());
+    }
+
+    @Test
+    void unsupportedRendererFormatFailsClearly() {
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> indicatorConfig("{\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
+                        + "\"style\":{\"renderer\":{\"type\":\"jpg\",\"path\":\"data/img/icon.jpg\"}}}")
+        );
+
+        assertTrue(exception.getMessage().contains("style.renderer"));
+        assertTrue(exception.getMessage().contains("svg"));
+        assertTrue(exception.getMessage().contains("png"));
+    }
+
+    @Test
+    void rendererTypeMustMatchPathExtension() {
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> indicatorConfig("{\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
+                        + "\"style\":{\"renderer\":{\"type\":\"png\",\"path\":\"data/img/test.svg\"}}}")
+        );
+
+        assertTrue(exception.getMessage().contains("does not match"));
+    }
+
+    @Test
+    void blankRendererPathFailsClearly() {
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> indicatorConfig("{\"code\":\"ind\",\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
+                        + "\"style\":{\"renderer\":{\"type\":\"png\",\"path\":\" \"}}}")
+        );
+
+        assertTrue(exception.getMessage().contains("path"));
     }
 
     @Test
@@ -281,6 +335,25 @@ class IndicatorJsonConfigTest {
         assertEquals(60.0F, bounds.height());
     }
 
+    @Test
+    void controlConfigLoaderCreatesPngIndicatorAndResolvesPath() {
+        JSONObject root = JSONObject.parse("{\"controls\":[{\"type\":\"indicator\",\"code\":\"ind\","
+                + "\"x\":40,\"y\":50,\"width\":24,\"height\":30,"
+                + "\"style\":{\"renderer\":{\"type\":\"png\",\"path\":\"data/img/indicator-mask.png\"}},"
+                + "\"tooltip\":\"PNG indicator\"}]}");
+        JsonApplet sketch = new JsonApplet(root);
+        sketch.loadedImage = maskImage();
+
+        Map<String, Control> controls = new ControlConfigLoader(sketch).load("controls.json");
+        Indicator indicator = assertInstanceOf(Indicator.class, controls.get("ind"));
+
+        assertEquals(1, sketch.loadImageCalls);
+        assertEquals("data/img/indicator-mask.png", sketch.lastImagePath);
+        assertEquals("png", indicator.getStyle().getRendererType());
+        assertEquals("data/img/indicator-mask.png", indicator.getStyle().getRendererPath());
+        assertEquals("PNG indicator", indicator.getTooltip().getText());
+    }
+
     private static IndicatorConfig indicatorConfig(String json) {
         return new IndicatorConfigLoader(new PApplet()).loadFromJson(JSONObject.parse(json), "indicator.json");
     }
@@ -297,10 +370,23 @@ class IndicatorJsonConfigTest {
         return sketch;
     }
 
+    private static PImage maskImage() {
+        PImage image = new PImage(2, 2, PApplet.ARGB);
+        image.loadPixels();
+        for (int i = 0; i < image.pixels.length; i++) {
+            image.pixels[i] = 0xFF123456;
+        }
+        image.updatePixels();
+        return image;
+    }
+
     private static final class JsonApplet extends PApplet {
         private final JSONObject root;
         private int loadShapeCalls;
+        private int loadImageCalls;
         private String lastShapePath;
+        private String lastImagePath;
+        private PImage loadedImage;
 
         private JsonApplet(JSONObject root) {
             this.root = root;
@@ -316,6 +402,13 @@ class IndicatorJsonConfigTest {
             this.loadShapeCalls++;
             this.lastShapePath = filename;
             return new PShape();
+        }
+
+        @Override
+        public PImage loadImage(String filename) {
+            this.loadImageCalls++;
+            this.lastImagePath = filename;
+            return this.loadedImage;
         }
     }
 }

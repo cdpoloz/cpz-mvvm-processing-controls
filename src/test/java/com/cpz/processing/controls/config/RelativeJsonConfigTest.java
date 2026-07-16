@@ -19,6 +19,7 @@ import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import com.cpz.processing.controls.testsupport.ProcessingTestSupport;
 import org.junit.jupiter.api.Test;
 import processing.core.PApplet;
+import processing.core.PImage;
 import processing.core.PShape;
 import processing.data.JSONObject;
 
@@ -253,6 +254,17 @@ class RelativeJsonConfigTest {
         @Override
         public PShape loadShape(String filename) {
             return new PShape();
+        }
+
+        @Override
+        public PImage loadImage(String filename) {
+            PImage image = new PImage(2, 2, PApplet.ARGB);
+            image.loadPixels();
+            for (int i = 0; i < image.pixels.length; i++) {
+                image.pixels[i] = 0xFF123456;
+            }
+            image.updatePixels();
+            return image;
         }
     }
 }

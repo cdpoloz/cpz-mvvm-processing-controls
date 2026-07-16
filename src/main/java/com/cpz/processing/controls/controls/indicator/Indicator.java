@@ -14,6 +14,7 @@ import com.cpz.processing.controls.core.util.ControlCode;
 import java.util.Objects;
 import processing.core.PApplet;
 import processing.core.PFont;
+import processing.core.PImage;
 import processing.core.PShape;
 
 /**
@@ -33,6 +34,7 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
     private Float parentWidth;
     private Float parentHeight;
     private PShape svgShape;
+    private PImage pngImage;
     private String loadedRendererType;
     private String loadedRendererPath;
     private float x;
@@ -52,32 +54,32 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
         this(sketch, code, x, y, width, height, null);
     }
 
-    public Indicator(PApplet sketch, float x, float y, float width, float height, String svgPath) {
-        this(sketch, ControlCode.auto("indicator"), x, y, width, height, svgPath);
+    public Indicator(PApplet sketch, float x, float y, float width, float height, String rendererPath) {
+        this(sketch, ControlCode.auto("indicator"), x, y, width, height, rendererPath);
     }
 
-    public Indicator(PApplet sketch, String code, float x, float y, float width, float height, String svgPath) {
-        this(sketch, code, ControlBounds.absolute(x, y, width, height), svgPath);
+    public Indicator(PApplet sketch, String code, float x, float y, float width, float height, String rendererPath) {
+        this(sketch, code, ControlBounds.absolute(x, y, width, height), rendererPath);
     }
 
     public Indicator(PApplet sketch, ControlBounds bounds) {
         this(sketch, ControlCode.auto("indicator"), bounds, null);
     }
 
-    public Indicator(PApplet sketch, ControlBounds bounds, String svgPath) {
-        this(sketch, ControlCode.auto("indicator"), bounds, svgPath);
+    public Indicator(PApplet sketch, ControlBounds bounds, String rendererPath) {
+        this(sketch, ControlCode.auto("indicator"), bounds, rendererPath);
     }
 
     public Indicator(PApplet sketch, String code, ControlBounds bounds) {
         this(sketch, code, bounds, null);
     }
 
-    public Indicator(PApplet sketch, String code, ControlBounds bounds, String svgPath) {
+    public Indicator(PApplet sketch, String code, ControlBounds bounds, String rendererPath) {
         this.sketch = Objects.requireNonNull(sketch, "sketch");
         this.code = Objects.requireNonNull(code, "code");
         this.bounds = Objects.requireNonNull(bounds, "bounds");
-        if (svgPath != null) {
-            this.style.setRenderer("svg", svgPath);
+        if (rendererPath != null) {
+            this.style.setRenderer(rendererPath);
         }
         this.syncStyleRenderer();
         this.tooltipSupport = new TooltipSupport(this::currentTooltipBounds, this::isVisible);
@@ -109,6 +111,8 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
                     this.sketch.shapeMode(PApplet.CENTER);
                     this.sketch.shape(this.svgShape, centerX, centerY, this.width, this.height);
                 }
+            } else if (this.style.isPngRenderer()) {
+                this.drawPng();
             } else {
                 this.sketch.ellipseMode(PApplet.CENTER);
                 this.sketch.circle(centerX, centerY, diameter);
@@ -164,6 +168,49 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
 
     public IndicatorStyle getStyle() {
         return this.style;
+    }
+
+    public String getRendererType() {
+        return this.style.getRendererType();
+    }
+
+    public String getRendererPath() {
+        return this.style.getRendererPath();
+    }
+
+    /**
+     * Configures a graphic renderer for this indicator.
+     *
+     * <p>Supported types are {@code svg} and {@code png}. PNG resources are
+     * loaded once, normalized to a white alpha mask, and tinted with the current
+     * indicator state color while drawing.</p>
+     *
+     * @param type renderer type, case-insensitive
+     * @param path non-empty Processing resource path
+     */
+    public void setRenderer(String type, String path) {
+        this.style.setRenderer(type, path);
+        this.syncStyleRenderer();
+    }
+
+    /**
+     * Configures a graphic renderer by inferring its type from the resource
+     * path extension.
+     *
+     * @param path non-empty Processing resource path ending in {@code .svg} or {@code .png}
+     */
+    public void setRenderer(String path) {
+        this.style.setRenderer(path);
+        this.syncStyleRenderer();
+    }
+
+    /**
+     * Clears the graphic renderer so the indicator returns to the default
+     * circular rendering path.
+     */
+    public void clearRenderer() {
+        this.style.clearRenderer();
+        this.syncStyleRenderer();
     }
 
     public void setStyle(IndicatorStyle style) {
@@ -311,6 +358,27 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
         return this.parentHeight != null ? this.parentHeight : this.sketch.height;
     }
 
+    private void drawPng() {
+        if (this.pngImage == null || this.pngImage.width <= 0 || this.pngImage.height <= 0
+                || this.width <= 0.0F || this.height <= 0.0F) {
+            return;
+        }
+
+        float scale = Math.min(this.width / this.pngImage.width, this.height / this.pngImage.height);
+        float imageWidth = this.pngImage.width * scale;
+        float imageHeight = this.pngImage.height * scale;
+        float imageX = this.x + (this.width - imageWidth) * 0.5F;
+        float imageY = this.y + (this.height - imageHeight) * 0.5F;
+
+        this.sketch.imageMode(PApplet.CORNER);
+        this.sketch.tint(this.on ? this.style.getOnColor() : this.style.getOffColor());
+        try {
+            this.sketch.image(this.pngImage, imageX, imageY, imageWidth, imageHeight);
+        } finally {
+            this.sketch.noTint();
+        }
+    }
+
     private void syncStyleRenderer() {
         String rendererType = this.style.getRendererType();
         String rendererPath = this.style.getRendererPath();
@@ -321,6 +389,7 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
         this.loadedRendererType = rendererType;
         this.loadedRendererPath = rendererPath;
         this.svgShape = this.style.isSvgRenderer() ? loadShape(this.sketch, rendererPath) : null;
+        this.pngImage = this.style.isPngRenderer() ? loadAndNormalizePng(this.sketch, rendererPath) : null;
         if (this.svgShape != null) {
             this.svgShape.disableStyle();
         }
@@ -335,5 +404,38 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
             shape = sketch.loadShape(path.substring("data/".length()));
         }
         return shape;
+    }
+
+    private static PImage loadAndNormalizePng(PApplet sketch, String path) {
+        if (sketch == null || path == null || path.isEmpty()) {
+            return null;
+        }
+        PImage image = sketch.loadImage(path);
+        if (image == null && path.startsWith("data/")) {
+            image = sketch.loadImage(path.substring("data/".length()));
+        }
+        if (image == null || image.width <= 0 || image.height <= 0) {
+            return null;
+        }
+        return normalizePngMask(image);
+    }
+
+    static PImage normalizePngMask(PImage source) {
+        Objects.requireNonNull(source, "source");
+        if (source.width <= 0 || source.height <= 0) {
+            throw new IllegalArgumentException(
+                    "Invalid PNG image dimensions: " + source.width + "x" + source.height + "."
+            );
+        }
+
+        source.loadPixels();
+        PImage normalized = new PImage(source.width, source.height, PApplet.ARGB);
+        normalized.loadPixels();
+        for (int i = 0; i < source.pixels.length; i++) {
+            int alpha = source.pixels[i] & 0xFF000000;
+            normalized.pixels[i] = alpha | 0x00FFFFFF;
+        }
+        normalized.updatePixels();
+        return normalized;
     }
 }

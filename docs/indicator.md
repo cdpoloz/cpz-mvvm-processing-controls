@@ -64,12 +64,17 @@ Indicator mixedIndicator = new Indicator(this, "indMixed",
                 ControlMeasure.absolute(24.0f)));
 ```
 
-SVG setup uses constructor overloads with a path:
+Graphic setup uses constructor overloads with a path. The renderer type is
+inferred from `.svg` or `.png`:
 
 ```java
 Indicator svgIndicator = new Indicator(this, "indSvg",
         ControlBounds.relative(0.1f, 0.1f, 0.08f, 0.08f),
         "data/img/test.svg");
+
+Indicator pngIndicator = new Indicator(this, "indPng",
+        ControlBounds.relative(0.2f, 0.1f, 0.08f, 0.08f),
+        "data/img/indicator-mask.png");
 ```
 
 Minimum public state API:
@@ -87,6 +92,11 @@ float getStrokeWeight();
 void setStrokeWeight(float weight);
 IndicatorStyle getStyle();
 void setStyle(IndicatorStyle style);
+String getRendererType();
+String getRendererPath();
+void setRenderer(String type, String path);
+void setRenderer(String path);
+void clearRenderer();
 ```
 
 The control also supports the common `Control` methods for code, drawing,
@@ -168,6 +178,47 @@ an SVG path continue to use the default circular LED rendering.
 
 ---
 
+## PNG
+
+`Indicator` can also render a PNG as a recoloreable alpha mask:
+
+```java
+Indicator pngIndicator = new Indicator(this, "indPng", 40, 40, 32, 32,
+        "data/img/indicator-mask.png");
+
+pngIndicator.setOnColor(0xFF2ECC71);
+pngIndicator.setOffColor(0xFF30343A);
+pngIndicator.setOn(true);
+```
+
+PNG paths use the same renderer API as SVG:
+
+```java
+indicator.setRenderer("png", "data/img/indicator-mask.png");
+indicator.setRenderer("data/img/indicator-mask.png");
+indicator.clearRenderer();
+```
+
+The PNG is loaded and normalized only when the renderer resource changes. Each
+source pixel keeps its alpha channel, while visible pixels are converted to
+white. During drawing, Processing `tint(...)` applies the current state color:
+`onColor` when `on=true`, otherwise `offColor`. The PNG's original RGB values
+are ignored, so black, colored, and white source icons all adopt the indicator
+state color.
+
+The PNG is drawn centered inside the indicator bounds and scaled uniformly so
+it fits completely without deformation. After drawing, the control calls
+`noTint()` and the draw path remains wrapped in Processing style isolation.
+
+Use PNG for rasterized monochrome icons with transparent backgrounds. SVG is
+still preferable when vector scaling is required.
+
+If a PNG cannot be loaded, the configured PNG renderer remains active but no
+image is drawn, matching the existing SVG failure behavior. Use
+`clearRenderer()` to return to the default circular LED renderer.
+
+---
+
 ## Style And Stroke
 
 `Indicator` stores its visual values in an `IndicatorStyle`. The direct color
@@ -186,8 +237,9 @@ IndicatorStyle style = new IndicatorStyle()
 indicator.setStyle(style);
 ```
 
-`Indicator` exposes a configurable visual stroke for the circular LED and SVG
-rendering modes:
+`Indicator` exposes a configurable visual stroke. It is visible in the
+circular LED and SVG rendering modes; PNG uses the image alpha mask and state
+tint.
 
 ```java
 indicator.setStrokeColor(0xFFFFFFFF);
@@ -315,7 +367,7 @@ Relative bounds are also supported:
 }
 ```
 
-SVG JSON uses the same renderer block used by Button and Toggle:
+SVG and PNG JSON use the same renderer block used by Button and Toggle:
 
 ```json
 {
@@ -343,6 +395,28 @@ SVG JSON uses the same renderer block used by Button and Toggle:
 }
 ```
 
+PNG renderer entry:
+
+```json
+{
+  "type": "indicator",
+  "code": "indPng",
+  "x": 40,
+  "y": 40,
+  "width": 32,
+  "height": 32,
+  "on": true,
+  "onColor": "#FF2ECC71",
+  "offColor": "#FF30343A",
+  "style": {
+    "renderer": {
+      "type": "png",
+      "path": "data/img/indicator-mask.png"
+    }
+  }
+}
+```
+
 Rules:
 
 - `bounds` takes precedence over legacy `x` / `y` / `width` / `height`
@@ -357,7 +431,10 @@ Rules:
 - `style.strokeWidth` is accepted as an alias only when `strokeWeight` is absent
 - `tooltip` uses the same object block as other tooltip-capable controls
 - `tooltip` may also be a string shorthand for tooltip text
-- SVG uses `style.renderer.type = "svg"` and `style.renderer.path`
+- graphic renderers use `style.renderer.type` and `style.renderer.path`
+- supported renderer types are `svg` and `png`
+- renderer type and file extension are case-insensitive and must match
+- PNG is interpreted as an alpha mask; original RGB values are not preserved
 
 For consistency with the existing style-oriented JSON shape, `style.onColor`
 and `style.offColor` are accepted as aliases. Top-level `onColor` and
@@ -394,4 +471,13 @@ The SVG examples are:
 src/main/java/com/cpz/processing/controls/examples/indicator/IndicatorSvgTest.java
 src/main/java/com/cpz/processing/controls/examples/indicator/IndicatorSvgJsonTest.java
 data/config/indicator-svg.json
+```
+
+The combined circular, SVG, and PNG examples are:
+
+```text
+src/main/java/com/cpz/processing/controls/examples/indicator/IndicatorGraphicTest.java
+src/main/java/com/cpz/processing/controls/examples/indicator/IndicatorGraphicJsonTest.java
+data/config/indicator-graphic.json
+data/img/indicator-mask.png
 ```

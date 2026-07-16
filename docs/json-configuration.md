@@ -489,8 +489,8 @@ Indicator properties:
 - `style.strokeColor`: optional visual border color
 - `style.strokeWeight`: optional visual border width; `0` disables the stroke
 - `style.strokeWidth`: optional alias used only when `strokeWeight` is absent
-- `style.renderer`: optional renderer object; SVG uses
-  `{"type":"svg","path":"..."}`
+- `style.renderer`: optional renderer object; supported values are
+  `{"type":"svg","path":"..."}` and `{"type":"png","path":"..."}`
 
 Minimal indicator entry:
 
@@ -544,6 +544,32 @@ SVG indicator entry:
 }
 ```
 
+PNG indicator entry:
+
+```json
+{
+  "type": "indicator",
+  "code": "indPng",
+  "bounds": {
+    "mode": "relative",
+    "x": 0.1,
+    "y": 0.1,
+    "width": 0.08,
+    "height": 0.08
+  },
+  "on": true,
+  "onColor": "#FF2ECC71",
+  "offColor": "#FF30343A",
+  "style": {
+    "renderer": {
+      "type": "png",
+      "path": "data/img/indicator-mask.png"
+    }
+  },
+  "tooltip": "PNG indicator"
+}
+```
+
 `on` defaults to `false`. `onColor` defaults to green and `offColor` defaults
 to dark gray when omitted. These visual values are applied to the control's
 `IndicatorStyle`. `style.strokeColor` defaults to the indicator border color
@@ -552,10 +578,13 @@ canonical border-width property; `style.strokeWidth` is accepted only as an
 alias for Toggle terminology. `borderColor` is not an Indicator visual border
 property; it belongs to tooltip style blocks. Relative `bounds` follows the same explicit
 `absolute` / `relative` mode rules as the other controls; `bounds` takes
-precedence over legacy `x` / `y` / `width` / `height`. SVG uses the same
-`style.renderer` object as Button and Toggle and is represented by
-`IndicatorStyle`. Supported renderer values in this iteration are
-`{"type":"svg","path":"..."}`.
+precedence over legacy `x` / `y` / `width` / `height`. SVG and PNG use the same
+`style.renderer` object as Button and Toggle and are represented by
+`IndicatorStyle`. Supported renderer values are `{"type":"svg","path":"..."}`
+and `{"type":"png","path":"..."}`. Renderer type and file extension are
+case-insensitive and must match. PNG is treated as a monochrome alpha mask:
+its alpha is preserved, its RGB values are ignored, and the final color comes
+from the indicator `onColor` / `offColor`.
 
 `progressbar` does not render text and is non-interactive. It displays a
 determinate value horizontally or vertically according to `fillDirection`. Its

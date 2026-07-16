@@ -8,8 +8,13 @@ import com.cpz.processing.controls.controls.indicator.style.IndicatorStyle;
 import com.cpz.processing.controls.controls.panel.Panel;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Path;
+import javax.imageio.ImageIO;
 import org.junit.jupiter.api.Test;
 import processing.core.PApplet;
+import processing.core.PImage;
 import processing.core.PShape;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class IndicatorTest {
@@ -210,6 +216,212 @@ class IndicatorTest {
         assertEquals(65.0F, sketch.lastShapeY);
         assertEquals(24.0F, sketch.lastShapeWidth);
         assertEquals(30.0F, sketch.lastShapeHeight);
+    }
+
+    @Test
+    void pngConstructorLoadsAndDrawsTintedMask() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        sketch.loadedImage = maskImage(2, 4);
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 40.0F, 40.0F, "data/img/indicator-mask.png");
+        indicator.setOnColor(0xFF00AA00);
+        indicator.setOn(true);
+
+        indicator.draw();
+
+        assertEquals("png", indicator.getRendererType());
+        assertEquals("data/img/indicator-mask.png", indicator.getRendererPath());
+        assertEquals(1, sketch.loadImageCalls);
+        assertEquals("data/img/indicator-mask.png", sketch.lastLoadImagePath);
+        assertEquals(0, sketch.circleCalls);
+        assertEquals(0, sketch.shapeCalls);
+        assertEquals(1, sketch.imageCalls);
+        assertEquals(0xFF00AA00, sketch.lastTintColor);
+        assertEquals(1, sketch.noTintCalls);
+        assertEquals(50.0F, sketch.lastImageX);
+        assertEquals(50.0F, sketch.lastImageY);
+        assertEquals(20.0F, sketch.lastImageWidth);
+        assertEquals(40.0F, sketch.lastImageHeight);
+    }
+
+    @Test
+    void pngExtensionIsCaseInsensitive() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        sketch.loadedImage = maskImage(2, 2);
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 24.0F, "data/img/indicator-mask.PNG");
+
+        indicator.draw();
+
+        assertEquals("png", indicator.getRendererType());
+        assertEquals(1, sketch.loadImageCalls);
+        assertEquals(1, sketch.imageCalls);
+    }
+
+    @Test
+    void pngMaskNormalizationPreservesAlphaAndIgnoresOriginalRgb() {
+        PImage source = new PImage(2, 2, PApplet.ARGB);
+        source.loadPixels();
+        source.pixels[0] = 0x00000000;
+        source.pixels[1] = 0x80112233;
+        source.pixels[2] = 0xFFFF0000;
+        source.pixels[3] = 0x4000FF00;
+        source.updatePixels();
+
+        PImage normalized = Indicator.normalizePngMask(source);
+
+        normalized.loadPixels();
+        assertEquals(0x00FFFFFF, normalized.pixels[0]);
+        assertEquals(0x80FFFFFF, normalized.pixels[1]);
+        assertEquals(0xFFFFFFFF, normalized.pixels[2]);
+        assertEquals(0x40FFFFFF, normalized.pixels[3]);
+    }
+
+    @Test
+    void pngTestResourceContainsTransparentSemiTransparentAndOpaquePixels() throws IOException {
+        BufferedImage image = ImageIO.read(Path.of("data/img/indicator-mask.png").toFile());
+
+        assertNotNull(image);
+        assertEquals(4, image.getWidth());
+        assertEquals(4, image.getHeight());
+        assertEquals(0x00000000, image.getRGB(0, 0));
+        assertEquals(0x80FF0000, image.getRGB(1, 0));
+        assertEquals(0xFF00FF00, image.getRGB(2, 0));
+        assertEquals(0x400000FF, image.getRGB(3, 0));
+    }
+
+    @Test
+    void pngTintUsesCurrentStateColor() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        sketch.loadedImage = maskImage(2, 2);
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 24.0F, "data/img/indicator-mask.png");
+        indicator.setOnColor(0xFF00AA00);
+        indicator.setOffColor(0xFF111111);
+
+        indicator.draw();
+        assertEquals(0xFF111111, sketch.lastTintColor);
+
+        indicator.setOn(true);
+        indicator.draw();
+        assertEquals(0xFF00AA00, sketch.lastTintColor);
+    }
+
+    @Test
+    void pngResourceIsNotReloadedOnEveryFrame() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        sketch.loadedImage = maskImage(2, 2);
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 24.0F, "data/img/indicator-mask.png");
+
+        indicator.draw();
+        PImage firstDrawImage = sketch.lastImage;
+        indicator.draw();
+
+        assertEquals(1, sketch.loadImageCalls);
+        assertSame(firstDrawImage, sketch.lastImage);
+        assertEquals(2, sketch.imageCalls);
+    }
+
+    @Test
+    void pngScalingPreservesAspectRatioAndCentersInBounds() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        sketch.loadedImage = maskImage(4, 2);
+        Indicator indicator = new Indicator(sketch, 10.0F, 20.0F, 40.0F, 40.0F, "data/img/indicator-mask.png");
+
+        indicator.draw();
+
+        assertEquals(10.0F, sketch.lastImageX);
+        assertEquals(30.0F, sketch.lastImageY);
+        assertEquals(40.0F, sketch.lastImageWidth);
+        assertEquals(20.0F, sketch.lastImageHeight);
+    }
+
+    @Test
+    void pngRendererCanBeChangedAtRuntime() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        sketch.loadedImage = maskImage(2, 2);
+        Indicator indicator = new Indicator(sketch, 10.0F, 20.0F, 20.0F, 20.0F);
+
+        indicator.setRenderer("png", "data/img/indicator-mask.png");
+        indicator.draw();
+
+        assertEquals("png", indicator.getRendererType());
+        assertEquals(1, sketch.loadImageCalls);
+        assertEquals(1, sketch.imageCalls);
+    }
+
+    @Test
+    void clearRendererReturnsToDefaultCircle() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        sketch.loadedImage = maskImage(2, 2);
+        Indicator indicator = new Indicator(sketch, 10.0F, 20.0F, 20.0F, 20.0F, "data/img/indicator-mask.png");
+
+        indicator.clearRenderer();
+        indicator.draw();
+
+        assertEquals(null, indicator.getRendererType());
+        assertEquals(null, indicator.getRendererPath());
+        assertEquals(1, sketch.circleCalls);
+        assertEquals(0, sketch.imageCalls);
+    }
+
+    @Test
+    void missingPngUsesExistingRendererBehaviorAndDrawsNothing() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        sketch.returnNullImage = true;
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 30.0F, "data/img/missing.png");
+
+        indicator.draw();
+
+        assertEquals(2, sketch.loadImageCalls);
+        assertEquals("img/missing.png", sketch.lastLoadImagePath);
+        assertEquals(0, sketch.imageCalls);
+        assertEquals(0, sketch.circleCalls);
+    }
+
+    @Test
+    void invalidPngDimensionsDrawNothing() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        sketch.loadedImage = new PImage(0, 2, PApplet.ARGB);
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 30.0F, "data/img/invalid.png");
+
+        indicator.draw();
+
+        assertEquals(1, sketch.loadImageCalls);
+        assertEquals(0, sketch.imageCalls);
+        assertEquals(0, sketch.circleCalls);
+    }
+
+    @Test
+    void unsupportedRendererExtensionFailsClearly() {
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Indicator(recordingSketch(800, 600), 40.0F, 50.0F, 24.0F, 30.0F, "data/img/icon.jpg")
+        );
+
+        assertTrue(exception.getMessage().contains(".svg"));
+        assertTrue(exception.getMessage().contains(".png"));
+    }
+
+    @Test
+    void emptyRuntimeRendererPathFailsClearly() {
+        Indicator indicator = new Indicator(recordingSketch(800, 600), 40.0F, 50.0F, 24.0F, 30.0F);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> indicator.setRenderer("png", " ")
+        );
+
+        assertTrue(exception.getMessage().contains("path"));
+    }
+
+    @Test
+    void pngDrawRestoresTintForFollowingRenderers() {
+        RecordingApplet sketch = recordingSketch(800, 600);
+        sketch.loadedImage = maskImage(2, 2);
+        Indicator indicator = new Indicator(sketch, 40.0F, 50.0F, 24.0F, 24.0F, "data/img/indicator-mask.png");
+
+        indicator.draw();
+
+        assertEquals(1, sketch.tintCalls);
+        assertEquals(1, sketch.noTintCalls);
     }
 
     @Test
@@ -431,14 +643,29 @@ class IndicatorTest {
         return sketch;
     }
 
+    private static PImage maskImage(int width, int height) {
+        PImage image = new PImage(width, height, PApplet.ARGB);
+        image.loadPixels();
+        for (int i = 0; i < image.pixels.length; i++) {
+            image.pixels[i] = 0xFF123456;
+        }
+        image.updatePixels();
+        return image;
+    }
+
     private static final class RecordingApplet extends PApplet {
         private int lastFillColor;
         private int lastStrokeColor;
+        private int lastTintColor;
         private int circleCalls;
         private int shapeCalls;
+        private int imageCalls;
         private int loadShapeCalls;
+        private int loadImageCalls;
         private int strokeCalls;
         private int noStrokeCalls;
+        private int tintCalls;
+        private int noTintCalls;
         private float lastCircleX;
         private float lastCircleY;
         private float lastCircleDiameter;
@@ -446,9 +673,17 @@ class IndicatorTest {
         private float lastShapeY;
         private float lastShapeWidth;
         private float lastShapeHeight;
+        private float lastImageX;
+        private float lastImageY;
+        private float lastImageWidth;
+        private float lastImageHeight;
         private float lastStrokeWeight;
         private String lastLoadShapePath;
+        private String lastLoadImagePath;
+        private PImage loadedImage;
+        private PImage lastImage;
         private boolean returnNullShape;
+        private boolean returnNullImage;
 
         @Override
         public void pushStyle() {
@@ -464,6 +699,10 @@ class IndicatorTest {
 
         @Override
         public void shapeMode(int mode) {
+        }
+
+        @Override
+        public void imageMode(int mode) {
         }
 
         @Override
@@ -488,6 +727,17 @@ class IndicatorTest {
         }
 
         @Override
+        public void tint(int rgb) {
+            this.tintCalls++;
+            this.lastTintColor = rgb;
+        }
+
+        @Override
+        public void noTint() {
+            this.noTintCalls++;
+        }
+
+        @Override
         public void circle(float x, float y, float extent) {
             this.circleCalls++;
             this.lastCircleX = x;
@@ -505,10 +755,27 @@ class IndicatorTest {
         }
 
         @Override
+        public void image(PImage image, float a, float b, float c, float d) {
+            this.imageCalls++;
+            this.lastImage = image;
+            this.lastImageX = a;
+            this.lastImageY = b;
+            this.lastImageWidth = c;
+            this.lastImageHeight = d;
+        }
+
+        @Override
         public PShape loadShape(String filename) {
             this.loadShapeCalls++;
             this.lastLoadShapePath = filename;
             return this.returnNullShape ? null : new PShape();
+        }
+
+        @Override
+        public PImage loadImage(String filename) {
+            this.loadImageCalls++;
+            this.lastLoadImagePath = filename;
+            return this.returnNullImage ? null : this.loadedImage;
         }
     }
 }

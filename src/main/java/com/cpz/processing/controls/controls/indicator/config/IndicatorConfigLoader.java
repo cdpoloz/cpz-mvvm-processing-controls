@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.indicator.config;
 
 import com.cpz.processing.controls.controls.indicator.Indicator;
+import com.cpz.processing.controls.controls.indicator.style.IndicatorStyle;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipJsonSupport;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.JsonConfigSupport;
@@ -100,16 +101,16 @@ public final class IndicatorConfigLoader {
         JSONObject renderer = style.getJSONObject("renderer");
         String type = JsonConfigSupport.getRequiredString(renderer, "type", path, "style.renderer");
         String normalizedType = type.trim().toLowerCase(Locale.ROOT);
-        if (!"svg".equals(normalizedType)) {
-            throw new IllegalArgumentException("Unsupported renderer type in " + path + ": " + type + ". Supported values in this iteration: svg.");
-        }
-
         String rendererPath = JsonConfigSupport.getRequiredString(renderer, "path", path, "style.renderer");
-        String normalizedPath = rendererPath.trim();
-        if (normalizedPath.isEmpty()) {
-            throw new IllegalArgumentException("Invalid 'path' value in " + path + " for style.renderer: \"" + rendererPath + "\". Expected a non-empty SVG path.");
+        try {
+            String normalizedPath = IndicatorStyle.normalizeRendererPath(rendererPath);
+            String validatedType = IndicatorStyle.normalizeRendererType(normalizedType, normalizedPath);
+            return new IndicatorConfig.RendererConfig(validatedType, normalizedPath);
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException(
+                    "Invalid indicator renderer in " + path + " for style.renderer: " + exception.getMessage(),
+                    exception
+            );
         }
-
-        return new IndicatorConfig.RendererConfig(normalizedType, normalizedPath);
     }
 }
