@@ -38,6 +38,11 @@ is rendered and hit-tested at global position `(110, 100)`.
 Moving the panel with `setPosition(...)` changes the panel origin only. It does
 not rewrite child positions.
 
+For composed `DropDown`, the same local-coordinate rule applies to the closed
+field. The panel renders that closed field under its own matrix translation and
+routes collapsed-field input by converting sketch-space pointer events into
+panel-local coordinates before delegating to the child.
+
 ---
 
 ## Explicit Relative Bounds
@@ -77,6 +82,16 @@ coordinates are still local to the panel. Child text controls that support
 `setTextSize(ControlMeasure.relative(...))` also resolve text size against the
 panel height.
 
+For a `DropDown` child specifically:
+
+- relative `x` uses the resolved panel width
+- relative `y` uses the resolved panel height
+- relative `width` uses the resolved panel height
+- relative `height` uses the resolved panel height
+
+This keeps the current uniform-height geometry contract unchanged. Relative
+width intentionally uses panel height as its scale factor.
+
 Relative text size is supported by `Button`, `Label`, `TextField`,
 `NumericField`, `RadioGroup`, `DropDown`, and the value text rendered by
 `Slider`.
@@ -106,6 +121,11 @@ leave the sketch in a translated coordinate system.
 
 The visual chrome is drawn before the local child transform. Panel style does
 not add padding and does not change child coordinates.
+
+If a child `DropDown` is expanded, `Panel.draw()` still renders only the
+collapsed field inside the translated panel space. The expanded list remains a
+global overlay. The child uses its local resolved coordinates plus the panel's
+resolved `(x, y)` offset to place that overlay in sketch space.
 
 ---
 
@@ -258,6 +278,46 @@ The layer receives normal sketch-space `PointerEvent` instances. The panel
 subtracts its own `x` and `y` before routing the event to compatible children.
 Children are consulted from last added to first added, so later children have
 the first chance to consume pointer input.
+
+For composed `DropDown`:
+
+- collapsed-field input is converted from global to panel-local before the
+  child handles it
+- expanded-list input stays global because it is captured by the drop-down's
+  overlay input layer
+- render and hit testing use the same resolved local geometry for the closed
+  field
+- the overlay uses `local + parentOffset` after the panel has synchronized the
+  child context
+
+---
+
+## Child Context Updates
+
+`Panel` refreshes child parent size and parent offset when:
+
+- `draw()` runs
+- `setPosition(...)` runs
+- `setSize(...)` runs
+- `setBounds(...)` runs
+- `setParentSize(...)` runs
+- `clearParentSize()` runs
+
+This means composed relative children update immediately for panel movement and
+panel resizing.
+
+For a direct sketch canvas resize, relative children are synchronized on the
+next panel synchronization path. The supported flow is:
+
+```java
+panel.draw();
+for (OverlayEntry entry : overlayManager.getActiveOverlays()) {
+    entry.getRender().run();
+}
+```
+
+Do not treat overlay rendering before the next panel synchronization after a
+canvas resize as a supported contract for composed relative children.
 
 Keyboard routing is available for children that implement the optional
 `KeyboardRoutableControl` contract, such as `TextField`, `NumericField`, and

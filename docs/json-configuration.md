@@ -255,6 +255,32 @@ standalone `DropDownInputLayer`; standalone drop-down registration remains
 valid only for drop-downs that are not routed by a panel. `Panel.children` JSON
 is not part of this format yet.
 
+If the drop-down was loaded with relative bounds, those original relative
+measures are preserved through loading and factory creation. After
+`panel.add(dropDown)`, they are re-resolved against the panel instead of the
+sketch canvas:
+
+- relative `x` uses panel width
+- relative `y` uses panel height
+- relative `width` uses panel height
+- relative `height` uses panel height
+
+The closed field remains local to the panel. The expanded list uses global
+overlay coordinates computed from `local + panelOffset`.
+
+After a sketch canvas resize, synchronize the panel before rendering active
+overlays:
+
+```java
+panel.draw();
+for (OverlayEntry entry : overlayManager.getActiveOverlays()) {
+    entry.getRender().run();
+}
+```
+
+Rendering the overlay before the next panel synchronization after a raw canvas
+resize is not part of the supported contract for composed relative dropdowns.
+
 ## Panel Style
 
 Panel visual style is configured through an optional nested `style` object:

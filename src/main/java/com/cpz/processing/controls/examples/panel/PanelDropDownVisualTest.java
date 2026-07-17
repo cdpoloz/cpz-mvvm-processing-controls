@@ -4,37 +4,47 @@ import com.cpz.processing.controls.controls.button.Button;
 import com.cpz.processing.controls.controls.button.input.ButtonInputLayer;
 import com.cpz.processing.controls.controls.dropdown.DropDown;
 import com.cpz.processing.controls.controls.dropdown.style.DefaultDropDownStyle;
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.controls.panel.Panel;
 import com.cpz.processing.controls.controls.panel.input.PanelInputLayer;
-import com.cpz.processing.controls.controls.toggle.Toggle;
+import com.cpz.processing.controls.controls.panel.style.PanelStyle;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
+import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import com.cpz.utils.color.Colors;
 import processing.core.PApplet;
 
 import java.util.List;
 
 /**
- * Visual validation for runtime DropDown composition inside Panel.
+ * Visual validation for relative DropDown composition inside a Panel.
+ *
+ * <p>The panel starts with relative root bounds and the dropdown keeps relative
+ * local bounds inside that panel. The sketch highlights the resolved panel
+ * frame and the closed field global bounds while keeping overlay rendering in
+ * the supported order: {@code panel.draw()} first, overlays second.</p>
  *
  * @author CPZ
  */
 public class PanelDropDownVisualTest extends PApplet {
+    private static final ControlBounds INITIAL_PANEL_BOUNDS = ControlBounds.relative(0.15F, 0.12F, 0.55F, 0.32F);
+    private static final ControlBounds INITIAL_DROPDOWN_BOUNDS = ControlBounds.relative(0.25F, 0.25F, 0.55F, 0.12F);
+
     private InputManager inputManager;
     private OverlayManager overlayManager;
 
     private Panel panel;
     private DropDown panelDropDown;
-    private Toggle panelToggle;
-    private Button lowerButton;
-    private Button btnVisible;
-    private Button btnEnabled;
+    private Button behindButton;
     private Button btnMove;
+    private Button btnResize;
+    private Button btnReset;
 
-    private int lowerClicks;
-    private boolean panelShifted;
+    private int behindClicks;
+    private boolean panelMoved;
+    private boolean panelResized;
 
     public static void main(String[] args) {
         PApplet.main(PanelDropDownVisualTest.class);
@@ -46,6 +56,7 @@ public class PanelDropDownVisualTest extends PApplet {
     }
 
     public void setup() {
+        surface.setResizable(true);
         this.inputManager = new InputManager();
         this.overlayManager = new OverlayManager();
 
@@ -55,16 +66,16 @@ public class PanelDropDownVisualTest extends PApplet {
     }
 
     public void draw() {
-        background(24, 27, 31);
+        background(22, 25, 29);
         this.drawBackdrop();
-        this.drawPanelFrame();
-        this.panel.draw();
-        this.lowerButton.draw();
-        this.btnVisible.draw();
-        this.btnEnabled.draw();
+        this.behindButton.draw();
         this.btnMove.draw();
-        this.drawStatus();
+        this.btnResize.draw();
+        this.btnReset.draw();
+        this.panel.draw();
         this.drawActiveOverlays();
+        this.drawDebugBounds();
+        this.drawStatus();
     }
 
     public void mouseMoved() {
@@ -92,12 +103,15 @@ public class PanelDropDownVisualTest extends PApplet {
                     topOverlay.getOnClose().run();
                 }
             }
-        } else if (key == 'v' || key == 'V') {
-            this.togglePanelVisible();
-        } else if (key == 'e' || key == 'E') {
-            this.togglePanelEnabled();
-        } else if (key == 'm' || key == 'M') {
-            this.movePanel();
+            return;
+        }
+
+        if (key == 'm' || key == 'M') {
+            this.toggleMovePanel();
+        } else if (key == 's' || key == 'S') {
+            this.toggleResizePanel();
+        } else if (key == 'r' || key == 'R') {
+            this.resetPanelRelativeBounds();
         }
     }
 
@@ -112,99 +126,128 @@ public class PanelDropDownVisualTest extends PApplet {
     }
 
     private void createPanel() {
-        this.panel = new Panel(this, "pnlDropDownDemo", 170.0F, 110.0F, 300.0F, 150.0F);
+        this.panel = new Panel(this, "pnlRelativeDropDown", INITIAL_PANEL_BOUNDS);
+        this.panel.setStyle(new PanelStyle()
+                .setBackgroundVisible(true)
+                .setBackgroundColor(Colors.argb(208, 31, 41, 52))
+                .setStrokeVisible(true)
+                .setStrokeColor(Colors.rgb(88, 164, 214))
+                .setStrokeWeight(2.0F)
+                .setCornerRadius(14.0F));
 
         this.panelDropDown = new DropDown(
                 this,
                 this.overlayManager,
                 this.inputManager,
-                "ddPanelChild",
-                List.of("Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta"),
-                120,
-                42.0F,
-                110.0F,
-                28.0F
+                "ddRelativeChild",
+                List.of("Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta"),
+                INITIAL_DROPDOWN_BOUNDS
         );
         this.panelDropDown.setStyle(this.createDropDownStyle());
-        this.panelToggle = new Toggle(this, "tglPanelChild", 218.0F, 42.0F, 62.0F, 34.0F);
-        Button childButton = new Button(this, "btnPanelChild", "Panel button", 150.0F, 104.0F, 180.0F, 34.0F);
-
-        this.panel.add(this.panelDropDown)
-                .add(this.panelToggle)
-                .add(childButton);
+        this.panel.add(this.panelDropDown);
     }
 
     private void createExternalControls() {
-        this.lowerButton = new Button(this, "btnBehindPanel", "Behind panel / overlay target", 320.0F, 302.0F, 260.0F, 36.0F);
-        this.lowerButton.setClickListener(() -> this.lowerClicks++);
+        this.behindButton = new Button(this, "btnBehind", "Behind overlay target", 670.0F, 246.0F, 200.0F, 38.0F);
+        this.behindButton.setClickListener(() -> this.behindClicks++);
 
-        this.btnVisible = new Button(this, "btnTogglePanelVisible", "Show / hide panel", 170.0F, 438.0F, 180.0F, 40.0F);
-        this.btnVisible.setClickListener(this::togglePanelVisible);
+        this.btnMove = new Button(this, "btnMovePanel", "Move panel", 118.0F, 456.0F, 160.0F, 40.0F);
+        this.btnMove.setClickListener(this::toggleMovePanel);
 
-        this.btnEnabled = new Button(this, "btnTogglePanelEnabled", "Enable / disable", 390.0F, 438.0F, 180.0F, 40.0F);
-        this.btnEnabled.setClickListener(this::togglePanelEnabled);
+        this.btnResize = new Button(this, "btnResizePanel", "Resize panel", 310.0F, 456.0F, 160.0F, 40.0F);
+        this.btnResize.setClickListener(this::toggleResizePanel);
 
-        this.btnMove = new Button(this, "btnMovePanel", "Move panel", 610.0F, 438.0F, 150.0F, 40.0F);
-        this.btnMove.setClickListener(this::movePanel);
+        this.btnReset = new Button(this, "btnResetPanel", "Reset relative", 502.0F, 456.0F, 170.0F, 40.0F);
+        this.btnReset.setClickListener(this::resetPanelRelativeBounds);
     }
 
     private void registerInput() {
-        this.inputManager.registerLayer(new ButtonInputLayer(10, this.btnVisible, this.btnEnabled, this.btnMove, this.lowerButton));
+        this.inputManager.registerLayer(new ButtonInputLayer(10, this.btnMove, this.btnResize, this.btnReset));
         this.inputManager.registerLayer(new PanelInputLayer(0, this.panel));
+        this.inputManager.registerLayer(new ButtonInputLayer(-1, this.behindButton));
     }
 
     private DefaultDropDownStyle createDropDownStyle() {
         com.cpz.processing.controls.controls.dropdown.config.DropDownStyleConfig style =
                 new com.cpz.processing.controls.controls.dropdown.config.DropDownStyleConfig();
-        style.itemHeight = 22.0F;
-        style.maxVisibleItems = 8;
+        style.itemHeight = 24.0F;
+        style.maxVisibleItems = 6;
         style.textSize = 12.0F;
-        style.baseFillOverride = Colors.rgb(232, 239, 245);
-        style.listFillOverride = Colors.rgb(245, 248, 251);
-        style.textOverride = Colors.rgb(33, 44, 57);
-        style.borderOverride = Colors.rgb(90, 122, 150);
-        style.focusedBorderOverride = Colors.rgb(38, 132, 212);
-        style.hoverItemOverlayOverride = Colors.argb(50, 38, 132, 212);
-        style.selectedItemOverlayOverride = Colors.argb(78, 38, 132, 212);
+        style.baseFillOverride = Colors.rgb(235, 240, 245);
+        style.listFillOverride = Colors.rgb(244, 248, 252);
+        style.textOverride = Colors.rgb(30, 41, 54);
+        style.borderOverride = Colors.rgb(91, 132, 170);
+        style.focusedBorderOverride = Colors.rgb(52, 160, 232);
+        style.hoverItemOverlayOverride = Colors.argb(52, 52, 160, 232);
+        style.selectedItemOverlayOverride = Colors.argb(78, 52, 160, 232);
         return new DefaultDropDownStyle(style);
     }
 
     private void drawBackdrop() {
         pushStyle();
-        noStroke();
-        fill(42, 62, 84);
         rectMode(CORNER);
-        rect(120.0F, 240.0F, 410.0F, 110.0F, 16.0F);
-        fill(220);
+        noStroke();
+        fill(38, 58, 78);
+        rect(620.0F, 182.0F, 240.0F, 126.0F, 18.0F);
+        fill(228);
         textAlign(LEFT, TOP);
-        text("The large blue area plus the button sit behind the panel.\nUse the dropdown list outside the panel bounds to detect click-through.", 136.0F, 254.0F);
+        text("The button on the right stays behind the panel and overlay.\nOpen the dropdown and click its list over this region to verify there is no click-through.", 636.0F, 198.0F);
         popStyle();
     }
 
-    private void drawPanelFrame() {
-        if (!this.panel.isVisible()) {
-            return;
-        }
+    private void drawDebugBounds() {
+        TooltipBounds localBounds = this.panelDropDown.getTooltipBounds();
+        TooltipBounds globalBounds = this.panel.tooltipTarget(this.panelDropDown).getTooltipBounds();
 
         pushStyle();
         rectMode(CORNER);
         noFill();
-        stroke(this.panel.isEnabled() ? Colors.rgb(88, 180, 230) : Colors.rgb(112, 118, 126));
+
+        stroke(98, 208, 255);
         strokeWeight(2.0F);
         rect(this.panel.getX(), this.panel.getY(), this.panel.getWidth(), this.panel.getHeight(), 8.0F);
+
+        stroke(255, 206, 96);
+        rect(globalBounds.x(), globalBounds.y(), globalBounds.width(), globalBounds.height(), 6.0F);
+
+        stroke(114, 255, 170);
+        float localCenterX = localBounds.x() + localBounds.width() * 0.5F;
+        float localCenterY = localBounds.y() + localBounds.height() * 0.5F;
+        float globalCenterX = globalBounds.x() + globalBounds.width() * 0.5F;
+        float globalCenterY = globalBounds.y() + globalBounds.height() * 0.5F;
+        line(this.panel.getX(), this.panel.getY(), globalCenterX, globalCenterY);
+        line(globalCenterX - 8.0F, globalCenterY, globalCenterX + 8.0F, globalCenterY);
+        line(globalCenterX, globalCenterY - 8.0F, globalCenterX, globalCenterY + 8.0F);
+
+        fill(114, 255, 170);
+        textAlign(LEFT, BOTTOM);
+        text("local center (" + format(localCenterX) + ", " + format(localCenterY) + ")", this.panel.getX() + 10.0F, this.panel.getY() - 10.0F);
+        text("global center (" + format(globalCenterX) + ", " + format(globalCenterY) + ")", globalBounds.x(), globalBounds.y() - 10.0F);
         popStyle();
     }
 
     private void drawStatus() {
-        fill(228);
+        TooltipBounds localBounds = this.panelDropDown.getTooltipBounds();
+        TooltipBounds globalBounds = this.panel.tooltipTarget(this.panelDropDown).getTooltipBounds();
+
+        pushStyle();
+        fill(232);
         textAlign(LEFT, TOP);
-        text("Panel position: (" + (int) this.panel.getX() + ", " + (int) this.panel.getY() + ")"
-                + " | visible=" + this.panel.isVisible()
-                + " | enabled=" + this.panel.isEnabled()
-                + " | dropdown expanded=" + this.panelDropDown.isExpanded()
-                + " | selected=" + this.panelDropDown.getSelectedItem(), 42.0F, 28.0F);
-        text("Behind-panel button clicks: " + this.lowerClicks, 42.0F, 54.0F);
-        text("Keys: V visibility, E enabled, M move. ESC closes the top overlay when one is open.", 42.0F, 80.0F);
+        text("Canvas: " + width + " x " + height
+                + " | panel: (" + format(this.panel.getX()) + ", " + format(this.panel.getY()) + ", "
+                + format(this.panel.getWidth()) + ", " + format(this.panel.getHeight()) + ")", 30.0F, 24.0F);
+        text("DropDown relative measures: x=0.25w, y=0.25h, width=0.55h, height=0.12h", 30.0F, 48.0F);
+        text("DropDown local bounds: (" + format(localBounds.x()) + ", " + format(localBounds.y()) + ", "
+                + format(localBounds.width()) + ", " + format(localBounds.height()) + ")", 30.0F, 72.0F);
+        text("DropDown global bounds: (" + format(globalBounds.x()) + ", " + format(globalBounds.y()) + ", "
+                + format(globalBounds.width()) + ", " + format(globalBounds.height()) + ")", 30.0F, 96.0F);
+        text("Expanded=" + this.panelDropDown.isExpanded()
+                + " | selectedIndex=" + this.panelDropDown.getSelectedIndex()
+                + " | selectedItem=" + this.panelDropDown.getSelectedItem()
+                + " | behindClicks=" + this.behindClicks, 30.0F, 120.0F);
+        text("Keys: M move panel, S resize panel, R restore relative panel, ESC close top overlay.", 30.0F, 144.0F);
+        text("Draw order: behind controls -> panel.draw() -> overlayManager active overlays -> debug/status", 30.0F, 168.0F);
+        popStyle();
     }
 
     private void drawActiveOverlays() {
@@ -217,20 +260,35 @@ public class PanelDropDownVisualTest extends PApplet {
         this.inputManager.dispatchPointer(new PointerEvent(type, mouseX, mouseY, mouseButton));
     }
 
-    private void togglePanelVisible() {
-        this.panel.setVisible(!this.panel.isVisible());
-    }
-
-    private void togglePanelEnabled() {
-        this.panel.setEnabled(!this.panel.isEnabled());
-    }
-
-    private void movePanel() {
-        this.panelShifted = !this.panelShifted;
-        if (this.panelShifted) {
-            this.panel.setPosition(360.0F, 150.0F);
+    private void toggleMovePanel() {
+        this.panelMoved = !this.panelMoved;
+        if (this.panelMoved) {
+            this.panel.setPosition(320.0F, 92.0F);
+        } else if (this.panelResized) {
+            this.panel.setPosition(160.0F, 62.0F);
         } else {
-            this.panel.setPosition(170.0F, 110.0F);
+            this.resetPanelRelativeBounds();
         }
+    }
+
+    private void toggleResizePanel() {
+        this.panelResized = !this.panelResized;
+        if (this.panelResized) {
+            this.panel.setSize(430.0F, 228.0F);
+        } else if (this.panelMoved) {
+            this.panel.setSize(495.0F, 166.0F);
+        } else {
+            this.resetPanelRelativeBounds();
+        }
+    }
+
+    private void resetPanelRelativeBounds() {
+        this.panelMoved = false;
+        this.panelResized = false;
+        this.panel.setBounds(INITIAL_PANEL_BOUNDS);
+    }
+
+    private static String format(float value) {
+        return Integer.toString(Math.round(value));
     }
 }

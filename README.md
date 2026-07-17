@@ -219,7 +219,21 @@ interactively without rewriting child coordinates. `DropDown` can be added as
 a runtime child with `panel.add(dropDown)`: the collapsed field uses panel-local
 coordinates, while the expanded list remains a global overlay. JSON can
 configure both controls, but the parent-child relationship is still established
-in Java.
+in Java. For relative composed drop-downs, `x` resolves against panel width and
+`y`, `width`, and `height` resolve against panel height, preserving the current
+uniform-height geometry contract.
+
+When a composed relative drop-down is expanded, use the supported draw order:
+
+```java
+panel.draw();
+for (OverlayEntry entry : overlayManager.getActiveOverlays()) {
+    entry.getRender().run();
+}
+```
+
+After a raw sketch canvas resize, the child overlay is refreshed on the next
+panel synchronization path, so render overlays after `panel.draw()`.
 
 See [Panel](docs/panel.md),
 `src/main/java/com/cpz/processing/controls/examples/panel/PanelVisualTest.java`,
@@ -237,6 +251,11 @@ Relative measures are explicit. The loader does not infer that values between
 - relative `width` uses `parentHeight * factor`
 - relative `height` uses `parentHeight * factor`
 - relative `textSize` uses `parentHeight * factor`
+
+For controls added to a `Panel`, the parent reference becomes the panel's
+resolved width and height. The resolved child coordinates stay local to the
+panel, while `DropDown` overlays use those local coordinates plus the panel's
+resolved sketch-space offset.
 
 Legacy absolute JSON remains valid:
 

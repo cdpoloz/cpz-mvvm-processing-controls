@@ -5,6 +5,9 @@ import com.cpz.processing.controls.controls.button.Button;
 import com.cpz.processing.controls.controls.button.input.ButtonInputLayer;
 import com.cpz.processing.controls.controls.config.ControlConfigLoader;
 import com.cpz.processing.controls.controls.dropdown.DropDown;
+import com.cpz.processing.controls.controls.dropdown.util.DropDownOverlayController;
+import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.controls.geometry.MeasureMode;
 import com.cpz.processing.controls.controls.panel.Panel;
 import com.cpz.processing.controls.controls.panel.config.PanelConfig;
 import com.cpz.processing.controls.controls.panel.config.PanelConfigLoader;
@@ -19,10 +22,12 @@ import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
 import com.cpz.processing.controls.testsupport.ProcessingTestSupport;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import processing.core.PShape;
 import processing.data.JSONObject;
 
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
@@ -39,6 +44,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PanelJsonConfigTest {
+    @AfterEach
+    void tearDown() {
+        clearDropDownControllers();
+    }
+
     @Test
     void panelConfigLoaderReadsStructuralPanelConfig() {
         PanelConfig config = new PanelConfigLoader(new RecordingApplet(JSONObject.parse(
@@ -249,6 +259,83 @@ class PanelJsonConfigTest {
     }
 
     @Test
+    void relativePanelAndRelativeDropDownLoadedFromJsonComposeAtRuntimeAndUseGlobalOverlayCoordinates() {
+        JSONObject root = JSONObject.parse("{\"controls\":["
+                + "{\"type\":\"panel\",\"code\":\"panel\","
+                + "\"bounds\":{\"mode\":\"relative\",\"x\":0.25,\"y\":0.1,\"width\":0.5,\"height\":0.2}},"
+                + "{\"type\":\"dropdown\",\"code\":\"dropDown\","
+                + "\"items\":[\"Alpha\",\"Beta\",\"Gamma\",\"Delta\",\"Epsilon\",\"Zeta\"],"
+                + "\"selectedIndex\":0,"
+                + "\"bounds\":{\"mode\":\"relative\",\"x\":0.2,\"y\":0.25,\"width\":0.5,\"height\":0.1},"
+                + "\"style\":{\"itemHeight\":20}},"
+                + "{\"type\":\"button\",\"code\":\"behind\",\"text\":\"Behind\",\"x\":260,\"y\":126,\"width\":120,\"height\":24}"
+                + "]}");
+        RecordingApplet sketch = new RecordingApplet(root);
+        sketch.width = 800;
+        sketch.height = 600;
+        ProcessingTestSupport.graphics(sketch);
+        InputManager inputManager = new InputManager();
+        OverlayManager overlayManager = new OverlayManager();
+
+        Map<String, Control> controls = new ControlConfigLoader(sketch, overlayManager, inputManager).load("controls.json");
+        Panel panel = assertInstanceOf(Panel.class, controls.get("panel"));
+        DropDown dropDown = assertInstanceOf(DropDown.class, controls.get("dropDown"));
+        Button behindButton = assertInstanceOf(Button.class, controls.get("behind"));
+        AtomicInteger behindClicks = new AtomicInteger();
+        behindButton.setClickListener(behindClicks::incrementAndGet);
+
+        assertMeasure(relativeBoundsOf(dropDown).x().mode(), MeasureMode.RELATIVE);
+        assertMeasure(relativeBoundsOf(dropDown).y().mode(), MeasureMode.RELATIVE);
+        assertMeasure(relativeBoundsOf(dropDown).width().mode(), MeasureMode.RELATIVE);
+        assertMeasure(relativeBoundsOf(dropDown).height().mode(), MeasureMode.RELATIVE);
+        assertEquals(10.0F, dropDown.getTooltipBounds().x(), 0.001F);
+        assertEquals(120.0F, dropDown.getTooltipBounds().y(), 0.001F);
+        assertEquals(300.0F, dropDown.getTooltipBounds().width(), 0.001F);
+        assertEquals(60.0F, dropDown.getTooltipBounds().height(), 0.001F);
+
+        panel.add(dropDown);
+        inputManager.registerLayer(new PanelInputLayer(0, panel));
+        inputManager.registerLayer(new ButtonInputLayer(-1, behindButton));
+
+        assertEquals(200.0F, panel.getX(), 0.001F);
+        assertEquals(60.0F, panel.getY(), 0.001F);
+        assertEquals(300.0F, panel.getWidth(), 0.001F);
+        assertEquals(120.0F, panel.getHeight(), 0.001F);
+        assertEquals(30.0F, dropDown.getTooltipBounds().x(), 0.001F);
+        assertEquals(24.0F, dropDown.getTooltipBounds().y(), 0.001F);
+        assertEquals(60.0F, dropDown.getTooltipBounds().width(), 0.001F);
+        assertEquals(12.0F, dropDown.getTooltipBounds().height(), 0.001F);
+        assertEquals(230.0F, panel.tooltipTarget(dropDown).getTooltipBounds().x(), 0.001F);
+        assertEquals(84.0F, panel.tooltipTarget(dropDown).getTooltipBounds().y(), 0.001F);
+        assertEquals(60.0F, panel.tooltipTarget(dropDown).getTooltipBounds().width(), 0.001F);
+        assertEquals(12.0F, panel.tooltipTarget(dropDown).getTooltipBounds().height(), 0.001F);
+        assertTrue(dropDown.canConsumePointerEvent(new PointerEvent(PointerEvent.Type.PRESS, 60.0F, 30.0F)));
+        assertTrue(panel.canConsumePointerEvent(new PointerEvent(PointerEvent.Type.PRESS, 260.0F, 90.0F)));
+
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, 260.0F, 90.0F));
+
+        assertTrue(dropDown.isExpanded());
+        assertEquals(1, overlayManager.getActiveOverlays().size());
+
+        panel.draw();
+        renderOverlays(overlayManager);
+
+        assertEquals(230.0F, sketch.listRectX, 0.001F);
+        assertEquals(96.0F, sketch.listRectY, 0.001F);
+        assertEquals(60.0F, sketch.listRectWidth, 0.001F);
+
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, 260.0F, 126.0F));
+
+        assertEquals("Beta", dropDown.getSelectedItem());
+        assertFalse(dropDown.isExpanded());
+        assertEquals(0, overlayManager.getActiveOverlays().size());
+        assertEquals(0, behindClicks.get());
+
+        dropDown.dispose();
+        overlayManager.clearAll();
+    }
+
+    @Test
     void panelDropDownExampleJsonLoadsAndComposesWithoutStandaloneInputLayer() throws Exception {
         JSONObject root = JSONObject.parse(Files.readString(Path.of("data/config/panel-dropdown.json")));
         RecordingApplet sketch = new RecordingApplet(root);
@@ -336,6 +423,33 @@ class PanelJsonConfigTest {
     private static void renderOverlays(OverlayManager overlayManager) {
         for (OverlayEntry entry : overlayManager.getActiveOverlays()) {
             entry.getRender().run();
+        }
+    }
+
+    private static ControlBounds relativeBoundsOf(DropDown dropDown) {
+        try {
+            Field field = DropDown.class.getDeclaredField("bounds");
+            field.setAccessible(true);
+            return (ControlBounds) field.get(dropDown);
+        } catch (ReflectiveOperationException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    private static void assertMeasure(MeasureMode actual, MeasureMode expected) {
+        assertEquals(expected, actual);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void clearDropDownControllers() {
+        try {
+            Field field = DropDownOverlayController.class.getDeclaredField("CONTROLLERS");
+            field.setAccessible(true);
+            for (DropDownOverlayController controller : new java.util.ArrayList<>((java.util.List<DropDownOverlayController>) field.get(null))) {
+                controller.dispose();
+            }
+        } catch (ReflectiveOperationException ex) {
+            throw new AssertionError(ex);
         }
     }
 

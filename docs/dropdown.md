@@ -126,6 +126,17 @@ then establishes the parent-child relationship with `panel.add(dropDown)`.
 The dropdown coordinates from JSON are interpreted as local after composition,
 while the expanded list remains a global overlay.
 
+For composed relative geometry, the current contract is:
+
+- relative `x` resolves against the panel width
+- relative `y` resolves against the panel height
+- relative `width` resolves against the panel height
+- relative `height` resolves against the panel height
+
+The collapsed field keeps those resolved coordinates as panel-local values. The
+expanded list uses the same resolved local geometry plus the current panel
+offset to render and hit-test in sketch space.
+
 ---
 
 ## Focus behavior
@@ -234,7 +245,7 @@ The overlay is internal, but the host still renders active overlays through the 
 ```java
 public void draw() {
     background(28);
-    dropDown.draw();
+    panel.draw();
 
     for (OverlayEntry entry : overlayManager.getActiveOverlays()) {
         entry.getRender().run();
@@ -243,6 +254,10 @@ public void draw() {
 ```
 
 This keeps overlay ordering centralized and consistent with the existing infrastructure.
+
+For composed relative dropdowns after a sketch canvas resize, let the panel run
+its next synchronization path before rendering overlays. `panel.draw()`
+followed by overlay rendering is the supported order.
 
 ---
 
