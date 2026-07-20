@@ -163,6 +163,10 @@ NotificationStyle style = new NotificationStyle()
         .setIconTextGap(10.0F)
         .setCornerRadius(8.0F)
         .setStrokeWeight(1.0F)
+        .setSeverityBackgroundColor(NotificationSeverity.INFO, 0xFF102A38)
+        .setSeverityBackgroundColor(NotificationSeverity.SUCCESS, 0xFF123023)
+        .setSeverityBackgroundColor(NotificationSeverity.WARNING, 0xFF382A12)
+        .setSeverityBackgroundColor(NotificationSeverity.ERROR, 0xFF38151D)
         .setSeverityIcon(NotificationSeverity.INFO, "data/img/test.svg")
         .setSeverityIcon(NotificationSeverity.WARNING, "data/img/test.svg");
 
@@ -203,6 +207,22 @@ colors and styles defined by the SVG; notification severity colors do not
 recolor them. The manager loads each configured SVG once per severity/path and
 reuses it until that path changes. A configured path that cannot be loaded is
 reported as an `IllegalArgumentException` identifying the severity and path.
+
+Each severity may also override the notification background without changing
+the border, accent strip, text, SVG icon, or layout:
+
+```java
+style.setSeverityBackgroundColor(NotificationSeverity.ERROR, 0xFF38151D);
+Integer errorBackground = style.getSeverityBackgroundColor(NotificationSeverity.ERROR);
+style.clearSeverityBackgroundColor(NotificationSeverity.ERROR);
+```
+
+The getter returns `null` when no severity-specific color is configured.
+`setSeverityBackgroundColor(severity, null)` also clears the association. The
+effective background is the configured severity color when present, otherwise
+`backgroundColor`; consequently an unconfigured style renders exactly as
+before. Text color is not adjusted automatically, so configure severity
+backgrounds with sufficient contrast against the existing `textColor`.
 
 There are no shadows, countdown bars, animations, fade, slide, easing, hover
 pause, close buttons, or actions.
@@ -278,6 +298,12 @@ Supported standalone JSON fields:
     "accentWidth": 5.0,
     "iconSize": 24.0,
     "iconTextGap": 10.0,
+    "severityBackgroundColors": {
+      "info": "#102A38",
+      "success": "#123023",
+      "warning": "#382A12",
+      "error": "#38151D"
+    },
     "severityIcons": {
       "info": "data/img/test.svg",
       "success": "data/img/test.svg",
@@ -318,6 +344,27 @@ association. Icon paths use the existing optional non-blank string convention:
 blank or non-string configured values are rejected, while unknown severity keys
 are ignored. SVG paths are resolved lazily through Processing; a configured but
 unloadable path raises an error when the icon is first needed.
+
+`style.severityBackgroundColors` is optional, follows the same normalized
+severity-key rules as `severityIcons`, and may be partial:
+
+```json
+{
+  "style": {
+    "severityBackgroundColors": {
+      "warning": "#382A12",
+      "error": "#38151D"
+    }
+  }
+}
+```
+
+Unlisted severities fall back to `backgroundColor`. During a partial apply, an
+absent block preserves existing associations; an explicit `null` for a known
+severity clears that association and restores the fallback. Values use the
+same integer ARGB or `#RRGGBB` / `#AARRGGBB` color syntax as `backgroundColor`.
+This is independent of, and fully compatible with, `severityIcons`. It does
+not choose a contrasting text color automatically.
 
 `defaultDurationMillis` is applied before `severityDurations`, so a JSON file
 can set a global duration and then override warning or error durations.

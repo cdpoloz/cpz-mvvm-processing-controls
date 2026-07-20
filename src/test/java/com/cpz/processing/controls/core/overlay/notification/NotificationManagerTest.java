@@ -487,13 +487,65 @@ class NotificationManagerTest {
         NotificationStyle source = new NotificationStyle()
                 .setIconSize(26.0F)
                 .setIconTextGap(9.0F)
+                .setSeverityBackgroundColor(NotificationSeverity.SUCCESS, 0xFF123023)
                 .setSeverityIcon(NotificationSeverity.SUCCESS, "data/img/success.svg");
 
         NotificationStyle copy = new NotificationStyle(source);
 
         assertEquals(26.0F, copy.getIconSize());
         assertEquals(9.0F, copy.getIconTextGap());
+        assertEquals(0xFF123023, copy.getSeverityBackgroundColor(NotificationSeverity.SUCCESS));
         assertEquals("data/img/success.svg", copy.getSeverityIcon(NotificationSeverity.SUCCESS));
+    }
+
+    @Test
+    void severityBackgroundColorStyleApiAssignsQueriesAndClearsOptionalColors() {
+        NotificationStyle style = new NotificationStyle();
+
+        for (NotificationSeverity severity : NotificationSeverity.values()) {
+            assertNull(style.getSeverityBackgroundColor(severity));
+            style.setSeverityBackgroundColor(severity, 0xFF102030 + severity.ordinal());
+            assertEquals(0xFF102030 + severity.ordinal(), style.getSeverityBackgroundColor(severity));
+        }
+
+        style.clearSeverityBackgroundColor(NotificationSeverity.WARNING);
+        assertNull(style.getSeverityBackgroundColor(NotificationSeverity.WARNING));
+        assertEquals(0xFF102030 + NotificationSeverity.ERROR.ordinal(), style.getSeverityBackgroundColor(NotificationSeverity.ERROR));
+        style.setSeverityBackgroundColor(NotificationSeverity.ERROR, null);
+        assertNull(style.getSeverityBackgroundColor(NotificationSeverity.ERROR));
+        assertThrows(NullPointerException.class, () -> style.setSeverityBackgroundColor(null, 0xFF102030));
+        assertThrows(NullPointerException.class, () -> style.getSeverityBackgroundColor(null));
+        assertThrows(NullPointerException.class, () -> style.clearSeverityBackgroundColor(null));
+    }
+
+    @Test
+    void rendererUsesSeverityBackgroundColorWithoutChangingIconLayout() {
+        RecordingApplet sketch = recordingSketch();
+        sketch.loadedShape = new SizedShape(24.0F, 24.0F);
+        NotificationManager manager = manager(sketch, new OverlayManager(), new FakeTimeSource(0L));
+        manager.setPlacement(NotificationPlacement.TOP_LEFT);
+        manager.setStyle(new NotificationStyle()
+                .setBackgroundColor(0xFF202020)
+                .setSeverityBackgroundColor(NotificationSeverity.WARNING, 0xFF382A12)
+                .setAccentWidth(5.0F)
+                .setTextPadding(12.0F)
+                .setIconSize(24.0F)
+                .setIconTextGap(10.0F)
+                .setSeverityIcon(NotificationSeverity.WARNING, "data/img/test.svg"));
+        manager.warning("Warning");
+
+        manager.getOverlayEntry().getRender().run();
+
+        assertEquals(0xFF382A12, sketch.fillColors.get(0));
+        assertEquals(1, sketch.shapeCalls);
+        assertEquals(67.0F, sketch.lastTextX);
+
+        manager.getStyle().clearSeverityBackgroundColor(NotificationSeverity.WARNING);
+        manager.getOverlayEntry().getRender().run();
+
+        assertEquals(0xFF202020, sketch.fillColors.get(3));
+        assertEquals(2, sketch.shapeCalls);
+        assertEquals(67.0F, sketch.lastTextX);
     }
 
     @Test
@@ -666,6 +718,7 @@ class NotificationManagerTest {
         private float lastShapeHeight;
         private String lastLoadShapePath;
         private final List<String> loadShapePaths = new java.util.ArrayList<>();
+        private final List<Integer> fillColors = new java.util.ArrayList<>();
         private PShape loadedShape;
         private boolean returnNullShape;
 
@@ -679,6 +732,7 @@ class NotificationManagerTest {
 
         @Override
         public void fill(int rgb) {
+            this.fillColors.add(rgb);
         }
 
         @Override

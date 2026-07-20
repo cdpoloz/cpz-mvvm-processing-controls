@@ -239,7 +239,8 @@ public final class NotificationManager {
         } else {
             this.sketch.noStroke();
         }
-        this.sketch.fill(this.style.getBackgroundColor());
+        Integer severityBackgroundColor = this.style.getSeverityBackgroundColor(frame.notification().getSeverity());
+        this.sketch.fill(severityBackgroundColor != null ? severityBackgroundColor : this.style.getBackgroundColor());
         this.sketch.rect(frame.x(), frame.y(), frame.width(), frame.height(), this.style.getCornerRadius());
 
         this.sketch.noStroke();

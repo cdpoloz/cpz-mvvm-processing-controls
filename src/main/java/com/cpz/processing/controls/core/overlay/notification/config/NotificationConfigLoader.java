@@ -152,6 +152,7 @@ public final class NotificationConfigLoader {
                 JsonConfigSupport.getOptionalColor(style, "warningAccentColor", path),
                 JsonConfigSupport.getOptionalColor(style, "errorAccentColor", path),
                 readSeverityIcons(style, path),
+                readSeverityBackgroundColors(style, path),
                 fontPath,
                 path,
                 fontPath == null ? null : fontResolverFactory.create(fontPath, path)
@@ -192,6 +193,35 @@ public final class NotificationConfigLoader {
             }
         }
         return icons;
+    }
+
+    private static Map<NotificationSeverity, Integer> readSeverityBackgroundColors(JSONObject style, String path) {
+        EnumMap<NotificationSeverity, Integer> colors = new EnumMap<>(NotificationSeverity.class);
+        if (!style.hasKey("severityBackgroundColors") || style.isNull("severityBackgroundColors")) {
+            return colors;
+        }
+
+        Object rawColors = style.get("severityBackgroundColors");
+        if (!(rawColors instanceof JSONObject)) {
+            return colors;
+        }
+
+        JSONObject severityBackgroundColors = (JSONObject) rawColors;
+        for (Object rawKey : severityBackgroundColors.keys()) {
+            NotificationSeverity severity = parseSeverity(rawKey);
+            if (severity == null) {
+                continue;
+            }
+
+            String key = String.valueOf(rawKey);
+            colors.put(
+                    severity,
+                    severityBackgroundColors.isNull(key)
+                            ? null
+                            : JsonConfigSupport.getOptionalColor(severityBackgroundColors, key, path)
+            );
+        }
+        return colors;
     }
 
     private static Integer readPositiveInt(JSONObject json, String key) {

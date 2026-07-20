@@ -138,6 +138,18 @@ class NotificationConfigLoaderTest {
     }
 
     @Test
+    void absentSeverityBackgroundColorsLeaveAllSeveritiesOnGeneralBackground() {
+        NotificationManager manager = manager();
+
+        config("{\"style\":{\"backgroundColor\":\"#102030\"}}").applyTo(manager);
+
+        assertEquals(0xFF102030, manager.getStyle().getBackgroundColor());
+        for (NotificationSeverity severity : NotificationSeverity.values()) {
+            assertNull(manager.getStyle().getSeverityBackgroundColor(severity));
+        }
+    }
+
+    @Test
     void loadReadsSeverityAccentColors() {
         NotificationManager manager = manager();
 
@@ -201,6 +213,78 @@ class NotificationConfigLoaderTest {
         assertNull(style.getSeverityIcon(NotificationSeverity.SUCCESS));
         assertEquals("data/img/warning.svg", style.getSeverityIcon(NotificationSeverity.WARNING));
         assertEquals("data/img/error.svg", style.getSeverityIcon(NotificationSeverity.ERROR));
+    }
+
+    @Test
+    void loadReadsCompleteSeverityBackgroundColors() {
+        NotificationManager manager = manager();
+
+        config("{\"style\":{\"severityBackgroundColors\":{"
+                + "\"info\":\"#102A38\",\"SUCCESS\":\"#123023\","
+                + "\"warning\":\"#382A12\",\"error\":\"#38151D\"}}}").applyTo(manager);
+
+        NotificationStyle style = manager.getStyle();
+        assertEquals(0xFF102A38, style.getSeverityBackgroundColor(NotificationSeverity.INFO));
+        assertEquals(0xFF123023, style.getSeverityBackgroundColor(NotificationSeverity.SUCCESS));
+        assertEquals(0xFF382A12, style.getSeverityBackgroundColor(NotificationSeverity.WARNING));
+        assertEquals(0xFF38151D, style.getSeverityBackgroundColor(NotificationSeverity.ERROR));
+    }
+
+    @Test
+    void partialSeverityBackgroundColorsPreserveOtherAssociationsAndAcceptNormalizedKeys() {
+        NotificationManager manager = manager();
+        manager.setStyle(new NotificationStyle()
+                .setSeverityBackgroundColor(NotificationSeverity.INFO, 0xFF010203)
+                .setSeverityBackgroundColor(NotificationSeverity.SUCCESS, 0xFF040506));
+
+        config("{\"style\":{\"severityBackgroundColors\":{\"warning\":\"#382A12\",\"ERROR\":\"#38151D\"}}}")
+                .applyTo(manager);
+
+        NotificationStyle style = manager.getStyle();
+        assertEquals(0xFF010203, style.getSeverityBackgroundColor(NotificationSeverity.INFO));
+        assertEquals(0xFF040506, style.getSeverityBackgroundColor(NotificationSeverity.SUCCESS));
+        assertEquals(0xFF382A12, style.getSeverityBackgroundColor(NotificationSeverity.WARNING));
+        assertEquals(0xFF38151D, style.getSeverityBackgroundColor(NotificationSeverity.ERROR));
+    }
+
+    @Test
+    void nullSeverityBackgroundColorClearsExistingAssociationWhileOmittedColorsArePreserved() {
+        NotificationManager manager = manager();
+        manager.setStyle(new NotificationStyle()
+                .setSeverityBackgroundColor(NotificationSeverity.INFO, 0xFF010203)
+                .setSeverityBackgroundColor(NotificationSeverity.ERROR, 0xFF040506));
+
+        config("{\"style\":{\"severityBackgroundColors\":{\"info\":null,\"warning\":\"#382A12\"}}}")
+                .applyTo(manager);
+
+        assertNull(manager.getStyle().getSeverityBackgroundColor(NotificationSeverity.INFO));
+        assertEquals(0xFF040506, manager.getStyle().getSeverityBackgroundColor(NotificationSeverity.ERROR));
+        assertEquals(0xFF382A12, manager.getStyle().getSeverityBackgroundColor(NotificationSeverity.WARNING));
+    }
+
+    @Test
+    void absentSeverityBackgroundColorsPreserveCurrentStyleAssociations() {
+        NotificationManager manager = manager();
+        manager.setStyle(new NotificationStyle().setSeverityBackgroundColor(NotificationSeverity.ERROR, 0xFF38151D));
+
+        config("{\"style\":{\"iconSize\":30.0}}").applyTo(manager);
+
+        assertEquals(0xFF38151D, manager.getStyle().getSeverityBackgroundColor(NotificationSeverity.ERROR));
+    }
+
+    @Test
+    void invalidSeverityBackgroundColorUsesSharedColorValidationAndUnknownKeysAreIgnored() {
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> config("{\"style\":{\"severityBackgroundColors\":{\"error\":\"not-a-color\"}}}")
+        );
+        assertTrue(exception.getMessage().contains("Unsupported color format"));
+
+        NotificationManager manager = manager();
+        config("{\"style\":{\"severityBackgroundColors\":{\"critical\":\"#010203\",\"info\":\"#102A38\"}}}")
+                .applyTo(manager);
+        assertEquals(0xFF102A38, manager.getStyle().getSeverityBackgroundColor(NotificationSeverity.INFO));
+        assertNull(manager.getStyle().getSeverityBackgroundColor(NotificationSeverity.ERROR));
     }
 
     @Test

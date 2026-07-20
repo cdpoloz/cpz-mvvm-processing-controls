@@ -24,6 +24,12 @@
     "accentWidth": 5.0,
     "iconSize": 24.0,
     "iconTextGap": 10.0,
+    "severityBackgroundColors": {
+      "info": "#102A38",
+      "success": "#123023",
+      "warning": "#382A12",
+      "error": "#38151D"
+    },
     "severityIcons": {
       "info": "data/img/test.svg",
       "success": "data/img/test.svg",

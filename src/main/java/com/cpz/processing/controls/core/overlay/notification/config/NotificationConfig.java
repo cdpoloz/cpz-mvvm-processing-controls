@@ -113,6 +113,7 @@ public final class NotificationConfig {
         private final Integer warningAccentColor;
         private final Integer errorAccentColor;
         private final EnumMap<NotificationSeverity, String> severityIcons;
+        private final EnumMap<NotificationSeverity, Integer> severityBackgroundColors;
         private final String fontPath;
         private final String sourcePath;
         private final FontResolver fontResolver;
@@ -137,6 +138,7 @@ public final class NotificationConfig {
                 Integer warningAccentColor,
                 Integer errorAccentColor,
                 Map<NotificationSeverity, String> severityIcons,
+                Map<NotificationSeverity, Integer> severityBackgroundColors,
                 String fontPath,
                 String sourcePath,
                 FontResolver fontResolver
@@ -162,6 +164,10 @@ public final class NotificationConfig {
             this.severityIcons = new EnumMap<>(NotificationSeverity.class);
             if (severityIcons != null) {
                 this.severityIcons.putAll(severityIcons);
+            }
+            this.severityBackgroundColors = new EnumMap<>(NotificationSeverity.class);
+            if (severityBackgroundColors != null) {
+                this.severityBackgroundColors.putAll(severityBackgroundColors);
             }
             this.fontPath = fontPath;
             this.sourcePath = sourcePath;
@@ -244,6 +250,10 @@ public final class NotificationConfig {
             return Collections.unmodifiableMap(this.severityIcons);
         }
 
+        public Map<NotificationSeverity, Integer> getSeverityBackgroundColors() {
+            return Collections.unmodifiableMap(this.severityBackgroundColors);
+        }
+
         public String getFontPath() {
             return this.fontPath;
         }
@@ -309,6 +319,9 @@ public final class NotificationConfig {
             }
             for (Map.Entry<NotificationSeverity, String> entry : this.severityIcons.entrySet()) {
                 target.setSeverityIcon(entry.getKey(), entry.getValue());
+            }
+            for (Map.Entry<NotificationSeverity, Integer> entry : this.severityBackgroundColors.entrySet()) {
+                target.setSeverityBackgroundColor(entry.getKey(), entry.getValue());
             }
             if (this.fontPath != null) {
                 PFont resolvedFont = this.resolveFont(sketch, target.getTextSize());

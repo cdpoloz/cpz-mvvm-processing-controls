@@ -37,6 +37,7 @@ public final class NotificationStyle {
     private float iconSize = 24.0F;
     private float iconTextGap = 8.0F;
     private final EnumMap<NotificationSeverity, String> severityIcons = new EnumMap<>(NotificationSeverity.class);
+    private final EnumMap<NotificationSeverity, Integer> severityBackgroundColors = new EnumMap<>(NotificationSeverity.class);
     private PFont font;
 
     public NotificationStyle() {
@@ -63,6 +64,7 @@ public final class NotificationStyle {
             this.iconSize = source.iconSize;
             this.iconTextGap = source.iconTextGap;
             this.severityIcons.putAll(source.severityIcons);
+            this.severityBackgroundColors.putAll(source.severityBackgroundColors);
             this.font = source.font;
         }
     }
@@ -265,6 +267,46 @@ public final class NotificationStyle {
      */
     public NotificationStyle clearSeverityIcon(NotificationSeverity severity) {
         this.severityIcons.remove(Objects.requireNonNull(severity, "severity"));
+        return this;
+    }
+
+    /**
+     * Associates an optional background color with a notification severity.
+     * A {@code null} color clears the association and restores the general
+     * background color fallback.
+     *
+     * @param severity notification severity
+     * @param color background color, or {@code null} to clear it
+     * @return this style
+     */
+    public NotificationStyle setSeverityBackgroundColor(NotificationSeverity severity, Integer color) {
+        Objects.requireNonNull(severity, "severity");
+        if (color == null) {
+            this.severityBackgroundColors.remove(severity);
+        } else {
+            this.severityBackgroundColors.put(severity, color);
+        }
+        return this;
+    }
+
+    /**
+     * Returns the optional background color associated with a severity.
+     *
+     * @param severity notification severity
+     * @return configured background color, or {@code null}
+     */
+    public Integer getSeverityBackgroundColor(NotificationSeverity severity) {
+        return this.severityBackgroundColors.get(Objects.requireNonNull(severity, "severity"));
+    }
+
+    /**
+     * Removes the optional background color associated with a severity.
+     *
+     * @param severity notification severity
+     * @return this style
+     */
+    public NotificationStyle clearSeverityBackgroundColor(NotificationSeverity severity) {
+        this.severityBackgroundColors.remove(Objects.requireNonNull(severity, "severity"));
         return this;
     }
 
