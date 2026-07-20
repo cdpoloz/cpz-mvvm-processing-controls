@@ -22,6 +22,14 @@
     "width": 320.0,
     "minHeight": 48.0,
     "accentWidth": 5.0,
+    "iconSize": 24.0,
+    "iconTextGap": 10.0,
+    "severityIcons": {
+      "info": "data/img/test.svg",
+      "success": "data/img/test.svg",
+      "warning": "data/img/test.svg",
+      "error": "data/img/test.svg"
+    },
     "infoAccentColor": "#3B82F6",
     "successAccentColor": "#22C55E",
     "warningAccentColor": "#F59E0B",

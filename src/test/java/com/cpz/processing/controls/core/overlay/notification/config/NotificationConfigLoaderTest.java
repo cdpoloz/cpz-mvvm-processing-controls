@@ -13,6 +13,7 @@ import processing.core.PFont;
 import processing.data.JSONObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -179,6 +180,64 @@ class NotificationConfigLoaderTest {
         assertEquals(310.0F, style.getWidth());
         assertEquals(52.0F, style.getMinHeight());
         assertEquals(6.0F, style.getAccentWidth());
+    }
+
+    @Test
+    void loadReadsIconMetricsAndPartialSeverityIcons() {
+        NotificationManager manager = manager();
+
+        config("{\"style\":{"
+                + "\"iconSize\":26.0,"
+                + "\"iconTextGap\":9.0,"
+                + "\"severityIcons\":{"
+                + "\"warning\":\" data/img/warning.svg \","
+                + "\"ERROR\":\"data/img/error.svg\""
+                + "}}}").applyTo(manager);
+
+        NotificationStyle style = manager.getStyle();
+        assertEquals(26.0F, style.getIconSize());
+        assertEquals(9.0F, style.getIconTextGap());
+        assertNull(style.getSeverityIcon(NotificationSeverity.INFO));
+        assertNull(style.getSeverityIcon(NotificationSeverity.SUCCESS));
+        assertEquals("data/img/warning.svg", style.getSeverityIcon(NotificationSeverity.WARNING));
+        assertEquals("data/img/error.svg", style.getSeverityIcon(NotificationSeverity.ERROR));
+    }
+
+    @Test
+    void nullSeverityIconClearsExistingIconWhileOmittedIconsArePreserved() {
+        NotificationManager manager = manager();
+        manager.setStyle(new NotificationStyle()
+                .setSeverityIcon(NotificationSeverity.INFO, "data/img/info.svg")
+                .setSeverityIcon(NotificationSeverity.SUCCESS, "data/img/success.svg"));
+
+        config("{\"style\":{\"severityIcons\":{\"info\":null,\"warning\":\"data/img/warning.svg\"}}}")
+                .applyTo(manager);
+
+        assertNull(manager.getStyle().getSeverityIcon(NotificationSeverity.INFO));
+        assertEquals("data/img/success.svg", manager.getStyle().getSeverityIcon(NotificationSeverity.SUCCESS));
+        assertEquals("data/img/warning.svg", manager.getStyle().getSeverityIcon(NotificationSeverity.WARNING));
+    }
+
+    @Test
+    void absentSeverityIconsPreserveCurrentStyleAssociations() {
+        NotificationManager manager = manager();
+        manager.setStyle(new NotificationStyle().setSeverityIcon(NotificationSeverity.ERROR, "data/img/error.svg"));
+
+        config("{\"style\":{\"iconSize\":30.0}}").applyTo(manager);
+
+        assertEquals(30.0F, manager.getStyle().getIconSize());
+        assertEquals("data/img/error.svg", manager.getStyle().getSeverityIcon(NotificationSeverity.ERROR));
+    }
+
+    @Test
+    void blankSeverityIconPathUsesOptionalStringValidation() {
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> config("{\"style\":{\"severityIcons\":{\"info\":\"  \"}}}")
+        );
+
+        assertTrue(exception.getMessage().contains("severityIcons"));
+        assertTrue(exception.getMessage().contains("blank"));
     }
 
     @Test

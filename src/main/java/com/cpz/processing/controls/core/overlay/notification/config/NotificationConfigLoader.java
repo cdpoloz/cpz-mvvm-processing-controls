@@ -145,14 +145,53 @@ public final class NotificationConfigLoader {
                 JsonConfigSupport.getOptionalFloat(style, "width"),
                 JsonConfigSupport.getOptionalFloat(style, "minHeight"),
                 JsonConfigSupport.getOptionalFloat(style, "accentWidth"),
+                JsonConfigSupport.getOptionalFloat(style, "iconSize"),
+                JsonConfigSupport.getOptionalFloat(style, "iconTextGap"),
                 JsonConfigSupport.getOptionalColor(style, "infoAccentColor", path),
                 JsonConfigSupport.getOptionalColor(style, "successAccentColor", path),
                 JsonConfigSupport.getOptionalColor(style, "warningAccentColor", path),
                 JsonConfigSupport.getOptionalColor(style, "errorAccentColor", path),
+                readSeverityIcons(style, path),
                 fontPath,
                 path,
                 fontPath == null ? null : fontResolverFactory.create(fontPath, path)
         );
+    }
+
+    private static Map<NotificationSeverity, String> readSeverityIcons(JSONObject style, String path) {
+        EnumMap<NotificationSeverity, String> icons = new EnumMap<>(NotificationSeverity.class);
+        if (!style.hasKey("severityIcons") || style.isNull("severityIcons")) {
+            return icons;
+        }
+
+        Object rawIcons = style.get("severityIcons");
+        if (!(rawIcons instanceof JSONObject)) {
+            return icons;
+        }
+
+        JSONObject severityIcons = (JSONObject) rawIcons;
+        for (Object rawKey : severityIcons.keys()) {
+            NotificationSeverity severity = parseSeverity(rawKey);
+            if (severity == null) {
+                continue;
+            }
+
+            String key = String.valueOf(rawKey);
+            if (severityIcons.isNull(key)) {
+                icons.put(severity, null);
+            } else {
+                icons.put(
+                        severity,
+                        JsonConfigSupport.getOptionalNonBlankString(
+                                severityIcons,
+                                key,
+                                path,
+                                "notification style.severityIcons"
+                        )
+                );
+            }
+        }
+        return icons;
     }
 
     private static Integer readPositiveInt(JSONObject json, String key) {

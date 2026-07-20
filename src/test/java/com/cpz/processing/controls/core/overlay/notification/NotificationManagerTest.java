@@ -5,6 +5,7 @@ import com.cpz.processing.controls.core.overlay.OverlayManager;
 import com.cpz.processing.controls.testsupport.ProcessingTestSupport;
 import com.cpz.utils.time.TimeSource;
 import java.util.List;
+import processing.core.PShape;
 import org.junit.jupiter.api.Test;
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -463,6 +464,146 @@ class NotificationManagerTest {
         assertEquals(18.0F, sketch.textSizeDuringTextDraw);
     }
 
+    @Test
+    void severityIconStyleApiAssignsQueriesAndClearsOptionalPaths() {
+        NotificationStyle style = new NotificationStyle();
+
+        style.setSeverityIcon(NotificationSeverity.WARNING, "  data/img/warning.svg  ");
+
+        assertEquals("data/img/warning.svg", style.getSeverityIcon(NotificationSeverity.WARNING));
+        style.setSeverityIcon(NotificationSeverity.WARNING, " ");
+        assertNull(style.getSeverityIcon(NotificationSeverity.WARNING));
+
+        style.setSeverityIcon(NotificationSeverity.ERROR, "data/img/error.svg");
+        style.clearSeverityIcon(NotificationSeverity.ERROR);
+        assertNull(style.getSeverityIcon(NotificationSeverity.ERROR));
+        assertThrows(NullPointerException.class, () -> style.setSeverityIcon(null, "data/img/icon.svg"));
+        assertThrows(NullPointerException.class, () -> style.getSeverityIcon(null));
+        assertThrows(NullPointerException.class, () -> style.clearSeverityIcon(null));
+    }
+
+    @Test
+    void notificationStyleCopyPreservesSeverityIconsAndIconMetrics() {
+        NotificationStyle source = new NotificationStyle()
+                .setIconSize(26.0F)
+                .setIconTextGap(9.0F)
+                .setSeverityIcon(NotificationSeverity.SUCCESS, "data/img/success.svg");
+
+        NotificationStyle copy = new NotificationStyle(source);
+
+        assertEquals(26.0F, copy.getIconSize());
+        assertEquals(9.0F, copy.getIconTextGap());
+        assertEquals("data/img/success.svg", copy.getSeverityIcon(NotificationSeverity.SUCCESS));
+    }
+
+    @Test
+    void absentSeverityIconPreservesExistingTextPositionAndDoesNotLoadShape() {
+        RecordingApplet sketch = recordingSketch();
+        NotificationManager manager = manager(sketch, new OverlayManager(), new FakeTimeSource(0L));
+        manager.setPlacement(NotificationPlacement.TOP_LEFT);
+        manager.setStyle(new NotificationStyle()
+                .setMargin(10.0F)
+                .setAccentWidth(5.0F)
+                .setTextPadding(12.0F));
+        manager.warning("No icon");
+
+        manager.getOverlayEntry().getRender().run();
+
+        assertEquals(0, sketch.loadShapeCalls);
+        assertEquals(0, sketch.shapeCalls);
+        assertEquals(27.0F, sketch.lastTextX);
+    }
+
+    @Test
+    void severityIconDrawsBetweenAccentAndTextWithProportionalSize() {
+        RecordingApplet sketch = recordingSketch();
+        PShape shape = new SizedShape(48.0F, 24.0F);
+        sketch.loadedShape = shape;
+        NotificationManager manager = manager(sketch, new OverlayManager(), new FakeTimeSource(0L));
+        manager.setPlacement(NotificationPlacement.TOP_LEFT);
+        manager.setStyle(new NotificationStyle()
+                .setMargin(10.0F)
+                .setMinHeight(48.0F)
+                .setAccentWidth(5.0F)
+                .setTextPadding(12.0F)
+                .setIconSize(24.0F)
+                .setIconTextGap(10.0F)
+                .setSeverityIcon(NotificationSeverity.WARNING, "data/img/warning.svg"));
+        manager.warning("With icon");
+
+        manager.getOverlayEntry().getRender().run();
+
+        assertEquals(1, sketch.loadShapeCalls);
+        assertEquals("data/img/warning.svg", sketch.lastLoadShapePath);
+        assertEquals(1, sketch.shapeCalls);
+        assertEquals(27.0F, sketch.lastShapeX);
+        assertEquals(28.0F, sketch.lastShapeY);
+        assertEquals(24.0F, sketch.lastShapeWidth);
+        assertEquals(12.0F, sketch.lastShapeHeight);
+        assertEquals(61.0F, sketch.lastTextX);
+    }
+
+    @Test
+    void severityIconsResolveIndependentlyAndAreReusedAcrossFrames() {
+        RecordingApplet sketch = recordingSketch();
+        NotificationManager manager = manager(sketch, new OverlayManager(), new FakeTimeSource(0L));
+        NotificationStyle style = new NotificationStyle()
+                .setSeverityIcon(NotificationSeverity.INFO, "data/img/info.svg")
+                .setSeverityIcon(NotificationSeverity.SUCCESS, "data/img/success.svg")
+                .setSeverityIcon(NotificationSeverity.WARNING, "data/img/warning.svg")
+                .setSeverityIcon(NotificationSeverity.ERROR, "data/img/error.svg");
+        manager.setStyle(style);
+        manager.info("Info");
+        manager.success("Success");
+        manager.warning("Warning");
+        manager.error("Error");
+
+        manager.getOverlayEntry().getRender().run();
+        manager.getOverlayEntry().getRender().run();
+
+        assertEquals(4, sketch.loadShapeCalls);
+        assertTrue(sketch.loadShapePaths.contains("data/img/info.svg"));
+        assertTrue(sketch.loadShapePaths.contains("data/img/success.svg"));
+        assertTrue(sketch.loadShapePaths.contains("data/img/warning.svg"));
+        assertTrue(sketch.loadShapePaths.contains("data/img/error.svg"));
+    }
+
+    @Test
+    void changingSeverityIconPathInvalidatesThatSeverityCache() {
+        RecordingApplet sketch = recordingSketch();
+        NotificationManager manager = manager(sketch, new OverlayManager(), new FakeTimeSource(0L));
+        NotificationStyle style = new NotificationStyle()
+                .setSeverityIcon(NotificationSeverity.INFO, "data/img/first.svg");
+        manager.setStyle(style);
+        manager.info("Info");
+
+        manager.getOverlayEntry().getRender().run();
+        style.setSeverityIcon(NotificationSeverity.INFO, "data/img/second.svg");
+        manager.getOverlayEntry().getRender().run();
+
+        assertEquals(2, sketch.loadShapeCalls);
+        assertEquals("data/img/second.svg", sketch.lastLoadShapePath);
+    }
+
+    @Test
+    void invalidConfiguredSeverityIconFailsWithPathAndSeverity() {
+        RecordingApplet sketch = recordingSketch();
+        sketch.returnNullShape = true;
+        NotificationManager manager = manager(sketch, new OverlayManager(), new FakeTimeSource(0L));
+        manager.setStyle(new NotificationStyle()
+                .setSeverityIcon(NotificationSeverity.ERROR, "data/img/missing.svg"));
+        manager.error("Error");
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> manager.getOverlayEntry().getRender().run()
+        );
+
+        assertTrue(exception.getMessage().contains("ERROR"));
+        assertTrue(exception.getMessage().contains("data/img/missing.svg"));
+        assertEquals(2, sketch.loadShapeCalls);
+    }
+
     private static NotificationManager manager(PApplet sketch, OverlayManager overlayManager, TimeSource clock) {
         return new NotificationManager(sketch, overlayManager, clock);
     }
@@ -516,6 +657,17 @@ class NotificationManagerTest {
     private static final class RecordingApplet extends PApplet {
         private int strokeCalls;
         private int noStrokeCalls;
+        private int shapeCalls;
+        private int loadShapeCalls;
+        private float lastTextX;
+        private float lastShapeX;
+        private float lastShapeY;
+        private float lastShapeWidth;
+        private float lastShapeHeight;
+        private String lastLoadShapePath;
+        private final List<String> loadShapePaths = new java.util.ArrayList<>();
+        private PShape loadedShape;
+        private boolean returnNullShape;
 
         @Override
         public void pushStyle() {
@@ -558,6 +710,28 @@ class NotificationManagerTest {
 
         @Override
         public void text(String str, float x, float y) {
+            this.lastTextX = x;
+        }
+
+        @Override
+        public void shapeMode(int mode) {
+        }
+
+        @Override
+        public void shape(PShape shape, float x, float y, float width, float height) {
+            this.shapeCalls++;
+            this.lastShapeX = x;
+            this.lastShapeY = y;
+            this.lastShapeWidth = width;
+            this.lastShapeHeight = height;
+        }
+
+        @Override
+        public PShape loadShape(String filename) {
+            this.loadShapeCalls++;
+            this.lastLoadShapePath = filename;
+            this.loadShapePaths.add(filename);
+            return this.returnNullShape ? null : (this.loadedShape == null ? new PShape() : this.loadedShape);
         }
 
         @Override
@@ -566,6 +740,26 @@ class NotificationManagerTest {
 
         @Override
         public void rect(float a, float b, float c, float d, float tl, float tr, float br, float bl) {
+        }
+    }
+
+    private static final class SizedShape extends PShape {
+        private final float shapeWidth;
+        private final float shapeHeight;
+
+        private SizedShape(float shapeWidth, float shapeHeight) {
+            this.shapeWidth = shapeWidth;
+            this.shapeHeight = shapeHeight;
+        }
+
+        @Override
+        public float getWidth() {
+            return this.shapeWidth;
+        }
+
+        @Override
+        public float getHeight() {
+            return this.shapeHeight;
         }
     }
 

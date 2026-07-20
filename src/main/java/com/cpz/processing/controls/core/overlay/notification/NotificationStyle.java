@@ -1,5 +1,7 @@
 package com.cpz.processing.controls.core.overlay.notification;
 
+import java.util.EnumMap;
+import java.util.Objects;
 import processing.core.PFont;
 
 /**
@@ -32,6 +34,9 @@ public final class NotificationStyle {
     private int warningAccentColor = DEFAULT_WARNING_ACCENT_COLOR;
     private int errorAccentColor = DEFAULT_ERROR_ACCENT_COLOR;
     private float accentWidth = 5.0F;
+    private float iconSize = 24.0F;
+    private float iconTextGap = 8.0F;
+    private final EnumMap<NotificationSeverity, String> severityIcons = new EnumMap<>(NotificationSeverity.class);
     private PFont font;
 
     public NotificationStyle() {
@@ -55,6 +60,9 @@ public final class NotificationStyle {
             this.warningAccentColor = source.warningAccentColor;
             this.errorAccentColor = source.errorAccentColor;
             this.accentWidth = source.accentWidth;
+            this.iconSize = source.iconSize;
+            this.iconTextGap = source.iconTextGap;
+            this.severityIcons.putAll(source.severityIcons);
             this.font = source.font;
         }
     }
@@ -200,6 +208,63 @@ public final class NotificationStyle {
 
     public NotificationStyle setAccentWidth(float accentWidth) {
         this.accentWidth = Math.max(0.0F, accentWidth);
+        return this;
+    }
+
+    public float getIconSize() {
+        return this.iconSize;
+    }
+
+    public NotificationStyle setIconSize(float iconSize) {
+        this.iconSize = Math.max(0.0F, iconSize);
+        return this;
+    }
+
+    public float getIconTextGap() {
+        return this.iconTextGap;
+    }
+
+    public NotificationStyle setIconTextGap(float iconTextGap) {
+        this.iconTextGap = Math.max(0.0F, iconTextGap);
+        return this;
+    }
+
+    /**
+     * Associates an optional SVG resource path with a notification severity.
+     * A {@code null} or blank path clears the association.
+     *
+     * @param severity notification severity
+     * @param path Processing SVG resource path, or {@code null} to clear it
+     * @return this style
+     */
+    public NotificationStyle setSeverityIcon(NotificationSeverity severity, String path) {
+        Objects.requireNonNull(severity, "severity");
+        if (path == null || path.trim().isEmpty()) {
+            this.severityIcons.remove(severity);
+        } else {
+            this.severityIcons.put(severity, path.trim());
+        }
+        return this;
+    }
+
+    /**
+     * Returns the optional SVG resource path associated with a severity.
+     *
+     * @param severity notification severity
+     * @return configured Processing SVG resource path, or {@code null}
+     */
+    public String getSeverityIcon(NotificationSeverity severity) {
+        return this.severityIcons.get(Objects.requireNonNull(severity, "severity"));
+    }
+
+    /**
+     * Removes the optional SVG resource path associated with a severity.
+     *
+     * @param severity notification severity
+     * @return this style
+     */
+    public NotificationStyle clearSeverityIcon(NotificationSeverity severity) {
+        this.severityIcons.remove(Objects.requireNonNull(severity, "severity"));
         return this;
     }
 

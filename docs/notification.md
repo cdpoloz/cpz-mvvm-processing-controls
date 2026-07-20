@@ -159,8 +159,12 @@ NotificationStyle style = new NotificationStyle()
         .setFont(font)
         .setTextSize(14.0F)
         .setTextPadding(12.0F)
+        .setIconSize(24.0F)
+        .setIconTextGap(10.0F)
         .setCornerRadius(8.0F)
-        .setStrokeWeight(1.0F);
+        .setStrokeWeight(1.0F)
+        .setSeverityIcon(NotificationSeverity.INFO, "data/img/test.svg")
+        .setSeverityIcon(NotificationSeverity.WARNING, "data/img/test.svg");
 
 notifications.setStyle(style);
 ```
@@ -170,6 +174,7 @@ The renderer draws:
 - rounded background rectangle
 - optional border
 - severity accent strip
+- optional severity SVG icon between the accent strip and text
 - wrapped message text
 
 `NotificationStyle.setFont(PFont)` configures one global font for the
@@ -178,8 +183,29 @@ The renderer draws:
 `setStyle(null)` restores the default style. Negative stroke weight is clamped
 to `0.0F`; `strokeWeight == 0.0F` disables border rendering.
 
-No icons, SVG renderers, shadows, countdown bars, animations, fade, slide,
-easing, hover pause, close buttons, or actions are included in `0.9.0`.
+Each `NotificationSeverity` can optionally use a distinct SVG path:
+
+```java
+style.setSeverityIcon(NotificationSeverity.WARNING, "data/img/test.svg");
+String warningIcon = style.getSeverityIcon(NotificationSeverity.WARNING);
+style.clearSeverityIcon(NotificationSeverity.WARNING);
+```
+
+`setSeverityIcon(severity, null)` and a blank runtime path clear that severity.
+With no usable icon path, no icon is drawn and no icon area is reserved: the
+text remains at its pre-icon position. With a resolved icon, its square area
+starts where the text previously started, is vertically centered, and the text
+is shifted by `iconSize + iconTextGap`. The defaults are `24.0F` and `8.0F`;
+both values are clamped to zero or greater.
+
+SVGs are fitted proportionally inside the `iconSize` square and retain the
+colors and styles defined by the SVG; notification severity colors do not
+recolor them. The manager loads each configured SVG once per severity/path and
+reuses it until that path changes. A configured path that cannot be loaded is
+reported as an `IllegalArgumentException` identifying the severity and path.
+
+There are no shadows, countdown bars, animations, fade, slide, easing, hover
+pause, close buttons, or actions.
 
 ---
 
@@ -250,6 +276,14 @@ Supported standalone JSON fields:
     "width": 320.0,
     "minHeight": 48.0,
     "accentWidth": 5.0,
+    "iconSize": 24.0,
+    "iconTextGap": 10.0,
+    "severityIcons": {
+      "info": "data/img/test.svg",
+      "success": "data/img/test.svg",
+      "warning": "data/img/test.svg",
+      "error": "data/img/test.svg"
+    },
     "infoAccentColor": "#3B82F6",
     "successAccentColor": "#22C55E",
     "warningAccentColor": "#F59E0B",
@@ -263,6 +297,27 @@ are ignored. `placement` and severity keys are case-insensitive and accept
 hyphens, underscores, or spaces. Invalid placement falls back to `TOP_RIGHT`;
 unknown severity keys and invalid or non-positive JSON duration values are
 ignored.
+
+`style.severityIcons` is optional and may be partial. For example, this leaves
+the other severities without a newly configured icon:
+
+```json
+{
+  "style": {
+    "severityIcons": {
+      "warning": "data/img/test.svg",
+      "error": "data/img/test.svg"
+    }
+  }
+}
+```
+
+An absent `severityIcons` block preserves current icon associations during a
+partial config apply. An explicit `null` value for a known severity clears that
+association. Icon paths use the existing optional non-blank string convention:
+blank or non-string configured values are rejected, while unknown severity keys
+are ignored. SVG paths are resolved lazily through Processing; a configured but
+unloadable path raises an error when the icon is first needed.
 
 `defaultDurationMillis` is applied before `severityDurations`, so a JSON file
 can set a global duration and then override warning or error durations.

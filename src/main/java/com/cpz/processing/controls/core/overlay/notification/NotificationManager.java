@@ -11,6 +11,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Objects;
 import processing.core.PApplet;
+import processing.core.PShape;
 
 /**
  * App-facing manager for toast-style runtime notifications.
@@ -37,6 +38,7 @@ public final class NotificationManager {
     private final OverlayEntry overlayEntry;
     private final List<Notification> notifications = new ArrayList<>();
     private final EnumMap<NotificationSeverity, Long> severityDurations = new EnumMap<>(NotificationSeverity.class);
+    private final EnumMap<NotificationSeverity, CachedIcon> severityIconCache = new EnumMap<>(NotificationSeverity.class);
     private NotificationPlacement placement = NotificationPlacement.TOP_RIGHT;
     private NotificationStyle style = new NotificationStyle();
     private int maxVisible = DEFAULT_MAX_VISIBLE;
@@ -189,9 +191,13 @@ public final class NotificationManager {
         float width = this.resolvedWidth();
         float x = this.resolvedX(width);
         float cursor = this.startsAtTop() ? this.style.getMargin() : this.sketch.height - this.style.getMargin();
-        float textWidth = Math.max(1.0F, width - this.style.getAccentWidth() - this.style.getTextPadding() * 2.0F);
-
         for (Notification notification : ordered) {
+            PShape icon = this.resolveSeverityIcon(notification.getSeverity());
+            float iconTextOffset = icon == null ? 0.0F : this.style.getIconSize() + this.style.getIconTextGap();
+            float textWidth = Math.max(
+                    1.0F,
+                    width - this.style.getAccentWidth() - this.style.getTextPadding() * 2.0F - iconTextOffset
+            );
             List<String> lines = this.wrapLines(notification.getMessage(), textWidth);
             float height = this.heightFor(lines);
             float y;
@@ -202,7 +208,7 @@ public final class NotificationManager {
                 y = cursor - height;
                 cursor -= height + this.style.getGap();
             }
-            frames.add(new NotificationFrame(notification, x, y, width, height, lines));
+            frames.add(new NotificationFrame(notification, x, y, width, height, lines, icon));
         }
         return frames;
     }
@@ -251,9 +257,16 @@ public final class NotificationManager {
             );
         }
 
+        if (frame.icon() != null) {
+            this.drawIcon(frame);
+        }
+
         this.sketch.fill(this.style.getTextColor());
         this.sketch.textAlign(PApplet.LEFT, PApplet.TOP);
         float textX = frame.x() + this.style.getAccentWidth() + this.style.getTextPadding();
+        if (frame.icon() != null) {
+            textX += this.style.getIconSize() + this.style.getIconTextGap();
+        }
         float textY = frame.y() + this.style.getTextPadding();
         float lineHeight = this.lineHeight();
         for (int i = 0; i < frame.lines().size(); i++) {
@@ -304,6 +317,67 @@ public final class NotificationManager {
         while (this.notifications.size() > this.maxVisible) {
             this.notifications.remove(0);
         }
+    }
+
+    private PShape resolveSeverityIcon(NotificationSeverity severity) {
+        NotificationSeverity resolvedSeverity = severity == null ? NotificationSeverity.INFO : severity;
+        String path = this.style.getSeverityIcon(resolvedSeverity);
+        if (path == null) {
+            this.severityIconCache.remove(resolvedSeverity);
+            return null;
+        }
+
+        CachedIcon cached = this.severityIconCache.get(resolvedSeverity);
+        if (cached != null && cached.path.equals(path)) {
+            return cached.shape;
+        }
+
+        PShape shape = this.loadSeverityIcon(resolvedSeverity, path);
+        this.severityIconCache.put(resolvedSeverity, new CachedIcon(path, shape));
+        return shape;
+    }
+
+    private PShape loadSeverityIcon(NotificationSeverity severity, String path) {
+        PShape shape;
+        try {
+            shape = this.sketch.loadShape(path);
+            if (shape == null && path.startsWith("data/")) {
+                shape = this.sketch.loadShape(path.substring("data/".length()));
+            }
+        } catch (RuntimeException exception) {
+            throw new IllegalArgumentException(
+                    "Could not load notification SVG icon for severity " + severity + ": " + path,
+                    exception
+            );
+        }
+        if (shape == null) {
+            throw new IllegalArgumentException(
+                    "Could not load notification SVG icon for severity " + severity + ": " + path
+            );
+        }
+        return shape;
+    }
+
+    private void drawIcon(NotificationFrame frame) {
+        float iconSize = this.style.getIconSize();
+        if (iconSize <= 0.0F) {
+            return;
+        }
+
+        PShape icon = frame.icon();
+        float iconWidth = iconSize;
+        float iconHeight = iconSize;
+        if (icon.getWidth() > 0.0F && icon.getHeight() > 0.0F) {
+            float scale = Math.min(iconSize / icon.getWidth(), iconSize / icon.getHeight());
+            iconWidth = icon.getWidth() * scale;
+            iconHeight = icon.getHeight() * scale;
+        }
+
+        float areaX = frame.x() + this.style.getAccentWidth() + this.style.getTextPadding();
+        float iconX = areaX + (iconSize - iconWidth) * 0.5F;
+        float iconY = frame.y() + (frame.height() - iconHeight) * 0.5F;
+        this.sketch.shapeMode(PApplet.CORNER);
+        this.sketch.shape(icon, iconX, iconY, iconWidth, iconHeight);
     }
 
     private List<Notification> notificationsInEdgeOrder() {
@@ -409,14 +483,24 @@ public final class NotificationManager {
         private final float width;
         private final float height;
         private final List<String> lines;
+        private final PShape icon;
 
-        NotificationFrame(Notification notification, float x, float y, float width, float height, List<String> lines) {
+        NotificationFrame(
+                Notification notification,
+                float x,
+                float y,
+                float width,
+                float height,
+                List<String> lines,
+                PShape icon
+        ) {
             this.notification = notification;
             this.x = x;
             this.y = y;
             this.width = width;
             this.height = height;
             this.lines = List.copyOf(lines);
+            this.icon = icon;
         }
 
         Notification notification() {
@@ -441,6 +525,20 @@ public final class NotificationManager {
 
         List<String> lines() {
             return this.lines;
+        }
+
+        PShape icon() {
+            return this.icon;
+        }
+    }
+
+    private static final class CachedIcon {
+        private final String path;
+        private final PShape shape;
+
+        private CachedIcon(String path, PShape shape) {
+            this.path = path;
+            this.shape = shape;
         }
     }
 }

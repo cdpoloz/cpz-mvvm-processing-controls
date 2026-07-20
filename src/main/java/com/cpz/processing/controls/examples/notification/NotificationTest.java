@@ -57,8 +57,14 @@ public class NotificationTest extends PApplet {
                 .setTextPadding(12.0F)
                 .setMinHeight(48.0F)
                 .setAccentWidth(5.0F)
+                .setIconSize(24.0F)
+                .setIconTextGap(10.0F)
                 .setCornerRadius(8.0F)
-                .setStrokeWeight(1.0F));
+                .setStrokeWeight(1.0F)
+                .setSeverityIcon(NotificationSeverity.INFO, "data/img/test.svg")
+                .setSeverityIcon(NotificationSeverity.SUCCESS, "data/img/test.svg")
+                .setSeverityIcon(NotificationSeverity.WARNING, "data/img/test.svg")
+                .setSeverityIcon(NotificationSeverity.ERROR, "data/img/test.svg"));
 
         this.infoButton = createButton("btnInfo", "Info", 100.0F, 96.0F);
         this.successButton = createButton("btnSuccess", "Success", 100.0F, 154.0F);

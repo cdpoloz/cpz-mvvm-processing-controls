@@ -114,10 +114,24 @@ Example:
 {
   "style": {
     "font": "data/font/JetBrainsMono.ttf",
-    "textSize": 14.0
+    "textSize": 14.0,
+    "iconSize": 24.0,
+    "iconTextGap": 10.0,
+    "severityIcons": {
+      "warning": "data/img/test.svg",
+      "error": "data/img/test.svg"
+    }
   }
 }
 ```
+
+`style.severityIcons` maps case-insensitive notification severities (`info`,
+`success`, `warning`, `error`) to optional SVG paths. The map may be partial;
+unlisted severities draw no icon unless an earlier style value is being
+preserved by a partial apply. `null` clears an explicitly listed severity.
+When an icon resolves, it is placed between the severity accent and the text,
+using `iconSize` and `iconTextGap`; with no icon, no extra space is reserved.
+SVG colors are retained from the resource itself.
 
 `progressbar` is a regular control JSON type. `notification` is not.
 

@@ -106,10 +106,13 @@ public final class NotificationConfig {
         private final Float width;
         private final Float minHeight;
         private final Float accentWidth;
+        private final Float iconSize;
+        private final Float iconTextGap;
         private final Integer infoAccentColor;
         private final Integer successAccentColor;
         private final Integer warningAccentColor;
         private final Integer errorAccentColor;
+        private final EnumMap<NotificationSeverity, String> severityIcons;
         private final String fontPath;
         private final String sourcePath;
         private final FontResolver fontResolver;
@@ -127,10 +130,13 @@ public final class NotificationConfig {
                 Float width,
                 Float minHeight,
                 Float accentWidth,
+                Float iconSize,
+                Float iconTextGap,
                 Integer infoAccentColor,
                 Integer successAccentColor,
                 Integer warningAccentColor,
                 Integer errorAccentColor,
+                Map<NotificationSeverity, String> severityIcons,
                 String fontPath,
                 String sourcePath,
                 FontResolver fontResolver
@@ -147,10 +153,16 @@ public final class NotificationConfig {
             this.width = width;
             this.minHeight = minHeight;
             this.accentWidth = accentWidth;
+            this.iconSize = iconSize;
+            this.iconTextGap = iconTextGap;
             this.infoAccentColor = infoAccentColor;
             this.successAccentColor = successAccentColor;
             this.warningAccentColor = warningAccentColor;
             this.errorAccentColor = errorAccentColor;
+            this.severityIcons = new EnumMap<>(NotificationSeverity.class);
+            if (severityIcons != null) {
+                this.severityIcons.putAll(severityIcons);
+            }
             this.fontPath = fontPath;
             this.sourcePath = sourcePath;
             this.fontResolver = fontResolver;
@@ -204,6 +216,14 @@ public final class NotificationConfig {
             return this.accentWidth;
         }
 
+        public Float getIconSize() {
+            return this.iconSize;
+        }
+
+        public Float getIconTextGap() {
+            return this.iconTextGap;
+        }
+
         public Integer getInfoAccentColor() {
             return this.infoAccentColor;
         }
@@ -218,6 +238,10 @@ public final class NotificationConfig {
 
         public Integer getErrorAccentColor() {
             return this.errorAccentColor;
+        }
+
+        public Map<NotificationSeverity, String> getSeverityIcons() {
+            return Collections.unmodifiableMap(this.severityIcons);
         }
 
         public String getFontPath() {
@@ -265,6 +289,12 @@ public final class NotificationConfig {
             if (this.accentWidth != null) {
                 target.setAccentWidth(this.accentWidth);
             }
+            if (this.iconSize != null) {
+                target.setIconSize(this.iconSize);
+            }
+            if (this.iconTextGap != null) {
+                target.setIconTextGap(this.iconTextGap);
+            }
             if (this.infoAccentColor != null) {
                 target.setInfoAccentColor(this.infoAccentColor);
             }
@@ -276,6 +306,9 @@ public final class NotificationConfig {
             }
             if (this.errorAccentColor != null) {
                 target.setErrorAccentColor(this.errorAccentColor);
+            }
+            for (Map.Entry<NotificationSeverity, String> entry : this.severityIcons.entrySet()) {
+                target.setSeverityIcon(entry.getKey(), entry.getValue());
             }
             if (this.fontPath != null) {
                 PFont resolvedFont = this.resolveFont(sketch, target.getTextSize());
