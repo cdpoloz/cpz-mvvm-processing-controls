@@ -61,6 +61,7 @@ public class Launcher {
         // Label ******************************************
         //PApplet.main(LabelTest.class);
         //PApplet.main(LabelJsonTest.class);
+        //PApplet.main(LabelRelativeJsonTest.class);
 
         // RadioGroup *************************************
         //PApplet.main(RadioGroupTest.class);

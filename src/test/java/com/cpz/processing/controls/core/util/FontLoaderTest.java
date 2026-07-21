@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -53,6 +54,22 @@ class FontLoaderTest {
 
         assertSame(expected, actual);
         assertEquals(1, sketch.getCreateFontCalls());
+    }
+
+    @Test
+    void resolverCachesFontsByNormalizedEffectiveTextSize() {
+        PFont expected = ProcessingTestSupport.font("Monospaced", 21);
+        ProcessingTestSupport.FontApplet sketch = new ProcessingTestSupport.FontApplet(expected);
+        FontLoader.FontResolver resolver = FontLoader.resolver("data/font/test.ttf", "label", "labels.json");
+
+        PFont first = resolver.load(sketch, 20.6F);
+        PFont second = resolver.load(sketch, 21.4F);
+        resolver.load(sketch, 21.6F);
+
+        assertSame(expected, first);
+        assertSame(first, second);
+        assertEquals(2, sketch.getCreateFontCalls());
+        assertEquals(List.of(21.0F, 22.0F), sketch.getCreateFontSizes());
     }
 
     @Test

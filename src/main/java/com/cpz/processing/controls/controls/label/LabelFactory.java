@@ -31,7 +31,7 @@ public final class LabelFactory {
         label.setVisible(config.isVisible());
 
         if (config.getStyle() != null) {
-            label.setStyle(new DefaultLabelStyle(toStyleConfig(sketch, config.getStyle())));
+            label.setStyle(new DefaultLabelStyle(toStyleConfig(sketch, config.getStyle(), config.getTextSizeMeasure() != null)));
         }
         if (config.getTextSizeMeasure() != null) {
             label.setTextSize(config.getTextSizeMeasure());
@@ -41,13 +41,16 @@ public final class LabelFactory {
         return label;
     }
 
-    private static LabelStyleConfig toStyleConfig(PApplet sketch, LabelConfig.StyleConfig style) {
+    private static LabelStyleConfig toStyleConfig(PApplet sketch, LabelConfig.StyleConfig style, boolean deferFontLoad) {
         LabelStyleConfig result = new LabelStyleConfig();
         if (style.getTextSize() != null) {
             result.textSize = style.getTextSize();
         }
         if (style.getFontPath() != null) {
-            result.font = FontLoader.load(sketch, style.getFontPath(), result.textSize, "label", style.getSourcePath());
+            result.fontResolver = FontLoader.resolver(style.getFontPath(), "label", style.getSourcePath());
+            if (!deferFontLoad) {
+                result.font = result.fontResolver.load(sketch, result.textSize);
+            }
         }
         result.textColor = style.getTextColor();
         if (style.getLineSpacingMultiplier() != null) {

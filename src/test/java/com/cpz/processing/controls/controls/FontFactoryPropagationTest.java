@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls;
 
 import com.cpz.processing.controls.controls.button.ButtonFactory;
+import com.cpz.processing.controls.controls.button.Button;
 import com.cpz.processing.controls.controls.button.config.ButtonConfigLoader;
 import com.cpz.processing.controls.controls.button.style.ButtonRenderStyle;
 import com.cpz.processing.controls.controls.button.style.render.SvgButtonRenderer;
@@ -68,6 +69,29 @@ class FontFactoryPropagationTest {
 
         assertTrue(graphics.appliedFonts().stream().anyMatch(applied -> applied == font));
         assertTrue(graphics.appliedSizes().contains(18.0F));
+    }
+
+    @Test
+    void controlMeasureTextSizeRefreshesJsonFontBeforeButtonDrawAndThenReusesIt() {
+        PFont font = ProcessingTestSupport.font("Monospaced", 21);
+        ProcessingTestSupport.FontApplet sketch = new ProcessingTestSupport.FontApplet(font);
+        ProcessingTestSupport.RecordingGraphics graphics = ProcessingTestSupport.graphics(sketch);
+
+        Button button = ButtonFactory.create(
+                sketch,
+                new ButtonConfigLoader(sketch).loadFromJson(
+                        parse("{\"code\":\"b\",\"text\":\"Button\",\"x\":20,\"y\":20,\"width\":40,\"height\":20,"
+                                + "\"textSize\":{\"mode\":\"absolute\",\"value\":21},"
+                                + "\"style\":{\"font\":\"font.ttf\"}}"),
+                        "controls.json"
+                )
+        );
+        int callsAfterFactory = sketch.getCreateFontCalls();
+        button.draw();
+
+        assertTrue(sketch.getCreateFontSizes().contains(21.0F), sketch.getCreateFontSizes().toString());
+        assertTrue(graphics.appliedSizes().contains(21.0F));
+        assertEquals(callsAfterFactory, sketch.getCreateFontCalls(), "draw must reuse the size-resolved JSON font");
     }
 
     private List<Spec> specs() {

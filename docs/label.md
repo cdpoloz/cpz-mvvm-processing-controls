@@ -161,6 +161,43 @@ Minimal JSON:
 }
 ```
 
+Relative bounds use the same explicit object as other controls:
+
+```json
+"bounds": {
+  "mode": "relative",
+  "x": 0.1,
+  "y": 0.2,
+  "width": 0.3,
+  "height": 0.05
+}
+```
+
+For a root label, relative `x` resolves against sketch width, while relative
+`y`, `width`, and `height` resolve against sketch height. When the label is
+added to a `Panel`, the parent reference becomes the panel's resolved width and
+height, and the resolved coordinates remain local to the panel.
+
+Relative text size is a top-level control measure, not a style property:
+
+```json
+"textSize": {
+  "mode": "relative",
+  "value": 0.021
+}
+```
+
+For `Label`, the relative value resolves against `parentHeight()`: sketch height
+for a root label, or panel height for a label inside a `Panel`. The equivalent
+explicit absolute form is:
+
+```json
+"textSize": {
+  "mode": "absolute",
+  "value": 20.0
+}
+```
+
 JSON style can also provide a custom font path:
 
 ```json
@@ -175,11 +212,48 @@ JSON style can also provide a custom font path:
 }
 ```
 
-In the JSON flow, `LabelConfigLoader` reads the optional `font` path and
-`LabelFactory` loads it through the shared font loader while creating the
-control. The size passed to Processing is `textSize` when present, or `12.0f`
-otherwise. Loading never occurs during `draw()`. If `font` is omitted or
-`null`, no control-specific font is imposed.
+`style.textSize` is the legacy absolute style value. If top-level `textSize`
+and `style.textSize` are both present, top-level `textSize` is applied after the
+style and takes precedence.
+
+With a JSON `style.font`, the library creates a `PFont` at the effective text
+size used by the label. Relative text sizes are rounded to whole pixels for the
+font cache, so stable frames reuse the same font while resize events can create
+one additional cached size on demand. If `font` is omitted or `null`, no
+control-specific font is imposed.
+
+Complete relative JSON example:
+
+```json
+{
+  "type": "label",
+  "code": "lblSlot01",
+  "text": "S01",
+  "bounds": {
+    "mode": "relative",
+    "x": 0.7930585938,
+    "y": 0.1690281974,
+    "width": 0.2,
+    "height": 0.03423967774
+  },
+  "textSize": {
+    "mode": "relative",
+    "value": 0.02114803625
+  },
+  "style": {
+    "font": "data/font/JetBrainsMono.ttf",
+    "textColor": "#F2EBE7",
+    "lineSpacingMultiplier": 1.0,
+    "alignX": "start",
+    "alignY": "top",
+    "disabledAlpha": 80
+  }
+}
+```
+
+See `data/config/label-relative.json` and
+`src/main/java/com/cpz/processing/controls/examples/label/LabelRelativeJsonTest.java`
+for a runnable JSON font example with relative bounds and text size.
 
 Minimal Java sketch flow:
 

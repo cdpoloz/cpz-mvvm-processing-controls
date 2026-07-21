@@ -115,6 +115,7 @@ public final class DefaultLabelStyle implements LabelStyle {
       }
       LabelStyleConfig copy = new LabelStyleConfig();
       copy.font = config.font;
+      copy.fontResolver = config.fontResolver;
       copy.textSize = config.textSize;
       copy.textColor = config.textColor;
       copy.lineSpacingMultiplier = config.lineSpacingMultiplier;

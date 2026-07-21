@@ -24,6 +24,7 @@ import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipSupport;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import com.cpz.processing.controls.core.util.ControlCode;
+import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PApplet;
 import processing.core.PFont;
 
@@ -384,6 +385,7 @@ public final class DropDown implements PointerRoutableControl, ParentSizeAwareCo
         DropDownStyleConfig styleConfig = this.view.getStyle().getDropDownStyleConfig();
         if (styleConfig != null) {
             styleConfig.textSize = this.textSize.resolve(this.parentHeight());
+            styleConfig.font = FontLoader.resolve(styleConfig.fontResolver, this.sketch, styleConfig.textSize, styleConfig.font);
         }
     }
 

@@ -162,6 +162,7 @@ public final class DefaultTextFieldStyle implements TextFieldStyle {
       copy.selectionTextColor = config.selectionTextColor;
       copy.textSize = config.textSize;
       copy.font = config.font;
+      copy.fontResolver = config.fontResolver;
       copy.themeProvider = config.themeProvider;
       return copy;
    }

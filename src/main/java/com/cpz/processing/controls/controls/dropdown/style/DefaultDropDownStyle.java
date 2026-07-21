@@ -261,6 +261,7 @@ public final class DefaultDropDownStyle {
       copy.maxVisibleItems = config.maxVisibleItems;
       copy.disabledAlpha = config.disabledAlpha;
       copy.font = config.font;
+      copy.fontResolver = config.fontResolver;
       copy.themeProvider = config.themeProvider;
       return copy;
    }

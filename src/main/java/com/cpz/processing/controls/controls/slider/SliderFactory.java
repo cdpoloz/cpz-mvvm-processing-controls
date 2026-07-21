@@ -36,7 +36,7 @@ public final class SliderFactory {
         slider.setVisible(config.isVisible());
 
         if (config.getStyle() != null) {
-            slider.setStyle(new SliderStyle(toStyleConfig(sketch, config.getStyle())));
+            slider.setStyle(new SliderStyle(toStyleConfig(sketch, config.getStyle(), config.getTextSizeMeasure() != null)));
         }
         if (config.getTextSizeMeasure() != null) {
             slider.setTextSize(config.getTextSizeMeasure());
@@ -46,7 +46,7 @@ public final class SliderFactory {
         return slider;
     }
 
-    private static SliderStyleConfig toStyleConfig(PApplet sketch, SliderConfig.StyleConfig style) {
+    private static SliderStyleConfig toStyleConfig(PApplet sketch, SliderConfig.StyleConfig style, boolean deferFontLoad) {
         SliderStyleConfig result = new SliderStyleConfig();
         result.trackOverride = style.getTrackOverride();
         result.trackHoverOverride = style.getTrackHoverOverride();
@@ -105,7 +105,10 @@ public final class SliderFactory {
             float creationSize = result.textSize != null
                     ? result.textSize
                     : TypographySupport.DEFAULT_CUSTOM_FONT_SIZE;
-            result.font = FontLoader.load(sketch, style.getFontPath(), creationSize, "slider", style.getSourcePath());
+            result.fontResolver = FontLoader.resolver(style.getFontPath(), "slider", style.getSourcePath());
+            if (!deferFontLoad) {
+                result.font = result.fontResolver.load(sketch, creationSize);
+            }
         }
         return result;
     }

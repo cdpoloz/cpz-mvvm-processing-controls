@@ -134,6 +134,7 @@ public final class DefaultButtonStyle implements ButtonStyle {
       copy.renderer = config.renderer;
       copy.themeProvider = config.themeProvider;
       copy.font = config.font;
+      copy.fontResolver = config.fontResolver;
       copy.textSize = config.textSize;
       return copy;
    }

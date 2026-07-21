@@ -508,6 +508,39 @@ Style remains nested under each control entry:
 
 The style block still affects appearance only. It does not define behavior, listeners, input routing, or binding.
 
+Relative geometry and text size are top-level control properties. The loader
+does not infer relative values from numbers between `0` and `1`.
+
+```json
+{
+  "type": "label",
+  "code": "lblRelative",
+  "text": "Relative label",
+  "bounds": {
+    "mode": "relative",
+    "x": 0.1,
+    "y": 0.2,
+    "width": 0.3,
+    "height": 0.05
+  },
+  "textSize": {
+    "mode": "relative",
+    "value": 0.021
+  }
+}
+```
+
+For root controls, relative `x` uses sketch width. Relative `y`, `width`, and
+`height` use sketch height. For controls added to a `Panel`, the same rules use
+the panel's resolved width and height instead, and the resolved child
+coordinates remain local to the panel.
+
+For text-rendering controls, top-level `textSize` accepts only the explicit
+object shape with `mode` and `value`. `mode` may be `relative` or `absolute`.
+Legacy `style.textSize` remains valid only as a numeric absolute style value.
+When both are present, top-level `textSize` is applied after the style and takes
+precedence.
+
 Every control that currently renders text accepts an optional `font` path in
 its style:
 
@@ -730,9 +763,39 @@ default `LEFT_TO_RIGHT` direction.
 }
 ```
 
+Relative label entry with JSON font:
+
+```json
+{
+  "type": "label",
+  "code": "lblSlot01",
+  "text": "S01",
+  "bounds": {
+    "mode": "relative",
+    "x": 0.7930585938,
+    "y": 0.1690281974,
+    "width": 0.2,
+    "height": 0.03423967774
+  },
+  "textSize": {
+    "mode": "relative",
+    "value": 0.02114803625
+  },
+  "style": {
+    "font": "data/font/JetBrainsMono.ttf",
+    "textColor": "#F2EBE7",
+    "lineSpacingMultiplier": 1.0,
+    "alignX": "start",
+    "alignY": "top",
+    "disabledAlpha": 80
+  }
+}
+```
+
 The control-specific loader validates and stores the path. The corresponding
-factory then creates the `PFont` through the shared font loader. Loading occurs
-once while the control is created, never during `draw()`.
+factory creates the initial `PFont` through the shared font loader. When
+top-level relative `textSize` later resolves to a different whole-pixel size,
+the same resolver creates and caches that additional size on demand.
 
 `font` may be omitted or set to JSON `null`. Both mean that the control does
 not impose a font; rendering falls back to the font currently active in
@@ -760,6 +823,12 @@ The font file must be accessible to the Processing sketch, for example
 `data/font/JetBrainsMono.ttf`. Invalid, unreadable or unsupported font files
 fail control creation with an `IllegalArgumentException`; they do not fail
 later from the render loop.
+
+When a JSON font is combined with top-level `textSize`, the font is resolved for
+the effective text size, including relative sizes. The resolver caches fonts by
+path and whole-pixel size, so a stable frame does not recreate fonts. If a canvas
+or panel resize changes the resolved text size to a new whole-pixel value, one
+new cached `PFont` is created on demand.
 
 ---
 

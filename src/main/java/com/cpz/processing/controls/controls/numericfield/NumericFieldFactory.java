@@ -29,7 +29,7 @@ public final class NumericFieldFactory {
         numericField.setVisible(config.isVisible());
 
         if (config.getStyle() != null) {
-            numericField.setStyle(new NumericFieldStyle(toStyleConfig(sketch, config.getStyle())));
+            numericField.setStyle(new NumericFieldStyle(toStyleConfig(sketch, config.getStyle(), config.getTextSizeMeasure() != null)));
         }
         if (config.getTextSizeMeasure() != null) {
             numericField.setTextSize(config.getTextSizeMeasure());
@@ -39,7 +39,7 @@ public final class NumericFieldFactory {
         return numericField;
     }
 
-    private static NumericFieldStyleConfig toStyleConfig(PApplet sketch, NumericFieldConfig.StyleConfig style) {
+    private static NumericFieldStyleConfig toStyleConfig(PApplet sketch, NumericFieldConfig.StyleConfig style, boolean deferFontLoad) {
         NumericFieldStyleConfig result = new NumericFieldStyleConfig();
         result.backgroundColor = style.getBackgroundColor();
         result.borderColor = style.getBorderColor();
@@ -51,7 +51,10 @@ public final class NumericFieldFactory {
             result.textSize = style.getTextSize();
         }
         if (style.getFontPath() != null) {
-            result.font = FontLoader.load(sketch, style.getFontPath(), result.textSize, "numeric field", style.getSourcePath());
+            result.fontResolver = FontLoader.resolver(style.getFontPath(), "numeric field", style.getSourcePath());
+            if (!deferFontLoad) {
+                result.font = result.fontResolver.load(sketch, result.textSize);
+            }
         }
         return result;
     }

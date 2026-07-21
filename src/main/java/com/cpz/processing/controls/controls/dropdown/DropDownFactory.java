@@ -35,7 +35,7 @@ public final class DropDownFactory {
         dropDown.setEnabled(config.isEnabled());
         dropDown.setVisible(config.isVisible());
         if (config.getStyle() != null) {
-            dropDown.setStyle(new DefaultDropDownStyle(toStyleConfig(sketch, config.getStyle())));
+            dropDown.setStyle(new DefaultDropDownStyle(toStyleConfig(sketch, config.getStyle(), config.getTextSizeMeasure() != null)));
         }
         if (config.getTextSizeMeasure() != null) {
             dropDown.setTextSize(config.getTextSizeMeasure());
@@ -44,7 +44,7 @@ public final class DropDownFactory {
         return dropDown;
     }
 
-    private static DropDownStyleConfig toStyleConfig(PApplet sketch, DropDownConfig.StyleConfig style) {
+    private static DropDownStyleConfig toStyleConfig(PApplet sketch, DropDownConfig.StyleConfig style, boolean deferFontLoad) {
         DropDownStyleConfig result = new DropDownStyleConfig();
         result.baseFillOverride = style.getBaseFillOverride();
         result.listFillOverride = style.getListFillOverride();
@@ -82,7 +82,10 @@ public final class DropDownFactory {
         }
         result.disabledAlpha = style.getDisabledAlpha();
         if (style.getFontPath() != null) {
-            result.font = FontLoader.load(sketch, style.getFontPath(), result.textSize, "drop down", style.getSourcePath());
+            result.fontResolver = FontLoader.resolver(style.getFontPath(), "drop down", style.getSourcePath());
+            if (!deferFontLoad) {
+                result.font = result.fontResolver.load(sketch, result.textSize);
+            }
         }
         result.themeProvider = null;
         return result;

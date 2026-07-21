@@ -219,6 +219,7 @@ public final class RadioGroupStyle {
       copy.cornerRadius = config.cornerRadius;
       copy.disabledAlpha = config.disabledAlpha;
       copy.font = config.font;
+      copy.fontResolver = config.fontResolver;
       copy.themeProvider = config.themeProvider;
       return copy;
    }

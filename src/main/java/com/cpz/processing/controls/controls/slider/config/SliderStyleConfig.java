@@ -2,6 +2,7 @@ package com.cpz.processing.controls.controls.slider.config;
 
 import com.cpz.processing.controls.controls.slider.style.SvgColorMode;
 import com.cpz.processing.controls.core.theme.ThemeProvider;
+import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PFont;
 import processing.core.PShape;
 
@@ -60,6 +61,11 @@ public final class SliderStyleConfig {
     * Optional value-text font. {@code null} preserves the active Processing font.
     */
    public PFont font;
+   /**
+    * Optional JSON font resolver. When present, the control refreshes
+    * {@link #font} for the currently resolved text size.
+    */
+   public FontLoader.FontResolver fontResolver;
    /**
     * Optional value-text size. {@code null} preserves the active Processing size.
     */

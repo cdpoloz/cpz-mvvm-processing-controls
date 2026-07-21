@@ -191,12 +191,17 @@ For minimal visual examples of relative bounds, see
 `src/main/java/com/cpz/processing/controls/examples/button/ButtonRelativeTest.java`
 for the Java API and
 `src/main/java/com/cpz/processing/controls/examples/button/ButtonJsonRelativeTest.java`
-with `data/config/button-relative.json` for JSON loading.
+with `data/config/button-relative.json` for JSON loading. For a JSON `Label`
+using relative bounds, relative `textSize`, and a TTF font, see
+`data/config/label-relative.json` and
+`src/main/java/com/cpz/processing/controls/examples/label/LabelRelativeJsonTest.java`.
 
 In JSON, legacy `style.textSize` remains an absolute style value for existing
 config files. The top-level `textSize` object shown above is the relative-aware
 control measure and takes effect through the public facade. If both are present,
 top-level `textSize` is applied after the style and therefore takes precedence.
+When a JSON `style.font` is present, the font is resolved for the effective
+top-level text size and cached by whole-pixel size.
 
 ---
 

@@ -62,7 +62,7 @@ public final class LabelConfigLoader {
 
         JSONObject style = root.getJSONObject("style");
         return new LabelConfig.StyleConfig(
-                JsonConfigSupport.getOptionalFloat(style, "textSize"),
+                readLegacyStyleTextSize(style, path),
                 JsonConfigSupport.getOptionalNonBlankString(style, "font", path, "label style"),
                 JsonConfigSupport.getOptionalColor(style, "textColor", path),
                 JsonConfigSupport.getOptionalFloat(style, "lineSpacingMultiplier"),
@@ -71,6 +71,20 @@ public final class LabelConfigLoader {
                 JsonConfigSupport.getOptionalInt(style, "disabledAlpha"),
                 path
         );
+    }
+
+    private Float readLegacyStyleTextSize(JSONObject style, String path) {
+        if (!style.hasKey("textSize") || style.isNull("textSize")) {
+            return null;
+        }
+        Object raw = style.get("textSize");
+        if (!(raw instanceof Number)) {
+            throw new IllegalArgumentException(
+                    "Invalid 'style.textSize' value in " + path + " for label style: expected a numeric absolute value. "
+                            + "Use top-level 'textSize' with {\"mode\":\"relative|absolute\",\"value\":...} for ControlMeasure-based sizing."
+            );
+        }
+        return ((Number) raw).floatValue();
     }
 
     private HorizontalAlign readHorizontalAlign(JSONObject style, String path) {

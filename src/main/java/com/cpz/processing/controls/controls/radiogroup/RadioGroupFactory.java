@@ -40,7 +40,7 @@ public final class RadioGroupFactory {
         radioGroup.setVisible(config.isVisible());
 
         if (config.getStyle() != null) {
-            radioGroup.setStyle(new RadioGroupStyle(toStyleConfig(sketch, config.getStyle())));
+            radioGroup.setStyle(new RadioGroupStyle(toStyleConfig(sketch, config.getStyle(), config.getTextSizeMeasure() != null)));
         }
         if (config.hasExplicitBounds()) {
             radioGroup.setBounds(config.getBounds());
@@ -53,7 +53,7 @@ public final class RadioGroupFactory {
         return radioGroup;
     }
 
-    private static RadioGroupStyleConfig toStyleConfig(PApplet sketch, RadioGroupConfig.StyleConfig style) {
+    private static RadioGroupStyleConfig toStyleConfig(PApplet sketch, RadioGroupConfig.StyleConfig style, boolean deferFontLoad) {
         RadioGroupStyleConfig result = new RadioGroupStyleConfig();
         result.textOverride = style.getTextOverride();
         result.indicatorOverride = style.getIndicatorOverride();
@@ -93,7 +93,10 @@ public final class RadioGroupFactory {
         }
         result.disabledAlpha = style.getDisabledAlpha();
         if (style.getFontPath() != null) {
-            result.font = FontLoader.load(sketch, style.getFontPath(), result.textSize, "radio group", style.getSourcePath());
+            result.fontResolver = FontLoader.resolver(style.getFontPath(), "radio group", style.getSourcePath());
+            if (!deferFontLoad) {
+                result.font = result.fontResolver.load(sketch, result.textSize);
+            }
         }
         return result;
     }

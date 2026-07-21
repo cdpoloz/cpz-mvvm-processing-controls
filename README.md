@@ -713,8 +713,10 @@ That template shows:
 
 Text-rendering controls (`Button`, `Label`, `Slider`, `RadioGroup`,
 `TextField`, `NumericField`, and `DropDown`) support an optional per-control
-`PFont`, including JSON `style.font` paths. Fonts from JSON are loaded when the
-control is created. A `null` font preserves the font active in
+`PFont`, including JSON `style.font` paths. Fonts from JSON are resolved through
+a bounded cache keyed by the normalized whole-pixel render size, so top-level
+relative `textSize` can refresh the font after canvas or panel resizing without
+recreating it every frame. A `null` font preserves the font active in
 Processing/PGraphics; the theme does not yet define a global font.
 
 Tooltip JSON follows the same render-loop rule: fonts from `tooltipStyles` and

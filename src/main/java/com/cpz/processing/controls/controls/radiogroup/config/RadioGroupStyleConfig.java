@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.radiogroup.config;
 
 import com.cpz.processing.controls.core.theme.ThemeProvider;
+import com.cpz.processing.controls.core.util.FontLoader;
 import processing.core.PFont;
 
 /**
@@ -41,6 +42,11 @@ public final class RadioGroupStyleConfig {
     * Optional control font. {@code null} preserves the active Processing font.
     */
    public PFont font;
+   /**
+    * Optional JSON font resolver. When present, the control refreshes
+    * {@link #font} for the currently resolved text size.
+    */
+   public FontLoader.FontResolver fontResolver;
    public ThemeProvider themeProvider;
 
    /**

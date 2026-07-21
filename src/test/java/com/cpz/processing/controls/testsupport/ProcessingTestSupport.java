@@ -64,6 +64,7 @@ public final class ProcessingTestSupport {
         private RuntimeException createFontFailure;
         private int createFontCalls;
         private float lastCreateFontSize;
+        private final List<Float> createFontSizes = new ArrayList<>();
 
         public FontApplet(PFont font) {
             this.font = font;
@@ -80,6 +81,7 @@ public final class ProcessingTestSupport {
         public PFont createFont(String name, float size) {
             this.createFontCalls++;
             this.lastCreateFontSize = size;
+            this.createFontSizes.add(size);
             if (this.createFontFailure != null) {
                 throw this.createFontFailure;
             }
@@ -109,6 +111,10 @@ public final class ProcessingTestSupport {
 
         public float getLastCreateFontSize() {
             return this.lastCreateFontSize;
+        }
+
+        public List<Float> getCreateFontSizes() {
+            return this.createFontSizes;
         }
     }
 }

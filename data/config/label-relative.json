@@ -1,0 +1,103 @@
+{
+  "controls": [
+    {
+      "type": "panel",
+      "code": "pnlLabelRelative",
+      "bounds": {
+        "mode": "relative",
+        "x": 0.08,
+        "y": 0.18,
+        "width": 0.45,
+        "height": 0.24
+      },
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "backgroundVisible": true,
+        "backgroundColor": "#1A242C36",
+        "strokeVisible": true,
+        "strokeColor": "#668A94A6",
+        "strokeWeight": 1.0,
+        "cornerRadius": 6.0
+      }
+    },
+    {
+      "type": "label",
+      "code": "lblRootRelative",
+      "text": "Root relative label",
+      "bounds": {
+        "mode": "relative",
+        "x": 0.08,
+        "y": 0.08,
+        "width": 0.55,
+        "height": 0.08
+      },
+      "textSize": {
+        "mode": "relative",
+        "value": 0.045
+      },
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "font": "data/font/JetBrainsMono.ttf",
+        "textColor": "#F2EBE7",
+        "lineSpacingMultiplier": 1.0,
+        "alignX": "start",
+        "alignY": "top",
+        "disabledAlpha": 80
+      }
+    },
+    {
+      "type": "label",
+      "code": "lblPanelRelative",
+      "text": "Panel-relative label",
+      "bounds": {
+        "mode": "relative",
+        "x": 0.08,
+        "y": 0.16,
+        "width": 0.7,
+        "height": 0.14
+      },
+      "textSize": {
+        "mode": "relative",
+        "value": 0.16
+      },
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "font": "data/font/JetBrainsMono.ttf",
+        "textColor": "#9EE6D4",
+        "lineSpacingMultiplier": 1.0,
+        "alignX": "start",
+        "alignY": "top",
+        "disabledAlpha": 80
+      }
+    },
+    {
+      "type": "label",
+      "code": "lblAbsoluteTopLevel",
+      "text": "Top-level absolute textSize",
+      "bounds": {
+        "mode": "relative",
+        "x": 0.08,
+        "y": 0.48,
+        "width": 0.65,
+        "height": 0.08
+      },
+      "textSize": {
+        "mode": "absolute",
+        "value": 20.0
+      },
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "font": "data/font/JetBrainsMono.ttf",
+        "textColor": "#D2E4FF",
+        "lineSpacingMultiplier": 1.0,
+        "alignX": "start",
+        "alignY": "top",
+        "disabledAlpha": 80
+      }
+    }
+  ]
+}

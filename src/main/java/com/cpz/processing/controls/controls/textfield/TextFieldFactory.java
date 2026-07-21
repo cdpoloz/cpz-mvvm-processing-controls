@@ -29,7 +29,7 @@ public final class TextFieldFactory {
         textField.setVisible(config.isVisible());
 
         if (config.getStyle() != null) {
-            textField.setStyle(new DefaultTextFieldStyle(toStyleConfig(sketch, config.getStyle())));
+            textField.setStyle(new DefaultTextFieldStyle(toStyleConfig(sketch, config.getStyle(), config.getTextSizeMeasure() != null)));
         }
         if (config.getTextSizeMeasure() != null) {
             textField.setTextSize(config.getTextSizeMeasure());
@@ -39,7 +39,7 @@ public final class TextFieldFactory {
         return textField;
     }
 
-    private static TextFieldStyleConfig toStyleConfig(PApplet sketch, TextFieldConfig.StyleConfig style) {
+    private static TextFieldStyleConfig toStyleConfig(PApplet sketch, TextFieldConfig.StyleConfig style, boolean deferFontLoad) {
         TextFieldStyleConfig result = new TextFieldStyleConfig();
         result.backgroundColor = style.getBackgroundColor();
         result.borderColor = style.getBorderColor();
@@ -51,7 +51,10 @@ public final class TextFieldFactory {
             result.textSize = style.getTextSize();
         }
         if (style.getFontPath() != null) {
-            result.font = FontLoader.load(sketch, style.getFontPath(), result.textSize, "text field", style.getSourcePath());
+            result.fontResolver = FontLoader.resolver(style.getFontPath(), "text field", style.getSourcePath());
+            if (!deferFontLoad) {
+                result.font = result.fontResolver.load(sketch, result.textSize);
+            }
         }
         return result;
     }

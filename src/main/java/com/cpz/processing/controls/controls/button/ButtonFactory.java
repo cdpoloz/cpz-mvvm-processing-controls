@@ -26,7 +26,7 @@ public final class ButtonFactory {
         button.setVisible(config.isVisible());
 
         if (config.getStyle() != null) {
-            button.setStyle(new DefaultButtonStyle(toStyleConfig(sketch, config.getStyle())));
+            button.setStyle(new DefaultButtonStyle(toStyleConfig(sketch, config.getStyle(), config.getTextSizeMeasure() != null)));
         }
         if (config.getTextSizeMeasure() != null) {
             button.setTextSize(config.getTextSizeMeasure());
@@ -36,7 +36,7 @@ public final class ButtonFactory {
         return button;
     }
 
-    private static ButtonStyleConfig toStyleConfig(PApplet sketch, ButtonConfig.StyleConfig style) {
+    private static ButtonStyleConfig toStyleConfig(PApplet sketch, ButtonConfig.StyleConfig style, boolean deferFontLoad) {
         ButtonStyleConfig result = new ButtonStyleConfig();
         if (style.getBaseColor() != null) {
             result.baseColor = style.getBaseColor();
@@ -73,7 +73,10 @@ public final class ButtonFactory {
             float creationSize = result.textSize != null
                     ? result.textSize
                     : TypographySupport.DEFAULT_CUSTOM_FONT_SIZE;
-            result.font = FontLoader.load(sketch, style.getFontPath(), creationSize, "button", style.getSourcePath());
+            result.fontResolver = FontLoader.resolver(style.getFontPath(), "button", style.getSourcePath());
+            if (!deferFontLoad) {
+                result.font = result.fontResolver.load(sketch, creationSize);
+            }
         }
         return result;
     }

@@ -164,6 +164,7 @@ public final class SliderStyle {
       copy.thumbShape = config.thumbShape;
       copy.themeProvider = config.themeProvider;
       copy.font = config.font;
+      copy.fontResolver = config.fontResolver;
       copy.textSize = config.textSize;
       return copy;
    }
