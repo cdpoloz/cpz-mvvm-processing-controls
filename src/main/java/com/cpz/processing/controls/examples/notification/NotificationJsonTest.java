@@ -25,6 +25,7 @@ public class NotificationJsonTest extends PApplet {
     private Button successButton;
     private Button warningButton;
     private Button errorButton;
+    private Button placementButton;
 
     public static void main(String[] args) {
         PApplet.main(NotificationJsonTest.class);
@@ -45,18 +46,24 @@ public class NotificationJsonTest extends PApplet {
         this.successButton = createButton("btnSuccess", "Success", 100.0F, 154.0F);
         this.warningButton = createButton("btnWarning", "Warning", 100.0F, 212.0F);
         this.errorButton = createButton("btnError", "Error", 100.0F, 270.0F);
+        this.placementButton = createButton("btnPlacement", "Use placement", 280.0F, 180.0F);
 
         this.infoButton.setClickListener(() -> this.notifications.info("Information message configured by standalone JSON."));
         this.successButton.setClickListener(() -> this.notifications.success("Operation completed successfully."));
         this.warningButton.setClickListener(() -> this.notifications.warning("Warning duration and color come from notification.json."));
         this.errorButton.setClickListener(() -> this.notifications.error("Error duration and color come from notification.json."));
+        this.placementButton.setClickListener(() -> {
+            this.notifications.clearPosition();
+            this.notifications.info("Custom JSON position cleared; configured placement restored.");
+        });
 
         this.inputManager.registerLayer(new ButtonInputLayer(
                 0,
                 this.infoButton,
                 this.successButton,
                 this.warningButton,
-                this.errorButton
+                this.errorButton,
+                this.placementButton
         ));
     }
 
@@ -67,6 +74,7 @@ public class NotificationJsonTest extends PApplet {
         this.successButton.draw();
         this.warningButton.draw();
         this.errorButton.draw();
+        this.placementButton.draw();
         this.drawActiveOverlays();
     }
 
@@ -109,7 +117,7 @@ public class NotificationJsonTest extends PApplet {
         text("Notification JSON config", 64.0F, 42.0F);
         fill(Colors.gray(160));
         textSize(14.0F);
-        text("Standalone JSON config controls placement, durations, style, typography, and SVG icons.", 250.0F, 104.0F);
+        text("Standalone JSON config controls placement, position, durations, style, typography, and SVG icons.", 250.0F, 104.0F);
         text("Messages remain runtime events from button callbacks.", 250.0F, 128.0F);
     }
 

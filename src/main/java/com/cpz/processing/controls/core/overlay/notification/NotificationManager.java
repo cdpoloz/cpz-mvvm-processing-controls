@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.core.overlay.notification;
 
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
 import com.cpz.processing.controls.core.style.TypographySupport;
@@ -40,6 +41,7 @@ public final class NotificationManager {
     private final EnumMap<NotificationSeverity, Long> severityDurations = new EnumMap<>(NotificationSeverity.class);
     private final EnumMap<NotificationSeverity, CachedIcon> severityIconCache = new EnumMap<>(NotificationSeverity.class);
     private NotificationPlacement placement = NotificationPlacement.TOP_RIGHT;
+    private NotificationPosition position;
     private NotificationStyle style = new NotificationStyle();
     private int maxVisible = DEFAULT_MAX_VISIBLE;
     private boolean registered;
@@ -116,6 +118,56 @@ public final class NotificationManager {
         this.placement = placement == null ? NotificationPlacement.TOP_RIGHT : placement;
     }
 
+    /**
+     * Returns the optional custom origin of the notification stack.
+     *
+     * @return custom position, or {@code null} when placement controls layout
+     */
+    public NotificationPosition getPosition() {
+        return this.position;
+    }
+
+    /**
+     * Sets the custom origin of the notification stack. A {@code null} value
+     * clears the custom origin without changing the configured placement.
+     *
+     * @param position custom stack origin, or {@code null} to clear it
+     */
+    public void setPosition(NotificationPosition position) {
+        this.position = position;
+    }
+
+    /**
+     * Sets the custom origin from independently configured axis measures.
+     *
+     * @param x horizontal absolute or relative measure
+     * @param y vertical absolute or relative measure
+     * @throws NullPointerException if either coordinate is {@code null}
+     * @throws IllegalArgumentException if either coordinate is non-finite
+     */
+    public void setPosition(ControlMeasure x, ControlMeasure y) {
+        this.setPosition(NotificationPosition.of(x, y));
+    }
+
+    /**
+     * Sets an absolute custom origin for the notification stack.
+     *
+     * @param x absolute horizontal coordinate
+     * @param y absolute vertical coordinate
+     * @throws IllegalArgumentException if either coordinate is non-finite
+     */
+    public void setPosition(float x, float y) {
+        this.setPosition(NotificationPosition.absolute(x, y));
+    }
+
+    /**
+     * Clears the custom stack origin and restores layout through the currently
+     * configured placement.
+     */
+    public void clearPosition() {
+        this.position = null;
+    }
+
     public NotificationStyle getStyle() {
         return this.style;
     }
@@ -189,8 +241,8 @@ public final class NotificationManager {
         List<Notification> ordered = this.notificationsInEdgeOrder();
         List<NotificationFrame> frames = new ArrayList<>();
         float width = this.resolvedWidth();
-        float x = this.resolvedX(width);
-        float cursor = this.startsAtTop() ? this.style.getMargin() : this.sketch.height - this.style.getMargin();
+        LayoutOrigin origin = this.resolvedLayoutOrigin(width);
+        float cursor = origin.y();
         for (Notification notification : ordered) {
             PShape icon = this.resolveSeverityIcon(notification.getSeverity());
             float iconTextOffset = icon == null ? 0.0F : this.style.getIconSize() + this.style.getIconTextGap();
@@ -201,14 +253,14 @@ public final class NotificationManager {
             List<String> lines = this.wrapLines(notification.getMessage(), textWidth);
             float height = this.heightFor(lines);
             float y;
-            if (this.startsAtTop()) {
+            if (origin.stacksDown()) {
                 y = cursor;
                 cursor += height + this.style.getGap();
             } else {
                 y = cursor - height;
                 cursor -= height + this.style.getGap();
             }
-            frames.add(new NotificationFrame(notification, x, y, width, height, lines, icon));
+            frames.add(new NotificationFrame(notification, origin.x(), y, width, height, lines, icon));
         }
         return frames;
     }
@@ -404,7 +456,27 @@ public final class NotificationManager {
         return Math.min(requestedWidth, availableWidth);
     }
 
-    private float resolvedX(float width) {
+    private LayoutOrigin resolvedLayoutOrigin(float width) {
+        if (this.position != null) {
+            return this.resolvedCustomOrigin();
+        }
+        return this.resolvedPlacementOrigin(width);
+    }
+
+    private LayoutOrigin resolvedCustomOrigin() {
+        return new LayoutOrigin(
+                this.position.x().resolve(this.sketch.width),
+                this.position.y().resolve(this.sketch.height),
+                true
+        );
+    }
+
+    private LayoutOrigin resolvedPlacementOrigin(float width) {
+        float y = this.startsAtTop() ? this.style.getMargin() : this.sketch.height - this.style.getMargin();
+        return new LayoutOrigin(this.resolvedPlacementX(width), y, this.startsAtTop());
+    }
+
+    private float resolvedPlacementX(float width) {
         switch (this.placement) {
             case TOP_LEFT:
             case BOTTOM_LEFT:
@@ -420,6 +492,9 @@ public final class NotificationManager {
                 }
                 return Math.max(0.0F, this.sketch.width - this.style.getMargin() - width);
         }
+    }
+
+    private record LayoutOrigin(float x, float y, boolean stacksDown) {
     }
 
     private List<String> wrapLines(String text, float maxWidth) {

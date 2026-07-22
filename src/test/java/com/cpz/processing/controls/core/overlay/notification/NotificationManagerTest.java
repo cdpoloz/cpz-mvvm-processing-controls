@@ -1,5 +1,7 @@
 package com.cpz.processing.controls.core.overlay.notification;
 
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
+import com.cpz.processing.controls.controls.geometry.MeasureMode;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
 import com.cpz.processing.controls.testsupport.ProcessingTestSupport;
@@ -378,6 +380,164 @@ class NotificationManagerTest {
     }
 
     @Test
+    void allPlacementsRetainExpectedVerticalOrigin() {
+        assertPlacementY(NotificationPlacement.TOP_LEFT, 10.0F);
+        assertPlacementY(NotificationPlacement.TOP_CENTER, 10.0F);
+        assertPlacementY(NotificationPlacement.TOP_RIGHT, 10.0F);
+        assertPlacementY(NotificationPlacement.BOTTOM_LEFT, 350.0F);
+        assertPlacementY(NotificationPlacement.BOTTOM_CENTER, 350.0F);
+        assertPlacementY(NotificationPlacement.BOTTOM_RIGHT, 350.0F);
+    }
+
+    @Test
+    void floatPositionOverloadCreatesAbsolutePositionAndUsesExactOrigin() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0L));
+        manager.setPosition(120.0F, 75.0F);
+        manager.show("Placed");
+
+        NotificationPosition position = manager.getPosition();
+        NotificationManager.NotificationFrame frame = manager.layoutFrames().get(0);
+
+        assertEquals(MeasureMode.ABSOLUTE, position.x().mode());
+        assertEquals(MeasureMode.ABSOLUTE, position.y().mode());
+        assertEquals(120.0F, frame.x());
+        assertEquals(75.0F, frame.y());
+    }
+
+    @Test
+    void relativeAndMixedPositionsResolveAgainstCurrentSketchAxes() {
+        RecordingApplet sketch = recordingSketch();
+        NotificationManager manager = manager(sketch, new OverlayManager(), new FakeTimeSource(0L));
+        manager.setPosition(ControlMeasure.relative(0.5F), ControlMeasure.absolute(120.0F));
+        manager.show("Mixed");
+
+        NotificationManager.NotificationFrame frame = manager.layoutFrames().get(0);
+
+        assertEquals(250.0F, frame.x());
+        assertEquals(120.0F, frame.y());
+
+        manager.setPosition(NotificationPosition.relative(0.5F, 0.5F));
+        frame = manager.layoutFrames().get(0);
+        assertEquals(250.0F, frame.x());
+        assertEquals(200.0F, frame.y());
+    }
+
+    @Test
+    void relativePositionUsesCurrentViewportOnEveryLayout() {
+        RecordingApplet sketch = recordingSketch();
+        NotificationManager manager = manager(sketch, new OverlayManager(), new FakeTimeSource(0L));
+        manager.setPosition(NotificationPosition.relative(0.5F, 0.25F));
+        manager.show("Responsive");
+
+        assertEquals(250.0F, manager.layoutFrames().get(0).x());
+        assertEquals(100.0F, manager.layoutFrames().get(0).y());
+
+        sketch.width = 300;
+        sketch.height = 200;
+
+        assertEquals(150.0F, manager.layoutFrames().get(0).x());
+        assertEquals(50.0F, manager.layoutFrames().get(0).y());
+    }
+
+    @Test
+    void customPositionOverridesPlacementWithoutChangingStoredPlacement() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0L));
+        manager.setPlacement(NotificationPlacement.BOTTOM_RIGHT);
+        manager.setPosition(25.0F, 30.0F);
+        manager.show("Custom");
+
+        NotificationManager.NotificationFrame frame = manager.layoutFrames().get(0);
+
+        assertEquals(25.0F, frame.x());
+        assertEquals(30.0F, frame.y());
+        assertEquals(NotificationPlacement.BOTTOM_RIGHT, manager.getPlacement());
+    }
+
+    @Test
+    void changingLatentPlacementAndClearingPositionRestoresNewPlacement() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0L));
+        manager.setStyle(new NotificationStyle().setWidth(200.0F).setMargin(10.0F));
+        manager.setPlacement(NotificationPlacement.BOTTOM_LEFT);
+        manager.setPosition(25.0F, 30.0F);
+        manager.show("Placed");
+
+        manager.setPlacement(NotificationPlacement.TOP_CENTER);
+        assertEquals(25.0F, manager.layoutFrames().get(0).x());
+        assertEquals(30.0F, manager.layoutFrames().get(0).y());
+
+        manager.clearPosition();
+
+        assertEquals(NotificationPlacement.TOP_CENTER, manager.getPlacement());
+        assertEquals(150.0F, manager.layoutFrames().get(0).x());
+        assertEquals(10.0F, manager.layoutFrames().get(0).y());
+    }
+
+    @Test
+    void nullPositionClearsCustomOrigin() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0L));
+        manager.setPlacement(NotificationPlacement.TOP_LEFT);
+        manager.setStyle(new NotificationStyle().setMargin(12.0F));
+        manager.setPosition(100.0F, 80.0F);
+        manager.setPosition((NotificationPosition) null);
+        manager.show("Placed");
+
+        assertNull(manager.getPosition());
+        assertEquals(12.0F, manager.layoutFrames().get(0).x());
+        assertEquals(12.0F, manager.layoutFrames().get(0).y());
+    }
+
+    @Test
+    void nullMeasureCoordinateFailsFast() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0L));
+
+        assertThrows(NullPointerException.class, () -> manager.setPosition(null, ControlMeasure.absolute(0.0F)));
+        assertThrows(NullPointerException.class, () -> manager.setPosition(ControlMeasure.absolute(0.0F), null));
+    }
+
+    @Test
+    void customOriginIsNotClampedOrOffsetByMarginAndAlwaysStacksDownward() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0L));
+        manager.setPlacement(NotificationPlacement.BOTTOM_RIGHT);
+        manager.setStyle(new NotificationStyle()
+                .setMargin(100.0F)
+                .setGap(7.0F)
+                .setMinHeight(40.0F)
+                .setTextSize(12.0F));
+        manager.setPosition(-20.0F, 450.0F);
+        manager.show("Older");
+        manager.show("Newest");
+
+        List<NotificationManager.NotificationFrame> frames = manager.layoutFrames();
+
+        assertEquals("Newest", frames.get(0).notification().getMessage());
+        assertEquals(-20.0F, frames.get(0).x());
+        assertEquals(450.0F, frames.get(0).y());
+        assertEquals(frames.get(0).y() + frames.get(0).height() + 7.0F, frames.get(1).y());
+    }
+
+    @Test
+    void expirationRecompactsCustomStackFromOrigin() {
+        FakeTimeSource clock = new FakeTimeSource(0L);
+        NotificationManager manager = manager(sketch(), new OverlayManager(), clock);
+        manager.setPosition(40.0F, 50.0F);
+        manager.show("Older", NotificationSeverity.INFO, 1000L);
+        manager.show("Newest", NotificationSeverity.INFO, 100L);
+
+        List<NotificationManager.NotificationFrame> initial = manager.layoutFrames();
+        assertEquals("Newest", initial.get(0).notification().getMessage());
+        assertEquals(50.0F, initial.get(0).y());
+        assertTrue(initial.get(1).y() > initial.get(0).y());
+
+        clock.setMillis(100L);
+        List<NotificationManager.NotificationFrame> remaining = manager.layoutFrames();
+
+        assertEquals(1, remaining.size());
+        assertEquals("Older", remaining.get(0).notification().getMessage());
+        assertEquals(40.0F, remaining.get(0).x());
+        assertEquals(50.0F, remaining.get(0).y());
+    }
+
+    @Test
     void overlayEntryHasNoFocusTargetAndNoInputLayer() {
         NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0L));
         OverlayEntry entry = manager.getOverlayEntry();
@@ -669,6 +829,18 @@ class NotificationManagerTest {
         manager.show("Placed");
 
         assertEquals(expectedX, manager.layoutFrames().get(0).x());
+    }
+
+    private static void assertPlacementY(NotificationPlacement placement, float expectedY) {
+        NotificationManager manager = manager(recordingSketch(), new OverlayManager(), new FakeTimeSource(0L));
+        manager.setStyle(new NotificationStyle()
+                .setMargin(10.0F)
+                .setMinHeight(40.0F)
+                .setTextSize(12.0F));
+        manager.setPlacement(placement);
+        manager.show("Placed");
+
+        assertEquals(expectedY, manager.layoutFrames().get(0).y());
     }
 
     private static PApplet sketch() {

@@ -3,6 +3,7 @@ package com.cpz.processing.controls.examples.notification;
 import com.cpz.processing.controls.controls.button.Button;
 import com.cpz.processing.controls.controls.button.input.ButtonInputLayer;
 import com.cpz.processing.controls.controls.button.style.ButtonDefaultStyles;
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
@@ -28,6 +29,9 @@ public class NotificationTest extends PApplet {
     private Button successButton;
     private Button warningButton;
     private Button errorButton;
+    private Button absolutePositionButton;
+    private Button relativePositionButton;
+    private Button placementButton;
 
     public static void main(String[] args) {
         PApplet.main(NotificationTest.class);
@@ -74,18 +78,36 @@ public class NotificationTest extends PApplet {
         this.successButton = createButton("btnSuccess", "Success", 100.0F, 154.0F);
         this.warningButton = createButton("btnWarning", "Warning", 100.0F, 212.0F);
         this.errorButton = createButton("btnError", "Error", 100.0F, 270.0F);
+        this.absolutePositionButton = createButton("btnAbsolutePosition", "Absolute", 280.0F, 190.0F);
+        this.relativePositionButton = createButton("btnRelativePosition", "Relative", 280.0F, 248.0F);
+        this.placementButton = createButton("btnPlacement", "Use placement", 280.0F, 306.0F);
 
         this.infoButton.setClickListener(() -> this.notifications.info("Information message shown from a runtime event."));
         this.successButton.setClickListener(() -> this.notifications.success("Operation completed successfully."));
         this.warningButton.setClickListener(() -> this.notifications.warning("Warning: review the current settings before continuing."));
         this.errorButton.setClickListener(() -> this.notifications.error("Error: the requested operation could not be completed."));
+        this.absolutePositionButton.setClickListener(() -> {
+            this.notifications.setPosition(402.0F, 18.0F);
+            this.notifications.info("Absolute notification origin at (402, 18).");
+        });
+        this.relativePositionButton.setClickListener(() -> {
+            this.notifications.setPosition(ControlMeasure.relative(0.5F), ControlMeasure.relative(0.05F));
+            this.notifications.info("Relative notification origin at (0.5, 0.05).");
+        });
+        this.placementButton.setClickListener(() -> {
+            this.notifications.clearPosition();
+            this.notifications.info("Custom position cleared; TOP_RIGHT placement restored.");
+        });
 
         this.inputManager.registerLayer(new ButtonInputLayer(
                 0,
                 this.infoButton,
                 this.successButton,
                 this.warningButton,
-                this.errorButton
+                this.errorButton,
+                this.absolutePositionButton,
+                this.relativePositionButton,
+                this.placementButton
         ));
     }
 
@@ -96,6 +118,9 @@ public class NotificationTest extends PApplet {
         this.successButton.draw();
         this.warningButton.draw();
         this.errorButton.draw();
+        this.absolutePositionButton.draw();
+        this.relativePositionButton.draw();
+        this.placementButton.draw();
         this.drawActiveOverlays();
     }
 

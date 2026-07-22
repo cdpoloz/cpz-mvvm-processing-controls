@@ -104,14 +104,20 @@ registered in `ControlFactoryRegistry`.
 Notification manager/style defaults can be loaded from a standalone JSON file
 with `NotificationConfigLoader`. That file is separate from the controls JSON
 document and supports only notification-system settings such as placement,
-visible count, durations, severity durations, and visual style. That standalone
-style also supports `style.font` for the manager-wide notification typography.
+custom stack position, visible count, durations, severity durations, and visual
+style. That standalone style also supports `style.font` for the manager-wide
+notification typography.
 It does not define notification messages or trigger runtime notifications.
 
 Example:
 
 ```json
 {
+  "placement": "bottom-right",
+  "position": {
+    "x": {"mode": "relative", "value": 0.5},
+    "y": {"mode": "absolute", "value": 120.0}
+  },
   "style": {
     "font": "data/font/JetBrainsMono.ttf",
     "textSize": 14.0,
@@ -130,6 +136,23 @@ Example:
   }
 }
 ```
+
+`position` is an optional manager-level override of placement. Its `(x, y)` is
+the exact top-left corner of the newest notification; older notifications stack
+downward using the configured gap. The margin does not offset this origin and
+coordinates are not clamped.
+
+Position measures are explicit. A relative `x` resolves against sketch width,
+and a relative `y` resolves against sketch height on every layout. Thus
+`{"mode":"relative","value":0.5}` means 50 percent and follows sketch
+resizes. Absolute and relative modes may be mixed between axes. Naked numbers
+and percentage strings are not accepted.
+
+An omitted `position` preserves the current manager value, `position: null`
+clears it, and an object requires valid `x` and `y` measures. Invalid or partial
+objects fail before any configuration is applied. When both placement and
+position are present, placement remains stored and becomes active again after
+`NotificationManager.clearPosition()`.
 
 `style.severityIcons` maps case-insensitive notification severities (`info`,
 `success`, `warning`, `error`) to optional SVG paths. The map may be partial;

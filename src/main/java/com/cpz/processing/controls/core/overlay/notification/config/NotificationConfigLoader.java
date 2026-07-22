@@ -1,7 +1,9 @@
 package com.cpz.processing.controls.core.overlay.notification.config;
 
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.core.overlay.notification.NotificationManager;
 import com.cpz.processing.controls.core.overlay.notification.NotificationPlacement;
+import com.cpz.processing.controls.core.overlay.notification.NotificationPosition;
 import com.cpz.processing.controls.core.overlay.notification.NotificationSeverity;
 import com.cpz.processing.controls.core.util.FontLoader;
 import com.cpz.processing.controls.core.util.JsonConfigSupport;
@@ -51,13 +53,58 @@ public final class NotificationConfigLoader {
         Objects.requireNonNull(root, "root");
         Objects.requireNonNull(path, "path");
 
+        PositionConfig position = readPosition(root, path);
         return new NotificationConfig(
                 readPlacement(root),
+                position.specified(),
+                position.value(),
                 readPositiveInt(root, "maxVisible"),
                 readPositiveLong(root, "defaultDurationMillis"),
                 readSeverityDurations(root),
                 readStyle(root, path, fontResolverFactory)
         );
+    }
+
+    private static PositionConfig readPosition(JSONObject root, String path) {
+        if (!root.hasKey("position")) {
+            return new PositionConfig(false, null);
+        }
+        if (root.isNull("position")) {
+            return new PositionConfig(true, null);
+        }
+
+        Object rawPosition = root.get("position");
+        if (!(rawPosition instanceof JSONObject)) {
+            throw new IllegalArgumentException(
+                    "Invalid 'position' value in " + path
+                            + " for notification: expected an object with 'x' and 'y' measures, or null."
+            );
+        }
+
+        JSONObject position = (JSONObject) rawPosition;
+        String positionPath = path + " -> position";
+        ControlMeasure x = readRequiredPositionMeasure(position, "x", positionPath);
+        ControlMeasure y = readRequiredPositionMeasure(position, "y", positionPath);
+        return new PositionConfig(true, NotificationPosition.of(x, y));
+    }
+
+    private static ControlMeasure readRequiredPositionMeasure(JSONObject position, String axis, String path) {
+        if (!position.hasKey(axis) || position.isNull(axis)) {
+            throw new IllegalArgumentException(
+                    "Missing required notification position coordinate '" + axis + "' in " + path
+                            + ". Expected an object with explicit 'mode' and 'value'."
+            );
+        }
+
+        try {
+            return JsonConfigSupport.getOptionalControlMeasure(position, axis, path, "notification position");
+        } catch (RuntimeException exception) {
+            throw new IllegalArgumentException(
+                    "Invalid notification position coordinate '" + axis + "' in " + path
+                            + ". Cause: " + exception.getMessage(),
+                    exception
+            );
+        }
     }
 
     private static NotificationPlacement readPlacement(JSONObject root) {
@@ -257,6 +304,9 @@ public final class NotificationConfigLoader {
 
     private interface FontResolverFactory {
         NotificationConfig.FontResolver create(String fontPath, String sourcePath);
+    }
+
+    private record PositionConfig(boolean specified, NotificationPosition value) {
     }
 
     private static final class BoundFontResolverFactory implements FontResolverFactory {

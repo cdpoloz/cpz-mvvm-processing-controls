@@ -1,5 +1,15 @@
 {
   "placement": "bottom-center",
+  "position": {
+    "x": {
+      "mode": "relative",
+      "value": 0.5
+    },
+    "y": {
+      "mode": "relative",
+      "value": 0.05
+    }
+  },
   "maxVisible": 4,
   "defaultDurationMillis": 3000,
   "severityDurations": {

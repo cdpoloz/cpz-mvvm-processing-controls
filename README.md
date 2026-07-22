@@ -412,9 +412,17 @@ pointer or keyboard input in `0.9.2`, and is not configured inside
 
 Notification manager/style defaults can be loaded from standalone JSON through
 `NotificationConfigLoader`, for example `data/config/notification.json`. This
-JSON is separate from the controls JSON layer: it configures placement,
-durations, max visible count, and visual style only. It does not define
-messages, trigger notifications, or register `Notification` as a control type.
+JSON is separate from the controls JSON layer: it configures placement, an
+optional custom stack position, durations, max visible count, and visual style
+only. It does not define messages, trigger notifications, or register
+`Notification` as a control type.
+
+`NotificationManager.setPosition(...)` overrides placement with the exact
+top-left origin of the newest notification. Older notifications stack downward;
+`clearPosition()` restores the stored placement. Relative position measures use
+`ControlMeasure`: `0.5f` means 50 percent, x resolves against sketch width, and
+y resolves against sketch height on every layout. Coordinates are not clamped,
+and position remains manager-wide rather than per notification.
 
 `ProgressBar` is the non-interactive progress display control introduced before
 the notification work and remains available in `0.9.2`.

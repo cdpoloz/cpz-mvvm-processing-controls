@@ -148,8 +148,12 @@ sketch content.
 Notifications are toast-style runtime overlays, not controls.
 
 - `NotificationManager` owns one render-only `OverlayEntry`
+- `NotificationManager` owns the optional global stack origin and resolves
+  relative x/y measures against the current sketch size during each layout
 - `Notification` items are runtime events with message, severity, creation
   time, and duration
+- a custom origin places the newest item exactly at its top-left coordinate and
+  stacks older items downward; individual items do not own geometry
 - `NotificationStyle` owns the visual surface for the toast stack
 - notifications do not register pointer or keyboard input layers
 - notifications do not receive focus and are not modal

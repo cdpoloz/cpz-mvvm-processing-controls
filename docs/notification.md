@@ -18,6 +18,8 @@ success messages, warnings, or errors. Use a future dialog/modal feature, not
   `OverlayEntry`
 - `NotificationSeverity`: `INFO`, `SUCCESS`, `WARNING`, `ERROR`
 - `NotificationPlacement`: top/bottom and left/right/center stack placement
+- `NotificationPosition`: immutable custom stack origin with independent
+  absolute or relative axis measures
 - `NotificationStyle`: mutable visual style object
 
 The host sketch still owns `OverlayManager` and renders active overlays.
@@ -79,6 +81,12 @@ boolean isEmpty();
 NotificationPlacement getPlacement();
 void setPlacement(NotificationPlacement placement);
 
+NotificationPosition getPosition();
+void setPosition(NotificationPosition position);
+void setPosition(ControlMeasure x, ControlMeasure y);
+void setPosition(float x, float y);
+void clearPosition();
+
 NotificationStyle getStyle();
 void setStyle(NotificationStyle style);
 
@@ -95,6 +103,7 @@ void setMaxVisible(int maxVisible);
 Default behavior:
 
 - placement: `TOP_RIGHT`
+- custom position: none
 - info duration: `3000L`
 - success duration: `3000L`
 - warning duration: `4500L`
@@ -140,9 +149,41 @@ placements stack upward.
 When the visible limit is exceeded, the oldest notification is dropped. There
 is no queue or backlog in `0.9.0`.
 
-Placement is defined by `NotificationPlacement`. Notification is an overlay
-anchored to predefined screen regions, so it does not expose formal relative
-positioning, relative sizing, or manual x/y placement APIs in this release.
+Placement is defined by `NotificationPlacement`. A custom manager-level
+position can override the placement origin without changing the stored
+placement:
+
+```java
+notifications.setPosition(420.0f, 24.0f);
+
+notifications.setPosition(
+        ControlMeasure.relative(0.5f),
+        ControlMeasure.relative(0.1f));
+
+notifications.clearPosition();
+```
+
+The two-float overload is always absolute. `ControlMeasure.relative(0.5f)`
+means 50 percent; values such as `50` and strings such as `"50%"` are not
+relative-position syntax. Horizontal relative coordinates resolve against
+`sketch.width`, while vertical relative coordinates resolve against
+`sketch.height`. Each axis may use a different mode.
+
+The custom `(x, y)` is the exact top-left corner of the newest notification.
+Older notifications stack downward from it using `NotificationStyle.gap`.
+`NotificationStyle.margin` does not offset the custom origin. The stack is
+recalculated after expiry or removal, so the newest remaining notification
+returns to the configured origin.
+
+Custom coordinates are not clamped. Negative values, coordinates outside the
+sketch, and relative factors outside `[0, 1]` are valid. Relative measures are
+resolved on every layout, so resizing the sketch updates the origin on the next
+render. `NaN`, infinite values, and null axis measures are rejected.
+
+While a custom position is active, changing the placement updates its stored
+value but does not affect layout. `clearPosition()` restores that placement.
+Position is a property of `NotificationManager`; individual `Notification`
+events do not contain geometry.
 
 ---
 
@@ -274,6 +315,16 @@ Supported standalone JSON fields:
 ```json
 {
   "placement": "top-right",
+  "position": {
+    "x": {
+      "mode": "relative",
+      "value": 0.5
+    },
+    "y": {
+      "mode": "absolute",
+      "value": 120.0
+    }
+  },
   "maxVisible": 4,
   "defaultDurationMillis": 3000,
   "severityDurations": {
@@ -323,6 +374,14 @@ are ignored. `placement` and severity keys are case-insensitive and accept
 hyphens, underscores, or spaces. Invalid placement falls back to `TOP_RIGHT`;
 unknown severity keys and invalid or non-positive JSON duration values are
 ignored.
+
+`position` uses the same explicit `ControlMeasure` JSON representation as
+relative control geometry. Both `x` and `y` are required when the object is
+present. Omission preserves the manager's current custom position; an explicit
+`null` clears it. Missing or null axes, unknown modes, non-numeric values, and
+naked numbers are rejected atomically. When `placement` and `position` are both
+present, both are stored, the custom position controls layout, and clearing it
+restores the configured placement.
 
 `style.severityIcons` is optional and may be partial. For example, this leaves
 the other severities without a newly configured icon:

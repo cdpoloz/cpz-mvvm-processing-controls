@@ -1,9 +1,11 @@
 package com.cpz.processing.controls.core.overlay.notification.config;
 
 import com.cpz.processing.controls.controls.config.ControlConfigLoader;
+import com.cpz.processing.controls.controls.geometry.MeasureMode;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
 import com.cpz.processing.controls.core.overlay.notification.NotificationManager;
 import com.cpz.processing.controls.core.overlay.notification.NotificationPlacement;
+import com.cpz.processing.controls.core.overlay.notification.NotificationPosition;
 import com.cpz.processing.controls.core.overlay.notification.NotificationSeverity;
 import com.cpz.processing.controls.core.overlay.notification.NotificationStyle;
 import com.cpz.processing.controls.testsupport.ProcessingTestSupport;
@@ -13,6 +15,7 @@ import processing.core.PFont;
 import processing.data.JSONObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,6 +38,148 @@ class NotificationConfigLoaderTest {
         assertPlacement("TOP_RIGHT", NotificationPlacement.TOP_RIGHT);
         assertPlacement("top right", NotificationPlacement.TOP_RIGHT);
         assertPlacement(" bottom center ", NotificationPlacement.BOTTOM_CENTER);
+    }
+
+    @Test
+    void loadReadsAbsolutePosition() {
+        NotificationConfig config = config("{\"position\":{"
+                + "\"x\":{\"mode\":\"absolute\",\"value\":120},"
+                + "\"y\":{\"mode\":\"absolute\",\"value\":80}}}");
+        NotificationManager manager = manager();
+
+        config.applyTo(manager);
+
+        assertTrue(config.isPositionSpecified());
+        assertPosition(manager.getPosition(), MeasureMode.ABSOLUTE, 120.0F, MeasureMode.ABSOLUTE, 80.0F);
+    }
+
+    @Test
+    void loadReadsRelativePositionAndHalfMeansFiftyPercent() {
+        NotificationManager manager = manager();
+
+        config("{\"position\":{"
+                + "\"x\":{\"mode\":\"relative\",\"value\":0.5},"
+                + "\"y\":{\"mode\":\"relative\",\"value\":0.25}}}").applyTo(manager);
+
+        assertPosition(manager.getPosition(), MeasureMode.RELATIVE, 0.5F, MeasureMode.RELATIVE, 0.25F);
+        assertEquals(250.0F, manager.getPosition().x().resolve(500.0F));
+        assertEquals(100.0F, manager.getPosition().y().resolve(400.0F));
+    }
+
+    @Test
+    void loadReadsMixedPositionMeasures() {
+        NotificationManager manager = manager();
+
+        config("{\"position\":{"
+                + "\"x\":{\"mode\":\"relative\",\"value\":0.5},"
+                + "\"y\":{\"mode\":\"absolute\",\"value\":120}}}").applyTo(manager);
+
+        assertPosition(manager.getPosition(), MeasureMode.RELATIVE, 0.5F, MeasureMode.ABSOLUTE, 120.0F);
+    }
+
+    @Test
+    void placementAndPositionAreBothStoredAndPlacementReturnsAfterClear() {
+        NotificationManager manager = manager();
+
+        config("{\"placement\":\"bottom-left\",\"position\":{"
+                + "\"x\":{\"mode\":\"absolute\",\"value\":40},"
+                + "\"y\":{\"mode\":\"absolute\",\"value\":50}}}").applyTo(manager);
+
+        assertEquals(NotificationPlacement.BOTTOM_LEFT, manager.getPlacement());
+        assertPosition(manager.getPosition(), MeasureMode.ABSOLUTE, 40.0F, MeasureMode.ABSOLUTE, 50.0F);
+
+        manager.clearPosition();
+        assertNull(manager.getPosition());
+        assertEquals(NotificationPlacement.BOTTOM_LEFT, manager.getPlacement());
+    }
+
+    @Test
+    void successiveConfigsDistinguishOmittedConfiguredAndNullPosition() {
+        NotificationManager manager = manager();
+        manager.setPosition(10.0F, 20.0F);
+
+        NotificationConfig omitted = config("{}");
+        omitted.applyTo(manager);
+        assertFalse(omitted.isPositionSpecified());
+        assertPosition(manager.getPosition(), MeasureMode.ABSOLUTE, 10.0F, MeasureMode.ABSOLUTE, 20.0F);
+
+        config("{\"position\":{"
+                + "\"x\":{\"mode\":\"relative\",\"value\":0.25},"
+                + "\"y\":{\"mode\":\"absolute\",\"value\":90}}}").applyTo(manager);
+        assertPosition(manager.getPosition(), MeasureMode.RELATIVE, 0.25F, MeasureMode.ABSOLUTE, 90.0F);
+
+        NotificationConfig cleared = config("{\"position\":null}");
+        cleared.applyTo(manager);
+        assertTrue(cleared.isPositionSpecified());
+        assertNull(cleared.getPosition());
+        assertNull(manager.getPosition());
+    }
+
+    @Test
+    void partialOrNullPositionCoordinatesFailClearly() {
+        IllegalArgumentException missingY = assertThrows(
+                IllegalArgumentException.class,
+                () -> config("{\"position\":{\"x\":{\"mode\":\"absolute\",\"value\":10}}}")
+        );
+        IllegalArgumentException nullX = assertThrows(
+                IllegalArgumentException.class,
+                () -> config("{\"position\":{\"x\":null,\"y\":{\"mode\":\"absolute\",\"value\":20}}}")
+        );
+
+        assertTrue(missingY.getMessage().contains("'y'"));
+        assertTrue(nullX.getMessage().contains("'x'"));
+    }
+
+    @Test
+    void invalidPositionModesAndValuesFailClearly() {
+        IllegalArgumentException mode = assertThrows(
+                IllegalArgumentException.class,
+                () -> config("{\"position\":{"
+                        + "\"x\":{\"mode\":\"fluid\",\"value\":0.5},"
+                        + "\"y\":{\"mode\":\"absolute\",\"value\":20}}}")
+        );
+        IllegalArgumentException value = assertThrows(
+                IllegalArgumentException.class,
+                () -> config("{\"position\":{"
+                        + "\"x\":{\"mode\":\"relative\",\"value\":\"half\"},"
+                        + "\"y\":{\"mode\":\"absolute\",\"value\":20}}}")
+        );
+
+        assertTrue(mode.getMessage().contains("'x'"));
+        assertTrue(mode.getMessage().contains("relative"));
+        assertTrue(value.getMessage().contains("'x'"));
+    }
+
+    @Test
+    void nakedNumericCoordinatesAndNonObjectPositionFailClearly() {
+        IllegalArgumentException naked = assertThrows(
+                IllegalArgumentException.class,
+                () -> config("{\"position\":{\"x\":0.5,\"y\":0.25}}")
+        );
+        IllegalArgumentException nonObject = assertThrows(
+                IllegalArgumentException.class,
+                () -> config("{\"position\":42}")
+        );
+
+        assertTrue(naked.getMessage().contains("explicit 'mode' and 'value'"));
+        assertTrue(nonObject.getMessage().contains("expected an object"));
+    }
+
+    @Test
+    void invalidPositionPreventsPartialApplication() {
+        NotificationManager manager = manager();
+        manager.setPlacement(NotificationPlacement.BOTTOM_LEFT);
+        manager.setPosition(10.0F, 20.0F);
+        JSONObject root = JSONObject.parse("{\"placement\":\"top-center\",\"position\":{"
+                + "\"x\":{\"mode\":\"absolute\",\"value\":30}}}");
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> NotificationConfigLoader.apply(new JsonApplet(root), "notification.json", manager)
+        );
+
+        assertEquals(NotificationPlacement.BOTTOM_LEFT, manager.getPlacement());
+        assertPosition(manager.getPosition(), MeasureMode.ABSOLUTE, 10.0F, MeasureMode.ABSOLUTE, 20.0F);
     }
 
     @Test
@@ -505,6 +650,19 @@ class NotificationConfigLoaderTest {
         config("{\"placement\":\"" + raw + "\"}").applyTo(manager);
 
         assertEquals(expected, manager.getPlacement());
+    }
+
+    private static void assertPosition(
+            NotificationPosition position,
+            MeasureMode xMode,
+            float x,
+            MeasureMode yMode,
+            float y
+    ) {
+        assertEquals(xMode, position.x().mode());
+        assertEquals(x, position.x().value());
+        assertEquals(yMode, position.y().mode());
+        assertEquals(y, position.y().value());
     }
 
     private static NotificationConfig config(String json) {

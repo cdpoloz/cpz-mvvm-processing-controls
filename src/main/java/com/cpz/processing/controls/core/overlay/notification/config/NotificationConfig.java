@@ -2,6 +2,7 @@ package com.cpz.processing.controls.core.overlay.notification.config;
 
 import com.cpz.processing.controls.core.overlay.notification.NotificationManager;
 import com.cpz.processing.controls.core.overlay.notification.NotificationPlacement;
+import com.cpz.processing.controls.core.overlay.notification.NotificationPosition;
 import com.cpz.processing.controls.core.overlay.notification.NotificationSeverity;
 import com.cpz.processing.controls.core.overlay.notification.NotificationStyle;
 import java.util.Collections;
@@ -22,6 +23,8 @@ import processing.core.PFont;
  */
 public final class NotificationConfig {
     private final NotificationPlacement placement;
+    private final boolean positionSpecified;
+    private final NotificationPosition position;
     private final Integer maxVisible;
     private final Long defaultDurationMillis;
     private final EnumMap<NotificationSeverity, Long> severityDurations;
@@ -29,12 +32,16 @@ public final class NotificationConfig {
 
     NotificationConfig(
             NotificationPlacement placement,
+            boolean positionSpecified,
+            NotificationPosition position,
             Integer maxVisible,
             Long defaultDurationMillis,
             Map<NotificationSeverity, Long> severityDurations,
             StyleConfig style
     ) {
         this.placement = placement;
+        this.positionSpecified = positionSpecified;
+        this.position = position;
         this.maxVisible = maxVisible;
         this.defaultDurationMillis = defaultDurationMillis;
         this.severityDurations = new EnumMap<>(NotificationSeverity.class);
@@ -46,6 +53,25 @@ public final class NotificationConfig {
 
     public NotificationPlacement getPlacement() {
         return this.placement;
+    }
+
+    /**
+     * Returns whether the source JSON explicitly configured {@code position},
+     * including an explicit {@code null} used to clear the manager position.
+     *
+     * @return whether position was present in the source JSON
+     */
+    public boolean isPositionSpecified() {
+        return this.positionSpecified;
+    }
+
+    /**
+     * Returns the configured custom position.
+     *
+     * @return configured position, or {@code null} when omitted or explicitly cleared
+     */
+    public NotificationPosition getPosition() {
+        return this.position;
     }
 
     public Integer getMaxVisible() {
@@ -73,6 +99,9 @@ public final class NotificationConfig {
 
         if (this.placement != null) {
             manager.setPlacement(this.placement);
+        }
+        if (this.positionSpecified) {
+            manager.setPosition(this.position);
         }
         if (this.maxVisible != null && this.maxVisible > 0) {
             manager.setMaxVisible(this.maxVisible);
