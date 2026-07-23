@@ -20,11 +20,13 @@ import java.util.List;
 public class DropDownTest extends PApplet {
     private InputManager inputManager;
     private OverlayManager overlayManager;
-    private DropDown dropDown;
-    private String currentSelection;
+    private DropDown primaryDropDown;
+    private DropDown secondaryDropDown;
+    private String primarySelection;
+    private String secondarySelection;
 
     public void settings() {
-        size(760, 360);
+        size(760, 460);
         smooth(8);
     }
 
@@ -32,14 +34,23 @@ public class DropDownTest extends PApplet {
         inputManager = new InputManager();
         overlayManager = new OverlayManager();
 
-        dropDown = new DropDown(this, overlayManager, inputManager, "ddTest",
-                List.of("Option Alpha", "Option Beta", "Option Gamma", "Option Delta", "Option Epsilon"),
-                1, 380.0f, 110.0f, 420.0f, 48.0f);
-        dropDown.setChangeListener(index -> {
-            System.out.println("DropDown selectedIndex = " + index);
-            currentSelection = dropDown.getSelectedItem();
+        primaryDropDown = new DropDown(this, overlayManager, inputManager, "ddPrimary",
+                List.of("Primary Alpha", "Primary Beta", "Primary Gamma", "Primary Delta", "Primary Epsilon"),
+                0, 380.0f, 90.0f, 420.0f, 44.0f);
+        primaryDropDown.setChangeListener(index -> {
+            System.out.println("Primary DropDown selectedIndex = " + index);
+            primarySelection = primaryDropDown.getSelectedItem();
         });
-        currentSelection = dropDown.getSelectedItem();
+        primarySelection = primaryDropDown.getSelectedItem();
+
+        secondaryDropDown = new DropDown(this, overlayManager, inputManager, "ddSecondary",
+                List.of("Secondary One", "Secondary Two", "Secondary Three"),
+                1, 380.0f, 169.0f, 420.0f, 38.0f);
+        secondaryDropDown.setChangeListener(index -> {
+            System.out.println("Secondary DropDown selectedIndex = " + index);
+            secondarySelection = secondaryDropDown.getSelectedItem();
+        });
+        secondarySelection = secondaryDropDown.getSelectedItem();
 
         DropDownStyleConfig style = new DropDownStyleConfig();
         style.baseFillOverride = Colors.rgb(236, 242, 248);
@@ -51,21 +62,27 @@ public class DropDownTest extends PApplet {
         style.selectedItemOverlayOverride = Colors.argb(72, 38, 132, 212);
         style.textSize = 16.0f;
         style.itemHeight = 38.0f;
-        dropDown.setStyle(new DefaultDropDownStyle(style));
+        DefaultDropDownStyle dropDownStyle = new DefaultDropDownStyle(style);
+        primaryDropDown.setStyle(dropDownStyle);
+        secondaryDropDown.setStyle(dropDownStyle);
 
-        inputManager.registerLayer(new DropDownInputLayer(0, dropDown));
+        inputManager.registerLayer(new DropDownInputLayer(0, primaryDropDown));
+        inputManager.registerLayer(new DropDownInputLayer(0, secondaryDropDown));
         textAlign(CENTER, CENTER);
     }
 
     public void draw() {
         background(28);
-        dropDown.draw();
+        primaryDropDown.draw();
+        secondaryDropDown.draw();
         drawActiveOverlays();
         fill(180);
-        text(dropDown.getCode() + " | focused = " + dropDown.isFocused() + " | expanded = " + dropDown.isExpanded(), 380, 185);
-        text("selected = " + currentSelection, 380, 215);
-        text("click base to open/close | click option to select | click outside to close", 380, 250);
-        text("ESC closes overlay only while one is open; otherwise Processing keeps its normal behavior", 380, 275);
+        text(primaryDropDown.getCode() + " | selected = " + primarySelection
+                + " | expanded = " + primaryDropDown.isExpanded(), 380, 340);
+        text(secondaryDropDown.getCode() + " | selected = " + secondarySelection
+                + " | expanded = " + secondaryDropDown.isExpanded(), 380, 370);
+        text("Open the first menu: Primary Beta intentionally covers the second field and must win.", 380, 405);
+        text("Close the first menu to use the second normally | ESC closes the active overlay.", 380, 430);
     }
 
     public void mouseMoved() {
@@ -95,7 +112,8 @@ public class DropDownTest extends PApplet {
     }
 
     public void exit() {
-        dropDown.dispose();
+        primaryDropDown.dispose();
+        secondaryDropDown.dispose();
         overlayManager.clearAll();
         super.exit();
     }

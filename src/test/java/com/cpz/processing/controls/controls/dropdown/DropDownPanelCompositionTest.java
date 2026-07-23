@@ -407,6 +407,142 @@ class DropDownPanelCompositionTest {
     }
 
     @Test
+    void visibleStandaloneOptionTakesPriorityOverOverlappingSiblingBase() {
+        RecordingApplet sketch = sketch(640, 480);
+        InputManager inputManager = new InputManager();
+        OverlayManager overlayManager = this.overlayManager();
+        DropDown first = this.track(new DropDown(
+                sketch,
+                overlayManager,
+                inputManager,
+                "first",
+                List.of("Alpha", "Beta", "Gamma"),
+                2,
+                160.0F,
+                110.0F,
+                100.0F,
+                24.0F
+        ));
+        DropDown second = this.track(new DropDown(
+                sketch,
+                overlayManager,
+                inputManager,
+                "second",
+                List.of("One", "Two"),
+                0,
+                160.0F,
+                132.0F,
+                100.0F,
+                20.0F
+        ));
+        first.setStyle(style());
+        second.setStyle(style());
+        AtomicInteger selectionChanges = new AtomicInteger();
+        first.setChangeListener(index -> selectionChanges.incrementAndGet());
+        inputManager.registerLayer(new DropDownInputLayer(0, first));
+        inputManager.registerLayer(new DropDownInputLayer(0, second));
+
+        press(inputManager, 160.0F, 110.0F);
+        press(inputManager, 160.0F, 132.0F);
+
+        assertEquals("Alpha", first.getSelectedItem());
+        assertEquals(1, selectionChanges.get());
+        assertFalse(first.isExpanded());
+        assertFalse(second.isExpanded());
+        assertEquals(0, overlayManager.getActiveOverlays().size());
+
+        inputManager.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, 160.0F, 132.0F));
+
+        assertEquals("Alpha", first.getSelectedItem());
+        assertEquals(1, selectionChanges.get());
+        assertFalse(second.isExpanded());
+    }
+
+    @Test
+    void pressOutsideOpenMenuStillTransfersToUncoveredSiblingBase() {
+        RecordingApplet sketch = sketch(640, 480);
+        InputManager inputManager = new InputManager();
+        OverlayManager overlayManager = this.overlayManager();
+        DropDown first = this.track(new DropDown(
+                sketch,
+                overlayManager,
+                inputManager,
+                "first",
+                List.of("Alpha", "Beta", "Gamma"),
+                0,
+                160.0F,
+                110.0F,
+                100.0F,
+                24.0F
+        ));
+        DropDown second = this.track(new DropDown(
+                sketch,
+                overlayManager,
+                inputManager,
+                "second",
+                List.of("One", "Two"),
+                0,
+                160.0F,
+                250.0F,
+                100.0F,
+                24.0F
+        ));
+        first.setStyle(style());
+        second.setStyle(style());
+        inputManager.registerLayer(new DropDownInputLayer(0, first));
+        inputManager.registerLayer(new DropDownInputLayer(0, second));
+
+        press(inputManager, 160.0F, 110.0F);
+        press(inputManager, 160.0F, 250.0F);
+
+        assertFalse(first.isExpanded());
+        assertTrue(second.isExpanded());
+        assertEquals(1, overlayManager.getActiveOverlays().size());
+    }
+
+    @Test
+    void visiblePanelOptionTakesPriorityOverOverlappingStandaloneBase() {
+        RecordingApplet sketch = sketch(640, 480);
+        InputManager inputManager = new InputManager();
+        OverlayManager overlayManager = this.overlayManager();
+        Panel panel = new Panel(sketch, "panel", 100.0F, 80.0F, 200.0F, 120.0F);
+        DropDown panelDropDown = this.panelDropDown(
+                sketch,
+                overlayManager,
+                inputManager,
+                panel,
+                60.0F,
+                30.0F,
+                100.0F,
+                24.0F
+        );
+        panelDropDown.setSelectedIndex(2);
+        DropDown standalone = this.track(new DropDown(
+                sketch,
+                overlayManager,
+                inputManager,
+                "standalone",
+                List.of("One", "Two"),
+                0,
+                160.0F,
+                132.0F,
+                100.0F,
+                20.0F
+        ));
+        standalone.setStyle(style());
+        inputManager.registerLayer(new PanelInputLayer(0, panel));
+        inputManager.registerLayer(new DropDownInputLayer(-1, standalone));
+
+        press(inputManager, 160.0F, 110.0F);
+        press(inputManager, 160.0F, 132.0F);
+
+        assertEquals("Alpha", panelDropDown.getSelectedItem());
+        assertFalse(panelDropDown.isExpanded());
+        assertFalse(standalone.isExpanded());
+        assertEquals(0, overlayManager.getActiveOverlays().size());
+    }
+
+    @Test
     void movingPanelUpdatesEffectiveDropDownPositionWhileClosedAndOpen() {
         RecordingApplet sketch = sketch(640, 480);
         InputManager inputManager = new InputManager();

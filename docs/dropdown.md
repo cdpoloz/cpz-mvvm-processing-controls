@@ -113,7 +113,13 @@ Behavior:
 - the base `DropDownInputLayer` handles the collapsed control flow
 - when the control expands, the internal overlay controller registers an internal top-priority input layer
 - while expanded, that overlay layer captures pointer events and prevents click-through to unrelated controls
-- when the user clicks another dropdown, the current overlay closes and the interaction is transferred internally
+- the visible field and option list of the expanded dropdown take priority over controls underneath them, including another dropdown field
+- when the user clicks another dropdown outside the expanded dropdown's field and option list, the current overlay closes and the interaction is transferred internally
+
+The `DropDownTest` example intentionally places two dropdowns so the
+`Primary Beta` option of the first menu covers the second field. Selecting that
+visible option updates the first dropdown and leaves the second closed. Closing
+the first menu exposes the second dropdown for ordinary opening and selection.
 
 When a `DropDown` is added to a `Panel`, do not also register a standalone
 `DropDownInputLayer` for that same instance. The panel routes input to the

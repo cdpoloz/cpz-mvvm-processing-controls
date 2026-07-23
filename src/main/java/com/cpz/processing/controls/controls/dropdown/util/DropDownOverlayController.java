@@ -207,7 +207,8 @@ public final class DropDownOverlayController {
                   DropDownOverlayController.this.view.handleMouseMove(event.getX(), event.getY());
                   return true;
                case PRESS:
-                  if (DropDownOverlayController.this.routePressToSibling(event)) {
+                  if (!DropDownOverlayController.this.view.contains(event.getX(), event.getY())
+                          && DropDownOverlayController.this.routePressToSibling(event)) {
                      return true;
                   }
 
