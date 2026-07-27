@@ -86,7 +86,10 @@ This keeps behavior decisions out of the view, rendering decisions out of the mo
 - `PointerEvent` carries `type`, `x`, `y`, `pressed`, `button`, `shift`, `ctrl`, `alt`, and `wheelDelta`
 - `KeyboardEvent` carries key identity plus modifier state
 - control input adapters handle framework-owned events directly and do not require Processing event objects
-- `FocusManager` owns keyboard focus, traversal, and restoration
+- each `InputManager` owns one `FocusManager`, which provides exclusive
+  keyboard focus, traversal, and restoration within that routing scope
+- focus-aware layers attach their facade-local focus managers while registered;
+  separate `InputManager` instances therefore remain independent
 - controls that need keyboard interaction implement `KeyboardInputTarget`
 - pointer-oriented controls expose hit testing through `PointerInteractable`
 

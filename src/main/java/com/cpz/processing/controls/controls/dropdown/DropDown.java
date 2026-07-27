@@ -15,6 +15,7 @@ import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.controls.geometry.ResolvedBounds;
 import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.focus.FocusManagerAware;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
@@ -46,7 +47,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class DropDown implements PointerRoutableControl, ParentSizeAwareControl, ParentContextAwareControl, TooltipAttachable {
+public final class DropDown implements PointerRoutableControl, ParentSizeAwareControl, ParentContextAwareControl, TooltipAttachable, FocusManagerAware {
     private static final int DEFAULT_OVERLAY_Z_INDEX = 100;
 
     private final PApplet sketch;
@@ -190,6 +191,16 @@ public final class DropDown implements PointerRoutableControl, ParentSizeAwareCo
 
     public boolean isFocused() {
         return this.viewModel.isFocused();
+    }
+
+    @Override
+    public void attachFocusManager(FocusManager focusManager) {
+        this.focusManager.attachAuthority(focusManager);
+    }
+
+    @Override
+    public void detachFocusManager(FocusManager focusManager) {
+        this.focusManager.detachAuthority(focusManager);
     }
 
     public void setChangeListener(ValueListener<Integer> listener) {

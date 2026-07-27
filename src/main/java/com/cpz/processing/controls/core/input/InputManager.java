@@ -1,5 +1,7 @@
 package com.cpz.processing.controls.core.input;
 
+import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.focus.FocusManagerAware;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,10 +13,15 @@ import java.util.List;
  * to consume each event and forward it to concrete facade methods, overlays, or
  * sketch-level shortcuts.</p>
  *
+ * <p>Each manager owns one {@link FocusManager}. Focus-aware layers attach to
+ * that authority while registered, so focus is exclusive within this routing
+ * scope and independent from every other {@code InputManager}.</p>
+ *
  * @author CPZ
  */
 public class InputManager {
    private final List<InputLayer> layers = new ArrayList<>();
+   private final FocusManager focusManager = new FocusManager();
 
    /**
     * Registers a layer and keeps dispatch order sorted by descending priority.
@@ -23,6 +30,9 @@ public class InputManager {
     */
    public void registerLayer(InputLayer layer) {
       if (layer != null && !this.layers.contains(layer)) {
+         if (layer instanceof FocusManagerAware) {
+            ((FocusManagerAware)layer).attachFocusManager(this.focusManager);
+         }
          this.layers.add(layer);
          this.sortLayers();
       }
@@ -34,7 +44,22 @@ public class InputManager {
     * @param layer layer to remove
     */
    public void unregisterLayer(InputLayer layer) {
-      this.layers.remove(layer);
+      if (this.layers.remove(layer) && layer instanceof FocusManagerAware) {
+         ((FocusManagerAware)layer).detachFocusManager(this.focusManager);
+      }
+   }
+
+   /**
+    * Returns the focus authority owned by this routing manager.
+    *
+    * <p>The returned instance has the same lifecycle and isolation boundary as
+    * this {@code InputManager}. It can be supplied to other host-owned
+    * infrastructure such as an {@code OverlayManager}.</p>
+    *
+    * @return this manager's focus authority
+    */
+   public FocusManager getFocusManager() {
+      return this.focusManager;
    }
 
    private void sortLayers() {

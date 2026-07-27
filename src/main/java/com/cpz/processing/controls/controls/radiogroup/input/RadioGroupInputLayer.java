@@ -1,6 +1,8 @@
 package com.cpz.processing.controls.controls.radiogroup.input;
 
 import com.cpz.processing.controls.controls.radiogroup.RadioGroup;
+import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.focus.FocusManagerAware;
 import com.cpz.processing.controls.core.input.DefaultInputLayer;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
@@ -16,7 +18,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class RadioGroupInputLayer extends DefaultInputLayer {
+public final class RadioGroupInputLayer extends DefaultInputLayer implements FocusManagerAware {
     private final RadioGroup radioGroup;
     private boolean pointerCaptured;
 
@@ -51,5 +53,15 @@ public final class RadioGroupInputLayer extends DefaultInputLayer {
         }
         this.radioGroup.handleKeyboardEvent(event);
         return true;
+    }
+
+    @Override
+    public void attachFocusManager(FocusManager focusManager) {
+        this.radioGroup.attachFocusManager(focusManager);
+    }
+
+    @Override
+    public void detachFocusManager(FocusManager focusManager) {
+        this.radioGroup.detachFocusManager(focusManager);
     }
 }

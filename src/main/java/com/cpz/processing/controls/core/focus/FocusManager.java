@@ -5,29 +5,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Public class for focus manager.
+ * Owns an exclusive set of focusable targets.
  *
- * Responsibilities:
- * - Expose a public architectural role.
- * - Keep responsibilities explicit in the API surface.
- *
- * Behavior:
- * - Keeps the public role isolated from unrelated concerns.
- *
- * Notes:
- * - This type is part of the public project surface.
+ * <p>A standalone manager remains a complete local authority. A facade-owned
+ * manager can also be attached to a host authority; requests then participate
+ * in the host's exclusive focus scope while local clear operations affect only
+ * targets registered by that facade.</p>
  *
  * @author CPZ
  */
 public final class FocusManager {
-   private final List focusables = new ArrayList();
-   private final List focusHistory = new ArrayList();
-   private final Map snapshots = new HashMap();
+   private final List<Focusable> focusables = new ArrayList<>();
+   private final List<FocusToken> focusHistory = new ArrayList<>();
+   private final Map<FocusToken, FocusSnapshot> snapshots = new HashMap<>();
    private Focusable focused;
    private int focusedIndex = -1;
+   private FocusManager authority;
+   private int authorityAttachments;
 
    /**
     * Performs register.
@@ -40,8 +38,110 @@ public final class FocusManager {
    public void register(Focusable focusable) {
       if (focusable != null && !this.focusables.contains(focusable)) {
          this.focusables.add(focusable);
+         if (this.authority != null) {
+            this.authority.register(focusable);
+         }
       }
 
+   }
+
+   /**
+    * Removes a target from this manager.
+    *
+    * <p>If the target currently owns focus, focus is cleared before the target
+    * is released. Snapshots referring to the target are discarded so the
+    * manager does not retain it for later restoration.</p>
+    *
+    * @param focusable target to remove
+    */
+   public void unregister(Focusable focusable) {
+      if (focusable == null || !this.focusables.remove(focusable)) {
+         return;
+      }
+      List<FocusToken> discardedTokens = new ArrayList<>();
+      for (Map.Entry<FocusToken, FocusSnapshot> entry : this.snapshots.entrySet()) {
+         if (entry.getValue().target == focusable) {
+            discardedTokens.add(entry.getKey());
+         }
+      }
+      for (FocusToken token : discardedTokens) {
+         this.snapshots.remove(token);
+         this.focusHistory.remove(token);
+      }
+      if (this.authority != null) {
+         this.authority.unregister(focusable);
+         return;
+      }
+
+      if (this.focused == focusable) {
+         this.clearFocus();
+      } else if (this.focused != null) {
+         this.focusedIndex = this.focusables.indexOf(this.focused);
+      }
+   }
+
+   /**
+    * Attaches this facade-local manager to a shared authority.
+    *
+    * <p>Repeated attachment to the same authority is reference-counted so a
+    * control exposed through more than one registered layer is not detached
+    * prematurely. Attaching one local manager to two different authorities at
+    * the same time is rejected because a control cannot belong to two routing
+    * scopes simultaneously.</p>
+    *
+    * @param focusManager shared authority
+    */
+   public void attachAuthority(FocusManager focusManager) {
+      FocusManager shared = Objects.requireNonNull(focusManager, "focusManager").rootAuthority();
+      if (shared == this) {
+         return;
+      }
+      if (this.authority == shared) {
+         this.authorityAttachments++;
+         return;
+      }
+      if (this.authority != null) {
+         throw new IllegalStateException("Focus manager is already attached to another authority.");
+      }
+
+      Focusable previouslyFocused = this.focused != null && this.focused.isFocused()
+            ? this.focused
+            : null;
+      if (previouslyFocused != null) {
+         this.clearCurrentFocus();
+      }
+      this.focused = null;
+      this.focusedIndex = -1;
+      this.authority = shared;
+      this.authorityAttachments = 1;
+      for (Focusable focusable : this.focusables) {
+         shared.register(focusable);
+      }
+      if (previouslyFocused != null) {
+         shared.requestFocus(previouslyFocused);
+      }
+   }
+
+   /**
+    * Detaches this facade-local manager from the supplied authority.
+    *
+    * @param focusManager authority previously supplied to
+    *                     {@link #attachAuthority(FocusManager)}
+    */
+   public void detachAuthority(FocusManager focusManager) {
+      if (focusManager == null || this.authority != focusManager.rootAuthority()) {
+         return;
+      }
+      if (--this.authorityAttachments > 0) {
+         return;
+      }
+
+      FocusManager previousAuthority = this.authority;
+      this.authority = null;
+      this.authorityAttachments = 0;
+      for (Focusable focusable : this.focusables) {
+         previousAuthority.unregister(focusable);
+      }
    }
 
    /**
@@ -53,6 +153,15 @@ public final class FocusManager {
     * - Executes the public operation exposed by this type.
     */
    public void requestFocus(Focusable focusable) {
+      if (this.authority != null) {
+         if (focusable == null) {
+            this.clearFocus();
+            return;
+         }
+         this.register(focusable);
+         this.authority.requestFocus(focusable);
+         return;
+      }
       if (focusable != null && focusable.isVisible() && focusable.isEnabled()) {
          this.register(focusable);
          if (this.focused == focusable) {
@@ -76,6 +185,13 @@ public final class FocusManager {
     * - Updates the public state or registration owned by this type.
     */
    public void clearFocus() {
+      if (this.authority != null) {
+         Focusable sharedFocus = this.authority.getFocused();
+         if (this.focusables.contains(sharedFocus)) {
+            this.authority.clearFocus();
+         }
+         return;
+      }
       this.clearCurrentFocus();
       this.focused = null;
       this.focusedIndex = -1;
@@ -91,6 +207,9 @@ public final class FocusManager {
     * - Returns the current value without applying side effects.
     */
    public boolean isFocused(Focusable focusable) {
+      if (this.authority != null) {
+         return this.authority.isFocused(focusable);
+      }
       return this.focused == focusable && focusable != null && focusable.isFocused();
    }
 
@@ -103,6 +222,9 @@ public final class FocusManager {
     * - Executes the public operation exposed by this type.
     */
    public FocusToken pushFocus() {
+      if (this.authority != null) {
+         return this.authority.pushFocus();
+      }
       FocusToken focusable = new FocusToken();
       this.snapshots.put(focusable, new FocusSnapshot(this.focused, this.focusedIndex));
       this.focusHistory.add(focusable);
@@ -118,6 +240,10 @@ public final class FocusManager {
     * - Executes the public operation exposed by this type.
     */
    public void popFocus(FocusToken token) {
+      if (this.authority != null) {
+         this.authority.popFocus(token);
+         return;
+      }
       this.releaseFocusToken(token, true);
    }
 
@@ -130,6 +256,10 @@ public final class FocusManager {
     * - Executes the public operation exposed by this type.
     */
    public void discardFocus(FocusToken token) {
+      if (this.authority != null) {
+         this.authority.discardFocus(token);
+         return;
+      }
       this.releaseFocusToken(token, false);
    }
 
@@ -140,6 +270,10 @@ public final class FocusManager {
     * - Executes the public operation exposed by this type.
     */
    public void focusNext() {
+      if (this.authority != null) {
+         this.authority.focusNext();
+         return;
+      }
       if (this.focusables.isEmpty()) {
          this.clearFocus();
       } else {
@@ -147,7 +281,7 @@ public final class FocusManager {
 
          for(int value2 = 1; value2 <= this.focusables.size(); ++value2) {
             int candidateIndex = Math.floorMod(value + value2, this.focusables.size());
-            Focusable candidate = (Focusable)this.focusables.get(candidateIndex);
+            Focusable candidate = this.focusables.get(candidateIndex);
             if (candidate.isVisible() && candidate.isEnabled()) {
                this.requestFocus(candidate);
                return;
@@ -165,6 +299,10 @@ public final class FocusManager {
     * - Executes the public operation exposed by this type.
     */
    public void focusPrevious() {
+      if (this.authority != null) {
+         this.authority.focusPrevious();
+         return;
+      }
       if (this.focusables.isEmpty()) {
          this.clearFocus();
       } else {
@@ -172,7 +310,7 @@ public final class FocusManager {
 
          for(int value2 = 1; value2 <= this.focusables.size(); ++value2) {
             int candidateIndex = Math.floorMod(value - value2, this.focusables.size());
-            Focusable candidate = (Focusable)this.focusables.get(candidateIndex);
+            Focusable candidate = this.focusables.get(candidateIndex);
             if (candidate.isVisible() && candidate.isEnabled()) {
                this.requestFocus(candidate);
                return;
@@ -192,6 +330,10 @@ public final class FocusManager {
     * - Returns the current value without applying side effects.
     */
    public KeyboardInputTarget getFocusedKeyboardTarget() {
+      if (this.authority != null) {
+         KeyboardInputTarget sharedTarget = this.authority.getFocusedKeyboardTarget();
+         return this.focusables.contains(sharedTarget) ? sharedTarget : null;
+      }
       return this.focused instanceof KeyboardInputTarget ? (KeyboardInputTarget)this.focused : null;
    }
 
@@ -204,6 +346,10 @@ public final class FocusManager {
     * - Returns the current value without applying side effects.
     */
    public Focusable getFocused() {
+      if (this.authority != null) {
+         Focusable sharedFocus = this.authority.getFocused();
+         return this.focusables.contains(sharedFocus) ? sharedFocus : null;
+      }
       return this.focused;
    }
 
@@ -223,7 +369,7 @@ public final class FocusManager {
          } else {
             boolean active = index == this.focusHistory.size() - 1;
             this.focusHistory.remove(index);
-            FocusSnapshot snapshot = (FocusSnapshot)this.snapshots.remove(token);
+            FocusSnapshot snapshot = this.snapshots.remove(token);
             if (focused && active && snapshot != null) {
                this.restoreSnapshot(snapshot);
             }
@@ -240,6 +386,10 @@ public final class FocusManager {
       } else {
          this.clearFocus();
       }
+   }
+
+   private FocusManager rootAuthority() {
+      return this.authority == null ? this : this.authority.rootAuthority();
    }
 
    /**

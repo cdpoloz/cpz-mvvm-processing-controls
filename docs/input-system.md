@@ -24,9 +24,13 @@ This keeps interaction deterministic, testable, and source-agnostic.
 - `PointerEvent`: immutable pointer snapshot used for dispatch
 - `KeyboardEvent`: immutable keyboard snapshot used for dispatch
 - `KeyboardState`: tracks pressed keys and derives modifier state for keyboard dispatch
-- `InputManager`: dispatches pointer and keyboard events in priority order
+- `InputManager`: dispatches pointer and keyboard events in priority order and
+  owns the exclusive focus scope for its registered layers
 - `InputLayer`: defines capture order and event ownership
-- `FocusManager`: tracks keyboard focus and focus restoration
+- `FocusManager`: tracks exclusive keyboard focus and focus restoration within
+  one `InputManager`
+- `FocusManagerAware`: optional capability used to attach and detach a layer or
+  container from that scope without extending the minimal `Control` contract
 - `PointerInputTarget`: contract for pointer-aware ViewModels
 - `KeyboardInputTarget`: contract for focusable text-oriented ViewModels
 - Control-specific input adapters: handle `PointerEvent` or `KeyboardEvent` and translate geometry-aware input into `ViewModel` calls
@@ -86,7 +90,12 @@ In practice:
 - passive layers such as `TooltipInputLayer` can observe pointer motion and return `false`
 - notification overlays do not participate in input dispatch in `0.9.0`
 - pointer and keyboard dispatch share the same layer ordering model
-- focus remains managed by `FocusManager`, not by the external source
+- focus remains managed by the `FocusManager` owned by `InputManager`, not by
+  the external source
+- registering a focus-aware layer joins that manager's scope; unregistering it
+  releases any focus owned through the layer
+- separate `InputManager` instances have independent focus scopes and no
+  global focus registry is used
 
 ## Keyboard State
 

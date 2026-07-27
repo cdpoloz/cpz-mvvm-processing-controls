@@ -95,10 +95,36 @@ La suite específica conjunta de input/foco, Panel, DropDown y overlays ejecutó
 65 tests sin fallos antes de añadir la última regresión de oclusión de
 Checkbox; la clase de input/foco se volvió a ejecutar después con sus 16 casos.
 
+### Validación posterior a la corrección de H2
+
+La autoridad de foco se acotó a cada `InputManager`. Las caracterizaciones de
+foco múltiple se transformaron en regresiones y se añadieron casos de
+transferencia, aislamiento y lifecycle.
+
+- Estado inicial de esta fase: rama `master`, commit `0502053`, working tree
+  limpio y versión Maven `0.9.10`.
+- La primera ejecución de las 23 pruebas de input/foco, antes de cambiar
+  producción, produjo 7 fallos que reproducían exclusividad, transferencia,
+  aislamiento y liberación ausentes.
+
+| Validación H2 final | Tests | Fallos | Errores | Omitidos | Resultado |
+|---|---:|---:|---:|---:|---|
+| `StructuralInputFocusCharacterizationTest` | 23 | 0 | 0 | 0 | `BUILD SUCCESS` |
+| Foco, Panel, DropDown, overlays y caracterización anidada | 90 | 0 | 0 | 0 | `BUILD SUCCESS` |
+| Suite completa | 473 | 0 | 0 | 0 | `BUILD SUCCESS` |
+| `mvn -DskipTests javadoc:javadoc` | n/a | n/a | n/a | n/a | `BUILD SUCCESS` |
+
+El incremento de 466 a 473 corresponde a siete pruebas nuevas; las
+caracterizaciones ya existentes se adaptaron sin eliminar casos. Maven
+mantiene la advertencia no bloqueante de Guava sobre
+`sun.misc.Unsafe::objectFieldOffset`.
+
 ## 2. Inventario y clasificación de API pública
 
-La inspección mecánica encontró 258 fuentes de producción fuera de
-`examples/**` y `main/**`; 257 contienen una declaración top-level pública.
+La inspección mecánica inicial encontró 258 fuentes de producción fuera de
+`examples/**` y `main/**`; la adición de `FocusManagerAware` en H2 eleva el
+estado actual a 259, de las cuales 258 contienen una declaración top-level
+pública.
 Como el JAR solo excluye launcher y ejemplos, casi toda la implementación es
 técnicamente accesible. La tabla agrupa tipos con la misma evidencia y el
 mismo riesgo; no implica que todos los integrantes tengan que compartir
@@ -119,7 +145,7 @@ Escala de riesgo:
 | `common.binding.ValueListener<T>`, `button.util.ButtonListener` | Punto de extensión/callback | Setters públicos y ejemplos de binding | Alto | Conservar; completar contrato de callback/null |
 | `core.input.PointerEvent`, `KeyboardEvent`, `InputLayer`, `DefaultInputLayer`, `InputManager` | Infraestructura pública y punto de extensión | `docs/input-system.md`, ejemplos y todas las capas | Alto | Formalizar consumo, prioridad y mutación durante dispatch |
 | `controls.*.input.*InputLayer` | Infraestructura pública por necesidad técnica | La documentación de controles exige registrarlas en `InputManager` | Alto | Conservar firmas; corregir semántica solo con regresiones |
-| `core.focus.Focusable`, `FocusManager`, `FocusManager.FocusToken` | Infraestructura pública | Usados por controles editables y overlays; `docs/architecture.md:89` | Medio/alto | Investigar el ámbito de propiedad antes de prometerlo |
+| `core.focus.Focusable`, `FocusManager`, `FocusManager.FocusToken`, `FocusManagerAware` | Infraestructura pública | Usados por controles editables, overlays y `InputManager`; `docs/architecture.md` | Medio/alto | Documentar el ámbito por `InputManager`; conservar compatibilidad |
 | `core.overlay.OverlayManager`, `OverlayEntry` | Infraestructura pública | Construcción en ejemplos/docs de dropdown, tooltip y notification | Alto | Definir cierre coordinado frente a purga |
 | `core.overlay.tooltip.Tooltip`, `TooltipTarget`, `TooltipAttachable`, `TooltipArea`, `TooltipBounds` | API soportada/punto de extensión | `docs/tooltip.md`, APIs de fachadas, ejemplos y tests | Alto | Conservar |
 | `TooltipOverlayController` y tipos tooltip de input/config/factory | Infraestructura pública | El host construye el controller; JSON y ejemplos lo exponen | Alto | Conservar construcción y documentar lifecycle |
@@ -158,9 +184,10 @@ automática del comportamiento caracterizado.
 | Dos controles no solapados | El que contiene el evento | Solo ese | Como máximo el interactuado | Una capa ajena fuera de bounds no debe bloquear | Confirmado por regresión para Checkbox, TextField, NumericField y RadioGroup |
 | Dos controles solapados en capas distintas | Control de capa superior elegible | Sí | El superior si es focusable | `InputManager` descendente | Confirmado |
 | Dos controles solapados en una capa multicontrol | Decisión pendiente: previsiblemente último/topmost | Una vez | Un único receptor | Requiere orden intrapa explícito | Pendiente; algunas capas difunden |
-| Dos controles focusables de la misma familia | Segundo control tras hacer click | Sí | Solo el segundo | Prioridad visual/routing | Contrato deseado inferido; actual contradice |
-| Dos familias focusables en el mismo host | Control interactuado | Sí | Un único foco en el ámbito del host | Prioridad visual/routing | Contrato deseado inferido; ámbito sin documentar |
-| Click en espacio vacío del panel/host | Ningún control de acción | Normalmente no | Foco liberado en el ámbito aplicable | Continúa, salvo contenedor modal | Inferencia |
+| Dos controles focusables de la misma familia en un `InputManager` | Segundo control tras hacer click | Sí | Solo el segundo | Prioridad visual/routing | Confirmado por regresión para TextField |
+| Dos familias focusables en un `InputManager` | Control interactuado | Sí | Un único foco en el gestor | Prioridad visual/routing | Confirmado por regresión para TextField/NumericField, RadioGroup y DropDown |
+| Click en espacio vacío del panel/host | Ningún control de acción | Normalmente no | Foco liberado en el ámbito aplicable | Continúa, salvo contenedor modal | Confirmado para TextField/NumericField dentro de Panel |
+| Controles en dos `InputManager` distintos | Solo el control del gestor que recibe el evento | Según ese gestor | Un propietario independiente por gestor | El límite del gestor precede al orden de capas | Confirmado por regresión |
 | Control normal bajo overlay capturador | Overlay | Sí | Política del overlay | Overlay antes de capas normales | Confirmado |
 | Campo de `DropDown` abierto | Dropdown actual | Sí | Sigue abierto/focado o alterna según acción | Overlay abierto | Confirmado |
 | Opción visible de `DropDown` abierto | Opción del dropdown actual | Sí | Selecciona, cierra y libera | Overlay abierto | Confirmado |
@@ -182,7 +209,7 @@ automática del comportamiento caracterizado.
 | Consumo fuera de bounds, oculto/deshabilitado y prioridad | `StructuralInputFocusCharacterizationTest`: `checkboxPressOutsideItsBoundsContinuesToEligibleLowerLayer`, `invisibleCheckboxDoesNotConsumeOutOfBoundsPress`, `textFieldOutsidePressReleasesFocusWithoutBlockingLowerLayer`, regresiones de NumericField/RadioGroup y oclusión de Button/Checkbox deshabilitados | Las caracterizaciones originales se convirtieron en regresiones del contrato corregido |
 | Consumo de teclado | `unfocusedRadioGroupDoesNotConsumeKeyboardEvent`, `focusedRadioGroupConsumesKeyboardEventAndMovesSelection` | Confirma ausencia de consumo sin foco y consumo/efecto con foco |
 | Captura iniciada dentro | `textFieldCaptureConsumesDragAndReleaseOutsideAfterEligiblePress` | Conserva DRAG/RELEASE exteriores hasta terminar la interacción |
-| Exclusividad/liberación de foco | Pruebas de dos TextFields, TextField+NumericField y click en espacio vacío | Misma familia, familias distintas y liberación |
+| Exclusividad/liberación de foco | `sameInputManagerKeepsFocusExclusiveBetweenTextFieldsInPanel`, `sameInputManagerTransfersFocusBetweenTextAndNumericInBothDirections`, `differentInputManagersKeepIndependentFocusScopes`, `keyboardRoutingFollowsNewOwnerAfterCrossFamilyTransfer`, regresiones de deshabilitado, retirada, Panel, RadioGroup y DropDown | Misma familia, familias distintas, aislamiento por gestor, teclado y lifecycle observable |
 | Prioridad del dropdown abierto | `openDropDownVisibleOptionHasPriorityOverOverlappingLowerControl` | Preserva explícitamente la prioridad contractual |
 | Ciclo normal frente a `clearAll()` | Tres pruebas `clearAll...` y `normalDropDownCloseSynchronizesProducerOverlayAndAllowsReopen` en `OverlayAndDropDownRegistryCharacterizationTest` | Cubre dropdown, tooltip y notification sin imponer un lifecycle común |
 | Registro global de dropdowns | `currentStaticRegistryTransfersPressAcrossDifferentSketchHosts`, prueba de `dispose()` y prueba de dispose abierto | Observable entre hosts; reflexión solo para contar altas/bajas |
@@ -217,11 +244,14 @@ inferiores. TextField, NumericField y RadioGroup consultan también
 **Contratos preservados.** La captura consume DRAG/RELEASE exteriores hasta
 RELEASE. La elegibilidad geométrica de las fachadas sigue incluyendo controles
 visibles deshabilitados dentro de bounds, por lo que su oclusión no se vuelve
-transparente. Las capas de overlay y DropDown no se modificaron.
+transparente. La semántica de consumo de las capas de overlay y DropDown no se
+modificó; la capa base de DropDown solo adquirió la capacidad de vinculación de
+foco descrita en H2.
 
-### H2 — el foco no es exclusivo dentro del host
+### H2 — el foco no era exclusivo dentro del `InputManager` — corregido
 
-**Hecho observado.** `TextField`, `NumericField`, `RadioGroup` y `DropDown`
+**Hecho originalmente caracterizado.** `TextField`, `NumericField`,
+`RadioGroup` y `DropDown`
 crean su propio `FocusManager` (por ejemplo `TextField.java:80`,
 `NumericField.java:85`, `RadioGroup.java:102`, `DropDown.java:116`). En un
 `Panel`, dos TextFields quedan simultáneamente enfocados; también TextField y
@@ -229,9 +259,24 @@ NumericField. El routing del Panel se detiene tras el hijo consumidor, por lo
 que el anterior no observa el click sobre el nuevo. Un click en área vacía sí
 visita ambos y libera ambos focos.
 
-**Inferencia.** La arquitectura habla de un propietario de foco, pero no
-define si el ámbito es sketch, `InputManager`, Panel o árbol de controles.
-Resolver ese ámbito es requisito previo a la corrección.
+**Decisión aplicada.** El ámbito es un `InputManager`: cada instancia posee un
+`FocusManager` y no comparte estado estático. `FocusManagerAware` expresa la
+capacidad opcional de participar en ese ámbito. `InputManager.registerLayer`
+vincula las capas focusables y `unregisterLayer` las desvincula; `Panel`
+propaga la misma autoridad a descendientes sin convertirse en propietario.
+
+**Estado corregido.** Los gestores locales de `TextField`, `NumericField`,
+`RadioGroup` y `DropDown` actúan como delegados de la autoridad mientras su
+capa está registrada. Conceder foco revoca primero el propietario anterior del
+mismo gestor. Dos gestores conservan autoridades independientes. Retirar una
+capa o un hijo focusable de Panel libera su ownership activo. Las fachadas y
+sus métodos públicos de foco se mantienen.
+
+**Límite de lifecycle.** TextField, NumericField y RadioGroup no ofrecen
+`dispose()`; su salida observable es `InputManager.unregisterLayer` o
+`Panel.remove`. `DropDown.dispose()` conserva su contrato existente y no se
+amplía en esta fase: el consumidor sigue siendo responsable de retirar su capa
+base del routing cuando corresponda.
 
 ### H3 — `OverlayManager.clearAll()` desincroniza a los productores
 
@@ -317,7 +362,6 @@ normales es intencional y debe preservarse.
 
 - Regla z-order dentro de una misma capa multicontrol. `InputManager` define
   prioridad entre capas, no necesariamente entre controles de la misma capa.
-- Ámbito deseado de foco exclusivo: sketch, árbol, Panel o `InputManager`.
 - API oficial individual de configs, factories, payloads de renderer y tipos
   `core.*`; el agrupamiento actual necesita una allowlist revisada.
 - Comportamiento de concurrencia o modificación de registros durante dispatch.
@@ -331,9 +375,9 @@ normales es intencional y debe preservarse.
    de sus fachadas, manteniendo captura separada.
 2. `docs/input-system.md:82-83` recomienda capas compartidas por tipo; Checkbox,
    RadioGroup, TextField, NumericField y DropDown reciben una sola fachada.
-3. `docs/architecture.md:89` y `docs/input-system.md:29,89` presentan
-   `FocusManager` como propietario del foco; cada fachada focusable crea uno
-   independiente y permite focos simultáneos.
+3. Resuelta: `docs/architecture.md` y `docs/input-system.md` delimitan ahora la
+   autoridad de foco al `InputManager`; los gestores locales se vinculan
+   automáticamente durante el registro de capas.
 4. El nombre y Javadoc genérico de `OverlayManager.clearAll()` sugieren una
    operación de lifecycle; el código implementa una purga sin callbacks.
 5. README `:19` afirma que no hay estado global/singletons en el contexto de
@@ -348,15 +392,14 @@ normales es intencional y debe preservarse.
    limitación actual para más de una profundidad.
 
 Las pruebas con nombres `current...` que permanecen caracterizan únicamente
-los defectos todavía pendientes de foco compartido, lifecycle de overlays,
-registro de dropdowns y paneles anidados. Las caracterizaciones de H1 se
-renombraron y transformaron en regresiones del contrato corregido.
+los defectos todavía pendientes de lifecycle de overlays, registro de
+dropdowns y paneles anidados. Las caracterizaciones de H1 y H2 se renombraron
+y transformaron en regresiones de los contratos corregidos.
 
 ## 8. Correcciones de producción recomendadas
 
 | Prioridad | Tarea posterior | Cambio conceptual | Evidencia | Riesgo/compatibilidad |
 |---|---|---|---|---|
-| Alta | Definir autoridad y ámbito de foco | Inyectar/compartir una autoridad por host o árbol sin ampliar `Control` | H2 | Alto; cambia interacción observable. Requiere decisión previa y ruta compatible |
 | Alta | Separar cierre coordinado de purga de overlays | Hacer que la API pública indique si notifica productores; migrar `clearAll` de forma compatible | H3 | Medio/alto; callbacks pueden reentrar. Añadir API nueva antes de cambiar semántica |
 | Alta | Acotar coordinación de dropdown al host | Registro propiedad del host/coordinador, manteniendo `dispose()` | H4 | Medio; afecta transferencia entre dropdowns. Preservar contrato dentro del mismo sketch |
 | Media | Propagar contexto acumulado en Panel anidado | Entregar a descendientes el offset global acumulado, sin alterar coordenadas locales ni medidas relativas | H5 | Medio; regresión en overlays/tooltips. Las nuevas pruebas dan coordenadas exactas |
@@ -369,25 +412,22 @@ eliminar `dispose()`.
 
 ## 9. Propuesta de división de tareas siguientes
 
-La separación de recepción, elegibilidad, captura y consumo de H1 se completó
-sin resolver el orden intrapa, que sigue siendo una decisión independiente.
+La separación de recepción, elegibilidad, captura y consumo de H1 y la
+autoridad por `InputManager` de H2 se completaron sin resolver el orden
+intrapa, que sigue siendo una decisión independiente.
 
-1. **Ámbito y transferencia de foco.** Elegir autoridad por host/árbol y una
-   vía de inyección compatible. Depende de la semántica de propagación de la
-   corrección de input ya establecida.
-2. **Lifecycle de overlays.** Añadir cierre coordinado explícito y definir la
+1. **Lifecycle de overlays.** Añadir cierre coordinado explícito y definir la
    compatibilidad de `clearAll`; cubrir por separado DropDown, Tooltip y
-   Notification. Puede avanzar en paralelo a foco si se controla la gestión de
-   tokens.
-3. **Coordinador de dropdown por host.** Sustituir el registro estático global
+   Notification.
+2. **Coordinador de dropdown por host.** Sustituir el registro estático global
    conservando prioridad y transferencia dentro del mismo host. Depende del
    contrato de input y debe preservar `dispose()`.
-4. **Contexto acumulado de Panel.** Corregir únicamente la propagación global
+3. **Contexto acumulado de Panel.** Corregir únicamente la propagación global
    a descendientes; no cambiar coordenadas locales, medidas relativas ni JSON.
-5. **Baseline de API soportada.** Convertir el inventario agrupado en allowlist
+4. **Baseline de API soportada.** Convertir el inventario agrupado en allowlist
    verificable y política de deprecación antes de cualquier movimiento de
    paquetes o visibilidad.
-6. **Actualización documental.** Solo después de que las decisiones anteriores
+5. **Actualización documental.** Solo después de que las decisiones anteriores
    estén cerradas.
 
 Cada tarea puede usar estas pruebas como punto de partida, pero las pruebas

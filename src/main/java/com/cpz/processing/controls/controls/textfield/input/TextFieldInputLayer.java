@@ -1,6 +1,8 @@
 package com.cpz.processing.controls.controls.textfield.input;
 
 import com.cpz.processing.controls.controls.textfield.TextField;
+import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.focus.FocusManagerAware;
 import com.cpz.processing.controls.core.input.DefaultInputLayer;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
@@ -17,7 +19,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class TextFieldInputLayer extends DefaultInputLayer {
+public final class TextFieldInputLayer extends DefaultInputLayer implements FocusManagerAware {
     private final TextField textField;
     private boolean pointerCaptured;
 
@@ -52,5 +54,15 @@ public final class TextFieldInputLayer extends DefaultInputLayer {
         }
         this.textField.handleKeyboardEvent(event);
         return true;
+    }
+
+    @Override
+    public void attachFocusManager(FocusManager focusManager) {
+        this.textField.attachFocusManager(focusManager);
+    }
+
+    @Override
+    public void detachFocusManager(FocusManager focusManager) {
+        this.textField.detachFocusManager(focusManager);
     }
 }

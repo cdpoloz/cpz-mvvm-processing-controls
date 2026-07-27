@@ -1,6 +1,8 @@
 package com.cpz.processing.controls.controls.dropdown.input;
 
 import com.cpz.processing.controls.controls.dropdown.DropDown;
+import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.focus.FocusManagerAware;
 import com.cpz.processing.controls.core.input.DefaultInputLayer;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
@@ -12,7 +14,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class DropDownInputLayer extends DefaultInputLayer {
+public final class DropDownInputLayer extends DefaultInputLayer implements FocusManagerAware {
     private final DropDown dropDown;
 
     public DropDownInputLayer(int priority, DropDown dropDown) {
@@ -34,5 +36,15 @@ public final class DropDownInputLayer extends DefaultInputLayer {
 
     public boolean handleKeyboardEvent(KeyboardEvent event) {
         return false;
+    }
+
+    @Override
+    public void attachFocusManager(FocusManager focusManager) {
+        this.dropDown.attachFocusManager(focusManager);
+    }
+
+    @Override
+    public void detachFocusManager(FocusManager focusManager) {
+        this.dropDown.detachFocusManager(focusManager);
     }
 }

@@ -1,6 +1,8 @@
 package com.cpz.processing.controls.controls.panel.input;
 
 import com.cpz.processing.controls.controls.panel.Panel;
+import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.focus.FocusManagerAware;
 import com.cpz.processing.controls.core.input.DefaultInputLayer;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
@@ -14,8 +16,9 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class PanelInputLayer extends DefaultInputLayer {
+public final class PanelInputLayer extends DefaultInputLayer implements FocusManagerAware {
     private final List<Panel> panels = new ArrayList<>();
+    private FocusManager focusManager;
 
     public PanelInputLayer(int priority, Panel... panels) {
         super(priority);
@@ -27,7 +30,11 @@ public final class PanelInputLayer extends DefaultInputLayer {
     }
 
     public void addPanel(Panel panel) {
-        this.panels.add(Objects.requireNonNull(panel, "panel"));
+        Panel requiredPanel = Objects.requireNonNull(panel, "panel");
+        this.panels.add(requiredPanel);
+        if (this.focusManager != null) {
+            requiredPanel.attachFocusManager(this.focusManager);
+        }
     }
 
     public boolean handlePointerEvent(PointerEvent event) {
@@ -56,5 +63,31 @@ public final class PanelInputLayer extends DefaultInputLayer {
             }
         }
         return false;
+    }
+
+    @Override
+    public void attachFocusManager(FocusManager focusManager) {
+        FocusManager requiredManager = Objects.requireNonNull(focusManager, "focusManager");
+        if (this.focusManager == requiredManager) {
+            return;
+        }
+        if (this.focusManager != null) {
+            throw new IllegalStateException("Panel input layer is already attached to another focus authority.");
+        }
+        this.focusManager = requiredManager;
+        for (Panel panel : this.panels) {
+            panel.attachFocusManager(requiredManager);
+        }
+    }
+
+    @Override
+    public void detachFocusManager(FocusManager focusManager) {
+        if (focusManager == null || this.focusManager != focusManager) {
+            return;
+        }
+        this.focusManager = null;
+        for (Panel panel : this.panels) {
+            panel.detachFocusManager(focusManager);
+        }
     }
 }

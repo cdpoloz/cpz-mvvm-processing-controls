@@ -14,6 +14,7 @@ import com.cpz.processing.controls.controls.numericfield.style.NumericFieldStyle
 import com.cpz.processing.controls.controls.numericfield.view.NumericFieldView;
 import com.cpz.processing.controls.controls.numericfield.viewmodel.NumericFieldViewModel;
 import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.focus.FocusManagerAware;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.KeyboardInputAdapter;
 import com.cpz.processing.controls.core.input.PointerEvent;
@@ -35,7 +36,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class NumericField implements PointerRoutableControl, KeyboardRoutableControl, ParentSizeAwareControl, TooltipAttachable {
+public final class NumericField implements PointerRoutableControl, KeyboardRoutableControl, ParentSizeAwareControl, TooltipAttachable, FocusManagerAware {
     private static final BigDecimal DEFAULT_MIN = null;
     private static final BigDecimal DEFAULT_MAX = null;
     private static final BigDecimal DEFAULT_STEP = BigDecimal.ONE;
@@ -114,6 +115,16 @@ public final class NumericField implements PointerRoutableControl, KeyboardRouta
 
     public boolean canConsumeKeyboardEvent(KeyboardEvent event) {
         return event != null && this.isFocused() && this.isVisible() && this.isEnabled();
+    }
+
+    @Override
+    public void attachFocusManager(FocusManager focusManager) {
+        this.focusManager.attachAuthority(focusManager);
+    }
+
+    @Override
+    public void detachFocusManager(FocusManager focusManager) {
+        this.focusManager.detachAuthority(focusManager);
     }
 
     public String getCode() {

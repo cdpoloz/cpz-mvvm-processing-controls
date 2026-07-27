@@ -15,6 +15,7 @@ import com.cpz.processing.controls.controls.textfield.style.TextFieldStyle;
 import com.cpz.processing.controls.controls.textfield.view.TextFieldView;
 import com.cpz.processing.controls.controls.textfield.viewmodel.TextFieldViewModel;
 import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.focus.FocusManagerAware;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.KeyboardInputAdapter;
 import com.cpz.processing.controls.core.input.PointerEvent;
@@ -35,7 +36,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class TextField implements PointerRoutableControl, KeyboardRoutableControl, ParentSizeAwareControl, TooltipAttachable {
+public final class TextField implements PointerRoutableControl, KeyboardRoutableControl, ParentSizeAwareControl, TooltipAttachable, FocusManagerAware {
     private final PApplet sketch;
     private final TextFieldModel model;
     private final TextFieldViewModel viewModel;
@@ -112,6 +113,16 @@ public final class TextField implements PointerRoutableControl, KeyboardRoutable
 
     public boolean canConsumeKeyboardEvent(KeyboardEvent event) {
         return event != null && this.isFocused() && this.isVisible() && this.isEnabled();
+    }
+
+    @Override
+    public void attachFocusManager(FocusManager focusManager) {
+        this.focusManager.attachAuthority(focusManager);
+    }
+
+    @Override
+    public void detachFocusManager(FocusManager focusManager) {
+        this.focusManager.detachAuthority(focusManager);
     }
 
     public String getCode() {

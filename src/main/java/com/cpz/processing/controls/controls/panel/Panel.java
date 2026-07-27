@@ -9,6 +9,8 @@ import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.controls.geometry.ResolvedBounds;
 import com.cpz.processing.controls.controls.panel.style.PanelStyle;
+import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.focus.FocusManagerAware;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.tooltip.Tooltip;
@@ -42,12 +44,16 @@ import java.util.Objects;
  * stay anchored to the effective sketch-space position without coupling this
  * container to a concrete child implementation.</p>
  *
+ * <p>A panel is not a focus owner. While its input layer is registered, it
+ * forwards the owning {@code InputManager}'s focus authority to focus-aware
+ * descendants, including descendants of nested panels.</p>
+ *
  * <p>The panel does not perform layout, clipping, padding, scroll, titles,
  * shadows, or declarative child loading from JSON.</p>
  *
  * @author CPZ
  */
-public final class Panel implements PointerRoutableControl, KeyboardRoutableControl, ParentSizeAwareControl {
+public final class Panel implements PointerRoutableControl, KeyboardRoutableControl, ParentSizeAwareControl, FocusManagerAware {
     private final PApplet sketch;
     private final String code;
     private final List<Control> children = new ArrayList<>();
@@ -64,6 +70,8 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
     private boolean enabled = true;
     private boolean pointerPressedInside;
     private PanelStyle style = new PanelStyle();
+    private FocusManager focusManager;
+    private int focusManagerAttachments;
 
     public Panel(PApplet sketch, float x, float y, float width, float height) {
         this(sketch, ControlCode.auto("panel"), x, y, width, height);
@@ -91,6 +99,9 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
             this.applyResolvedBounds();
             this.applyParentContextTo(requiredChild);
             this.applyCurrentAvailabilityTo(requiredChild);
+            if (this.focusManager != null && requiredChild instanceof FocusManagerAware) {
+                ((FocusManagerAware) requiredChild).attachFocusManager(this.focusManager);
+            }
         }
         return this;
     }
@@ -98,6 +109,9 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
     public boolean remove(Control child) {
         if (child == null || !this.children.remove(child)) {
             return false;
+        }
+        if (this.focusManager != null && child instanceof FocusManagerAware) {
+            ((FocusManagerAware) child).detachFocusManager(this.focusManager);
         }
         this.clearParentContextFrom(child);
         this.restoreChildAvailability(child);
@@ -122,6 +136,45 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
 
     public List<Control> children() {
         return Collections.unmodifiableList(this.children);
+    }
+
+    @Override
+    public void attachFocusManager(FocusManager focusManager) {
+        FocusManager requiredManager = Objects.requireNonNull(focusManager, "focusManager");
+        if (this.focusManager == requiredManager) {
+            this.focusManagerAttachments++;
+            return;
+        }
+        if (this.focusManager != null) {
+            throw new IllegalStateException("Panel is already attached to another focus authority.");
+        }
+
+        this.focusManager = requiredManager;
+        this.focusManagerAttachments = 1;
+        for (Control child : this.children) {
+            if (child instanceof FocusManagerAware) {
+                ((FocusManagerAware) child).attachFocusManager(requiredManager);
+            }
+        }
+    }
+
+    @Override
+    public void detachFocusManager(FocusManager focusManager) {
+        if (focusManager == null || this.focusManager != focusManager) {
+            return;
+        }
+        if (--this.focusManagerAttachments > 0) {
+            return;
+        }
+
+        FocusManager previousManager = this.focusManager;
+        this.focusManager = null;
+        this.focusManagerAttachments = 0;
+        for (Control child : this.children) {
+            if (child instanceof FocusManagerAware) {
+                ((FocusManagerAware) child).detachFocusManager(previousManager);
+            }
+        }
     }
 
     public void draw() {

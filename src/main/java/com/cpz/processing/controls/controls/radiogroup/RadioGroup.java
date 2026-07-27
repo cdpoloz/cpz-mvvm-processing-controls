@@ -14,6 +14,7 @@ import com.cpz.processing.controls.controls.radiogroup.style.RadioGroupStyle;
 import com.cpz.processing.controls.controls.radiogroup.view.RadioGroupView;
 import com.cpz.processing.controls.controls.radiogroup.viewmodel.RadioGroupViewModel;
 import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.focus.FocusManagerAware;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.KeyboardInputAdapter;
 import com.cpz.processing.controls.core.input.PointerEvent;
@@ -35,7 +36,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class RadioGroup implements PointerRoutableControl, KeyboardRoutableControl, ParentSizeAwareControl, TooltipAttachable {
+public final class RadioGroup implements PointerRoutableControl, KeyboardRoutableControl, ParentSizeAwareControl, TooltipAttachable, FocusManagerAware {
     private final PApplet sketch;
     private final RadioGroupModel model;
     private final RadioGroupViewModel viewModel;
@@ -134,6 +135,16 @@ public final class RadioGroup implements PointerRoutableControl, KeyboardRoutabl
 
     public boolean canConsumeKeyboardEvent(KeyboardEvent event) {
         return event != null && this.viewModel.isFocused() && this.isVisible() && this.isEnabled();
+    }
+
+    @Override
+    public void attachFocusManager(FocusManager focusManager) {
+        this.focusManager.attachAuthority(focusManager);
+    }
+
+    @Override
+    public void detachFocusManager(FocusManager focusManager) {
+        this.focusManager.detachAuthority(focusManager);
     }
 
     public String getCode() {

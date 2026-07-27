@@ -1,6 +1,8 @@
 package com.cpz.processing.controls.controls.numericfield.input;
 
 import com.cpz.processing.controls.controls.numericfield.NumericField;
+import com.cpz.processing.controls.core.focus.FocusManager;
+import com.cpz.processing.controls.core.focus.FocusManagerAware;
 import com.cpz.processing.controls.core.input.DefaultInputLayer;
 import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
@@ -17,7 +19,7 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class NumericFieldInputLayer extends DefaultInputLayer {
+public final class NumericFieldInputLayer extends DefaultInputLayer implements FocusManagerAware {
     private final NumericField numericField;
     private boolean pointerCaptured;
 
@@ -52,5 +54,15 @@ public final class NumericFieldInputLayer extends DefaultInputLayer {
         }
         this.numericField.handleKeyboardEvent(event);
         return true;
+    }
+
+    @Override
+    public void attachFocusManager(FocusManager focusManager) {
+        this.numericField.attachFocusManager(focusManager);
+    }
+
+    @Override
+    public void detachFocusManager(FocusManager focusManager) {
+        this.numericField.detachFocusManager(focusManager);
     }
 }
