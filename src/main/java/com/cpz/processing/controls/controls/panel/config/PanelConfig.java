@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.controls.panel.config;
 
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
+import com.cpz.processing.controls.core.util.ControlCode;
 
 import java.util.Objects;
 
@@ -25,7 +26,7 @@ public final class PanelConfig {
     }
 
     public PanelConfig(String code, ControlBounds bounds, boolean enabled, boolean visible, PanelStyleConfig style) {
-        this.code = Objects.requireNonNull(code, "code");
+        this.code = ControlCode.requireNonBlank(code);
         this.bounds = Objects.requireNonNull(bounds, "bounds");
         this.enabled = enabled;
         this.visible = visible;

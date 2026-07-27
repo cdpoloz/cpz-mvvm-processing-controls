@@ -32,7 +32,7 @@ public final class ToggleModel implements Enableable {
    }
 
    public ToggleModel(String text) {
-      this.code = Objects.requireNonNull(text, "code");
+      this.code = ControlCode.requireNonBlank(text);
    }
 
    public String getCode() {

@@ -47,7 +47,7 @@ public final class ProgressBarConfigLoader {
         Float value = JsonConfigSupport.getOptionalFloat(root, "value");
 
         return new ProgressBarConfig(
-                JsonConfigSupport.getRequiredString(root, "code", path, "progressbar"),
+                JsonConfigSupport.getRequiredNonBlankString(root, "code", path, "progressbar"),
                 min != null ? min : 0.0F,
                 max != null ? max : 1.0F,
                 value != null ? value : 0.0F,

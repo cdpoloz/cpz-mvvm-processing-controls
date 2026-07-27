@@ -30,7 +30,7 @@ public final class LabelModel implements Enableable {
    }
 
    public LabelModel(String text) {
-      this.code = Objects.requireNonNull(text, "code");
+      this.code = ControlCode.requireNonBlank(text);
    }
 
    public String getCode() {

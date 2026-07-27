@@ -8,7 +8,11 @@ import com.cpz.processing.controls.controls.panel.Panel;
 import com.cpz.processing.controls.controls.progressbar.style.ProgressBarStyle;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipAttachable;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import processing.core.PApplet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,9 +20,53 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProgressBarTest {
+    @ParameterizedTest(name = "setValue({0})")
+    @MethodSource("nonFiniteValues")
+    void setValueRejectsNonFiniteValuesWithoutChangingState(String label, float invalid) {
+        ProgressBar progressBar = new ProgressBar(sketch(800, 600), 40.0F, 50.0F, 200.0F, 20.0F);
+        progressBar.setValue(0.4F);
+
+        assertThrows(IllegalArgumentException.class, () -> progressBar.setValue(invalid));
+        assertEquals(0.4F, progressBar.getValue());
+        assertEquals(0.4F, progressBar.getProgress());
+    }
+
+    @ParameterizedTest(name = "setRange({0}, 1)")
+    @MethodSource("nonFiniteValues")
+    void setRangeRejectsNonFiniteMinimumWithoutChangingState(String label, float invalid) {
+        ProgressBar progressBar = new ProgressBar(sketch(800, 600), 40.0F, 50.0F, 200.0F, 20.0F);
+        progressBar.setValue(0.4F);
+
+        assertThrows(IllegalArgumentException.class, () -> progressBar.setRange(invalid, 1.0F));
+        assertEquals(0.0F, progressBar.getMin());
+        assertEquals(1.0F, progressBar.getMax());
+        assertEquals(0.4F, progressBar.getValue());
+    }
+
+    @ParameterizedTest(name = "setRange(0, {0})")
+    @MethodSource("nonFiniteValues")
+    void setRangeRejectsNonFiniteMaximumWithoutChangingState(String label, float invalid) {
+        ProgressBar progressBar = new ProgressBar(sketch(800, 600), 40.0F, 50.0F, 200.0F, 20.0F);
+        progressBar.setValue(0.4F);
+
+        assertThrows(IllegalArgumentException.class, () -> progressBar.setRange(0.0F, invalid));
+        assertEquals(0.0F, progressBar.getMin());
+        assertEquals(1.0F, progressBar.getMax());
+        assertEquals(0.4F, progressBar.getValue());
+    }
+
+    private static Stream<Arguments> nonFiniteValues() {
+        return Stream.of(
+                Arguments.of("NaN", Float.NaN),
+                Arguments.of("+Infinity", Float.POSITIVE_INFINITY),
+                Arguments.of("-Infinity", Float.NEGATIVE_INFINITY)
+        );
+    }
+
     @Test
     void defaultsToZeroToOneRangeAndZeroValue() {
         ProgressBar progressBar = new ProgressBar(sketch(800, 600), 40.0F, 50.0F, 200.0F, 20.0F);

@@ -220,7 +220,7 @@ public final class JsonConfigSupport {
 
     public static String getRequiredNonBlankString(JSONObject json, String key, String path, String context) {
         String value = getRequiredString(json, key, path, context);
-        if (value.trim().isEmpty()) {
+        if (value.isBlank()) {
             throw new IllegalArgumentException(
                     "Invalid '" + key + "' value in " + path + " for " + context + ": expected a non-blank string."
             );
@@ -229,8 +229,11 @@ public final class JsonConfigSupport {
     }
 
     public static void validatePositiveDimension(String key, float value, String path) {
-        if (value <= 0.0f) {
-            throw new IllegalArgumentException("Invalid '" + key + "' value in " + path + ": " + value + ". Expected a number greater than 0.");
+        if (!Float.isFinite(value) || value <= 0.0f) {
+            throw new IllegalArgumentException(
+                    "Invalid '" + key + "' value in " + path + ": " + value
+                            + ". Expected a finite number greater than 0."
+            );
         }
     }
 

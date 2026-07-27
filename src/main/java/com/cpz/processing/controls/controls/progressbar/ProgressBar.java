@@ -57,7 +57,7 @@ public final class ProgressBar implements ParentSizeAwareControl, TooltipAttacha
 
     public ProgressBar(PApplet sketch, String code, ControlBounds bounds) {
         this.sketch = Objects.requireNonNull(sketch, "sketch");
-        this.code = Objects.requireNonNull(code, "code");
+        this.code = ControlCode.requireNonBlank(code);
         this.bounds = Objects.requireNonNull(bounds, "bounds");
         this.tooltipSupport = new TooltipSupport(this::currentTooltipBounds, this::isVisible);
         this.applyResolvedBounds();
@@ -101,7 +101,14 @@ public final class ProgressBar implements ParentSizeAwareControl, TooltipAttacha
         return this.value;
     }
 
+    /**
+     * Stores a finite value clamped to the current range.
+     *
+     * @param value requested value
+     * @throws IllegalArgumentException when {@code value} is not finite
+     */
     public void setValue(float value) {
+        requireFinite("value", value);
         this.value = this.clampToRange(value);
     }
 
@@ -109,6 +116,13 @@ public final class ProgressBar implements ParentSizeAwareControl, TooltipAttacha
         return this.min;
     }
 
+    /**
+     * Updates the finite range endpoint and preserves the existing sorting and
+     * clamping behavior.
+     *
+     * @param min requested minimum
+     * @throws IllegalArgumentException when {@code min} is not finite
+     */
     public void setMin(float min) {
         this.setRange(min, this.max);
     }
@@ -117,11 +131,28 @@ public final class ProgressBar implements ParentSizeAwareControl, TooltipAttacha
         return this.max;
     }
 
+    /**
+     * Updates the finite range endpoint and preserves the existing sorting and
+     * clamping behavior.
+     *
+     * @param max requested maximum
+     * @throws IllegalArgumentException when {@code max} is not finite
+     */
     public void setMax(float max) {
         this.setRange(this.min, max);
     }
 
+    /**
+     * Sets a finite range, sorting inverted endpoints and reclamping the value.
+     * Validation occurs before the current state is changed.
+     *
+     * @param min requested minimum
+     * @param max requested maximum
+     * @throws IllegalArgumentException when either endpoint is not finite
+     */
     public void setRange(float min, float max) {
+        requireFinite("min", min);
+        requireFinite("max", max);
         if (min <= max) {
             this.min = min;
             this.max = max;
@@ -309,6 +340,12 @@ public final class ProgressBar implements ParentSizeAwareControl, TooltipAttacha
 
     private float clampToRange(float rawValue) {
         return Math.max(this.min, Math.min(this.max, rawValue));
+    }
+
+    private static void requireFinite(String field, float value) {
+        if (!Float.isFinite(value)) {
+            throw new IllegalArgumentException(field + " must be finite: " + value);
+        }
     }
 
     private void drawFill(float resolvedWidth, float resolvedHeight) {

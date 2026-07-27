@@ -16,4 +16,18 @@ public final class ControlCode {
         Objects.requireNonNull(prefix, "prefix");
         return prefix + "-" + UUID.randomUUID();
     }
+
+    /**
+     * Validates an explicit control code.
+     *
+     * @param code control identity
+     * @return the validated code
+     * @throws IllegalArgumentException when {@code code} is null, empty, or blank
+     */
+    public static String requireNonBlank(String code) {
+        if (code == null || code.isBlank()) {
+            throw new IllegalArgumentException("code must be a non-blank string.");
+        }
+        return code;
+    }
 }

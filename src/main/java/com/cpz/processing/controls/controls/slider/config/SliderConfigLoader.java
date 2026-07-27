@@ -62,7 +62,7 @@ public final class SliderConfigLoader {
         }
 
         return new SliderConfig(
-                JsonConfigSupport.getRequiredString(root, "code", path, "slider"),
+                JsonConfigSupport.getRequiredNonBlankString(root, "code", path, "slider"),
                 min,
                 max,
                 step,

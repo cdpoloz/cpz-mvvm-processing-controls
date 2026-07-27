@@ -80,7 +80,7 @@ public final class Indicator implements ParentSizeAwareControl, TooltipAttachabl
 
     public Indicator(PApplet sketch, String code, ControlBounds bounds, String rendererPath) {
         this.sketch = Objects.requireNonNull(sketch, "sketch");
-        this.code = Objects.requireNonNull(code, "code");
+        this.code = ControlCode.requireNonBlank(code);
         this.bounds = Objects.requireNonNull(bounds, "bounds");
         if (rendererPath != null) {
             this.style.setRenderer(rendererPath);

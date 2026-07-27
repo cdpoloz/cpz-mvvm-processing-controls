@@ -189,6 +189,36 @@ medidas relativas.
 El incremento de 484 a 487 corresponde a tres regresiones nuevas. Las cuatro
 caracterizaciones originales se conservaron y adaptaron al contrato corregido.
 
+### Validación posterior a las correcciones de H7 y H8
+
+La fase de correcciones menores uniformizó identidad no blank y finitud sin
+modificar las reglas de dominio para valores finitos, y corrigió únicamente el
+drift documental confirmado.
+
+- Estado inicial: rama `master`, commit `013f017`, working tree limpio y
+  versión Maven `0.9.10`.
+- `pom.xml` ya contenía `cpz-utils 0.2.4` en HEAD; no existía un diff heredado
+  en el worktree al comenzar esta fase y el archivo no se modificó.
+- La primera ejecución test-first válida ejecutó 85 pruebas y produjo 31
+  fallos: 9 de ProgressBar runtime, 9 de ProgressBar JSON, 6 de
+  `ControlMeasure`, 2 dimensiones JSON que escapaban la validación, 2 códigos
+  blank por loader específico y 3 identidades runtime. Los casos ya seguros
+  del loader agregado permanecieron verdes.
+- Una regresión suplementaria aisló la diferencia entre
+  `trim().isEmpty()` e `isBlank()`: ejecutó 17 pruebas y produjo 1 fallo al
+  aceptar whitespace Unicode directamente en el helper JSON común.
+
+| Validación H7/H8 final | Tests | Fallos | Errores | Omitidos | Resultado |
+|---|---:|---:|---:|---:|---|
+| Config, geometría, Panel, DropDown, overlays, input/foco y ProgressBar | 234 | 0 | 0 | 0 | `BUILD SUCCESS` |
+| Suite completa | 529 | 0 | 0 | 0 | `BUILD SUCCESS` |
+| `mvn -DskipTests javadoc:javadoc` | n/a | n/a | n/a | n/a | `BUILD SUCCESS` |
+
+El incremento de 487 a 529 corresponde a 42 regresiones nuevas. Maven mantuvo
+la advertencia conocida de Guava sobre
+`sun.misc.Unsafe::objectFieldOffset`; la recompilación focalizada mostró además
+los warnings preexistentes de API deprecada y operaciones unchecked.
+
 ## 2. Inventario y clasificación de API pública
 
 La inspección mecánica inicial encontró 258 fuentes de producción fuera de
@@ -449,6 +479,46 @@ antes que un Button inferior en la misma posición. Las pruebas existentes de
 y geometría de una sola profundidad. Esta diferencia frente a controles
 normales es intencional y debe preservarse.
 
+### H7 — validación desigual de identidades y valores no finitos — corregido
+
+**Hecho originalmente observado.** El loader agregado exigía `type` y `code`
+no blank, pero los loaders específicos admitían códigos vacíos o blank.
+Constructores y objetos de configuración solo rechazaban `null`.
+`ControlMeasure` admitía `NaN` e infinitos,
+`validatePositiveDimension` dejaba pasar `NaN` e infinito positivo, y
+`ProgressBar` podía conservar valores no finitos tanto por runtime como por su
+configuración.
+
+**Estado corregido.** Toda identidad explícita almacenada por las fachadas,
+modelos y configs usa la misma validación no nula y no blank. Los doce loaders
+específicos aplican el mismo contrato que el loader agregado. Los constructores
+legacy continúan generando códigos con el formato existente.
+
+`ControlMeasure` rechaza valores absolutos y relativos no finitos sin cambiar
+las reglas para ningún valor finito. Las dimensiones JSON conservan su
+requisito positivo y ahora deben ser finitas. `ProgressBar` valida de forma
+atómica `value`, `min` y `max` antes de aplicar el ordenamiento y clamp
+históricos; `ProgressBarConfig` aplica la misma política.
+
+### H8 — drift documental respecto de 0.9.10 — corregido
+
+**Hecho originalmente observado.** README y documentos de arquitectura y
+ProgressBar conservaban versiones anteriores, README negaba el soporte JSON
+raíz de `Panel`, la superficie arquitectónica omitía tres fachadas y el
+lifecycle terminal de `DropDown.dispose()` no estaba descrito por completo.
+
+**Estado corregido.** Las referencias de la línea vigente indican `0.9.10` y
+`cpz-utils 0.2.4`; la documentación distingue carga raíz de `Panel` de la
+composición runtime mediante `panel.add(...)`, porque no existe
+`Panel.children` JSON. Arquitectura incluye `Panel`, `Indicator` y
+`ProgressBar` sin imponer MVVM completo a controles simples. ProgressBar
+documenta finitud y DropDown documenta el estado terminal de `dispose()`.
+
+Los diagramas existentes se revisaron y no contienen información falsa
+relacionada con estos hallazgos. No se añadieron diagramas únicamente por su
+ausencia histórica. La clasificación formal de API continúa deliberadamente
+diferida a la fase de allowlist.
+
 ## 6. Hipótesis descartadas o pendientes
 
 ### Descartadas o acotadas
@@ -495,16 +565,20 @@ normales es intencional y debe preservarse.
    ahora el acumulado completo sin alterar los bounds locales.
 8. Resuelta: la documentación de Panel describe la composición anidada, el
    dropdown global y la ausencia de `Panel.children` JSON.
+9. Resuelta: runtime y JSON comparten identidad no blank y finitud geométrica,
+   sin cambiar las reglas para valores finitos.
+10. Resuelta: README y documentos de arquitectura, ProgressBar y DropDown
+    describen el estado real de `0.9.10`.
 
-Las caracterizaciones de H1, H2, H3, H4 y H5 se renombraron o transformaron en
-regresiones de los contratos corregidos.
+Las caracterizaciones de H1, H2, H3, H4, H5 y H7 se renombraron, transformaron
+o ampliaron como regresiones de los contratos corregidos.
 
 ## 8. Correcciones de producción recomendadas
 
 | Prioridad | Tarea posterior | Cambio conceptual | Evidencia | Riesgo/compatibilidad |
 |---|---|---|---|---|
 | Media | Establecer baseline/allowlist de API | Clasificar los 257 tipos y documentar soportado, extensión e interno antes de cualquier deprecación | Inventario §2 | Bajo ahora; evita una futura ruptura binaria accidental |
-| Baja | Actualizar documentación después de decidir contratos | Documentar foco, consumo, `clearAll`, lifecycle y límite de API | §7 | Bajo, pero no debe adelantarse a la decisión de producción |
+| Baja | Documentar la clasificación después de decidir la allowlist | Delimitar API soportada, extensión e internals sin cambiar visibilidad en esta fase | §2 y §7 | Bajo, pero no debe adelantarse a la decisión de API |
 
 No se recomienda una clase base universal, un MVVM forzado para controles
 simples, integrar Notification en `Control`, añadir hijos JSON a Panel ni
@@ -514,14 +588,16 @@ eliminar `dispose()`.
 
 La separación de recepción, elegibilidad, captura y consumo de H1, la
 autoridad por `InputManager` de H2, el cierre coordinado de H3, el coordinador
-por gestor de H4 y el contexto acumulado de H5 se completaron sin resolver el
-orden intrapa, que sigue siendo una decisión independiente.
+por gestor de H4, el contexto acumulado de H5, la validación de H7 y la
+alineación documental de H8 se completaron sin resolver el orden intrapa, que
+sigue siendo una decisión independiente.
 
 1. **Baseline de API soportada.** Convertir el inventario agrupado en allowlist
    verificable y política de deprecación antes de cualquier movimiento de
    paquetes o visibilidad.
-2. **Actualización documental.** Solo después de que las decisiones anteriores
-   estén cerradas.
+2. **Documentación de la allowlist.** Solo después de que las decisiones
+   anteriores estén cerradas; el drift factual de la documentación vigente ya
+   quedó corregido en H8.
 
 Cada tarea puede usar estas regresiones como punto de partida sin mantener el
 comportamiento defectuoso anterior como válido.

@@ -450,8 +450,8 @@ The main loader fails fast with clear errors when:
 - `controls` is missing
 - `controls` is not an array
 - an entry is not an object
-- `type` is missing
-- `code` is missing
+- `type` is missing, null, empty, or blank
+- `code` is missing, null, empty, or blank
 - a `code` is duplicated
 - `type` is unknown
 - a control-specific property is invalid
@@ -463,6 +463,8 @@ Examples of control-specific validation that remain delegated to the specific lo
 - `RadioGroup`: options and `selectedIndex`
 - `NumericField`: numeric text grammar
 - `DropDown`: items and `selectedIndex`
+- geometry: finite measurement values and positive finite JSON dimensions
+- `ProgressBar`: finite `min`, `max`, and `value`
 
 There is no silent fallback and no implicit autocorrection.
 
@@ -557,6 +559,10 @@ For root controls, relative `x` uses sketch width. Relative `y`, `width`, and
 `height` use sketch height. For controls added to a `Panel`, the same rules use
 the panel's resolved width and height instead, and the resolved child
 coordinates remain local to the panel.
+
+Every absolute or relative measurement value must be finite. Existing rules
+for finite positions and relative factors are unchanged; JSON dimensions retain
+their existing positive-value requirement and additionally must be finite.
 
 For text-rendering controls, top-level `textSize` accepts only the explicit
 object shape with `mode` and `value`. `mode` may be `relative` or `absolute`.
@@ -753,7 +759,8 @@ Minimal progress bar entry:
 }
 ```
 
-`value` is clamped to `[min, max]`. If `min > max`, the loader stores the
+`min`, `max`, and `value` must be finite. `value` is clamped to `[min, max]`.
+If `min > max`, the loader stores the
 sorted range. If `min == max`, normalized progress avoids division by zero and
 reports full progress after normal clamping. `style.strokeWeight` is the
 canonical border-width property. `borderColor` is not a ProgressBar visual

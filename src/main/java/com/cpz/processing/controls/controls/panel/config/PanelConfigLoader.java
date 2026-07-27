@@ -35,7 +35,7 @@ public final class PanelConfigLoader {
 
     public PanelConfig loadFromJson(JSONObject root, String path) {
         return new PanelConfig(
-                JsonConfigSupport.getRequiredString(root, "code", path, "panel"),
+                JsonConfigSupport.getRequiredNonBlankString(root, "code", path, "panel"),
                 JsonConfigSupport.getControlBounds(root, path, "panel"),
                 root.getBoolean("enabled", true),
                 root.getBoolean("visible", true),

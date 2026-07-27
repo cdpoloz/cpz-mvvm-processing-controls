@@ -6,6 +6,7 @@ import com.cpz.processing.controls.controls.slider.model.SliderOrientation;
 import com.cpz.processing.controls.controls.slider.model.SnapMode;
 import com.cpz.processing.controls.controls.slider.style.SvgColorMode;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipConfig;
+import com.cpz.processing.controls.core.util.ControlCode;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -88,7 +89,7 @@ public final class SliderConfig {
             StyleConfig style,
             TooltipConfig tooltip
     ) {
-        this.code = Objects.requireNonNull(code, "code");
+        this.code = ControlCode.requireNonBlank(code);
         this.min = Objects.requireNonNull(min, "min");
         this.max = Objects.requireNonNull(max, "max");
         this.step = Objects.requireNonNull(step, "step");

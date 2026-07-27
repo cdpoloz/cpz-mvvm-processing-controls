@@ -45,7 +45,7 @@ public final class SliderModel implements Enableable {
    }
 
    public SliderModel(String text) {
-      this.code = Objects.requireNonNull(text, "code");
+      this.code = ControlCode.requireNonBlank(text);
       this.min = DEFAULT_MIN;
       this.max = DEFAULT_MAX;
       this.step = DEFAULT_STEP;
@@ -56,7 +56,7 @@ public final class SliderModel implements Enableable {
    }
 
    public SliderModel(String text, BigDecimal bigDecimal, BigDecimal bigDecimal2, BigDecimal bigDecimal3, BigDecimal bigDecimal4, SnapMode snapMode) {
-      this.code = Objects.requireNonNull(text, "code");
+      this.code = ControlCode.requireNonBlank(text);
       BigDecimal bigDecimal5 = requireNonNull(bigDecimal, "min");
       BigDecimal bigDecimal6 = requireNonNull(bigDecimal2, "max");
       BigDecimal bigDecimal7 = requireNonNull(bigDecimal3, "step");

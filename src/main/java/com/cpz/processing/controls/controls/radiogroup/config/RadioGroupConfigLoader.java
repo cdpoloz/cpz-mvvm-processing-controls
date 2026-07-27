@@ -56,7 +56,7 @@ public final class RadioGroupConfigLoader {
         boolean explicitBounds = JsonConfigSupport.hasExplicitBounds(root);
         RadioGroupConfig.StyleConfig style = this.readStyle(root, path);
         return new RadioGroupConfig(
-                JsonConfigSupport.getRequiredString(root, "code", path, "radiogroup"),
+                JsonConfigSupport.getRequiredNonBlankString(root, "code", path, "radiogroup"),
                 options,
                 selectedIndex,
                 JsonConfigSupport.getControlBounds(root, path, "radiogroup", style != null && style.getItemHeight() != null ? style.getItemHeight() : 0.0F),

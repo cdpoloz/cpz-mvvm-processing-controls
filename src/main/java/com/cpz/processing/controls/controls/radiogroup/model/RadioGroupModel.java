@@ -58,7 +58,7 @@ public final class RadioGroupModel implements Enableable {
    }
 
    public RadioGroupModel(String text, List<String> list, int value) {
-      this.code = Objects.requireNonNull(text, "code");
+      this.code = ControlCode.requireNonBlank(text);
       this.enabled = true;
       this.options = this.sanitizeOptions(list);
       this.selectedIndex = this.normalizeIndex(value, this.options.size());

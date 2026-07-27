@@ -43,7 +43,7 @@ public final class IndicatorConfigLoader {
 
     public IndicatorConfig loadFromJson(JSONObject root, String path) {
         return new IndicatorConfig(
-                JsonConfigSupport.getRequiredString(root, "code", path, "indicator"),
+                JsonConfigSupport.getRequiredNonBlankString(root, "code", path, "indicator"),
                 root.getBoolean("on", false),
                 this.readColor(root, "onColor", Indicator.DEFAULT_ON_COLOR, path),
                 this.readColor(root, "offColor", Indicator.DEFAULT_OFF_COLOR, path),

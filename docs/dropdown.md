@@ -130,6 +130,12 @@ the expanded overlay also uses the manager supplied to the constructor,
 registering only the base layer in a different manager is rejected instead of
 creating a split routing lifecycle. No manual coordinator setup is required.
 
+Disposal unregisters the dropdown's overlay resources and permanently excludes
+that instance from later coordination. If disposal occurs while expanded, the
+characterized terminal state retains the expanded flag even though the overlay
+layer is gone; the disposed instance is not a reusable closed dropdown and
+cannot migrate to another `InputManager`.
+
 The `DropDownTest` example intentionally places two dropdowns so the
 `Primary Beta` option of the first menu covers the second field. Selecting that
 visible option updates the first dropdown and leaves the second closed. Closing

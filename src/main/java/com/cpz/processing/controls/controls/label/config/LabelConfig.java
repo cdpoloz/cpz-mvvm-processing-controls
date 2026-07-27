@@ -5,6 +5,7 @@ import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.controls.label.style.HorizontalAlign;
 import com.cpz.processing.controls.controls.label.style.VerticalAlign;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipConfig;
+import com.cpz.processing.controls.core.util.ControlCode;
 
 import java.util.Objects;
 
@@ -36,7 +37,7 @@ public final class LabelConfig {
     }
 
     public LabelConfig(String code, String text, ControlBounds bounds, ControlMeasure textSize, boolean enabled, boolean visible, StyleConfig style, TooltipConfig tooltip) {
-        this.code = Objects.requireNonNull(code, "code");
+        this.code = ControlCode.requireNonBlank(code);
         this.text = text == null ? "" : text;
         this.bounds = Objects.requireNonNull(bounds, "bounds");
         this.x = bounds.x().value();

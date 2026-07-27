@@ -54,7 +54,7 @@ public final class DropDownConfigLoader {
         }
 
         return new DropDownConfig(
-                JsonConfigSupport.getRequiredString(root, "code", path, "dropdown"),
+                JsonConfigSupport.getRequiredNonBlankString(root, "code", path, "dropdown"),
                 items,
                 selectedIndex,
                 JsonConfigSupport.getControlBounds(root, path, "dropdown"),

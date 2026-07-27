@@ -44,7 +44,7 @@ public final class LabelConfigLoader {
 
     public LabelConfig loadFromJson(JSONObject root, String path) {
         return new LabelConfig(
-                JsonConfigSupport.getRequiredString(root, "code", path, "label"),
+                JsonConfigSupport.getRequiredNonBlankString(root, "code", path, "label"),
                 root.getString("text", ""),
                 JsonConfigSupport.getControlBounds(root, path, "label"),
                 JsonConfigSupport.getOptionalControlMeasure(root, "textSize", path, "label"),

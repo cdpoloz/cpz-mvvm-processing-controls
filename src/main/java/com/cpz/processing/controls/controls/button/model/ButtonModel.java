@@ -39,7 +39,7 @@ public final class ButtonModel implements Enableable {
    }
 
    public ButtonModel(String text, String text2) {
-      this.code = Objects.requireNonNull(text, "code");
+      this.code = ControlCode.requireNonBlank(text);
       this.text = this.normalizeText(text2);
       this.enabled = true;
    }

@@ -44,7 +44,7 @@ public final class NumericFieldConfigLoader {
         validateText(text, path);
 
         return new NumericFieldConfig(
-                JsonConfigSupport.getRequiredString(root, "code", path, "numericfield"),
+                JsonConfigSupport.getRequiredNonBlankString(root, "code", path, "numericfield"),
                 text,
                 JsonConfigSupport.getControlBounds(root, path, "numericfield"),
                 JsonConfigSupport.getOptionalControlMeasure(root, "textSize", path, "numericfield"),

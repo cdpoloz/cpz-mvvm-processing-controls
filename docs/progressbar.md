@@ -3,12 +3,12 @@
 `ProgressBar` is a public non-interactive control for displaying an
 application-driven numeric progress value.
 
-This document describes the control as available in the current `0.9.0`
+This document describes the control as available in the current `0.9.10`
 release line.
 
 It implements `Control`, `ParentSizeAwareControl`, and `TooltipAttachable`. It
 does not implement `PointerRoutableControl` or `KeyboardRoutableControl`
-because this first version does not consume pointer or keyboard input.
+because the current implementation does not consume pointer or keyboard input.
 
 ---
 
@@ -91,12 +91,17 @@ Defaults:
 - `value = 0.0F`
 
 `setValue(...)` clamps the stored value to the current `[min, max]` range.
+It rejects `NaN` and either infinity before changing the stored value.
 
 `getProgress()` returns a normalized value from `0.0F` to `1.0F`.
 
 If `setRange(min, max)` receives `min > max`, the values are sorted
 automatically. This keeps JSON and runtime setup tolerant while preserving a
 predictable stored range.
+
+`setRange(...)`, `setMin(...)`, and `setMax(...)` reject non-finite endpoints
+before changing the range. JSON `min`, `max`, and `value` follow the same
+finite-value contract.
 
 If `min == max`, `getProgress()` avoids division by zero and returns `1.0F`
 when `value >= max`, otherwise `0.0F`. Since values are clamped to the single
@@ -187,7 +192,7 @@ this version.
 target.
 
 `enabled=false` does not change the logical value and does not block tooltips.
-In this first version, `ProgressBar` keeps the same simple visual appearance
+In the current implementation, `ProgressBar` keeps the same simple visual appearance
 when disabled because it is non-interactive. Programmatic updates still apply
 normally while disabled, including `setValue(...)`, `setRange(...)`, and the
 derived `getProgress()` result.
@@ -264,6 +269,9 @@ Supported JSON fill direction values are `"left-to-right"`,
 `"right-to-left"`, `"bottom-to-top"`, and `"top-to-bottom"`. Values are trimmed
 and case-insensitive; hyphen, underscore, and space separators are accepted.
 Invalid values use the default `LEFT_TO_RIGHT` direction.
+
+`min`, `max`, and `value` must be finite. Finite values keep the runtime range
+sorting and value clamping behavior described above.
 
 ---
 

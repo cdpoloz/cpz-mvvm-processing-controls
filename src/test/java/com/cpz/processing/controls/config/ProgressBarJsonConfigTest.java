@@ -11,15 +11,33 @@ import com.cpz.processing.controls.controls.progressbar.config.ProgressBarConfig
 import com.cpz.processing.controls.controls.progressbar.config.ProgressBarConfigLoader;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import processing.core.PApplet;
 import processing.data.JSONObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProgressBarJsonConfigTest {
+    @ParameterizedTest(name = "{0}={1}")
+    @MethodSource("nonFiniteProgressValues")
+    void nonFiniteProgressValuesAreRejected(String field, float value) {
+        JSONObject json = new NonFiniteProgressJson(field, value);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> new ProgressBarConfigLoader(new PApplet()).loadFromJson(json, "progressbar.json")
+        );
+        assertTrue(exception.getMessage().contains(field));
+    }
+
     @Test
     void legacyGeometryLoadsAsAbsoluteBounds() {
         ProgressBarConfig config = progressBarConfig("{\"code\":\"bar\",\"x\":40,\"y\":50,\"width\":200,\"height\":20}");
@@ -195,6 +213,15 @@ class ProgressBarJsonConfigTest {
         return new ProgressBarConfigLoader(new PApplet()).loadFromJson(JSONObject.parse(json), "progressbar.json");
     }
 
+    private static Stream<Arguments> nonFiniteProgressValues() {
+        return Stream.of("min", "max", "value")
+                .flatMap(field -> Stream.of(
+                        Arguments.of(field, Float.NaN),
+                        Arguments.of(field, Float.POSITIVE_INFINITY),
+                        Arguments.of(field, Float.NEGATIVE_INFINITY)
+                ));
+    }
+
     private static void assertFillDirection(String raw, ProgressBarFillDirection expected) {
         ProgressBarConfig config = progressBarConfig("{\"code\":\"bar\",\"x\":40,\"y\":50,\"width\":200,\"height\":20,"
                 + "\"style\":{\"fillDirection\":\"" + raw + "\"}}");
@@ -224,6 +251,29 @@ class ProgressBarJsonConfigTest {
         @Override
         public JSONObject loadJSONObject(String filename) {
             return this.root;
+        }
+    }
+
+    private static final class NonFiniteProgressJson extends JSONObject {
+        private final String nonFiniteField;
+        private final float nonFiniteValue;
+
+        private NonFiniteProgressJson(String nonFiniteField, float nonFiniteValue) {
+            this.nonFiniteField = nonFiniteField;
+            this.nonFiniteValue = nonFiniteValue;
+            this.setString("code", "bar");
+            this.setFloat("x", 40.0F);
+            this.setFloat("y", 50.0F);
+            this.setFloat("width", 200.0F);
+            this.setFloat("height", 20.0F);
+            this.setFloat("min", 0.0F);
+            this.setFloat("max", 1.0F);
+            this.setFloat("value", 0.5F);
+        }
+
+        @Override
+        public float getFloat(String key) {
+            return this.nonFiniteField.equals(key) ? this.nonFiniteValue : super.getFloat(key);
         }
     }
 }

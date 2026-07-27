@@ -52,7 +52,7 @@ public final class NumericFieldModel implements Enableable {
    }
 
    public NumericFieldModel(String text, BigDecimal value, BigDecimal min, BigDecimal max, BigDecimal step, boolean allowNegative, boolean allowDecimal, int scale) {
-      this.code = Objects.requireNonNull(text, "code");
+      this.code = ControlCode.requireNonBlank(text);
       this.min = min;
       this.max = max;
       if (this.min != null && this.max != null && this.max.compareTo(this.min) < 0) {

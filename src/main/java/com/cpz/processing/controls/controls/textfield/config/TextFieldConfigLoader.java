@@ -41,7 +41,7 @@ public final class TextFieldConfigLoader {
 
     public TextFieldConfig loadFromJson(JSONObject root, String path) {
         return new TextFieldConfig(
-                JsonConfigSupport.getRequiredString(root, "code", path, "textfield"),
+                JsonConfigSupport.getRequiredNonBlankString(root, "code", path, "textfield"),
                 root.getString("text", ""),
                 JsonConfigSupport.getControlBounds(root, path, "textfield"),
                 JsonConfigSupport.getOptionalControlMeasure(root, "textSize", path, "textfield"),

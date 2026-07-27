@@ -52,7 +52,7 @@ public final class ToggleConfigLoader {
         }
 
         return new ToggleConfig(
-                JsonConfigSupport.getRequiredString(root, "code", path, "toggle"),
+                JsonConfigSupport.getRequiredNonBlankString(root, "code", path, "toggle"),
                 state,
                 totalStates,
                 JsonConfigSupport.getControlBounds(root, path, "toggle"),

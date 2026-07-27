@@ -41,7 +41,7 @@ this library.
 
 CPZ dependencies:
 
-- `io.github.cdpoloz:cpz-utils:0.2.3`
+- `io.github.cdpoloz:cpz-utils:0.2.4`
 - controlled by the author and versioned as a normal Maven dependency
 - provides shared utility APIs used by the controls project
 - color helpers such as `Colors.rgb(...)` and `Colors.gray(...)` belong to
@@ -64,13 +64,13 @@ to your Maven project:
 <dependency>
     <groupId>io.github.cdpoloz</groupId>
     <artifactId>cpz-mvvm-processing-controls</artifactId>
-    <version>0.9.2</version>
+    <version>0.9.10</version>
 </dependency>
 ```
 
-Version `0.9.2` is the current stable release available from Maven Central.
+Version `0.9.10` is the current stable release available from Maven Central.
 Processing Core (`org.processing:core:4.5.5`) and `cpz-utils`
-(`io.github.cdpoloz:cpz-utils:0.2.3`) are resolved transitively by Maven; do
+(`io.github.cdpoloz:cpz-utils:0.2.4`) are resolved transitively by Maven; do
 not add them as manually copied JARs.
 
 ### Local development
@@ -407,7 +407,7 @@ The public control layer is exposed through closed ergonomic facades such as `Bu
 
 `Notification` is a toast-style runtime overlay feature, not a `Control`. It is
 created programmatically through `NotificationManager`, does not consume
-pointer or keyboard input in `0.9.2`, and is not configured inside
+pointer or keyboard input in `0.9.10`, and is not configured inside
 `controls[]`.
 
 Notification manager/style defaults can be loaded from standalone JSON through
@@ -425,13 +425,14 @@ y resolves against sketch height on every layout. Coordinates are not clamped,
 and position remains manager-wide rather than per notification.
 
 `ProgressBar` is the non-interactive progress display control introduced before
-the notification work and remains available in `0.9.2`.
+the notification work and remains available in `0.9.10`.
 
 Those facades also share a lightweight public contract, `Control`, for the small transversal surface that is common across the controls without exposing MVVM internals.
 
 `Panel` is the container facade for grouping controls. It uses local child
-coordinates and receives input through `PanelInputLayer`. JSON creation for
-panels is not part of the current JSON layer.
+coordinates and receives input through `PanelInputLayer`. A `Panel` can be
+loaded as a root control from JSON, but JSON does not support `Panel.children`;
+child composition remains a runtime operation through `panel.add(...)`.
 
 Tooltips are reusable overlays attached through `TooltipTarget`; controls and
 manual regions that own mutable tooltip data also implement `TooltipAttachable`.

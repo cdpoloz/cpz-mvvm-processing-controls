@@ -58,7 +58,7 @@ public final class DropDownModel implements Enableable {
    }
 
    public DropDownModel(String text, List<String> list, int value) {
-      this.code = Objects.requireNonNull(text, "code");
+      this.code = ControlCode.requireNonBlank(text);
       this.items = sanitizeItems(list);
       this.selectedIndex = normalizeSelectedIndex(value, this.items.size());
       this.enabled = true;

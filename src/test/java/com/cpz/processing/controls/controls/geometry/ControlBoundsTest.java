@@ -1,8 +1,11 @@
 package com.cpz.processing.controls.controls.geometry;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ControlBoundsTest {
     @Test
@@ -30,5 +33,25 @@ class ControlBoundsTest {
     @Test
     void relativeMeasureUsesProvidedParentHeight() {
         assertEquals(30.0F, ControlMeasure.relative(0.05F).resolve(600.0F));
+    }
+
+    @ParameterizedTest
+    @ValueSource(floats = {Float.NaN, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY})
+    void absoluteMeasureRejectsNonFiniteValues(float value) {
+        assertThrows(IllegalArgumentException.class, () -> ControlMeasure.absolute(value));
+    }
+
+    @ParameterizedTest
+    @ValueSource(floats = {Float.NaN, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY})
+    void relativeMeasureRejectsNonFiniteValues(float value) {
+        assertThrows(IllegalArgumentException.class, () -> ControlMeasure.relative(value));
+    }
+
+    @Test
+    void finiteAbsoluteAndRelativeMeasuresRemainValid() {
+        assertEquals(-12.5F, ControlMeasure.absolute(-12.5F).resolve(600.0F));
+        assertEquals(0.0F, ControlMeasure.absolute(0.0F).resolve(600.0F));
+        assertEquals(-30.0F, ControlMeasure.relative(-0.05F).resolve(600.0F));
+        assertEquals(0.0F, ControlMeasure.relative(0.0F).resolve(600.0F));
     }
 }

@@ -48,7 +48,7 @@ public final class CheckboxModel implements Enableable {
    }
 
    public CheckboxModel(String text, boolean enabled) {
-      this.code = Objects.requireNonNull(text, "code");
+      this.code = ControlCode.requireNonBlank(text);
       this.checked = enabled;
    }
 

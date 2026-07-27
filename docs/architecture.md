@@ -2,7 +2,9 @@
 
 ## Public Control Surface
 
-The framework exposes controls through closed public facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, and `DropDown`.
+The framework exposes controls through closed public facades such as `Button`,
+`Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`,
+`NumericField`, `DropDown`, `Panel`, `Indicator`, and `ProgressBar`.
 
 Those facades share a minimal public interface, `Control`, that contains only the transversal facade surface:
 
@@ -20,11 +22,16 @@ This contract is intentionally small:
 
 `Control` is distinct from `ControlView`. `Control` belongs to the public facade layer, while `ControlView` belongs to the internal MVVM view layer.
 
+Interactive controls use the MVVM pieces appropriate to their input and state.
+Simple containers and displays such as `Panel`, `Indicator`, and `ProgressBar`
+do not require a complete Model/ViewModel stack to participate in the same
+public `Control` surface.
+
 ## External Dependencies
 
 The controls project has two dependency levels:
 
-- CPZ dependency: `io.github.cdpoloz:cpz-utils:0.2.3`, controlled by the author and
+- CPZ dependency: `io.github.cdpoloz:cpz-utils:0.2.4`, controlled by the author and
   versioned as a normal Maven dependency
 - external dependency: `org.processing:core:4.5.5`, resolved by Maven and
   distributed under its own license

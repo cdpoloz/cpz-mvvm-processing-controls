@@ -2,6 +2,7 @@ package com.cpz.processing.controls.controls.indicator.config;
 
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipConfig;
+import com.cpz.processing.controls.core.util.ControlCode;
 import java.util.Objects;
 
 /**
@@ -35,7 +36,7 @@ public final class IndicatorConfig {
             RendererConfig renderer,
             TooltipConfig tooltip
     ) {
-        this.code = Objects.requireNonNull(code, "code");
+        this.code = ControlCode.requireNonBlank(code);
         this.on = on;
         this.onColor = onColor;
         this.offColor = offColor;

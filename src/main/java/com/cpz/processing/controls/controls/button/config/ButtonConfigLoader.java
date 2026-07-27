@@ -42,7 +42,7 @@ public final class ButtonConfigLoader {
 
     public ButtonConfig loadFromJson(JSONObject root, String path) {
         return new ButtonConfig(
-                JsonConfigSupport.getRequiredString(root, "code", path, "button"),
+                JsonConfigSupport.getRequiredNonBlankString(root, "code", path, "button"),
                 root.getString("text"),
                 JsonConfigSupport.getControlBounds(root, path, "button"),
                 JsonConfigSupport.getOptionalControlMeasure(root, "textSize", path, "button"),

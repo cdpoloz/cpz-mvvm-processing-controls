@@ -91,7 +91,7 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
 
     public Panel(PApplet sketch, String code, ControlBounds bounds) {
         this.sketch = Objects.requireNonNull(sketch, "sketch");
-        this.code = Objects.requireNonNull(code, "code");
+        this.code = ControlCode.requireNonBlank(code);
         this.bounds = Objects.requireNonNull(bounds, "bounds");
         this.applyResolvedBounds();
     }

@@ -3,7 +3,7 @@ package com.cpz.processing.controls.controls.geometry;
 import java.util.Objects;
 
 /**
- * Explicit measurement value used by relative geometry APIs.
+ * Explicit finite measurement value used by relative geometry APIs.
  *
  * @author CPZ
  */
@@ -13,13 +13,30 @@ public final class ControlMeasure {
 
     private ControlMeasure(MeasureMode mode, float value) {
         this.mode = Objects.requireNonNull(mode, "mode");
+        if (!Float.isFinite(value)) {
+            throw new IllegalArgumentException("Control measure value must be finite: " + value);
+        }
         this.value = value;
     }
 
+    /**
+     * Creates a finite absolute measurement.
+     *
+     * @param value absolute value
+     * @return the measurement
+     * @throws IllegalArgumentException when {@code value} is not finite
+     */
     public static ControlMeasure absolute(float value) {
         return new ControlMeasure(MeasureMode.ABSOLUTE, value);
     }
 
+    /**
+     * Creates a finite relative measurement.
+     *
+     * @param factor relative factor
+     * @return the measurement
+     * @throws IllegalArgumentException when {@code factor} is not finite
+     */
     public static ControlMeasure relative(float factor) {
         return new ControlMeasure(MeasureMode.RELATIVE, factor);
     }

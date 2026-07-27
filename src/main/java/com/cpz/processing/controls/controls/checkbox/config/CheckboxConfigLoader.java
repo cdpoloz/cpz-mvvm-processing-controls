@@ -42,7 +42,7 @@ public final class CheckboxConfigLoader {
 
     public CheckboxConfig loadFromJson(JSONObject root, String path) {
         return new CheckboxConfig(
-                JsonConfigSupport.getRequiredString(root, "code", path, "checkbox"),
+                JsonConfigSupport.getRequiredNonBlankString(root, "code", path, "checkbox"),
                 root.getBoolean("checked", false),
                 JsonConfigSupport.getControlBounds(root, path, "checkbox"),
                 root.getBoolean("enabled", true),

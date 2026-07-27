@@ -9,7 +9,7 @@ import com.cpz.utils.color.Colors;
 ```
 
 `cpz-utils` is resolved transitively from Maven Central as
-`io.github.cdpoloz:cpz-utils:0.2.3`. `Colors` is no longer provided by the
+`io.github.cdpoloz:cpz-utils:0.2.4`. `Colors` is no longer provided by the
 controls package.
 
 The current public model is explicit:

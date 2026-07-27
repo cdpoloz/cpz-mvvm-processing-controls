@@ -156,6 +156,11 @@ public final class DropDown implements PointerRoutableControl, ParentSizeAwareCo
                 && this.containsLocalBase(event.getX(), event.getY());
     }
 
+    /**
+     * Permanently disposes the overlay controller and leaves dropdown
+     * coordination. A dropdown disposed while expanded retains that terminal
+     * state flag but no longer owns an active overlay layer.
+     */
     public void dispose() {
         this.overlayController.dispose();
     }

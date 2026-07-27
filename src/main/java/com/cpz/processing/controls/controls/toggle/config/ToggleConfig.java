@@ -2,6 +2,7 @@ package com.cpz.processing.controls.controls.toggle.config;
 
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipConfig;
+import com.cpz.processing.controls.core.util.ControlCode;
 
 import java.util.Objects;
 
@@ -33,7 +34,7 @@ public final class ToggleConfig {
     }
 
     public ToggleConfig(String code, int state, int totalStates, ControlBounds bounds, boolean enabled, boolean visible, StyleConfig style, TooltipConfig tooltip) {
-        this.code = Objects.requireNonNull(code, "code");
+        this.code = ControlCode.requireNonBlank(code);
         this.state = state;
         this.totalStates = totalStates;
         this.bounds = Objects.requireNonNull(bounds, "bounds");

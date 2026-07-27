@@ -3,6 +3,7 @@ package com.cpz.processing.controls.controls.radiogroup.config;
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipConfig;
+import com.cpz.processing.controls.core.util.ControlCode;
 
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +37,7 @@ public final class RadioGroupConfig {
     }
 
     public RadioGroupConfig(String code, List<String> options, int selectedIndex, ControlBounds bounds, boolean explicitBounds, ControlMeasure textSize, boolean enabled, boolean visible, StyleConfig style, TooltipConfig tooltip) {
-        this.code = Objects.requireNonNull(code, "code");
+        this.code = ControlCode.requireNonBlank(code);
         this.options = List.copyOf(Objects.requireNonNull(options, "options"));
         this.selectedIndex = selectedIndex;
         this.bounds = Objects.requireNonNull(bounds, "bounds");
