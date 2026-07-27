@@ -219,7 +219,43 @@ la advertencia conocida de Guava sobre
 `sun.misc.Unsafe::objectFieldOffset`; la recompilación focalizada mostró además
 los warnings preexistentes de API deprecada y operaciones unchecked.
 
+### Validación posterior a la allowlist formal de API
+
+La revisión formal inventarió el bytecode compilado y estableció una allowlist
+tipo por tipo y miembro por miembro sin cambiar producción ni visibilidad.
+
+- Estado inicial: rama `master`, commit `28f3129`, working tree limpio,
+  versión `0.9.10` y `cpz-utils 0.2.4`.
+- No existían JPMS, japicmp, Revapi, Animal Sniffer ni otra comprobación de
+  compatibilidad o superficie pública.
+- El inventario distribuible contiene 280 tipos y 2.943 miembros
+  públicos/protegidos en 124 paquetes, excluyendo los namespaces de ejemplos y
+  launcher según el JAR Maven.
+- La primera ejecución compilada de las seis pruebas nuevas produjo tres
+  errores por ausencia deliberada del manifiesto canónico. La primera
+  comparación clasificada produjo dos fallos y un error que detectaron
+  normalización genérica, dependencias transitivas D y el método default
+  heredado de `ParentContextAwareControl`.
+
+| Validación de allowlist final | Tests | Fallos | Errores | Omitidos | Resultado |
+|---|---:|---:|---:|---:|---|
+| `PublicApiSurfaceTest` | 7 | 0 | 0 | 0 | `BUILD SUCCESS` |
+| Suite completa | 536 | 0 | 0 | 0 | `BUILD SUCCESS` |
+| `mvn -DskipTests javadoc:javadoc` | n/a | n/a | n/a | n/a | `BUILD SUCCESS` |
+
+La fuente canónica es `docs/public-api-signatures.txt`, explicada por
+`docs/public-api-allowlist.md`. La prueba compara reflexión compilada,
+clasificación, coherencia transitiva, orden determinista y exclusiones de
+distribución. No compara contra un JAR histórico.
+
 ## 2. Inventario y clasificación de API pública
+
+> **Estado posterior:** esta tabla conserva el inventario preliminar de la
+> auditoría. La clasificación formal tipo por tipo y miembro por miembro quedó
+> establecida después en
+> [`public-api-allowlist.md`](public-api-allowlist.md) y
+> [`public-api-signatures.txt`](public-api-signatures.txt), que son la fuente
+> canónica vigente.
 
 La inspección mecánica inicial encontró 258 fuentes de producción fuera de
 `examples/**` y `main/**`; la adición de `FocusManagerAware` en H2 eleva el
@@ -539,8 +575,6 @@ diferida a la fase de allowlist.
 
 - Regla z-order dentro de una misma capa multicontrol. `InputManager` define
   prioridad entre capas, no necesariamente entre controles de la misma capa.
-- API oficial individual de configs, factories, payloads de renderer y tipos
-  `core.*`; el agrupamiento actual necesita una allowlist revisada.
 - Comportamiento de concurrencia o modificación de registros durante dispatch.
 - Concurrencia de registro y dispatch de dropdowns; el contrato actual y las
   colecciones de `InputManager` son de uso monohilo.
@@ -559,8 +593,8 @@ diferida a la fase de allowlist.
    operación de lifecycle y el código ejecuta los callbacks de cierre.
 5. Resuelta: el coordinador de dropdowns ya no mantiene estado estático; cada
    `InputManager` posee su ámbito independiente.
-6. README `:20` llama ocultos a los internals MVVM aunque sus tipos y Javadocs
-   sean públicos y estén dentro del JAR.
+6. Resuelta: README y arquitectura distinguen ahora fachada soportada de tipos
+   MVVM bytecode-public; la allowlist no los presenta como ocultos.
 7. Resuelta: `ParentContextAwareControl` exige offset global y `Panel` propaga
    ahora el acumulado completo sin alterar los bounds locales.
 8. Resuelta: la documentación de Panel describe la composición anidada, el
@@ -577,8 +611,7 @@ o ampliaron como regresiones de los contratos corregidos.
 
 | Prioridad | Tarea posterior | Cambio conceptual | Evidencia | Riesgo/compatibilidad |
 |---|---|---|---|---|
-| Media | Establecer baseline/allowlist de API | Clasificar los 257 tipos y documentar soportado, extensión e interno antes de cualquier deprecación | Inventario §2 | Bajo ahora; evita una futura ruptura binaria accidental |
-| Baja | Documentar la clasificación después de decidir la allowlist | Delimitar API soportada, extensión e internals sin cambiar visibilidad en esta fase | §2 y §7 | Bajo, pero no debe adelantarse a la decisión de API |
+| Media | Planificar migraciones de categoría D | Evaluar cada candidato únicamente bajo una política futura de compatibilidad y migración | Allowlist canónica | Alto si implica reducción de visibilidad; no aplicar en `0.9.10` |
 
 No se recomienda una clase base universal, un MVVM forzado para controles
 simples, integrar Notification en `Control`, añadir hijos JSON a Panel ni
@@ -592,12 +625,9 @@ por gestor de H4, el contexto acumulado de H5, la validación de H7 y la
 alineación documental de H8 se completaron sin resolver el orden intrapa, que
 sigue siendo una decisión independiente.
 
-1. **Baseline de API soportada.** Convertir el inventario agrupado en allowlist
-   verificable y política de deprecación antes de cualquier movimiento de
-   paquetes o visibilidad.
-2. **Documentación de la allowlist.** Solo después de que las decisiones
-   anteriores estén cerradas; el drift factual de la documentación vigente ya
-   quedó corregido en H8.
+1. **Migraciones futuras de categoría D.** Requieren una versión y política de
+   compatibilidad explícitas; la allowlist actual no autoriza cambios de
+   visibilidad, paquetes o firmas.
 
 Cada tarea puede usar estas regresiones como punto de partida sin mantener el
 comportamiento defectuoso anterior como válido.

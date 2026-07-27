@@ -17,7 +17,7 @@ explicit input routing, and high-performance rendering.
 - Fully decoupled input system (no Processing dependency in interaction logic)
 - Explicit composition instead of implicit binding systems
 - Sketch-owned theming (no global state, no singletons)
-- Facade-based public API with hidden MVVM internals
+- Facade-first supported API with separately classified advanced and legacy exposure
 - Panel-based grouping for controls that share a local coordinate space
 
 ---
@@ -624,9 +624,12 @@ Public API notes:
 
 - closed concrete facades remain the main public entry points for each control
 - the public `Control` interface captures only the minimal transversal facade surface
-- `Control` is distinct from `ControlView`, which belongs to the internal MVVM view layer
+- `Control` is distinct from the bytecode-public MVVM implementation types,
+  whose compatibility status is recorded rather than hidden
 - the JSON layer creates closed facades and returns them through `Map<String, Control>`
 - JSON does not define binding; binding remains sketch-side
+- the supported surface and compatibility categories are defined by the
+  [Public API Allowlist](docs/public-api-allowlist.md)
 
 ---
 

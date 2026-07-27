@@ -124,9 +124,12 @@ The public controls remain facade types over the internal MVVM pipeline.
 
 - sketches use concrete facades such as `Button` or `TextField`
 - shared host-side logic may depend on the minimal `Control` interface
-- MVVM internals remain behind the facade boundary
+- MVVM implementation types remain bytecode-public for compatibility but are
+  not ordinary consumer entry points
 
 This keeps the public API lightweight without flattening the specific behavior of each control into a broad shared hierarchy.
+The exact supported, extension, infrastructure, and future-review categories
+are defined by the [Public API Allowlist](public-api-allowlist.md).
 
 ## JSON Layer
 
