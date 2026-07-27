@@ -2,7 +2,7 @@
 
 `Notification` is a toast-style runtime overlay feature for short status
 messages. It is not a `Control`, is not part of the `controls[]` JSON format,
-and does not consume pointer or keyboard input in `0.9.10`.
+and does not consume pointer or keyboard input in `0.9.11`.
 
 Use notifications for transient application feedback such as saved state,
 success messages, warnings, or errors. Use a future dialog/modal feature, not
@@ -151,7 +151,7 @@ closest to the selected screen edge. Top placements stack downward; bottom
 placements stack upward.
 
 When the visible limit is exceeded, the oldest notification is dropped. There
-is no queue or backlog in `0.9.10`.
+is no queue or backlog in `0.9.11`.
 
 Placement is defined by `NotificationPlacement`. A custom manager-level
 position can override the placement origin without changing the stored
@@ -294,7 +294,7 @@ Notification is runtime UI. It is not configured inside `controls[]`, is not
 created by `ControlConfigLoader`, and is not registered in
 `ControlFactoryRegistry`.
 
-`0.9.10` includes a standalone notification JSON loader for manager/style
+`0.9.11` includes a standalone notification JSON loader for manager/style
 defaults only. It does not define messages, trigger notifications, register
 input, or create controls:
 

@@ -8,9 +8,10 @@ Color helper examples in this document use `Colors` from `cpz-utils`:
 import com.cpz.utils.color.Colors;
 ```
 
-`cpz-utils` is resolved transitively from Maven Central as
-`io.github.cdpoloz:cpz-utils:0.2.4`. `Colors` is no longer provided by the
-controls package.
+The current source POM resolves `cpz-utils` transitively as
+`io.github.cdpoloz:cpz-utils:0.2.4`. The immutable `0.9.10` artifact already
+published in Maven Central declares `cpz-utils 0.2.3`. `Colors` is no longer
+provided by the controls package.
 
 The current public model is explicit:
 

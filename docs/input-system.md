@@ -89,7 +89,7 @@ In practice:
 - inactive layers are skipped
 - a layer that consumes an event stops propagation
 - passive layers such as `TooltipInputLayer` can observe pointer motion and return `false`
-- notification overlays do not participate in input dispatch in `0.9.10`
+- notification overlays do not participate in input dispatch in `0.9.11`
 - pointer and keyboard dispatch share the same layer ordering model
 - focus remains managed by the `FocusManager` owned by `InputManager`, not by
   the external source

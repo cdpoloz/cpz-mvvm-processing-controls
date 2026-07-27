@@ -3,7 +3,7 @@
 `ProgressBar` is a public non-interactive control for displaying an
 application-driven numeric progress value.
 
-This document describes the control as available in the current `0.9.10`
+This document describes the control as available in the current `0.9.11`
 release line.
 
 It implements `Control`, `ParentSizeAwareControl`, and `TooltipAttachable`. It

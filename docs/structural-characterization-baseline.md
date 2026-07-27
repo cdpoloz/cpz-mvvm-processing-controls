@@ -229,7 +229,7 @@ tipo por tipo y miembro por miembro sin cambiar producción ni visibilidad.
 - No existían JPMS, japicmp, Revapi, Animal Sniffer ni otra comprobación de
   compatibilidad o superficie pública.
 - El inventario distribuible contiene 280 tipos y 2.943 miembros
-  públicos/protegidos en 124 paquetes, excluyendo los namespaces de ejemplos y
+  públicos/protegidos en 123 paquetes, excluyendo los namespaces de ejemplos y
   launcher según el JAR Maven.
 - La primera ejecución compilada de las seis pruebas nuevas produjo tres
   errores por ausencia deliberada del manifiesto canónico. La primera
@@ -543,7 +543,7 @@ ProgressBar conservaban versiones anteriores, README negaba el soporte JSON
 raíz de `Panel`, la superficie arquitectónica omitía tres fachadas y el
 lifecycle terminal de `DropDown.dispose()` no estaba descrito por completo.
 
-**Estado corregido.** Las referencias de la línea vigente indican `0.9.10` y
+**Estado corregido.** Las referencias de la línea vigente indican `0.9.11` y
 `cpz-utils 0.2.4`; la documentación distingue carga raíz de `Panel` de la
 composición runtime mediante `panel.add(...)`, porque no existe
 `Panel.children` JSON. Arquitectura incluye `Panel`, `Indicator` y
@@ -602,7 +602,7 @@ diferida a la fase de allowlist.
 9. Resuelta: runtime y JSON comparten identidad no blank y finitud geométrica,
    sin cambiar las reglas para valores finitos.
 10. Resuelta: README y documentos de arquitectura, ProgressBar y DropDown
-    describen el estado real de `0.9.10`.
+    describen el estado real del candidato `0.9.11`.
 
 Las caracterizaciones de H1, H2, H3, H4, H5 y H7 se renombraron, transformaron
 o ampliaron como regresiones de los contratos corregidos.
@@ -611,7 +611,7 @@ o ampliaron como regresiones de los contratos corregidos.
 
 | Prioridad | Tarea posterior | Cambio conceptual | Evidencia | Riesgo/compatibilidad |
 |---|---|---|---|---|
-| Media | Planificar migraciones de categoría D | Evaluar cada candidato únicamente bajo una política futura de compatibilidad y migración | Allowlist canónica | Alto si implica reducción de visibilidad; no aplicar en `0.9.10` |
+| Media | Planificar migraciones de categoría D | Evaluar cada candidato únicamente bajo una política futura de compatibilidad y migración | Allowlist canónica | Alto si implica reducción de visibilidad; no aplicar en `0.9.11` |
 
 No se recomienda una clase base universal, un MVVM forzado para controles
 simples, integrar Notification en `Control`, añadir hijos JSON a Panel ni

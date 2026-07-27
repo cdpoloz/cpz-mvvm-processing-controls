@@ -2,7 +2,7 @@
 
 ## Status And Scope
 
-This document defines the supported public surface for version `0.9.10`.
+This document defines the supported public surface for version `0.9.11`.
 Public in bytecode and supported API are not synonyms: compatibility applies
 to every currently linkable signature, while categories A and B identify the
 surfaces consumers should deliberately build against.
@@ -22,7 +22,7 @@ as the default policy for its members, while an explicit member line can use a
 different category. This is used for SPI methods implemented by an A facade,
 infrastructure accessors, and accidental constructors.
 
-The reviewed `0.9.10` baseline contains:
+The reviewed `0.9.11` baseline contains:
 
 | Category | Types | Members | Meaning |
 |---|---:|---:|---|
@@ -30,7 +30,7 @@ The reviewed `0.9.10` baseline contains:
 | B | 78 | 623 | Supported advanced extension or integration SPI |
 | C | 4 | 21 | Public infrastructure, not an ordinary application entry point |
 | D | 53 | 562 | Compatible exposure retained for future review |
-| **Total** | **280** | **2,943** | 124 packages |
+| **Total** | **280** | **2,943** | 123 packages containing classified types |
 
 The inventory includes 2,926 public and 17 protected members. It preserves
 constructors, generic types, declared exceptions, nested types, enum-generated
@@ -110,7 +110,7 @@ They remain visible to satisfy current integration signatures.
 
 ### D: Future Visibility Review
 
-Category D remains fully present in `0.9.10`. It is not freely changeable, and
+Category D remains fully present in `0.9.11`. It is not freely changeable, and
 this classification does not deprecate, remove, move, or reduce any signature.
 
 | Candidate signature/family | Evidence and reason | Compatibility impact | Suggested migration and reconsideration condition |

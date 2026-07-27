@@ -29,15 +29,17 @@ public `Control` surface.
 
 ## External Dependencies
 
-The controls project has two dependency levels:
+The current source tree has two dependency levels:
 
 - CPZ dependency: `io.github.cdpoloz:cpz-utils:0.2.4`, controlled by the author and
   versioned as a normal Maven dependency
 - external dependency: `org.processing:core:4.5.5`, resolved by Maven and
   distributed under its own license
 
-Both dependencies are resolved transitively from Maven Central when this
-library is consumed through Maven.
+Both dependencies are resolved transitively when this source tree is installed
+or published through Maven. The immutable `0.9.10` artifact already present in
+Maven Central predates this source-tree dependency update and declares
+`cpz-utils 0.2.3`.
 
 Color helpers used by styles and examples are imported from:
 

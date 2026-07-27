@@ -41,7 +41,7 @@ this library.
 
 CPZ dependencies:
 
-- `io.github.cdpoloz:cpz-utils:0.2.4`
+- current source tree: `io.github.cdpoloz:cpz-utils:0.2.4`
 - controlled by the author and versioned as a normal Maven dependency
 - provides shared utility APIs used by the controls project
 - color helpers such as `Colors.rgb(...)` and `Colors.gray(...)` belong to
@@ -57,21 +57,22 @@ External dependencies:
 
 ### Maven dependency
 
-If consuming a published or locally installed build, add the controls artifact
-to your Maven project:
+For a locally installed `0.9.11` candidate, or after `0.9.11` is published,
+add the controls artifact to your Maven project:
 
 ```xml
 <dependency>
     <groupId>io.github.cdpoloz</groupId>
     <artifactId>cpz-mvvm-processing-controls</artifactId>
-    <version>0.9.10</version>
+    <version>0.9.11</version>
 </dependency>
 ```
 
-Version `0.9.10` is the current stable release available from Maven Central.
-Processing Core (`org.processing:core:4.5.5`) and `cpz-utils`
-(`io.github.cdpoloz:cpz-utils:0.2.4`) are resolved transitively by Maven; do
-not add them as manually copied JARs.
+Version `0.9.10` remains the current stable release available from Maven
+Central; its published POM resolves Processing Core `4.5.5` and
+`cpz-utils 0.2.3` transitively. This source tree prepares `0.9.11`, which keeps
+Processing Core `4.5.5` and updates `cpz-utils` to `0.2.4`. Do not add the
+transitive dependencies as manually copied JARs.
 
 ### Local development
 
@@ -407,7 +408,7 @@ The public control layer is exposed through closed ergonomic facades such as `Bu
 
 `Notification` is a toast-style runtime overlay feature, not a `Control`. It is
 created programmatically through `NotificationManager`, does not consume
-pointer or keyboard input in `0.9.10`, and is not configured inside
+pointer or keyboard input in `0.9.11`, and is not configured inside
 `controls[]`.
 
 Notification manager/style defaults can be loaded from standalone JSON through
@@ -425,7 +426,7 @@ y resolves against sketch height on every layout. Coordinates are not clamped,
 and position remains manager-wide rather than per notification.
 
 `ProgressBar` is the non-interactive progress display control introduced before
-the notification work and remains available in `0.9.10`.
+the notification work and remains available in `0.9.11`.
 
 Those facades also share a lightweight public contract, `Control`, for the small transversal surface that is common across the controls without exposing MVVM internals.
 
@@ -753,12 +754,16 @@ from `draw()`.
 - [Button](docs/button.md)
 - [Checkbox](docs/checkbox.md)
 - [Dropdown](docs/dropdown.md)
+- [Indicator](docs/indicator.md)
 - [Label](docs/label.md)
 - [NumericField](docs/numericfield.md)
+- [ProgressBar](docs/progressbar.md)
 - [RadioGroup](docs/radiogroup.md)
 - [Slider](docs/slider.md)
 - [TextField](docs/textfield.md)
 - [Toggle](docs/toggle.md)
+- [0.9.11 Release Notes](docs/release-notes-0.9.11.md)
+- [0.9.11 API/ABI Compatibility](docs/api-compatibility-0.9.11.md)
 
 The JSON documentation includes the canonical multi-control binding progression: first unidirectional sketch synchronization, then controlled bidirectional synchronization, both loaded from the same structural JSON document. The theme documentation uses `ThemeFacadeSketch` as the public example for sketch-owned theming with closed facades.
 

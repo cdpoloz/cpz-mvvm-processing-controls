@@ -1,4 +1,4 @@
-# Canonical public/protected API signature allowlist for 0.9.10.
+# Canonical public/protected API signature allowlist for 0.9.11.
 # Format: CATEGORY|T|binary-name|normalized type signature
 #         CATEGORY|M|declaring-binary-name|normalized declared member signature
 # Categories and update policy: docs/public-api-allowlist.md
