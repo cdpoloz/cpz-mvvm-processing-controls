@@ -2,10 +2,13 @@ package com.cpz.processing.controls.core.overlay;
 
 import com.cpz.processing.controls.core.focus.FocusManager;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Overlay component for overlay manager.
@@ -27,6 +30,7 @@ public class OverlayManager {
    private final List<OverlayEntry> focusManagedOverlays = new ArrayList<>();
    private final Map<OverlayEntry, FocusManager.FocusToken> focusTokens = new HashMap<>();
    private FocusManager focusManager;
+   private boolean clearingAll;
 
    /**
     * Creates a overlay manager.
@@ -136,22 +140,69 @@ public class OverlayManager {
    }
 
    /**
-    * Clears all.
+    * Closes every registered overlay through its normal lifecycle callback.
     *
-    * Behavior:
-    * - Updates the public state or registration owned by this type.
+    * <p>The operation uses stable snapshots so callbacks may safely unregister
+    * overlays or register follow-up overlays. Every entry encountered during
+    * the operation receives at most one close callback; entries without a
+    * callback are unregistered directly. Focus-managed overlays close in
+    * reverse registration order so focus restoration matches individual
+    * top-down closure.</p>
+    *
+    * <p>Runtime exceptions from callbacks are collected while the remaining
+    * overlays are still closed, then the first exception is rethrown with
+    * subsequent failures suppressed.</p>
     */
    public void clearAll() {
-      for(int color = this.focusManagedOverlays.size() - 1; color >= 0; --color) {
-         OverlayEntry overlayEntry = (OverlayEntry)this.focusManagedOverlays.get(color);
-         FocusManager.FocusToken token = (FocusManager.FocusToken)this.focusTokens.remove(overlayEntry);
-         if (this.focusManager != null) {
-            this.focusManager.discardFocus(token);
-         }
+      if (this.clearingAll) {
+         return;
       }
 
-      this.focusManagedOverlays.clear();
-      this.overlays.clear();
+      this.clearingAll = true;
+      RuntimeException failure = null;
+      Set<OverlayEntry> notified = Collections.newSetFromMap(new IdentityHashMap<>());
+      try {
+         while (!this.overlays.isEmpty()) {
+            for (OverlayEntry overlayEntry : this.closeOrderSnapshot()) {
+               if (notified.add(overlayEntry) && overlayEntry.getOnClose() != null) {
+                  try {
+                     overlayEntry.getOnClose().run();
+                  } catch (RuntimeException ex) {
+                     if (failure == null) {
+                        failure = ex;
+                     } else {
+                        failure.addSuppressed(ex);
+                     }
+                  }
+               }
+               if (this.overlays.contains(overlayEntry)) {
+                  this.unregister(overlayEntry);
+               }
+            }
+         }
+      } finally {
+         this.clearingAll = false;
+      }
+
+      if (failure != null) {
+         throw failure;
+      }
+   }
+
+   private List<OverlayEntry> closeOrderSnapshot() {
+      List<OverlayEntry> closeOrder = new ArrayList<>();
+      for (int index = this.focusManagedOverlays.size() - 1; index >= 0; index--) {
+         OverlayEntry overlayEntry = this.focusManagedOverlays.get(index);
+         if (this.overlays.contains(overlayEntry)) {
+            closeOrder.add(overlayEntry);
+         }
+      }
+      for (OverlayEntry overlayEntry : this.overlays) {
+         if (!closeOrder.contains(overlayEntry)) {
+            closeOrder.add(overlayEntry);
+         }
+      }
+      return closeOrder;
    }
 
    private void handleFocusOnRegister(OverlayEntry overlayEntry) {

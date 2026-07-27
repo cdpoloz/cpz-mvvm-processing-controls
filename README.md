@@ -615,7 +615,8 @@ Supporting infrastructure:
 - `InputManager` dispatches pointer and keyboard events by layer priority
 - `InputLayer` defines capture boundaries and event ownership
 - `FocusManager` owns keyboard focus and restoration
-- `OverlayManager` coordinates overlay ordering
+- `OverlayManager` coordinates overlay ordering and closes registered
+  producers through their lifecycle callbacks when `clearAll()` is called
 - `ThemeManager` is owned by the host sketch and exposes cached `ThemeSnapshot` instances to styles
 
 Public API notes:

@@ -54,6 +54,10 @@ is shown and unregisters it when all notifications expire or when
 `dispose()` performs the same cleanup as `clear()`; sketches usually call it
 from `exit()`.
 
+`OverlayManager.clearAll()` calls that same `clear()` lifecycle path. Active
+notifications are removed together with their overlay registration, and a
+subsequent `show(...)` registers the shared notification overlay again.
+
 Notification timing is backed by `cpz-utils.time.TimeSource`. The default
 manager constructor uses `SystemTimeSource`, which is monotonic and independent
 from Processing's `millis()`.

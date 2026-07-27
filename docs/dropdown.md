@@ -156,6 +156,10 @@ offset to render and hit-test in sketch space.
 
 No extra host-side focus hacks are required.
 
+`OverlayManager.clearAll()` invokes the same internal close path as an
+individual overlay close. An expanded dropdown therefore becomes collapsed,
+releases its overlay capture and focus, and can be opened again normally.
+
 ---
 
 ## Keyboard

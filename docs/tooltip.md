@@ -124,6 +124,11 @@ tooltips.refresh();
 When `Tooltip.isEnabled()` is `false`, the overlay is hidden even if the target
 is visible and the pointer is inside its bounds.
 
+`OverlayManager.clearAll()` hides a currently registered tooltip through its
+normal lifecycle callback. The controller clears its active registration state
+and can register the tooltip again on a later `refresh()` or
+`showIfMouseOver(...)`.
+
 ---
 
 ## Arbitrary Areas

@@ -111,9 +111,15 @@ public class OverlayEntry {
    }
 
    /**
-    * Returns on close.
+    * Returns the lifecycle callback used to close this overlay.
     *
-    * @return current on close
+    * <p>{@link OverlayManager#clearAll()} invokes this callback during
+    * coordinated global closure. Implementations should update producer state
+    * and unregister their normal overlay resources just as they do for an
+    * individual close.</p>
+    *
+    * @return close callback, or {@code null} when direct unregistration is
+    *         sufficient
     *
     * Behavior:
     * - Returns the current value without applying side effects.

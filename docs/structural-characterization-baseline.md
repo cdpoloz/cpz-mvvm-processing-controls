@@ -119,6 +119,28 @@ caracterizaciones ya existentes se adaptaron sin eliminar casos. Maven
 mantiene la advertencia no bloqueante de Guava sobre
 `sun.misc.Unsafe::objectFieldOffset`.
 
+### Validación posterior a la corrección de H3
+
+`OverlayManager.clearAll()` pasó de una purga silenciosa a un cierre
+coordinado mediante los callbacks de lifecycle ya presentes.
+
+- Estado inicial de esta fase: rama `master`, commit `0d62d9b`, working tree
+  limpio y versión Maven `0.9.10`.
+- La primera ejecución test-first de las 14 pruebas de caracterización y
+  manager produjo 6 fallos: los tres productores desincronizados, callbacks no
+  ejecutados y foco no restaurado.
+
+| Validación H3 | Tests | Fallos | Errores | Omitidos | Resultado |
+|---|---:|---:|---:|---:|---|
+| Caracterización de productores y `OverlayManagerTest` | 16 | 0 | 0 | 0 | `BUILD SUCCESS` |
+| Suite completa | 478 | 0 | 0 | 0 | `BUILD SUCCESS` |
+| `mvn -DskipTests javadoc:javadoc` | n/a | n/a | n/a | n/a | `BUILD SUCCESS` |
+
+El incremento de 473 a 478 corresponde a cuatro pruebas nuevas de
+`OverlayManager` y una prueba de coexistencia de productores. Se mantienen las
+advertencias no bloqueantes ya registradas de Guava, API deprecada y
+operaciones unchecked.
+
 ## 2. Inventario y clasificación de API pública
 
 La inspección mecánica inicial encontró 258 fuentes de producción fuera de
@@ -195,8 +217,8 @@ automática del comportamiento caracterizado.
 | Segundo dropdown cubierto por opción visible del actual | Opción del actual | Sí | Actual selecciona/cierra; sibling cerrado | Overlay actual | Confirmado |
 | Dropdowns en sketches distintos | Solo el del host que hace dispatch | Según ese host | Otro host inalterado | Límite de host antes que z-order | Contrato deseado inferido; actual contradice |
 | Cierre normal por API/callback/outside/dispose | Manager y productor sincronizados | Depende del camino | Estado transitorio coherente | n/a | Confirmado para caminos normales |
-| `OverlayManager.clearAll()` | Decidir: cierre coordinado o purga cruda explícita | n/a | Nunca captura invisible o estado irrecuperable | n/a | Decisión pendiente |
-| Nueva interacción tras `clearAll()` | Productor re-registra o quedó cerrado | Según interacción normal | Coherente con registro visible | Prioridad normal | Inferencia deseada |
+| `OverlayManager.clearAll()` | Cada `OverlayEntry.onClose`; fallback de desregistro para entradas sin callback | n/a | Productores cerrados y foco restaurado como en el cierre normal | Orden inverso de alta para overlays con foco; z-order para el resto | Confirmado por regresión |
+| Nueva interacción tras `clearAll()` | Productor cerrado vuelve a registrar por su ruta normal | Según interacción normal | Coherente con registro visible | Prioridad normal | Confirmado para DropDown, Tooltip y Notification |
 | Panel raíz y control hijo | Hijo recibe coordenadas locales y renderiza desplazado | Según bounds | Según hijo | Último hijo gana en Panel | Confirmado |
 | Panel dentro de Panel, descendiente normal | Descendiente en suma de offsets | Según bounds | Según descendiente | Orden anidado | Inferencia confirmada por nueva prueba |
 | Panel anidado y dropdown descendiente | Campo local; overlay con offset global total una vez | Sí en posición renderizada | Dropdown abierto/focado | Overlay al abrir | Contrato deseado; actual contradice |
@@ -211,7 +233,7 @@ automática del comportamiento caracterizado.
 | Captura iniciada dentro | `textFieldCaptureConsumesDragAndReleaseOutsideAfterEligiblePress` | Conserva DRAG/RELEASE exteriores hasta terminar la interacción |
 | Exclusividad/liberación de foco | `sameInputManagerKeepsFocusExclusiveBetweenTextFieldsInPanel`, `sameInputManagerTransfersFocusBetweenTextAndNumericInBothDirections`, `differentInputManagersKeepIndependentFocusScopes`, `keyboardRoutingFollowsNewOwnerAfterCrossFamilyTransfer`, regresiones de deshabilitado, retirada, Panel, RadioGroup y DropDown | Misma familia, familias distintas, aislamiento por gestor, teclado y lifecycle observable |
 | Prioridad del dropdown abierto | `openDropDownVisibleOptionHasPriorityOverOverlappingLowerControl` | Preserva explícitamente la prioridad contractual |
-| Ciclo normal frente a `clearAll()` | Tres pruebas `clearAll...` y `normalDropDownCloseSynchronizesProducerOverlayAndAllowsReopen` en `OverlayAndDropDownRegistryCharacterizationTest` | Cubre dropdown, tooltip y notification sin imponer un lifecycle común |
+| Ciclo normal frente a `clearAll()` | Regresiones individuales y mixtas de DropDown, Tooltip y Notification en `OverlayAndDropDownRegistryCharacterizationTest`; mutación de callbacks, idempotencia, altas durante cierre, excepciones y restauración de foco en `OverlayManagerTest` | Cierre coordinado reutiliza `OverlayEntry.onClose` sin imponer implementación común a los productores |
 | Registro global de dropdowns | `currentStaticRegistryTransfersPressAcrossDifferentSketchHosts`, prueba de `dispose()` y prueba de dispose abierto | Observable entre hosts; reflexión solo para contar altas/bajas |
 | Panel directo/anidado y offsets | Cuatro pruebas de `NestedPanelCharacterizationTest` | Render, hit-test, overlay global, medidas absolutas/relativas |
 
@@ -278,11 +300,10 @@ sus métodos públicos de foco se mantienen.
 amplía en esta fase: el consumidor sigue siendo responsable de retirar su capa
 base del routing cuando corresponda.
 
-### H3 — `OverlayManager.clearAll()` desincroniza a los productores
+### H3 — `OverlayManager.clearAll()` desincronizaba a los productores — corregido
 
-**Hecho observado.** `OverlayManager.clearAll`
-(`core/overlay/OverlayManager.java:144-155`) descarta registros y tokens sin
-ejecutar `OverlayEntry.onClose`.
+**Hecho originalmente caracterizado.** `OverlayManager.clearAll` descartaba
+registros y tokens sin ejecutar `OverlayEntry.onClose`.
 
 - DropDown queda `isExpanded()==true` sin overlay visual; el primer click en
   un control inferior es capturado por su capa interna y cierra el estado
@@ -296,6 +317,19 @@ ejecutar `OverlayEntry.onClose`.
 **Impacto.** Hay estado visual y de input divergente. Los tres productores no
 necesitan compartir implementación, pero sí una semántica explícita de purga o
 cierre.
+
+**Estado corregido.** `clearAll()` ejecuta el callback de cierre normal de cada
+entrada mediante snapshots estables y usa `unregister` como fallback para
+entradas sin callback. DropDown ejecuta `closeOverlay`, Tooltip ejecuta
+`hideTooltip` y Notification ejecuta `clear`; los tres actualizan así su
+estado propio antes de reutilizarse. Las entradas con foco se cierran en orden
+inverso al alta para preservar la restauración normal.
+
+La operación incluye cualquier overlay nuevo registrado por un callback,
+notifica una sola vez cada identidad durante la limpieza y es idempotente. Si
+uno o más callbacks lanzan una excepción runtime, se completa el cierre del
+resto y se relanza la primera, adjuntando las demás como suprimidas. No se
+añadió una API pública de purga administrativa silenciosa.
 
 ### H4 — el coordinador estático de dropdowns cruza sketches
 
@@ -354,9 +388,9 @@ normales es intencional y debe preservarse.
   normal coinciden.
 - **“`dispose()` no elimina dropdowns del registro”.** Refutada para llamadas
   explícitas: restaura el recuento y evita transferencia cross-host.
-- **“`clearAll()` inutiliza permanentemente el DropDown”.** Acotada: deja
-  captura invisible durante la siguiente interacción, pero ese click lo cierra
-  y después puede reabrirse. Tooltip y Notification requieren su reset normal.
+- **“`clearAll()` inutiliza permanentemente el DropDown”.** Corregida:
+  `clearAll()` sigue ahora la ruta normal de cierre, elimina la captura y
+  permite reabrirlo; Tooltip y Notification también vuelven a registrarse.
 
 ### Pendientes
 
@@ -378,8 +412,8 @@ normales es intencional y debe preservarse.
 3. Resuelta: `docs/architecture.md` y `docs/input-system.md` delimitan ahora la
    autoridad de foco al `InputManager`; los gestores locales se vinculan
    automáticamente durante el registro de capas.
-4. El nombre y Javadoc genérico de `OverlayManager.clearAll()` sugieren una
-   operación de lifecycle; el código implementa una purga sin callbacks.
+4. Resuelta: el nombre y Javadoc de `OverlayManager.clearAll()` describen una
+   operación de lifecycle y el código ejecuta los callbacks de cierre.
 5. README `:19` afirma que no hay estado global/singletons en el contexto de
    theming, mientras el coordinador de dropdowns sí mantiene una lista estática.
    La afirmación debe acotarse, no reinterpretarse como prohibición absoluta.
@@ -392,15 +426,14 @@ normales es intencional y debe preservarse.
    limitación actual para más de una profundidad.
 
 Las pruebas con nombres `current...` que permanecen caracterizan únicamente
-los defectos todavía pendientes de lifecycle de overlays, registro de
-dropdowns y paneles anidados. Las caracterizaciones de H1 y H2 se renombraron
-y transformaron en regresiones de los contratos corregidos.
+los defectos todavía pendientes del registro de dropdowns y paneles anidados.
+Las caracterizaciones de H1, H2 y H3 se renombraron y transformaron en
+regresiones de los contratos corregidos.
 
 ## 8. Correcciones de producción recomendadas
 
 | Prioridad | Tarea posterior | Cambio conceptual | Evidencia | Riesgo/compatibilidad |
 |---|---|---|---|---|
-| Alta | Separar cierre coordinado de purga de overlays | Hacer que la API pública indique si notifica productores; migrar `clearAll` de forma compatible | H3 | Medio/alto; callbacks pueden reentrar. Añadir API nueva antes de cambiar semántica |
 | Alta | Acotar coordinación de dropdown al host | Registro propiedad del host/coordinador, manteniendo `dispose()` | H4 | Medio; afecta transferencia entre dropdowns. Preservar contrato dentro del mismo sketch |
 | Media | Propagar contexto acumulado en Panel anidado | Entregar a descendientes el offset global acumulado, sin alterar coordenadas locales ni medidas relativas | H5 | Medio; regresión en overlays/tooltips. Las nuevas pruebas dan coordenadas exactas |
 | Media | Establecer baseline/allowlist de API | Clasificar los 257 tipos y documentar soportado, extensión e interno antes de cualquier deprecación | Inventario §2 | Bajo ahora; evita una futura ruptura binaria accidental |
@@ -412,22 +445,19 @@ eliminar `dispose()`.
 
 ## 9. Propuesta de división de tareas siguientes
 
-La separación de recepción, elegibilidad, captura y consumo de H1 y la
-autoridad por `InputManager` de H2 se completaron sin resolver el orden
-intrapa, que sigue siendo una decisión independiente.
+La separación de recepción, elegibilidad, captura y consumo de H1, la
+autoridad por `InputManager` de H2 y el cierre coordinado de H3 se completaron
+sin resolver el orden intrapa, que sigue siendo una decisión independiente.
 
-1. **Lifecycle de overlays.** Añadir cierre coordinado explícito y definir la
-   compatibilidad de `clearAll`; cubrir por separado DropDown, Tooltip y
-   Notification.
-2. **Coordinador de dropdown por host.** Sustituir el registro estático global
+1. **Coordinador de dropdown por host.** Sustituir el registro estático global
    conservando prioridad y transferencia dentro del mismo host. Depende del
    contrato de input y debe preservar `dispose()`.
-3. **Contexto acumulado de Panel.** Corregir únicamente la propagación global
+2. **Contexto acumulado de Panel.** Corregir únicamente la propagación global
    a descendientes; no cambiar coordenadas locales, medidas relativas ni JSON.
-4. **Baseline de API soportada.** Convertir el inventario agrupado en allowlist
+3. **Baseline de API soportada.** Convertir el inventario agrupado en allowlist
    verificable y política de deprecación antes de cualquier movimiento de
    paquetes o visibilidad.
-5. **Actualización documental.** Solo después de que las decisiones anteriores
+4. **Actualización documental.** Solo después de que las decisiones anteriores
    estén cerradas.
 
 Cada tarea puede usar estas pruebas como punto de partida, pero las pruebas

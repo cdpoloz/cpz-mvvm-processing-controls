@@ -76,7 +76,7 @@ class OverlayAndDropDownRegistryCharacterizationTest {
     }
 
     @Test
-    void clearAllCurrentlyRemovesDropDownVisualRegistrationButLeavesExpandedInputCapture() {
+    void clearAllClosesDropDownWithoutInvisibleCaptureAndAllowsReuse() {
         Host host = new Host();
         DropDown dropDown = host.dropDown("dropDown", 120.0F, 80.0F);
         Button lower = new Button(host.sketch, "lower", "Lower", 320.0F, 220.0F, 120.0F, 40.0F);
@@ -92,15 +92,13 @@ class OverlayAndDropDownRegistryCharacterizationTest {
             host.overlays.clearAll();
 
             assertEquals(0, host.overlays.getActiveOverlays().size());
-            assertTrue(dropDown.isExpanded(),
-                    "characterization only: manager purge does not close producer state");
+            assertFalse(dropDown.isExpanded());
+            assertFalse(dropDown.isFocused());
 
             click(host.input, 320.0F, 220.0F);
 
-            assertEquals(0, lowerClicks.get(),
-                    "characterization only: invisible DropDown overlay layer captures the first outside click");
-            assertFalse(dropDown.isExpanded(),
-                    "the captured outside click repairs state by following the normal close path");
+            assertEquals(1, lowerClicks.get(),
+                    "a globally closed DropDown must not retain an invisible capture layer");
 
             click(host.input, 120.0F, 80.0F);
             assertTrue(dropDown.isExpanded());
@@ -111,7 +109,7 @@ class OverlayAndDropDownRegistryCharacterizationTest {
     }
 
     @Test
-    void clearAllCurrentlyPreventsVisibleTooltipFromRegisteringAgainUntilControllerResets() {
+    void clearAllHidesTooltipAndAllowsRegistrationAgain() {
         PApplet sketch = sketch();
         OverlayManager overlays = new OverlayManager();
         TooltipOverlayController controller = new TooltipOverlayController(sketch, overlays);
@@ -122,22 +120,22 @@ class OverlayAndDropDownRegistryCharacterizationTest {
         assertEquals(1, overlays.getActiveOverlays().size());
 
         overlays.clearAll();
+        assertEquals(0, overlays.getActiveOverlays().size());
+
         controller.showIfMouseOver(50.0F, 50.0F);
+        assertEquals(1, overlays.getActiveOverlays().size());
 
-        assertEquals(0, overlays.getActiveOverlays().size(),
-                "characterization only: controller retains registered=true after manager purge");
-
-        controller.dispose();
-        controller.registerTarget(area);
+        overlays.clearAll();
+        overlays.clearAll();
         controller.showIfMouseOver(50.0F, 50.0F);
 
         assertEquals(1, overlays.getActiveOverlays().size(),
-                "normal controller reset permits registration again");
+                "repeated global closure must leave the tooltip reusable");
         controller.dispose();
     }
 
     @Test
-    void clearAllCurrentlyKeepsNotificationsButPreventsSubsequentShowFromRegistering() {
+    void clearAllClearsNotificationsAndAllowsNewNotification() {
         OverlayManager overlays = new OverlayManager();
         NotificationManager notifications = new NotificationManager(sketch(), overlays);
 
@@ -146,19 +144,53 @@ class OverlayAndDropDownRegistryCharacterizationTest {
         assertEquals(1, overlays.getActiveOverlays().size());
 
         overlays.clearAll();
-        notifications.success("After clearAll");
-
-        assertEquals(2, notifications.size(),
-                "producer state remains present after manager-only purge");
+        assertEquals(0, notifications.size());
         assertEquals(0, overlays.getActiveOverlays().size(),
-                "characterization only: retained registered flag prevents re-registration");
+                "producer state and overlay registry must be empty together");
 
-        notifications.clear();
-        notifications.info("After producer clear");
+        overlays.clearAll();
+        notifications.success("After clearAll");
 
         assertEquals(1, notifications.size());
         assertEquals(1, overlays.getActiveOverlays().size());
         notifications.dispose();
+    }
+
+    @Test
+    void clearAllCoordinatesMixedProducersAndLeavesAllReusable() {
+        Host host = new Host();
+        DropDown dropDown = host.dropDown("dropDown", 120.0F, 80.0F);
+        TooltipOverlayController tooltips = new TooltipOverlayController(host.sketch, host.overlays);
+        TooltipArea area = new TooltipArea(300.0F, 80.0F, 100.0F, 100.0F).setTooltip("Tooltip");
+        NotificationManager notifications = new NotificationManager(host.sketch, host.overlays);
+        host.input.registerLayer(new DropDownInputLayer(0, dropDown));
+        tooltips.registerTarget(area);
+        try {
+            click(host.input, 120.0F, 80.0F);
+            tooltips.showIfMouseOver(320.0F, 100.0F);
+            notifications.info("Before clearAll");
+            assertEquals(3, host.overlays.getActiveOverlays().size());
+
+            host.overlays.clearAll();
+
+            assertTrue(host.overlays.getActiveOverlays().isEmpty());
+            assertFalse(dropDown.isExpanded());
+            assertFalse(dropDown.isFocused());
+            assertTrue(notifications.isEmpty());
+
+            tooltips.showIfMouseOver(320.0F, 100.0F);
+            notifications.success("After clearAll");
+            click(host.input, 120.0F, 80.0F);
+
+            assertTrue(dropDown.isExpanded());
+            assertEquals(1, notifications.size());
+            assertEquals(3, host.overlays.getActiveOverlays().size());
+        } finally {
+            host.overlays.clearAll();
+            dropDown.dispose();
+            tooltips.dispose();
+            notifications.dispose();
+        }
     }
 
     @Test
