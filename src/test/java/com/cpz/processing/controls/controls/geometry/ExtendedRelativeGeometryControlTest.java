@@ -3,7 +3,6 @@ package com.cpz.processing.controls.controls.geometry;
 import com.cpz.processing.controls.controls.checkbox.Checkbox;
 import com.cpz.processing.controls.controls.dropdown.DropDown;
 import com.cpz.processing.controls.controls.dropdown.input.DropDownInputLayer;
-import com.cpz.processing.controls.controls.dropdown.util.DropDownOverlayController;
 import com.cpz.processing.controls.controls.numericfield.NumericField;
 import com.cpz.processing.controls.controls.panel.Panel;
 import com.cpz.processing.controls.controls.panel.input.PanelInputLayer;
@@ -16,12 +15,9 @@ import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipBounds;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import processing.core.PApplet;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,11 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ExtendedRelativeGeometryControlTest {
-    @AfterEach
-    void tearDown() {
-        clearDropDownControllers();
-    }
-
     @Test
     void absoluteBoundsKeepExistingCenterBasedTooltipBehavior() {
         PApplet sketch = sketch(800, 600);
@@ -276,16 +267,4 @@ class ExtendedRelativeGeometryControlTest {
         return sketch;
     }
 
-    @SuppressWarnings("unchecked")
-    private static void clearDropDownControllers() {
-        try {
-            Field field = DropDownOverlayController.class.getDeclaredField("CONTROLLERS");
-            field.setAccessible(true);
-            for (DropDownOverlayController controller : new ArrayList<>((List<DropDownOverlayController>) field.get(null))) {
-                controller.dispose();
-            }
-        } catch (ReflectiveOperationException ex) {
-            throw new AssertionError(ex);
-        }
-    }
 }

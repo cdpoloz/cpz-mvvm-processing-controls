@@ -116,6 +116,20 @@ Behavior:
 - the visible field and option list of the expanded dropdown take priority over controls underneath them, including another dropdown field
 - when the user clicks another dropdown outside the expanded dropdown's field and option list, the current overlay closes and the interaction is transferred internally
 
+Each `InputManager` owns this sibling coordination scope. Drop-downs
+registered directly in the same manager, or reached through a registered
+`Panel`, preserve exclusive opening and transfer. Drop-downs owned by different
+managers are independent: input, focus transfer, disposal, and overlay cleanup
+in one routing scope do not alter another.
+
+Registration joins the constructor-supplied manager's scope automatically.
+`InputManager.unregisterLayer()` and `Panel.remove()` leave that scope and
+close an active reusable overlay; re-registering the same layer in its original
+manager joins it again. `dispose()` leaves coordination permanently. Because
+the expanded overlay also uses the manager supplied to the constructor,
+registering only the base layer in a different manager is rejected instead of
+creating a split routing lifecycle. No manual coordinator setup is required.
+
 The `DropDownTest` example intentionally places two dropdowns so the
 `Primary Beta` option of the first menu covers the second field. Selecting that
 visible option updates the first dropdown and leaves the second closed. Closing

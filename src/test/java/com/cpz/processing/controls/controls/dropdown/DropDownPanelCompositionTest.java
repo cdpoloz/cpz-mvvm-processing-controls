@@ -4,7 +4,6 @@ import com.cpz.processing.controls.controls.button.Button;
 import com.cpz.processing.controls.controls.button.input.ButtonInputLayer;
 import com.cpz.processing.controls.controls.dropdown.input.DropDownInputLayer;
 import com.cpz.processing.controls.controls.dropdown.style.DefaultDropDownStyle;
-import com.cpz.processing.controls.controls.dropdown.util.DropDownOverlayController;
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.controls.geometry.MeasureMode;
@@ -47,7 +46,6 @@ class DropDownPanelCompositionTest {
         }
         this.dropDowns.clear();
         this.overlayManagers.clear();
-        clearDropDownControllers();
     }
 
     @Test
@@ -974,20 +972,6 @@ class DropDownPanelCompositionTest {
         assertMeasure(bounds.height(), testCase.heightMode, testCase.bounds.height().value());
 
         dropDown.dispose();
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void clearDropDownControllers() {
-        try {
-            Field field = DropDownOverlayController.class.getDeclaredField("CONTROLLERS");
-            field.setAccessible(true);
-            List<DropDownOverlayController> controllers = new ArrayList<>((List<DropDownOverlayController>) field.get(null));
-            for (DropDownOverlayController controller : controllers) {
-                controller.dispose();
-            }
-        } catch (ReflectiveOperationException ex) {
-            throw new AssertionError(ex);
-        }
     }
 
     private static final class MixedBoundsCase {

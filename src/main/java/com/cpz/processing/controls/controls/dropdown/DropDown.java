@@ -55,6 +55,7 @@ public final class DropDown implements PointerRoutableControl, ParentSizeAwareCo
     private final DropDownViewModel viewModel;
     private final DropDownView view;
     private final FocusManager focusManager;
+    private final InputManager inputManager;
     private final DropDownOverlayController overlayController;
     private final DropDownInputAdapter inputAdapter;
     private final TooltipSupport tooltipSupport;
@@ -69,6 +70,7 @@ public final class DropDown implements PointerRoutableControl, ParentSizeAwareCo
     private float localY;
     private float resolvedWidth;
     private float resolvedHeight;
+    private int routingAttachments;
 
     public DropDown(PApplet sketch, OverlayManager overlayManager, InputManager inputManager, List<String> items, float x, float y, float width, float height) {
         this(sketch, overlayManager, inputManager, ControlCode.auto("dropdown"), items, -1, x, y, width, height);
@@ -101,7 +103,7 @@ public final class DropDown implements PointerRoutableControl, ParentSizeAwareCo
     public DropDown(PApplet sketch, OverlayManager overlayManager, InputManager inputManager, String code, List<String> items, int selectedIndex, ControlBounds bounds) {
         this.sketch = Objects.requireNonNull(sketch, "sketch");
         Objects.requireNonNull(overlayManager, "overlayManager");
-        Objects.requireNonNull(inputManager, "inputManager");
+        this.inputManager = Objects.requireNonNull(inputManager, "inputManager");
         this.bounds = Objects.requireNonNull(bounds, "bounds");
         ResolvedBounds resolvedBounds = this.resolveBounds();
         this.model = new DropDownModel(code, items, selectedIndex);
@@ -195,11 +197,24 @@ public final class DropDown implements PointerRoutableControl, ParentSizeAwareCo
 
     @Override
     public void attachFocusManager(FocusManager focusManager) {
+        if (focusManager != this.inputManager.getFocusManager()) {
+            throw new IllegalStateException(
+                    "DropDown must be registered with the InputManager supplied to its constructor.");
+        }
         this.focusManager.attachAuthority(focusManager);
+        if (++this.routingAttachments == 1) {
+            this.overlayController.attachCoordination();
+        }
     }
 
     @Override
     public void detachFocusManager(FocusManager focusManager) {
+        if (focusManager == this.inputManager.getFocusManager() && this.routingAttachments > 0) {
+            if (this.routingAttachments == 1) {
+                this.overlayController.detachCoordination();
+            }
+            this.routingAttachments--;
+        }
         this.focusManager.detachAuthority(focusManager);
     }
 

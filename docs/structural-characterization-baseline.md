@@ -141,12 +141,36 @@ El incremento de 473 a 478 corresponde a cuatro pruebas nuevas de
 advertencias no bloqueantes ya registradas de Guava, API deprecada y
 operaciones unchecked.
 
+### Validación posterior a la corrección de H4
+
+La coordinación de dropdowns pasó de una lista estática global a una
+autoridad con el mismo ámbito y lifecycle que cada `InputManager`.
+
+- Estado inicial de esta fase: rama `master`, commit `5ec0baa`, working tree
+  limpio y versión Maven `0.9.10`.
+- La línea base anterior a las ediciones ejecutó 478 pruebas sin fallos.
+- La primera ejecución test-first de
+  `OverlayAndDropDownRegistryCharacterizationTest` ejecutó 12 pruebas y
+  produjo 3 fallos: transferencia entre hosts, participación después de
+  `unregisterLayer()` y participación de un descendiente de `Panel` en un
+  host ajeno.
+
+| Validación H4 | Tests | Fallos | Errores | Omitidos | Resultado |
+|---|---:|---:|---:|---:|---|
+| DropDown, overlays, input/foco, Panel y geometría | 94 | 0 | 0 | 0 | `BUILD SUCCESS` |
+| Suite completa | 484 | 0 | 0 | 0 | `BUILD SUCCESS` |
+| `mvn -DskipTests javadoc:javadoc` | n/a | n/a | n/a | n/a | `BUILD SUCCESS` |
+
+El incremento de 478 a 484 corresponde a seis regresiones nuevas de
+aislamiento, transferencia y lifecycle; las caracterizaciones defectuosas se
+transformaron sin eliminar casos.
+
 ## 2. Inventario y clasificación de API pública
 
 La inspección mecánica inicial encontró 258 fuentes de producción fuera de
 `examples/**` y `main/**`; la adición de `FocusManagerAware` en H2 eleva el
-estado actual a 259, de las cuales 258 contienen una declaración top-level
-pública.
+estado a 259. La adición de `DropDownCoordinator` en H4 eleva el estado actual
+a 260, de las cuales 259 contienen una declaración top-level pública.
 Como el JAR solo excluye launcher y ejemplos, casi toda la implementación es
 técnicamente accesible. La tabla agrupa tipos con la misma evidencia y el
 mismo riesgo; no implica que todos los integrantes tengan que compartir
@@ -215,7 +239,7 @@ automática del comportamiento caracterizado.
 | Opción visible de `DropDown` abierto | Opción del dropdown actual | Sí | Selecciona, cierra y libera | Overlay abierto | Confirmado |
 | Segundo dropdown fuera del campo/lista visibles del actual | Sibling después de cerrar actual | Sí | Segundo abierto/focado | Transferencia tras rechazo geométrico del actual | Confirmado |
 | Segundo dropdown cubierto por opción visible del actual | Opción del actual | Sí | Actual selecciona/cierra; sibling cerrado | Overlay actual | Confirmado |
-| Dropdowns en sketches distintos | Solo el del host que hace dispatch | Según ese host | Otro host inalterado | Límite de host antes que z-order | Contrato deseado inferido; actual contradice |
+| Dropdowns en `InputManager` distintos | Solo el del gestor que hace dispatch | Según ese gestor | Otro gestor inalterado | Límite del gestor antes que z-order | Confirmado por regresión |
 | Cierre normal por API/callback/outside/dispose | Manager y productor sincronizados | Depende del camino | Estado transitorio coherente | n/a | Confirmado para caminos normales |
 | `OverlayManager.clearAll()` | Cada `OverlayEntry.onClose`; fallback de desregistro para entradas sin callback | n/a | Productores cerrados y foco restaurado como en el cierre normal | Orden inverso de alta para overlays con foco; z-order para el resto | Confirmado por regresión |
 | Nueva interacción tras `clearAll()` | Productor cerrado vuelve a registrar por su ruta normal | Según interacción normal | Coherente con registro visible | Prioridad normal | Confirmado para DropDown, Tooltip y Notification |
@@ -234,14 +258,11 @@ automática del comportamiento caracterizado.
 | Exclusividad/liberación de foco | `sameInputManagerKeepsFocusExclusiveBetweenTextFieldsInPanel`, `sameInputManagerTransfersFocusBetweenTextAndNumericInBothDirections`, `differentInputManagersKeepIndependentFocusScopes`, `keyboardRoutingFollowsNewOwnerAfterCrossFamilyTransfer`, regresiones de deshabilitado, retirada, Panel, RadioGroup y DropDown | Misma familia, familias distintas, aislamiento por gestor, teclado y lifecycle observable |
 | Prioridad del dropdown abierto | `openDropDownVisibleOptionHasPriorityOverOverlappingLowerControl` | Preserva explícitamente la prioridad contractual |
 | Ciclo normal frente a `clearAll()` | Regresiones individuales y mixtas de DropDown, Tooltip y Notification en `OverlayAndDropDownRegistryCharacterizationTest`; mutación de callbacks, idempotencia, altas durante cierre, excepciones y restauración de foco en `OverlayManagerTest` | Cierre coordinado reutiliza `OverlayEntry.onClose` sin imponer implementación común a los productores |
-| Registro global de dropdowns | `currentStaticRegistryTransfersPressAcrossDifferentSketchHosts`, prueba de `dispose()` y prueba de dispose abierto | Observable entre hosts; reflexión solo para contar altas/bajas |
+| Coordinación de dropdowns | Regresiones de hosts independientes, transferencia en el mismo gestor, `unregisterLayer`, `Panel.remove`, `dispose()` y rechazo de migración parcial en `OverlayAndDropDownRegistryCharacterizationTest` | Aislamiento y lifecycle comprobados por efectos observables; no existe registro estático |
 | Panel directo/anidado y offsets | Cuatro pruebas de `NestedPanelCharacterizationTest` | Render, hit-test, overlay global, medidas absolutas/relativas |
 
-La reflexión se limita al tamaño de
-`DropDownOverlayController.CONTROLLERS`, porque no existe una API pública de
-consulta de lifecycle. El aislamiento entre sketches y el enrutado se prueban
-por efectos observables. No se intenta caracterizar por reflexión la forma
-interna de las entradas.
+El aislamiento entre gestores, el enrutado y las bajas se prueban por efectos
+observables. Ya no se usa reflexión para consultar coordinación de dropdowns.
 
 ## 5. Hallazgos confirmados
 
@@ -331,23 +352,38 @@ uno o más callbacks lanzan una excepción runtime, se completa el cierre del
 resto y se relanza la primera, adjuntando las demás como suprimidas. No se
 añadió una API pública de purga administrativa silenciosa.
 
-### H4 — el coordinador estático de dropdowns cruza sketches
+### H4 — el coordinador estático de dropdowns cruzaba sketches — corregido
 
-**Hecho observado.** `DropDownOverlayController.CONTROLLERS` es una lista
-estática (`DropDownOverlayController.java:29`) y
-`routePressToSibling` itera toda la lista (`:121-132`) sin filtrar por
-`InputManager`, `OverlayManager` o `PApplet`. Un evento enviado por el manager
-del primer host puede cerrar su dropdown y abrir el de un segundo sketch.
+**Hecho originalmente caracterizado.**
+`DropDownOverlayController.CONTROLLERS` era una lista estática y
+`routePressToSibling` iteraba todas las instancias sin filtrar por
+`InputManager`, `OverlayManager` o `PApplet`. Un evento enviado por el gestor
+del primer host podía cerrar su dropdown y abrir el de un segundo sketch.
 
-`DropDown.dispose()` sí elimina la instancia del registro y de los managers,
-y ciclos repetidos vuelven al recuento inicial. Por tanto, la hipótesis
-“dispose no limpia” queda descartada. Si se dispone abierto, el flag
-`isExpanded` permanece `true`; la prueba lo documenta como estado terminal, no
-como autorización para reutilizar una instancia dispuesta.
+**Decisión aplicada.** El ámbito estable es el `InputManager`: ya es la
+autoridad de routing y foco, y el `DropDown` lo recibe en construcción para
+registrar su capa de overlay. Cada manager posee un `DropDownCoordinator` no
+estático. Los controllers participan únicamente mientras la capa base o el
+`Panel` que los contiene están registrados en ese mismo manager.
 
-**Impacto.** Sin `dispose()` hay una referencia fuerte estática y posible
-contaminación entre hosts/tests. No se añadió una prueba GC deliberadamente
-frágil; el riesgo de retención se deduce de la referencia estática observada.
+**Estado corregido.** `InputManager.registerLayer()` y
+`unregisterLayer()`, junto con la propagación ya existente de
+`FocusManagerAware` en `Panel`, incorporan y retiran al dropdown de la
+coordinación. La última retirada cierra un overlay reutilizable; un alta
+posterior en el mismo gestor vuelve a incorporarlo. `Panel.remove()` aplica la
+misma baja. `DropDown.dispose()` retira definitivamente el controller y
+mantiene el estado terminal ya caracterizado cuando se dispone abierto.
+
+No queda una colección estática de hosts o dropdowns. Dos gestores pueden
+mantener un dropdown abierto cada uno; `clearAll()` de un host no afecta al
+otro. La transferencia y prioridad entre siblings del mismo gestor permanecen.
+
+**Límite de migración.** El `InputManager` y el `OverlayManager` del dropdown
+se fijan en su constructor; mover solo su capa a otro gestor dejaría la capa
+del overlay en el gestor original. Esta migración parcial, que nunca fue un
+flujo coherente, se rechaza explícitamente sin contaminar ninguno de los
+gestores. Una capa retirada sí puede volver a registrarse en su manager
+original.
 
 ### H5 — el fallo anidado está acotado al contexto global del overlay
 
@@ -386,8 +422,9 @@ normales es intencional y debe preservarse.
   la ausencia de un offset ancestro en el overlay global.
 - **“Los Paneles anidados están rotos en general”.** Refutada. Render e input
   normal coinciden.
-- **“`dispose()` no elimina dropdowns del registro”.** Refutada para llamadas
-  explícitas: restaura el recuento y evita transferencia cross-host.
+- **“`dispose()` no elimina dropdowns de la coordinación”.** Refutada:
+  impide transferencias posteriores en su manager; ya no existe un recuento
+  estático global.
 - **“`clearAll()` inutiliza permanentemente el DropDown”.** Corregida:
   `clearAll()` sigue ahora la ruta normal de cierre, elimina la captura y
   permite reabrirlo; Tooltip y Notification también vuelven a registrarse.
@@ -399,8 +436,8 @@ normales es intencional y debe preservarse.
 - API oficial individual de configs, factories, payloads de renderer y tipos
   `core.*`; el agrupamiento actual necesita una allowlist revisada.
 - Comportamiento de concurrencia o modificación de registros durante dispatch.
-- Recolección real de memoria sin `dispose()`: la retención fuerte se demuestra
-  por estructura, no mediante una prueba GC no determinista.
+- Concurrencia de registro y dispatch de dropdowns; el contrato actual y las
+  colecciones de `InputManager` son de uso monohilo.
 
 ## 7. Contradicciones entre código, tests y documentación
 
@@ -414,9 +451,8 @@ normales es intencional y debe preservarse.
    automáticamente durante el registro de capas.
 4. Resuelta: el nombre y Javadoc de `OverlayManager.clearAll()` describen una
    operación de lifecycle y el código ejecuta los callbacks de cierre.
-5. README `:19` afirma que no hay estado global/singletons en el contexto de
-   theming, mientras el coordinador de dropdowns sí mantiene una lista estática.
-   La afirmación debe acotarse, no reinterpretarse como prohibición absoluta.
+5. Resuelta: el coordinador de dropdowns ya no mantiene estado estático; cada
+   `InputManager` posee su ámbito independiente.
 6. README `:20` llama ocultos a los internals MVVM aunque sus tipos y Javadocs
    sean públicos y estén dentro del JAR.
 7. `ParentContextAwareControl:15-19` exige offset global, pero la propagación
@@ -426,15 +462,14 @@ normales es intencional y debe preservarse.
    limitación actual para más de una profundidad.
 
 Las pruebas con nombres `current...` que permanecen caracterizan únicamente
-los defectos todavía pendientes del registro de dropdowns y paneles anidados.
-Las caracterizaciones de H1, H2 y H3 se renombraron y transformaron en
-regresiones de los contratos corregidos.
+el defecto todavía pendiente de paneles anidados. Las caracterizaciones de
+H1, H2, H3 y H4 se renombraron y transformaron en regresiones de los contratos
+corregidos.
 
 ## 8. Correcciones de producción recomendadas
 
 | Prioridad | Tarea posterior | Cambio conceptual | Evidencia | Riesgo/compatibilidad |
 |---|---|---|---|---|
-| Alta | Acotar coordinación de dropdown al host | Registro propiedad del host/coordinador, manteniendo `dispose()` | H4 | Medio; afecta transferencia entre dropdowns. Preservar contrato dentro del mismo sketch |
 | Media | Propagar contexto acumulado en Panel anidado | Entregar a descendientes el offset global acumulado, sin alterar coordenadas locales ni medidas relativas | H5 | Medio; regresión en overlays/tooltips. Las nuevas pruebas dan coordenadas exactas |
 | Media | Establecer baseline/allowlist de API | Clasificar los 257 tipos y documentar soportado, extensión e interno antes de cualquier deprecación | Inventario §2 | Bajo ahora; evita una futura ruptura binaria accidental |
 | Baja | Actualizar documentación después de decidir contratos | Documentar foco, consumo, `clearAll`, lifecycle y límite de API | §7 | Bajo, pero no debe adelantarse a la decisión de producción |
@@ -446,18 +481,16 @@ eliminar `dispose()`.
 ## 9. Propuesta de división de tareas siguientes
 
 La separación de recepción, elegibilidad, captura y consumo de H1, la
-autoridad por `InputManager` de H2 y el cierre coordinado de H3 se completaron
-sin resolver el orden intrapa, que sigue siendo una decisión independiente.
+autoridad por `InputManager` de H2, el cierre coordinado de H3 y el coordinador
+por gestor de H4 se completaron sin resolver el orden intrapa, que sigue siendo
+una decisión independiente.
 
-1. **Coordinador de dropdown por host.** Sustituir el registro estático global
-   conservando prioridad y transferencia dentro del mismo host. Depende del
-   contrato de input y debe preservar `dispose()`.
-2. **Contexto acumulado de Panel.** Corregir únicamente la propagación global
+1. **Contexto acumulado de Panel.** Corregir únicamente la propagación global
    a descendientes; no cambiar coordenadas locales, medidas relativas ni JSON.
-3. **Baseline de API soportada.** Convertir el inventario agrupado en allowlist
+2. **Baseline de API soportada.** Convertir el inventario agrupado en allowlist
    verificable y política de deprecación antes de cualquier movimiento de
    paquetes o visibilidad.
-4. **Actualización documental.** Solo después de que las decisiones anteriores
+3. **Actualización documental.** Solo después de que las decisiones anteriores
    estén cerradas.
 
 Cada tarea puede usar estas pruebas como punto de partida, pero las pruebas

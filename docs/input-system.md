@@ -25,7 +25,8 @@ This keeps interaction deterministic, testable, and source-agnostic.
 - `KeyboardEvent`: immutable keyboard snapshot used for dispatch
 - `KeyboardState`: tracks pressed keys and derives modifier state for keyboard dispatch
 - `InputManager`: dispatches pointer and keyboard events in priority order and
-  owns the exclusive focus scope for its registered layers
+  owns the exclusive focus scope and drop-down coordination scope for its
+  registered layers
 - `InputLayer`: defines capture order and event ownership
 - `FocusManager`: tracks exclusive keyboard focus and focus restoration within
   one `InputManager`
@@ -96,6 +97,9 @@ In practice:
   releases any focus owned through the layer
 - separate `InputManager` instances have independent focus scopes and no
   global focus registry is used
+- drop-down sibling transfer is limited to controls currently attached to the
+  same `InputManager`; unregistering a layer or removing a panel child releases
+  that association
 
 ## Keyboard State
 

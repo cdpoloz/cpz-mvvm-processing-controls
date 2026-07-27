@@ -5,7 +5,6 @@ import com.cpz.processing.controls.controls.button.Button;
 import com.cpz.processing.controls.controls.button.input.ButtonInputLayer;
 import com.cpz.processing.controls.controls.config.ControlConfigLoader;
 import com.cpz.processing.controls.controls.dropdown.DropDown;
-import com.cpz.processing.controls.controls.dropdown.util.DropDownOverlayController;
 import com.cpz.processing.controls.controls.geometry.ControlBounds;
 import com.cpz.processing.controls.controls.geometry.MeasureMode;
 import com.cpz.processing.controls.controls.panel.Panel;
@@ -22,7 +21,6 @@ import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
 import com.cpz.processing.controls.testsupport.ProcessingTestSupport;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import processing.core.PShape;
 import processing.data.JSONObject;
@@ -44,11 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PanelJsonConfigTest {
-    @AfterEach
-    void tearDown() {
-        clearDropDownControllers();
-    }
-
     @Test
     void panelConfigLoaderReadsStructuralPanelConfig() {
         PanelConfig config = new PanelConfigLoader(new RecordingApplet(JSONObject.parse(
@@ -438,19 +431,6 @@ class PanelJsonConfigTest {
 
     private static void assertMeasure(MeasureMode actual, MeasureMode expected) {
         assertEquals(expected, actual);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void clearDropDownControllers() {
-        try {
-            Field field = DropDownOverlayController.class.getDeclaredField("CONTROLLERS");
-            field.setAccessible(true);
-            for (DropDownOverlayController controller : new java.util.ArrayList<>((java.util.List<DropDownOverlayController>) field.get(null))) {
-                controller.dispose();
-            }
-        } catch (ReflectiveOperationException ex) {
-            throw new AssertionError(ex);
-        }
     }
 
     private static final class RecordingApplet extends ProcessingTestSupport.FontApplet {

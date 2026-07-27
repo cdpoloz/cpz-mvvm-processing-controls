@@ -10,8 +10,6 @@ import com.cpz.processing.controls.core.input.KeyboardEvent;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -26,18 +24,20 @@ import java.util.Objects;
  * @author CPZ
  */
 public final class DropDownOverlayController {
-   private static final List<DropDownOverlayController> CONTROLLERS = new ArrayList<>();
    private final DropDownView view;
    private final DropDownViewModel viewModel;
    private final FocusManager focusManager;
    private final OverlayManager overlayManager;
     private final InputManager inputManager;
+    private final DropDownCoordinator coordinator;
     private final int zIndex;
     private final Runnable syncGlobalGeometry;
     private final Runnable syncPresentationGeometry;
     private final InputLayer inputLayer;
     private final OverlayEntry overlayEntry;
     private boolean registered;
+    private boolean coordinated;
+    private boolean disposed;
 
    /**
     * Creates a controller for one drop-down overlay.
@@ -59,13 +59,34 @@ public final class DropDownOverlayController {
       this.focusManager = focusManager;
       this.overlayManager = overlayManager;
       this.inputManager = inputManager;
+      this.coordinator = inputManager.getDropDownCoordinator();
       this.zIndex = zIndex;
       this.syncGlobalGeometry = syncGlobalGeometry;
       this.syncPresentationGeometry = syncPresentationGeometry;
       this.inputLayer = new OverlayInputLayer(zIndex);
       Objects.requireNonNull(view);
       this.overlayEntry = new OverlayEntry(zIndex, view::draw, this.inputLayer, this::closeOverlay);
-      CONTROLLERS.add(this);
+   }
+
+   /**
+    * Joins this controller to sibling coordination in its owning input scope.
+    */
+   public void attachCoordination() {
+      if (!this.disposed && !this.coordinated) {
+         this.coordinator.register(this);
+         this.coordinated = true;
+      }
+   }
+
+   /**
+    * Leaves sibling coordination and closes any active reusable overlay.
+    */
+   public void detachCoordination() {
+      if (this.coordinated) {
+         this.closeOverlay();
+         this.coordinator.unregister(this);
+         this.coordinated = false;
+      }
    }
 
    /**
@@ -86,7 +107,9 @@ public final class DropDownOverlayController {
     */
    public void dispose() {
       this.unregister();
-      CONTROLLERS.remove(this);
+      this.coordinator.unregister(this);
+      this.coordinated = false;
+      this.disposed = true;
    }
 
    /**
@@ -119,25 +142,17 @@ public final class DropDownOverlayController {
    }
 
    private boolean routePressToSibling(PointerEvent event) {
-      for(DropDownOverlayController dropDownOverlayController : CONTROLLERS) {
-         if (dropDownOverlayController != this && dropDownOverlayController.containsGlobalBase(event.getX(), event.getY())) {
-            this.closeOverlay();
-            dropDownOverlayController.handleTransferredPress(event.getX(), event.getY());
-            return true;
-         }
-      }
-
-      return false;
+      return this.coordinator.routePressToSibling(this, event);
    }
 
-   private void handleTransferredPress(float x, float y) {
+   void handleTransferredPress(float x, float y) {
       this.syncGlobal();
       this.view.handleMousePress(x, y, this.focusManager);
       this.syncRegistration();
       this.syncPresentation();
    }
 
-   private boolean containsGlobalBase(float x, float y) {
+   boolean containsGlobalBase(float x, float y) {
       if (!this.viewModel.isVisible() || !this.viewModel.isEnabled()) {
          return false;
       }

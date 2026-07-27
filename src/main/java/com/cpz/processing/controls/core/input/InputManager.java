@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.core.input;
 
+import com.cpz.processing.controls.controls.dropdown.util.DropDownCoordinator;
 import com.cpz.processing.controls.core.focus.FocusManager;
 import com.cpz.processing.controls.core.focus.FocusManagerAware;
 import java.util.ArrayList;
@@ -17,11 +18,15 @@ import java.util.List;
  * that authority while registered, so focus is exclusive within this routing
  * scope and independent from every other {@code InputManager}.</p>
  *
+ * <p>Each manager also owns one {@link DropDownCoordinator}, keeping sibling
+ * transfer within the same routing scope.</p>
+ *
  * @author CPZ
  */
 public class InputManager {
    private final List<InputLayer> layers = new ArrayList<>();
    private final FocusManager focusManager = new FocusManager();
+   private final DropDownCoordinator dropDownCoordinator = new DropDownCoordinator();
 
    /**
     * Registers a layer and keeps dispatch order sorted by descending priority.
@@ -60,6 +65,15 @@ public class InputManager {
     */
    public FocusManager getFocusManager() {
       return this.focusManager;
+   }
+
+   /**
+    * Returns the drop-down coordinator owned by this routing manager.
+    *
+    * @return routing-scoped drop-down coordinator
+    */
+   public DropDownCoordinator getDropDownCoordinator() {
+      return this.dropDownCoordinator;
    }
 
    private void sortLayers() {

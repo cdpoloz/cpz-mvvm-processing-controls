@@ -90,6 +90,8 @@ This keeps behavior decisions out of the view, rendering decisions out of the mo
   keyboard focus, traversal, and restoration within that routing scope
 - focus-aware layers attach their facade-local focus managers while registered;
   separate `InputManager` instances therefore remain independent
+- each `InputManager` also owns one non-static drop-down coordinator; sibling
+  transfer is therefore limited to registered controls in that routing scope
 - controls that need keyboard interaction implement `KeyboardInputTarget`
 - pointer-oriented controls expose hit testing through `PointerInteractable`
 

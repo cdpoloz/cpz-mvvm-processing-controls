@@ -4,7 +4,8 @@ import com.cpz.processing.controls.controls.button.Button;
 import com.cpz.processing.controls.controls.button.input.ButtonInputLayer;
 import com.cpz.processing.controls.controls.dropdown.DropDown;
 import com.cpz.processing.controls.controls.dropdown.input.DropDownInputLayer;
-import com.cpz.processing.controls.controls.dropdown.util.DropDownOverlayController;
+import com.cpz.processing.controls.controls.panel.Panel;
+import com.cpz.processing.controls.controls.panel.input.PanelInputLayer;
 import com.cpz.processing.controls.core.input.InputManager;
 import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
@@ -15,18 +16,17 @@ import com.cpz.processing.controls.core.overlay.tooltip.util.TooltipOverlayContr
 import org.junit.jupiter.api.Test;
 import processing.core.PApplet;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Characterizes producer/OverlayManager synchronization and the current static
- * DropDown sibling registry. Reflection is limited to counting the private
- * registry because production exposes no lifecycle-observation API for it.
+ * Characterizes producer/OverlayManager synchronization and DropDown
+ * coordination boundaries.
  */
 class OverlayAndDropDownRegistryCharacterizationTest {
     @Test
@@ -194,7 +194,7 @@ class OverlayAndDropDownRegistryCharacterizationTest {
     }
 
     @Test
-    void currentStaticRegistryTransfersPressAcrossDifferentSketchHosts() {
+    void eventFromOneHostDoesNotTransferToDropDownInAnotherHost() {
         Host firstHost = new Host();
         Host secondHost = new Host();
         DropDown first = firstHost.dropDown("first", 100.0F, 80.0F);
@@ -208,10 +208,36 @@ class OverlayAndDropDownRegistryCharacterizationTest {
 
             firstHost.input.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, 320.0F, 220.0F));
 
-            assertFalse(first.isExpanded());
-            assertTrue(second.isExpanded(),
-                    "characterization only: event dispatched through first host opens second host control");
+            assertFalse(first.isExpanded(),
+                    "the outside press still closes the dropdown in its own routing scope");
+            assertFalse(second.isExpanded());
             assertEquals(0, firstHost.overlays.getActiveOverlays().size());
+            assertEquals(0, secondHost.overlays.getActiveOverlays().size());
+        } finally {
+            first.dispose();
+            second.dispose();
+        }
+    }
+
+    @Test
+    void differentHostsCanKeepDropdownsOpenAndClearIndependently() {
+        Host firstHost = new Host();
+        Host secondHost = new Host();
+        DropDown first = firstHost.dropDown("first", 100.0F, 80.0F);
+        DropDown second = secondHost.dropDown("second", 320.0F, 220.0F);
+        firstHost.input.registerLayer(new DropDownInputLayer(0, first));
+        secondHost.input.registerLayer(new DropDownInputLayer(0, second));
+        try {
+            click(firstHost.input, 100.0F, 80.0F);
+            click(secondHost.input, 320.0F, 220.0F);
+            assertTrue(first.isExpanded());
+            assertTrue(second.isExpanded());
+
+            firstHost.overlays.clearAll();
+
+            assertFalse(first.isExpanded());
+            assertTrue(second.isExpanded());
+            assertTrue(firstHost.overlays.getActiveOverlays().isEmpty());
             assertEquals(1, secondHost.overlays.getActiveOverlays().size());
         } finally {
             first.dispose();
@@ -220,35 +246,155 @@ class OverlayAndDropDownRegistryCharacterizationTest {
     }
 
     @Test
-    void disposeRemovesDropDownFromCrossHostTransferAndRestoresRegistryCount() {
-        int initialControllers = registeredControllerCount();
-        Host firstHost = new Host();
-        Host secondHost = new Host();
-        DropDown first = firstHost.dropDown("first", 100.0F, 80.0F);
-        DropDown second = secondHost.dropDown("second", 320.0F, 220.0F);
-        firstHost.input.registerLayer(new DropDownInputLayer(0, first));
-        secondHost.input.registerLayer(new DropDownInputLayer(0, second));
-        assertEquals(initialControllers + 2, registeredControllerCount());
+    void sameInputManagerTransfersOpenStateAndFocusBetweenSiblings() {
+        Host host = new Host();
+        DropDown first = host.dropDown("first", 100.0F, 80.0F);
+        DropDown second = host.dropDown("second", 320.0F, 220.0F);
+        host.input.registerLayer(new DropDownInputLayer(0, first));
+        host.input.registerLayer(new DropDownInputLayer(0, second));
         try {
-            second.dispose();
-            assertEquals(initialControllers + 1, registeredControllerCount());
+            click(host.input, 100.0F, 80.0F);
+            assertTrue(first.isExpanded());
+            assertTrue(first.isFocused());
 
-            click(firstHost.input, 100.0F, 80.0F);
-            firstHost.input.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, 320.0F, 220.0F));
+            host.input.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, 320.0F, 220.0F));
 
             assertFalse(first.isExpanded());
-            assertFalse(second.isExpanded(),
-                    "disposed sibling no longer participates in global press transfer");
+            assertFalse(first.isFocused());
+            assertTrue(second.isExpanded());
+            assertTrue(second.isFocused());
+            assertEquals(1, host.overlays.getActiveOverlays().size());
         } finally {
             first.dispose();
             second.dispose();
         }
-        assertEquals(initialControllers, registeredControllerCount());
+    }
+
+    @Test
+    void disposeRemovesDropDownFromSameHostCoordination() {
+        Host host = new Host();
+        DropDown first = host.dropDown("first", 100.0F, 80.0F);
+        DropDown second = host.dropDown("second", 320.0F, 220.0F);
+        host.input.registerLayer(new DropDownInputLayer(0, first));
+        host.input.registerLayer(new DropDownInputLayer(0, second));
+        try {
+            second.dispose();
+            click(host.input, 100.0F, 80.0F);
+            host.input.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, 320.0F, 220.0F));
+
+            assertFalse(first.isExpanded());
+            assertFalse(second.isExpanded(),
+                    "a disposed sibling must not participate in same-host transfer");
+        } finally {
+            first.dispose();
+            second.dispose();
+        }
+    }
+
+    @Test
+    void unregisteredLayerLeavesCoordinationAndCanRejoinItsOriginalManager() {
+        Host host = new Host();
+        DropDown first = host.dropDown("first", 100.0F, 80.0F);
+        DropDown second = host.dropDown("second", 320.0F, 220.0F);
+        DropDownInputLayer firstLayer = new DropDownInputLayer(0, first);
+        DropDownInputLayer secondLayer = new DropDownInputLayer(0, second);
+        host.input.registerLayer(firstLayer);
+        host.input.registerLayer(secondLayer);
+        try {
+            host.input.unregisterLayer(secondLayer);
+            click(host.input, 100.0F, 80.0F);
+            host.input.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, 320.0F, 220.0F));
+
+            assertFalse(first.isExpanded());
+            assertFalse(second.isExpanded());
+
+            host.input.registerLayer(secondLayer);
+            click(host.input, 100.0F, 80.0F);
+            host.input.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, 320.0F, 220.0F));
+
+            assertFalse(first.isExpanded());
+            assertTrue(second.isExpanded(),
+                    "re-registering the layer in its constructor-owned manager restores coordination");
+        } finally {
+            first.dispose();
+            second.dispose();
+        }
+    }
+
+    @Test
+    void panelDescendantCoordinatesOnlyInsideItsInputManager() {
+        Host panelHost = new Host();
+        Host foreignHost = new Host();
+        Panel panel = new Panel(panelHost.sketch, "panel", 50.0F, 40.0F, 220.0F, 140.0F);
+        DropDown panelDropDown = panelHost.dropDown("panelDropDown", 60.0F, 30.0F);
+        DropDown foreign = foreignHost.dropDown("foreign", 360.0F, 240.0F);
+        panel.add(panelDropDown);
+        panelHost.input.registerLayer(new PanelInputLayer(0, panel));
+        foreignHost.input.registerLayer(new DropDownInputLayer(0, foreign));
+        try {
+            click(panelHost.input, 110.0F, 70.0F);
+            assertTrue(panelDropDown.isExpanded());
+
+            panelHost.input.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, 360.0F, 240.0F));
+
+            assertFalse(panelDropDown.isExpanded(),
+                    "the outside press still closes the panel descendant in its own scope");
+            assertFalse(foreign.isExpanded());
+        } finally {
+            panelDropDown.dispose();
+            foreign.dispose();
+        }
+    }
+
+    @Test
+    void removingPanelDescendantReleasesItFromSameHostCoordination() {
+        Host host = new Host();
+        Panel panel = new Panel(host.sketch, "panel", 50.0F, 40.0F, 220.0F, 140.0F);
+        DropDown removed = host.dropDown("removed", 60.0F, 30.0F);
+        DropDown remaining = host.dropDown("remaining", 360.0F, 240.0F);
+        panel.add(removed);
+        host.input.registerLayer(new PanelInputLayer(0, panel));
+        host.input.registerLayer(new DropDownInputLayer(0, remaining));
+        try {
+            assertTrue(panel.remove(removed));
+            click(host.input, 360.0F, 240.0F);
+            assertTrue(remaining.isExpanded());
+
+            host.input.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, 110.0F, 70.0F));
+
+            assertFalse(remaining.isExpanded());
+            assertFalse(removed.isExpanded(),
+                    "a child removed from a routed panel must no longer receive sibling transfers");
+        } finally {
+            removed.dispose();
+            remaining.dispose();
+        }
+    }
+
+    @Test
+    void constructorOwnedInputManagerRejectsPartialMigrationWithoutContamination() {
+        Host host = new Host();
+        InputManager foreignInput = new InputManager();
+        DropDown dropDown = host.dropDown("dropDown", 120.0F, 80.0F);
+        DropDownInputLayer layer = new DropDownInputLayer(0, dropDown);
+        try {
+            assertThrows(IllegalStateException.class, () -> foreignInput.registerLayer(layer));
+
+            foreignInput.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, 120.0F, 80.0F));
+            assertFalse(dropDown.isExpanded());
+
+            host.input.registerLayer(layer);
+            click(host.input, 120.0F, 80.0F);
+
+            assertTrue(dropDown.isExpanded(),
+                    "a failed foreign registration must not prevent registration in the constructor-owned manager");
+        } finally {
+            dropDown.dispose();
+        }
     }
 
     @Test
     void disposingOpenDropDownRemovesRegistrationsButCurrentlyRetainsExpandedFlag() {
-        int initialControllers = registeredControllerCount();
         Host host = new Host();
         DropDown dropDown = host.dropDown("dropDown", 120.0F, 80.0F);
         host.input.registerLayer(new DropDownInputLayer(0, dropDown));
@@ -260,19 +406,8 @@ class OverlayAndDropDownRegistryCharacterizationTest {
         dropDown.dispose();
 
         assertEquals(0, host.overlays.getActiveOverlays().size());
-        assertEquals(initialControllers, registeredControllerCount());
         assertTrue(dropDown.isExpanded(),
                 "characterization only: dispose is terminal cleanup, not a reusable close operation");
-    }
-
-    private static int registeredControllerCount() {
-        try {
-            Field field = DropDownOverlayController.class.getDeclaredField("CONTROLLERS");
-            field.setAccessible(true);
-            return ((List<?>) field.get(null)).size();
-        } catch (ReflectiveOperationException ex) {
-            throw new AssertionError("Could not inspect the only DropDown registry lifecycle signal", ex);
-        }
     }
 
     private static PApplet sketch() {
