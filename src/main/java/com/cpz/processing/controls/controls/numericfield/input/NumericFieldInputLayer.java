@@ -10,10 +10,16 @@ import java.util.Objects;
 /**
  * Reusable input layer for a single numeric field instance.
  *
+ * <p>Pointer consumption follows facade eligibility plus capture initiated by
+ * an eligible press; focus by itself does not consume unrelated pointer
+ * events. Keyboard consumption follows the facade focus and availability
+ * contract.</p>
+ *
  * @author CPZ
  */
 public final class NumericFieldInputLayer extends DefaultInputLayer {
     private final NumericField numericField;
+    private boolean pointerCaptured;
 
     public NumericFieldInputLayer(int priority, NumericField numericField) {
         super(priority);
@@ -24,15 +30,24 @@ public final class NumericFieldInputLayer extends DefaultInputLayer {
         if (event == null || event.getType() == PointerEvent.Type.WHEEL) {
             return false;
         }
-        this.numericField.handlePointerEvent(event);
-        if (event.getType() == PointerEvent.Type.MOVE) {
-            return false;
+
+        boolean eligible = this.numericField.canConsumePointerEvent(event);
+        boolean captured = this.pointerCaptured
+                && (event.getType() == PointerEvent.Type.DRAG
+                || event.getType() == PointerEvent.Type.RELEASE);
+        if (event.getType() == PointerEvent.Type.PRESS) {
+            this.pointerCaptured = eligible;
         }
-        return this.numericField.isFocused();
+
+        this.numericField.handlePointerEvent(event);
+        if (event.getType() == PointerEvent.Type.RELEASE) {
+            this.pointerCaptured = false;
+        }
+        return eligible || captured;
     }
 
     public boolean handleKeyboardEvent(KeyboardEvent event) {
-        if (event == null || !this.numericField.isFocused() || !this.numericField.isEnabled() || !this.numericField.isVisible()) {
+        if (!this.numericField.canConsumeKeyboardEvent(event)) {
             return false;
         }
         this.numericField.handleKeyboardEvent(event);
