@@ -43,6 +43,11 @@ field. The panel renders that closed field under its own matrix translation and
 routes collapsed-field input by converting sketch-space pointer events into
 panel-local coordinates before delegating to the child.
 
+Panels can be nested to any depth supported by ordinary child composition. Each
+panel remains local to its immediate parent. For descendants that need a
+sketch-space anchor, every panel propagates its current accumulated ancestor
+offset; this context does not rewrite local child bounds.
+
 ---
 
 ## Explicit Relative Bounds
@@ -124,8 +129,11 @@ not add padding and does not change child coordinates.
 
 If a child `DropDown` is expanded, `Panel.draw()` still renders only the
 collapsed field inside the translated panel space. The expanded list remains a
-global overlay. The child uses its local resolved coordinates plus the panel's
-resolved `(x, y)` offset to place that overlay in sketch space.
+global overlay. The child uses its local resolved coordinates plus the
+accumulated resolved `(x, y)` offset of all ancestor panels to render and
+hit-test that overlay in sketch space. Moving an ancestor through the existing
+geometry setters refreshes this accumulated origin without changing the
+dropdown's local coordinates.
 
 ---
 

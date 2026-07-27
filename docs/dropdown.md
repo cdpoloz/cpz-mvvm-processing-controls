@@ -153,9 +153,11 @@ For composed relative geometry, the current contract is:
 - relative `width` resolves against the panel height
 - relative `height` resolves against the panel height
 
-The collapsed field keeps those resolved coordinates as panel-local values. The
-expanded list uses the same resolved local geometry plus the current panel
-offset to render and hit-test in sketch space.
+The collapsed field keeps those resolved coordinates as values local to its
+immediate panel. The expanded list uses the same resolved local geometry plus
+the current accumulated offset of every ancestor panel to render and hit-test
+in sketch space. Each panel offset is applied exactly once; nesting does not
+change the relative-measure rules above.
 
 ---
 
@@ -279,9 +281,11 @@ public void draw() {
 
 This keeps overlay ordering centralized and consistent with the existing infrastructure.
 
-For composed relative dropdowns after a sketch canvas resize, let the panel run
-its next synchronization path before rendering overlays. `panel.draw()`
-followed by overlay rendering is the supported order.
+For composed relative dropdowns after a sketch canvas resize, let the root
+panel run its next synchronization path before rendering overlays.
+`rootPanel.draw()` followed by overlay rendering is the supported order. Direct
+panel geometry setters propagate the current accumulated origin immediately,
+including while a descendant dropdown is expanded.
 
 ---
 

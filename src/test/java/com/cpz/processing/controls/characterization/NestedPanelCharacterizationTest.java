@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.characterization;
 
 import com.cpz.processing.controls.controls.button.Button;
+import com.cpz.processing.controls.controls.button.input.ButtonInputLayer;
 import com.cpz.processing.controls.controls.dropdown.DropDown;
 import com.cpz.processing.controls.controls.dropdown.config.DropDownStyleConfig;
 import com.cpz.processing.controls.controls.dropdown.style.DefaultDropDownStyle;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Characterizes nested Panel coordinate propagation. Closed controls are
+ * Verifies nested Panel coordinate propagation. Closed controls are
  * rendered through Processing matrix translations; open DropDown content is
  * rendered in global overlay coordinates.
  */
@@ -82,17 +83,21 @@ class NestedPanelCharacterizationTest {
     }
 
     @Test
-    void nestedAbsoluteDropDownCurrentlyLosesRootOffsetOnlyWhenItBecomesGlobalOverlay() {
+    void nestedAbsoluteDropDownOverlayAccumulatesEveryPanelOffsetExactlyOnce() {
         RecordingApplet sketch = sketch(800, 600);
         InputManager input = new InputManager();
         OverlayManager overlays = new OverlayManager();
         Panel root = new Panel(sketch, "root", 100.0F, 80.0F, 300.0F, 180.0F);
         Panel nested = new Panel(sketch, "nested", 40.0F, 30.0F, 200.0F, 120.0F);
         DropDown dropDown = dropDown(sketch, overlays, input, "nestedDropDown", 60.0F, 25.0F, 100.0F, 24.0F);
+        Button lower = new Button(sketch, "lower", "Lower", 200.0F, 157.0F, 100.0F, 20.0F);
+        AtomicInteger lowerClicks = new AtomicInteger();
+        lower.setClickListener(lowerClicks::incrementAndGet);
         dropDown.setSelectedIndex(2);
         nested.add(dropDown);
         root.add(nested);
         input.registerLayer(new PanelInputLayer(0, root));
+        input.registerLayer(new ButtonInputLayer(-1, lower));
         try {
             root.draw();
             RectSnapshot closed = sketch.findRect(100.0F, 24.0F);
@@ -107,25 +112,29 @@ class NestedPanelCharacterizationTest {
             RectSnapshot currentBase = sketch.findRect(100.0F, 24.0F);
             RectSnapshot currentList = sketch.findRect(100.0F, 60.0F);
 
-            assertRect(currentBase, 50.0F, 43.0F, 100.0F, 24.0F);
-            assertRect(currentList, 50.0F, 67.0F, 100.0F, 60.0F);
-            assertEquals(100.0F, 150.0F - currentBase.x, 0.001F,
-                    "characterization: exactly the root x offset is missing, not applied twice");
-            assertEquals(80.0F, 123.0F - currentBase.y, 0.001F,
-                    "characterization: exactly the root y offset is missing, not applied twice");
+            assertRect(currentBase, 150.0F, 123.0F, 100.0F, 24.0F);
+            assertRect(currentList, 150.0F, 147.0F, 100.0F, 60.0F);
 
-            press(input, currentList.x + 50.0F, currentList.y + 10.0F);
+            press(input, 100.0F, 77.0F);
+            assertEquals("Three", dropDown.getSelectedItem(),
+                    "the former defective list position must not retain invisible hit testing");
+            assertFalse(dropDown.isExpanded());
+
+            press(input, 200.0F, 135.0F);
+            click(input, currentList.x + 50.0F, currentList.y + 10.0F);
 
             assertEquals("One", dropDown.getSelectedItem(),
-                    "overlay hit testing is aligned with the currently rendered, but globally misplaced, list");
+                    "overlay hit testing must use the same accumulated position as rendering");
             assertFalse(dropDown.isExpanded());
+            assertEquals(0, lowerClicks.get(),
+                    "the globally aligned option must retain priority over a lower control");
         } finally {
             dropDown.dispose();
         }
     }
 
     @Test
-    void nestedRelativeMeasuresResolvePerImmediateParentButOverlayStillMissesRootOffset() {
+    void nestedRelativeMeasuresResolvePerImmediateParentAndOverlayUsesGlobalOffset() {
         RecordingApplet sketch = sketch(800, 600);
         InputManager input = new InputManager();
         OverlayManager overlays = new OverlayManager();
@@ -165,10 +174,95 @@ class NestedPanelCharacterizationTest {
             RectSnapshot currentBase = sketch.findRect(45.0F, 18.0F);
             RectSnapshot currentList = sketch.findRect(45.0F, 60.0F);
 
-            assertRect(currentBase, 52.5F, 72.0F, 45.0F, 18.0F);
-            assertRect(currentList, 52.5F, 90.0F, 45.0F, 60.0F);
-            assertEquals(80.0F, 132.5F - currentBase.x, 0.001F);
-            assertEquals(60.0F, 132.0F - currentBase.y, 0.001F);
+            assertRect(currentBase, 132.5F, 132.0F, 45.0F, 18.0F);
+            assertRect(currentList, 132.5F, 150.0F, 45.0F, 60.0F);
+        } finally {
+            dropDown.dispose();
+        }
+    }
+
+    @Test
+    void threeNestedPanelsAccumulateAllOffsetsWithoutDepthLimit() {
+        RecordingApplet sketch = sketch(800, 600);
+        InputManager input = new InputManager();
+        OverlayManager overlays = new OverlayManager();
+        Panel root = new Panel(sketch, "root", 70.0F, 50.0F, 400.0F, 260.0F);
+        Panel middle = new Panel(sketch, "middle", 30.0F, 20.0F, 280.0F, 180.0F);
+        Panel inner = new Panel(sketch, "inner", 10.0F, 8.0F, 180.0F, 120.0F);
+        DropDown dropDown = dropDown(sketch, overlays, input, "deep", 40.0F, 22.0F, 100.0F, 24.0F);
+        inner.add(dropDown);
+        middle.add(inner);
+        root.add(middle);
+        input.registerLayer(new PanelInputLayer(0, root));
+        try {
+            root.draw();
+            assertRect(sketch.findRect(100.0F, 24.0F), 100.0F, 88.0F, 100.0F, 24.0F);
+
+            press(input, 150.0F, 100.0F);
+            sketch.clearRectHistory();
+            renderOverlays(overlays);
+
+            assertRect(sketch.findRect(100.0F, 24.0F), 100.0F, 88.0F, 100.0F, 24.0F);
+            assertRect(sketch.findRect(100.0F, 60.0F), 100.0F, 112.0F, 100.0F, 60.0F);
+            press(input, 150.0F, 122.0F);
+            assertEquals("One", dropDown.getSelectedItem());
+            assertFalse(dropDown.isExpanded());
+        } finally {
+            dropDown.dispose();
+        }
+    }
+
+    @Test
+    void movingRootWhileExpandedRefreshesNestedOverlayAndInputImmediately() {
+        RecordingApplet sketch = sketch(800, 600);
+        InputManager input = new InputManager();
+        OverlayManager overlays = new OverlayManager();
+        Panel root = new Panel(sketch, "root", 100.0F, 80.0F, 300.0F, 180.0F);
+        Panel nested = new Panel(sketch, "nested", 40.0F, 30.0F, 200.0F, 120.0F);
+        DropDown dropDown = dropDown(sketch, overlays, input, "moving", 60.0F, 25.0F, 100.0F, 24.0F);
+        nested.add(dropDown);
+        root.add(nested);
+        input.registerLayer(new PanelInputLayer(0, root));
+        try {
+            press(input, 200.0F, 135.0F);
+            root.setPosition(180.0F, 140.0F);
+
+            sketch.clearRectHistory();
+            renderOverlays(overlays);
+            assertRect(sketch.findRect(100.0F, 24.0F), 230.0F, 183.0F, 100.0F, 24.0F);
+            assertRect(sketch.findRect(100.0F, 60.0F), 230.0F, 207.0F, 100.0F, 60.0F);
+
+            press(input, 280.0F, 217.0F);
+            assertEquals("One", dropDown.getSelectedItem());
+            assertFalse(dropDown.isExpanded());
+        } finally {
+            dropDown.dispose();
+        }
+    }
+
+    @Test
+    void clearAllClosesNestedDropDownAndAllowsReopenAtSameGlobalPosition() {
+        RecordingApplet sketch = sketch(800, 600);
+        InputManager input = new InputManager();
+        OverlayManager overlays = new OverlayManager();
+        Panel root = new Panel(sketch, "root", 100.0F, 80.0F, 300.0F, 180.0F);
+        Panel nested = new Panel(sketch, "nested", 40.0F, 30.0F, 200.0F, 120.0F);
+        DropDown dropDown = dropDown(sketch, overlays, input, "clearable", 60.0F, 25.0F, 100.0F, 24.0F);
+        nested.add(dropDown);
+        root.add(nested);
+        input.registerLayer(new PanelInputLayer(0, root));
+        try {
+            press(input, 200.0F, 135.0F);
+            overlays.clearAll();
+
+            assertFalse(dropDown.isExpanded());
+            assertFalse(dropDown.isFocused());
+            assertTrue(overlays.getActiveOverlays().isEmpty());
+
+            press(input, 200.0F, 135.0F);
+            assertTrue(dropDown.isExpanded());
+            press(input, 200.0F, 157.0F);
+            assertEquals("One", dropDown.getSelectedItem());
         } finally {
             dropDown.dispose();
         }

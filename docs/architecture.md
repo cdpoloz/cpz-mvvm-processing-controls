@@ -103,6 +103,14 @@ External Source → Adapter → InputManager → InputLayer → InputAdapter →
 
 This same flow applies whether the source is Processing or another host environment.
 
+`Panel` composition keeps each child in the coordinate space of its immediate
+parent. Optional `ParentSizeAwareControl` integration resolves relative measures
+against that immediate parent; optional `ParentContextAwareControl` integration
+propagates the accumulated sketch-space origin through nested panels. A
+`DropDown` therefore keeps local collapsed-field bounds and applies the
+accumulated origin only when synchronizing its global overlay render and input
+geometry.
+
 ## Public Facades And MVVM
 
 The public controls remain facade types over the internal MVVM pipeline.

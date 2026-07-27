@@ -165,6 +165,30 @@ El incremento de 478 a 484 corresponde a seis regresiones nuevas de
 aislamiento, transferencia y lifecycle; las caracterizaciones defectuosas se
 transformaron sin eliminar casos.
 
+### Validación posterior a la corrección de H5
+
+La posición global del overlay acumula ahora el offset vigente de todos los
+paneles ancestros sin modificar las coordenadas locales ni las reglas de
+medidas relativas.
+
+- Estado inicial de esta fase: rama `master`, commit `8a6808f`, versión Maven
+  `0.9.10` y un cambio heredado en `pom.xml` no relacionado con H5.
+- La caracterización original ejecutó sus 4 pruebas sin fallos y documentó las
+  coordenadas defectuosas.
+- Tras convertir las expectativas y añadir las regresiones, la primera
+  ejecución test-first ejecutó 7 pruebas y produjo 4 fallos: overlay absoluto,
+  overlay relativo, profundidad de tres paneles y movimiento abierto.
+
+| Validación H5 | Tests | Fallos | Errores | Omitidos | Resultado |
+|---|---:|---:|---:|---:|---|
+| `NestedPanelCharacterizationTest` | 7 | 0 | 0 | 0 | `BUILD SUCCESS` |
+| DropDown, overlays, input/foco, Panel y geometría | 94 | 0 | 0 | 0 | `BUILD SUCCESS` |
+| Suite completa | 487 | 0 | 0 | 0 | `BUILD SUCCESS` |
+| `mvn -DskipTests javadoc:javadoc` | n/a | n/a | n/a | n/a | `BUILD SUCCESS` |
+
+El incremento de 484 a 487 corresponde a tres regresiones nuevas. Las cuatro
+caracterizaciones originales se conservaron y adaptaron al contrato corregido.
+
 ## 2. Inventario y clasificación de API pública
 
 La inspección mecánica inicial encontró 258 fuentes de producción fuera de
@@ -245,8 +269,8 @@ automática del comportamiento caracterizado.
 | Nueva interacción tras `clearAll()` | Productor cerrado vuelve a registrar por su ruta normal | Según interacción normal | Coherente con registro visible | Prioridad normal | Confirmado para DropDown, Tooltip y Notification |
 | Panel raíz y control hijo | Hijo recibe coordenadas locales y renderiza desplazado | Según bounds | Según hijo | Último hijo gana en Panel | Confirmado |
 | Panel dentro de Panel, descendiente normal | Descendiente en suma de offsets | Según bounds | Según descendiente | Orden anidado | Inferencia confirmada por nueva prueba |
-| Panel anidado y dropdown descendiente | Campo local; overlay con offset global total una vez | Sí en posición renderizada | Dropdown abierto/focado | Overlay al abrir | Contrato deseado; actual contradice |
-| Medidas relativas anidadas | Cada medida resuelve contra su padre inmediato; posición global suma ancestros | Según bounds resueltos | Según control | Normal/overlay | Fórmula confirmada; overlay actual contradice |
+| Panel anidado y dropdown descendiente | Campo local; overlay con offset global total una vez | Sí en posición renderizada | Dropdown abierto/focado | Overlay al abrir | Confirmado por regresión |
+| Medidas relativas anidadas | Cada medida resuelve contra su padre inmediato; posición global suma ancestros | Según bounds resueltos | Según control | Normal/overlay | Confirmado por regresión |
 
 ## 4. Mapa entre riesgos y pruebas añadidas
 
@@ -259,7 +283,7 @@ automática del comportamiento caracterizado.
 | Prioridad del dropdown abierto | `openDropDownVisibleOptionHasPriorityOverOverlappingLowerControl` | Preserva explícitamente la prioridad contractual |
 | Ciclo normal frente a `clearAll()` | Regresiones individuales y mixtas de DropDown, Tooltip y Notification en `OverlayAndDropDownRegistryCharacterizationTest`; mutación de callbacks, idempotencia, altas durante cierre, excepciones y restauración de foco en `OverlayManagerTest` | Cierre coordinado reutiliza `OverlayEntry.onClose` sin imponer implementación común a los productores |
 | Coordinación de dropdowns | Regresiones de hosts independientes, transferencia en el mismo gestor, `unregisterLayer`, `Panel.remove`, `dispose()` y rechazo de migración parcial en `OverlayAndDropDownRegistryCharacterizationTest` | Aislamiento y lifecycle comprobados por efectos observables; no existe registro estático |
-| Panel directo/anidado y offsets | Cuatro pruebas de `NestedPanelCharacterizationTest` | Render, hit-test, overlay global, medidas absolutas/relativas |
+| Panel directo/anidado y offsets | Siete pruebas de `NestedPanelCharacterizationTest` | Render, hit-test, overlay global, medidas absolutas/relativas, profundidad, cambio geométrico y `clearAll()` |
 
 El aislamiento entre gestores, el enrutado y las bajas se prueban por efectos
 observables. Ya no se usa reflexión para consultar coordinación de dropdowns.
@@ -385,9 +409,9 @@ flujo coherente, se rechaza explícitamente sin contaminar ninguno de los
 gestores. Una capa retirada sí puede volver a registrarse en su manager
 original.
 
-### H5 — el fallo anidado está acotado al contexto global del overlay
+### H5 — el fallo anidado estaba acotado al contexto global del overlay — corregido
 
-**Hecho observado.**
+**Hecho originalmente caracterizado.**
 
 - Panel raíz + hijo funciona.
 - Panel raíz + Panel anidado + Button renderiza y hace hit-test en la suma
@@ -400,10 +424,22 @@ original.
   canvas `800x600` → raíz `(80,60,300,180)` → panel anidado
   `(30,36,90,90)` → dropdown relativo dentro de este.
 
-**Causa probable, no corrección aplicada.** `Panel.applyParentContextTo`
-entrega al hijo únicamente su propio `(x,y)` resuelto, mientras
-`ParentContextAwareControl` documenta un offset en espacio global. El Panel
-anidado no acumula el contexto recibido al propagárselo a sus hijos.
+**Causa confirmada.** `Panel.applyParentContextTo` entregaba al hijo únicamente
+su propio `(x,y)` resuelto, mientras `ParentContextAwareControl` documenta un
+offset en espacio global. El Panel anidado no participaba en esa capacidad y,
+por tanto, no podía acumular el contexto recibido al propagárselo a sus hijos.
+
+**Estado corregido.** `Panel` implementa la capacidad opcional ya existente,
+conserva por separado el offset de sus ancestros y entrega a cada descendiente
+`offsetAncestros + posiciónLocalPanel`. Los bounds del Panel y de sus hijos
+siguen siendo locales; la conversión final del DropDown continúa ocurriendo al
+sincronizar su vista global de overlay. Los setters geométricos y los caminos de
+draw/input ya existentes refrescan el contexto, por lo que mover un ancestro con
+el dropdown abierto no deja una coordenada obsoleta.
+
+Las cuatro caracterizaciones originales son ahora regresiones del contrato
+correcto y se añadieron casos de tres paneles, movimiento abierto, posición
+defectuosa antigua, prioridad, reapertura y `clearAll()`.
 
 ### H6 — la prioridad ya documentada del dropdown se mantiene
 
@@ -418,8 +454,8 @@ normales es intencional y debe preservarse.
 ### Descartadas o acotadas
 
 - **“La composición de Paneles anidados aplica doble offset”.** Refutada. El
-  descendiente normal y el campo cerrado usan la suma correcta; el defecto es
-  la ausencia de un offset ancestro en el overlay global.
+  descendiente normal y el campo cerrado usan la suma correcta; el defecto era
+  la ausencia de un offset ancestro en el overlay global y quedó corregido.
 - **“Los Paneles anidados están rotos en general”.** Refutada. Render e input
   normal coinciden.
 - **“`dispose()` no elimina dropdowns de la coordinación”.** Refutada:
@@ -455,22 +491,18 @@ normales es intencional y debe preservarse.
    `InputManager` posee su ámbito independiente.
 6. README `:20` llama ocultos a los internals MVVM aunque sus tipos y Javadocs
    sean públicos y estén dentro del JAR.
-7. `ParentContextAwareControl:15-19` exige offset global, pero la propagación
-   anidada solo conserva el padre inmediato.
-8. La documentación de Panel describe correctamente composición runtime,
-   dropdown global y ausencia de `Panel.children` JSON, pero no advierte la
-   limitación actual para más de una profundidad.
+7. Resuelta: `ParentContextAwareControl` exige offset global y `Panel` propaga
+   ahora el acumulado completo sin alterar los bounds locales.
+8. Resuelta: la documentación de Panel describe la composición anidada, el
+   dropdown global y la ausencia de `Panel.children` JSON.
 
-Las pruebas con nombres `current...` que permanecen caracterizan únicamente
-el defecto todavía pendiente de paneles anidados. Las caracterizaciones de
-H1, H2, H3 y H4 se renombraron y transformaron en regresiones de los contratos
-corregidos.
+Las caracterizaciones de H1, H2, H3, H4 y H5 se renombraron o transformaron en
+regresiones de los contratos corregidos.
 
 ## 8. Correcciones de producción recomendadas
 
 | Prioridad | Tarea posterior | Cambio conceptual | Evidencia | Riesgo/compatibilidad |
 |---|---|---|---|---|
-| Media | Propagar contexto acumulado en Panel anidado | Entregar a descendientes el offset global acumulado, sin alterar coordenadas locales ni medidas relativas | H5 | Medio; regresión en overlays/tooltips. Las nuevas pruebas dan coordenadas exactas |
 | Media | Establecer baseline/allowlist de API | Clasificar los 257 tipos y documentar soportado, extensión e interno antes de cualquier deprecación | Inventario §2 | Bajo ahora; evita una futura ruptura binaria accidental |
 | Baja | Actualizar documentación después de decidir contratos | Documentar foco, consumo, `clearAll`, lifecycle y límite de API | §7 | Bajo, pero no debe adelantarse a la decisión de producción |
 
@@ -481,21 +513,18 @@ eliminar `dispose()`.
 ## 9. Propuesta de división de tareas siguientes
 
 La separación de recepción, elegibilidad, captura y consumo de H1, la
-autoridad por `InputManager` de H2, el cierre coordinado de H3 y el coordinador
-por gestor de H4 se completaron sin resolver el orden intrapa, que sigue siendo
-una decisión independiente.
+autoridad por `InputManager` de H2, el cierre coordinado de H3, el coordinador
+por gestor de H4 y el contexto acumulado de H5 se completaron sin resolver el
+orden intrapa, que sigue siendo una decisión independiente.
 
-1. **Contexto acumulado de Panel.** Corregir únicamente la propagación global
-   a descendientes; no cambiar coordenadas locales, medidas relativas ni JSON.
-2. **Baseline de API soportada.** Convertir el inventario agrupado en allowlist
+1. **Baseline de API soportada.** Convertir el inventario agrupado en allowlist
    verificable y política de deprecación antes de cualquier movimiento de
    paquetes o visibilidad.
-3. **Actualización documental.** Solo después de que las decisiones anteriores
+2. **Actualización documental.** Solo después de que las decisiones anteriores
    estén cerradas.
 
-Cada tarea puede usar estas pruebas como punto de partida, pero las pruebas
-`current...` que describen defectos deberán dejar paso a aserciones del
-contrato deseado, sin mantener ambos comportamientos como válidos.
+Cada tarea puede usar estas regresiones como punto de partida sin mantener el
+comportamiento defectuoso anterior como válido.
 
 ## 10. Archivos de esta fase
 

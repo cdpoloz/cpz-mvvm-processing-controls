@@ -40,9 +40,10 @@ import java.util.Objects;
  * coordinates, or input routing.</p>
  *
  * <p>Controls that implement {@link ParentContextAwareControl}, such as
- * {@code DropDown}, receive the resolved parent offset so global overlays can
- * stay anchored to the effective sketch-space position without coupling this
- * container to a concrete child implementation.</p>
+ * {@code DropDown}, receive the accumulated resolved offset of every ancestor
+ * panel so global overlays stay anchored to the effective sketch-space
+ * position without coupling this container to a concrete child
+ * implementation.</p>
  *
  * <p>A panel is not a focus owner. While its input layer is registered, it
  * forwards the owning {@code InputManager}'s focus authority to focus-aware
@@ -53,7 +54,8 @@ import java.util.Objects;
  *
  * @author CPZ
  */
-public final class Panel implements PointerRoutableControl, KeyboardRoutableControl, ParentSizeAwareControl, FocusManagerAware {
+public final class Panel implements PointerRoutableControl, KeyboardRoutableControl,
+        ParentSizeAwareControl, ParentContextAwareControl, FocusManagerAware {
     private final PApplet sketch;
     private final String code;
     private final List<Control> children = new ArrayList<>();
@@ -66,6 +68,8 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
     private float height;
     private Float parentWidth;
     private Float parentHeight;
+    private float parentOffsetX;
+    private float parentOffsetY;
     private boolean visible = true;
     private boolean enabled = true;
     private boolean pointerPressedInside;
@@ -453,6 +457,20 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
         this.refreshChildContexts();
     }
 
+    @Override
+    public void setParentOffset(float x, float y) {
+        this.parentOffsetX = x;
+        this.parentOffsetY = y;
+        this.refreshChildContexts();
+    }
+
+    @Override
+    public void clearParentOffset() {
+        this.parentOffsetX = 0.0F;
+        this.parentOffsetY = 0.0F;
+        this.refreshChildContexts();
+    }
+
     public float getX() {
         this.applyResolvedBounds();
         return this.x;
@@ -508,7 +526,10 @@ public final class Panel implements PointerRoutableControl, KeyboardRoutableCont
             ((ParentSizeAwareControl) child).setParentSize(this.width, this.height);
         }
         if (child instanceof ParentContextAwareControl) {
-            ((ParentContextAwareControl) child).setParentOffset(this.x, this.y);
+            ((ParentContextAwareControl) child).setParentOffset(
+                    this.parentOffsetX + this.x,
+                    this.parentOffsetY + this.y
+            );
         }
     }
 
