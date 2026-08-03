@@ -38,8 +38,10 @@ public class Launcher {
         //PApplet.main(ButtonRelativeTest.class);
         //PApplet.main(ButtonJsonRelativeTest.class);
         //PApplet.main(ButtonSvgTest.class);
+        //PApplet.main(ButtonPngTest.class);
         //PApplet.main(ButtonJsonTest.class);
         //PApplet.main(ButtonSvgJsonTest.class);
+        //PApplet.main(ButtonPngJsonTest.class);
 
         // Checkbox ***************************************
         //PApplet.main(CheckboxTest.class);

@@ -752,6 +752,7 @@ from `draw()`.
 - [Notification](docs/notification.md)
 - [Theme](docs/theme.md)
 - [Button](docs/button.md)
+- [Button (PNG alpha mask)](docs/button-png.md)
 - [Checkbox](docs/checkbox.md)
 - [Dropdown](docs/dropdown.md)
 - [Indicator](docs/indicator.md)

@@ -84,14 +84,14 @@ public final class ButtonConfigLoader {
         JSONObject renderer = style.getJSONObject("renderer");
         String type = JsonConfigSupport.getRequiredString(renderer, "type", path, "style.renderer");
         String normalizedType = type.trim().toLowerCase(Locale.ROOT);
-        if (!"svg".equals(normalizedType)) {
-            throw new IllegalArgumentException("Unsupported renderer type in " + path + ": " + type + ". Supported values in this iteration: svg.");
+        if (!"svg".equals(normalizedType) && !"png".equals(normalizedType)) {
+            throw new IllegalArgumentException("Unsupported renderer type in " + path + ": " + type + ". Supported values in this iteration: svg, png.");
         }
 
         String rendererPath = JsonConfigSupport.getRequiredString(renderer, "path", path, "style.renderer");
         String normalizedPath = rendererPath.trim();
         if (normalizedPath.isEmpty()) {
-            throw new IllegalArgumentException("Invalid 'path' value in " + path + " for style.renderer: \"" + rendererPath + "\". Expected a non-empty SVG path.");
+            throw new IllegalArgumentException("Invalid 'path' value in " + path + " for style.renderer: \"" + rendererPath + "\". Expected a non-empty SVG or PNG path.");
         }
 
         return new ButtonConfig.RendererConfig(normalizedType, normalizedPath);

@@ -966,7 +966,9 @@ It uses `data/config/tooltip-visual-test.json` for control tooltips and
 `data/config/server-tooltip.json` for a standalone tooltip assigned to a
 manual `TooltipArea`.
 
-SVG renderer configuration also remains local to the control style block:
+SVG and PNG renderer configuration remains local to the control style block.
+For Button, the renderer replaces the default rectangular shape and the text is
+drawn afterwards on top:
 
 ```json
 "renderer": {
@@ -974,6 +976,25 @@ SVG renderer configuration also remains local to the control style block:
   "path": "data/img/test.svg"
 }
 ```
+
+PNG alpha-mask renderer:
+
+```json
+"renderer": {
+  "type": "png",
+  "path": "data/img/button-mask.png"
+}
+```
+
+Button PNG resources preserve source alpha and discard source RGB. The current
+resolved button fill color is applied with Processing `tint(...)`, so the normal,
+hover, pressed, and disabled states use the same color rules as the default and
+SVG renderers. The image preserves its aspect ratio, is centered inside the
+button bounds, and does not use stroke or corner-radius style values.
+
+For Button, `style.renderer.type` is the source of truth and is not inferred
+from the path extension. Type matching is trimmed and case-insensitive. The path
+is trimmed and must not be empty.
 
 ---
 

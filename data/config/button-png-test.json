@@ -1,0 +1,48 @@
+{
+  "controls": [
+    {
+      "type": "button",
+      "code": "btnPngJson",
+      "text": "PNG Button",
+      "x": 210.0,
+      "y": 130.0,
+      "width": 220.0,
+      "height": 120.0,
+      "enabled": true,
+      "visible": true,
+      "style": {
+        "baseColor": "#3062DB",
+        "textColor": "#FFFFFF",
+        "disabledAlpha": 90,
+        "hoverBlendWithWhite": 0.12,
+        "pressedBlendWithBlack": 0.25,
+        "renderer": {
+          "type": "png",
+          "path": "data/img/button-mask.png"
+        }
+      }
+    },
+    {
+      "type": "button",
+      "code": "btnPngDisabledJson",
+      "text": "Disabled",
+      "x": 510.0,
+      "y": 130.0,
+      "width": 220.0,
+      "height": 120.0,
+      "enabled": false,
+      "visible": true,
+      "style": {
+        "baseColor": "#3062DB",
+        "textColor": "#FFFFFF",
+        "disabledAlpha": 90,
+        "hoverBlendWithWhite": 0.12,
+        "pressedBlendWithBlack": 0.25,
+        "renderer": {
+          "type": "png",
+          "path": "data/img/button-mask.png"
+        }
+      }
+    }
+  ]
+}

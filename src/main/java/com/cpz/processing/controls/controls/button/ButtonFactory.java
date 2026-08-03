@@ -3,6 +3,7 @@ package com.cpz.processing.controls.controls.button;
 import com.cpz.processing.controls.controls.button.config.ButtonConfig;
 import com.cpz.processing.controls.controls.button.config.ButtonStyleConfig;
 import com.cpz.processing.controls.controls.button.style.DefaultButtonStyle;
+import com.cpz.processing.controls.controls.button.style.render.PngButtonRenderer;
 import com.cpz.processing.controls.controls.button.style.render.SvgButtonRenderer;
 import com.cpz.processing.controls.core.overlay.tooltip.TooltipFactory;
 import com.cpz.processing.controls.core.style.TypographySupport;
@@ -65,8 +66,12 @@ public final class ButtonFactory {
         if (style.getPressedBlendWithBlack() != null) {
             result.pressedBlendWithBlack = style.getPressedBlendWithBlack();
         }
-        if (style.getRenderer() != null && "svg".equals(style.getRenderer().getType())) {
-            result.setRenderer(new SvgButtonRenderer(sketch, style.getRenderer().getPath()));
+        if (style.getRenderer() != null) {
+            if ("svg".equals(style.getRenderer().getType())) {
+                result.setRenderer(new SvgButtonRenderer(sketch, style.getRenderer().getPath()));
+            } else if ("png".equals(style.getRenderer().getType())) {
+                result.setRenderer(new PngButtonRenderer(sketch, style.getRenderer().getPath()));
+            }
         }
         result.textSize = style.getTextSize();
         if (style.getFontPath() != null) {

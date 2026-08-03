@@ -13,6 +13,7 @@ class ButtonViewState
 class DefaultButtonStyle
 class ButtonRenderStyle
 class DefaultButtonRenderer
+class PngButtonRenderer
 interface ThemeProvider
 class ThemeSnapshot
 
@@ -32,4 +33,5 @@ ThemeProvider --> ThemeSnapshot
 DefaultButtonStyle --> ButtonViewState : resolves
 DefaultButtonStyle --> ButtonRenderStyle : creates
 DefaultButtonRenderer --> ButtonRenderStyle : draws
+PngButtonRenderer --> ButtonRenderStyle : draws tinted alpha mask
 @enduml

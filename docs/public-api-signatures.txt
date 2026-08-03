@@ -178,6 +178,8 @@ A|M|com.cpz.processing.controls.controls.button.style.DefaultButtonStyle|public 
 B|M|com.cpz.processing.controls.controls.button.style.render.ButtonRenderer|public abstract void render(processing.core.PApplet,float,float,float,float,com.cpz.processing.controls.controls.button.style.ButtonRenderStyle)
 B|M|com.cpz.processing.controls.controls.button.style.render.DefaultButtonRenderer|public com.cpz.processing.controls.controls.button.style.render.DefaultButtonRenderer()
 B|M|com.cpz.processing.controls.controls.button.style.render.DefaultButtonRenderer|public void render(processing.core.PApplet,float,float,float,float,com.cpz.processing.controls.controls.button.style.ButtonRenderStyle)
+B|M|com.cpz.processing.controls.controls.button.style.render.PngButtonRenderer|public com.cpz.processing.controls.controls.button.style.render.PngButtonRenderer(processing.core.PApplet,java.lang.String)
+B|M|com.cpz.processing.controls.controls.button.style.render.PngButtonRenderer|public void render(processing.core.PApplet,float,float,float,float,com.cpz.processing.controls.controls.button.style.ButtonRenderStyle)
 B|M|com.cpz.processing.controls.controls.button.style.render.SvgButtonRenderer|public com.cpz.processing.controls.controls.button.style.render.SvgButtonRenderer(processing.core.PApplet,java.lang.String)
 B|M|com.cpz.processing.controls.controls.button.style.render.SvgButtonRenderer|public void render(processing.core.PApplet,float,float,float,float,com.cpz.processing.controls.controls.button.style.ButtonRenderStyle)
 B|M|com.cpz.processing.controls.controls.button.util.ButtonListener|public abstract void onClick()
@@ -2968,6 +2970,7 @@ B|T|com.cpz.processing.controls.controls.button.style.ButtonStyle|public abstrac
 A|T|com.cpz.processing.controls.controls.button.style.DefaultButtonStyle|public final class com.cpz.processing.controls.controls.button.style.DefaultButtonStyle implements com.cpz.processing.controls.controls.button.style.ButtonStyle
 B|T|com.cpz.processing.controls.controls.button.style.render.ButtonRenderer|public abstract interface com.cpz.processing.controls.controls.button.style.render.ButtonRenderer
 B|T|com.cpz.processing.controls.controls.button.style.render.DefaultButtonRenderer|public final class com.cpz.processing.controls.controls.button.style.render.DefaultButtonRenderer implements com.cpz.processing.controls.controls.button.style.render.ButtonRenderer
+B|T|com.cpz.processing.controls.controls.button.style.render.PngButtonRenderer|public final class com.cpz.processing.controls.controls.button.style.render.PngButtonRenderer implements com.cpz.processing.controls.controls.button.style.render.ButtonRenderer
 B|T|com.cpz.processing.controls.controls.button.style.render.SvgButtonRenderer|public final class com.cpz.processing.controls.controls.button.style.render.SvgButtonRenderer implements com.cpz.processing.controls.controls.button.style.render.ButtonRenderer
 B|T|com.cpz.processing.controls.controls.button.util.ButtonListener|public abstract interface com.cpz.processing.controls.controls.button.util.ButtonListener
 D|T|com.cpz.processing.controls.controls.button.view.ButtonView|public final class com.cpz.processing.controls.controls.button.view.ButtonView implements com.cpz.processing.controls.core.view.ControlView,com.cpz.processing.controls.core.input.PointerInteractable

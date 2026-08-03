@@ -208,5 +208,6 @@ public class ButtonSvgTest extends PApplet {
 ## See also
 
 - [Button](button.md)
+- [Button (PNG)](button-png.md)
 - [Input system](input-system.md)
 - [Architecture](architecture.md)

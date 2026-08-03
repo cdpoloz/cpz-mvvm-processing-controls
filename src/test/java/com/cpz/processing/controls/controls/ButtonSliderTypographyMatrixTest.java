@@ -5,6 +5,7 @@ import com.cpz.processing.controls.controls.button.config.ButtonConfigLoader;
 import com.cpz.processing.controls.controls.button.style.ButtonRenderStyle;
 import com.cpz.processing.controls.controls.button.style.render.ButtonRenderer;
 import com.cpz.processing.controls.controls.button.style.render.DefaultButtonRenderer;
+import com.cpz.processing.controls.controls.button.style.render.PngButtonRenderer;
 import com.cpz.processing.controls.controls.button.style.render.SvgButtonRenderer;
 import com.cpz.processing.controls.controls.slider.SliderFactory;
 import com.cpz.processing.controls.controls.slider.config.SliderConfigLoader;
@@ -34,7 +35,8 @@ class ButtonSliderTypographyMatrixTest {
 
         for (ButtonRenderer renderer : new ButtonRenderer[]{
                 new DefaultButtonRenderer(),
-                new SvgButtonRenderer(sketch, "missing.svg")
+                new SvgButtonRenderer(sketch, "missing.svg"),
+                new PngButtonRenderer(sketch, null)
         }) {
             assertButtonCase(renderer, sketch, graphics, ambient, custom, null, null, false, null);
             assertButtonCase(renderer, sketch, graphics, ambient, custom, null, 19.0F, false, 19.0F);

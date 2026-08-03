@@ -158,7 +158,14 @@ both `font` and `textSize` are `null`:
 In JSON, `style.font` is an optional font path. The font is loaded when the
 control is created, never during `draw()`.
 
-The button can also be rendered using SVG. See [Button (SVG)](button-svg.md) for the specialized variant.
+The button can also replace its default rectangle with a complete SVG or PNG
+renderer. Both variants keep the text centered above the configured resource:
+
+- [Button (SVG)](button-svg.md)
+- [Button (PNG alpha mask)](button-png.md)
+
+PNG resources preserve source alpha, ignore source RGB, and use the button's
+already resolved normal, hover, pressed, or disabled fill color.
 
 ---
 
@@ -384,5 +391,6 @@ public class ButtonTest extends PApplet {
 ## See also
 
 - [Button (SVG)](button-svg.md)
+- [Button (PNG)](button-png.md)
 - [Input system](input-system.md)
 - [Architecture](architecture.md)

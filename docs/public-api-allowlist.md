@@ -65,7 +65,7 @@ lifecycle remain defined by the control-specific documentation.
 | Controls | `Control`; `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, `DropDown`, `Panel`, `Indicator`, `ProgressBar` | Public facade constructors and domain operations are supported |
 | Geometry | `ControlBounds`, `ControlMeasure`, `MeasureMode`, `ResolvedBounds` | Absolute/relative contracts and finite-value validation are supported |
 | JSON | `ControlConfigLoader`; control configs, style configs, loaders, nested config payloads, and factories | Direct and aggregate loading are supported; factory zero-argument constructors are a D exception |
-| Styles | Documented default styles, default-style factories, mutable style configs, alignment/fill/orientation enums, and documented SVG renderer implementations | Ordinary appearance customization is supported |
+| Styles | Documented default styles, default-style factories, mutable style configs, alignment/fill/orientation enums, and documented SVG/PNG renderer implementations | Ordinary appearance customization is supported |
 | Input | `InputManager`, pointer/keyboard events and their enums, control-specific input layers, `KeyboardState`, `ProcessingKeyboardAdapter` | Register layers in one manager and preserve manager-scoped routing |
 | Overlays | `OverlayManager`; notification API/config; tooltip value/config API, `TooltipArea`, `TooltipFactory`, `TooltipInputLayer`, `TooltipOverlayController` | Producer lifecycle and manager ownership are supported |
 | Themes | `ThemeManager`, `DarkTheme`, `LightTheme`, `ThemeSnapshot`, `ThemeTokens` | Sketch-owned theme selection and immutable snapshots are supported |
