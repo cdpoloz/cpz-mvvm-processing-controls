@@ -48,6 +48,7 @@ public class TooltipVisualJsonTest extends PApplet {
     }
 
     public void setup() {
+        surface.setResizable(true);
         this.inputManager = new InputManager();
         this.overlayManager = new OverlayManager();
         this.tooltips = new TooltipOverlayController(this, this.overlayManager);
@@ -84,7 +85,7 @@ public class TooltipVisualJsonTest extends PApplet {
 
         fill(170);
         textAlign(CENTER, CENTER);
-        text("Hover JSON-loaded controls and the manual rectangle.", width * 0.5f, 370.0f);
+        text("Hover controls / rectangle. R: relative rectangle tooltip; A: absolute. Resize to compare.", width * 0.5f, 370.0f);
     }
 
     public void mouseMoved() {
@@ -104,6 +105,12 @@ public class TooltipVisualJsonTest extends PApplet {
     }
 
     public void keyPressed() {
+        if (key == 'r' || key == 'R') {
+            this.serverArea.setTooltip(TooltipFactory.loadFromJson(this, "config/server-tooltip-relative.json"));
+        } else if (key == 'a' || key == 'A') {
+            this.serverArea.setTooltip(TooltipFactory.loadFromJson(this, SERVER_TOOLTIP_CONFIG_PATH));
+        }
+
         if (key == ESC) {
             OverlayEntry topOverlay = this.overlayManager.getTopOverlay().orElse(null);
             if (topOverlay != null) {

@@ -185,6 +185,30 @@ public final class JsonConfigSupport {
         return toControlMeasure(rawMode, rawValue, key, measurePath, context);
     }
 
+    /**
+     * Reads an overlay style dimension: a legacy pixel number or an explicit measure.
+     *
+     * @param json style object
+     * @param key dimension name
+     * @param path source path for diagnostics
+     * @param context component name
+     * @return configured measure, or null when omitted
+     */
+    public static ControlMeasure getOptionalStyleMeasure(JSONObject json, String key, String path, String context) {
+        if (!json.hasKey(key) || json.isNull(key)) {
+            return null;
+        }
+        Object raw = json.get(key);
+        try {
+            return raw instanceof Number
+                    ? ControlMeasure.absolute(((Number) raw).floatValue())
+                    : getOptionalControlMeasure(json, key, path, context);
+        } catch (RuntimeException exception) {
+            throw new IllegalArgumentException("Invalid style dimension '" + key + "' in " + path
+                    + " for " + context + ". Cause: " + exception.getMessage(), exception);
+        }
+    }
+
     public static String getOptionalNonBlankString(JSONObject json, String key, String path, String context) {
         if (!json.hasKey(key) || json.isNull(key)) {
             return null;

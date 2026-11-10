@@ -317,3 +317,63 @@ The dedicated JSON tooltip demo is:
 - `src/main/java/com/cpz/processing/controls/examples/tooltip/TooltipVisualJsonTest.java`
 - `data/config/tooltip-visual-test.json`
 - `data/config/server-tooltip.json`
+
+## Relative style dimensions
+
+Tooltip uses the same explicit `ControlMeasure` pattern as Label. Relative style
+sizes use **sketch height**, even when the target belongs to a Panel, because
+tooltips draw on the global overlay surface. The tooltip still follows the
+target's global bounds and retains viewport positioning rules.
+
+```java
+TooltipStyleConfig style = new TooltipStyleConfig()
+        .setTextSize(ControlMeasure.relative(0.018F))
+        .setPadding(ControlMeasure.relative(0.012F))
+        .setOffset(ControlMeasure.relative(0.010F))
+        .setMinHeight(ControlMeasure.relative(0.040F));
+button.setTooltipStyle(style);
+// The Tooltip facade also accepts explicit measures:
+button.getTooltip().setCornerRadius(ControlMeasure.relative(0.008F));
+```
+
+All dimensions accept pixel numbers or `{ "mode": "relative", "value": 0.02 }`
+in inline styles, root `tooltipStyles` presets and standalone tooltip documents:
+`textSize`, `textPadding` (alias `padding`), `offset`, `cornerRadius`,
+`strokeWeight`, `minHeight` and `minWidth`.
+
+```json
+{
+  "text": "Server status",
+  "style": {
+    "textSize": {"mode": "relative", "value": 0.018},
+    "padding": {"mode": "relative", "value": 0.012},
+    "minHeight": {"mode": "relative", "value": 0.040},
+    "strokeWeight": 1
+  }
+}
+```
+
+`minHeight` is now read from JSON as well as Java. `minWidth` exposes the former
+40 px internal width minimum; its default remains 40 px. The legacy anchor path
+uses the configured offset and recomputes it after resizing.
+
+Existing numbers, public scalar fields and float setters remain pixel values.
+Use setters when switching between relative and absolute: float setters clear
+the corresponding retained measure. Direct assignments to legacy public scalar
+fields do not clear an explicit measure. `get...Measure()` returns the retained
+measure or the scalar as an absolute measure; `config.resolve(sketch)` returns
+an independent pixel copy. `DefaultTooltipStyle.resolveRenderStyle(snapshot,
+sketch)` resolves relative values; its existing context-free overloads retain
+the legacy scalar behavior.
+
+Measurement and rendering use the same resolved typography and padding each
+frame. Copies, presets and local overrides preserve measures without mutating
+the shared source. JSON fonts use Label's bounded cache by effective text size;
+setting a PFont explicitly clears that resolver. Omitted dimensions keep their
+absolute defaults. Finite measures are required and pixel limits apply after
+resolution.
+
+Visual check: run `TooltipVisualJsonTest`, press **R** and hover the manual
+rectangle. Resize the window to compare its relative tooltip against the
+absolute tooltips on the controls. Press **A** to restore the absolute standalone
+configuration. The relative document is `data/config/server-tooltip-relative.json`.

@@ -24,6 +24,86 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NotificationManagerTest {
     @Test
+    void relativeStylesResizeWithoutChangingTheirStoredMeasures() {
+        RecordingApplet sketch = recordingSketch();
+        sketch.width = 1200;
+        sketch.height = 600;
+        NotificationManager manager = manager(sketch, new OverlayManager(), new FakeTimeSource(0L));
+        NotificationStyle style = new NotificationStyle()
+                .setWidth(ControlMeasure.relative(0.5F))
+                .setMinHeight(ControlMeasure.relative(0.1F))
+                .setTextSize(ControlMeasure.relative(0.02F))
+                .setTextPadding(ControlMeasure.relative(0.01F))
+                .setGap(ControlMeasure.relative(0.02F))
+                .setMargin(ControlMeasure.relative(0.025F));
+        manager.setStyle(style);
+        manager.show("One");
+        manager.show("Two");
+        List<NotificationManager.NotificationFrame> first = manager.layoutFrames();
+        assertEquals(300.0F, first.get(0).width(), 0.001F);
+        assertEquals(60.0F, first.get(0).height(), 0.001F);
+        assertEquals(885.0F, first.get(0).x(), 0.001F);
+        assertEquals(15.0F, first.get(0).y(), 0.001F);
+        assertEquals(87.0F, first.get(1).y(), 0.001F);
+
+        sketch.height = 1000;
+        List<NotificationManager.NotificationFrame> resized = manager.layoutFrames();
+        assertEquals(500.0F, resized.get(0).width(), 0.001F);
+        assertEquals(100.0F, resized.get(0).height(), 0.001F);
+        assertEquals(675.0F, resized.get(0).x(), 0.001F);
+        assertEquals(145.0F, resized.get(1).y(), 0.001F);
+        assertEquals(MeasureMode.RELATIVE, style.getWidthMeasure().mode());
+        assertEquals(0.5F, style.getWidthMeasure().value());
+        style.setWidth(250.0F);
+        assertEquals(250.0F, manager.layoutFrames().get(0).width());
+        assertEquals(MeasureMode.ABSOLUTE, style.getWidthMeasure().mode());
+    }
+
+    @Test
+    void relativeIconGeometryUsesSamePixelsForLayoutAndDrawing() {
+        RecordingApplet sketch = recordingSketch();
+        sketch.height = 1000;
+        NotificationManager manager = manager(sketch, new OverlayManager(), new FakeTimeSource(0L));
+        NotificationStyle style = new NotificationStyle()
+                .setWidth(300).setMinHeight(60).setMargin(0)
+                .setIconSize(ControlMeasure.relative(0.02F))
+                .setIconTextGap(ControlMeasure.relative(0.01F))
+                .setAccentWidth(ControlMeasure.relative(0.005F))
+                .setTextPadding(ControlMeasure.relative(0.01F))
+                .setSeverityIcon(NotificationSeverity.INFO, "test.svg");
+        manager.setStyle(style);
+        manager.show("Icon");
+        manager.getOverlayEntry().getRender().run();
+        assertEquals(20.0F, sketch.lastShapeWidth, 0.001F);
+        float originX = manager.layoutFrames().get(0).x();
+        assertEquals(originX + 45.0F, sketch.lastTextX, 0.001F);
+        sketch.height = 500;
+        manager.getOverlayEntry().getRender().run();
+        assertEquals(10.0F, sketch.lastShapeWidth, 0.001F);
+        assertEquals(originX + 22.5F, sketch.lastTextX, 0.001F);
+    }
+
+    @Test
+    void relativeTextChangesWrappingAndHeightAtTheCurrentSketchSize() {
+        TypographyRecordingApplet sketch = new TypographyRecordingApplet();
+        sketch.width = 1000;
+        sketch.height = 500;
+        ProcessingTestSupport.graphics(sketch);
+        NotificationManager manager = new NotificationManager(sketch, new OverlayManager());
+        manager.setStyle(new NotificationStyle().setWidth(100).setMinHeight(1)
+                .setTextPadding(0).setAccentWidth(0).setTextSize(ControlMeasure.relative(0.04F)));
+        manager.show("one two three four");
+        List<NotificationManager.NotificationFrame> frames = manager.layoutFrames();
+        assertEquals(20.0F, sketch.textSizeDuringTextWidth);
+        assertEquals(50.0F, frames.get(0).height());
+        sketch.height = 1000;
+        manager.getOverlayEntry().getRender().run();
+        assertEquals(40.0F, sketch.textSizeDuringTextWidth);
+        assertEquals(40.0F, sketch.textSizeDuringTextDraw);
+        assertEquals(100.0F, manager.layoutFrames().get(0).height());
+    }
+
+    @Test
     void managerRegistersOneOverlayWhenFirstNotificationIsShown() {
         OverlayManager overlayManager = new OverlayManager();
         NotificationManager manager = manager(sketch(), overlayManager, new FakeTimeSource(0L));

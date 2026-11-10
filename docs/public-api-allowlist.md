@@ -194,3 +194,16 @@ only from external dependencies are not duplicated. The snapshot does not
 freeze behavior, parameter names, annotations, Javadocs, constant values,
 serialization form, or reflective ordering. Package-private/private elements
 are outside scope. There is no JPMS export boundary in this project.
+
+## Overlay relative sizing additions
+
+The NotificationStyle and Tooltip/TooltipStyleConfig `ControlMeasure` overloads,
+measure getters and independent pixel resolution APIs are category A, as are the
+JSON-facing StyleConfig measure getters and the longer Tooltip StyleConfig
+constructor. No previous public/protected signature was removed. Legacy scalar
+fields/getters/setters and existing constructors remain available.
+
+The context-aware DefaultTooltipStyle resolution, offset/minimum-width queries
+and resolved-render entry point are B styling SPI. The shared JSON style-measure
+reader remains D infrastructure. Font resolver exposure follows the existing
+Label FontResolver contract and does not introduce a new unit abstraction.

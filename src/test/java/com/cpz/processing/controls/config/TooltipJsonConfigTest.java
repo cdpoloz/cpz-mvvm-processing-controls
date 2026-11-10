@@ -25,6 +25,64 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TooltipJsonConfigTest {
     @Test
+    void relativePresetsInlineOverridesAndFontsSurviveResizing() {
+        JSONObject root = parse("""
+                {"tooltipStyles":{"relative":{"textSize":{"mode":"relative","value":0.02},
+                    "padding":{"mode":"relative","value":0.01},
+                    "minHeight":{"mode":"relative","value":0.05},
+                    "minWidth":{"mode":"relative","value":0.1},"font":"font.ttf"}},
+                 "controls":[
+                   {"type":"button","code":"first","text":"A","x":1,"y":1,"width":40,"height":20,
+                    "tooltip":{"text":"A","styleRef":"relative","style":{"padding":4}}},
+                   {"type":"button","code":"second","text":"B","x":1,"y":30,"width":40,"height":20,
+                    "tooltip":{"text":"B","styleRef":"relative"}}]}
+                """);
+        JsonFontApplet sketch = new JsonFontApplet(ProcessingTestSupport.font("Dialog", 14), root);
+        sketch.height = 500;
+        Map<String, Control> controls = new ControlConfigLoader(sketch).load("relative.json");
+        var first = ((Button) controls.get("first")).getTooltip().getStyleConfig();
+        var second = ((Button) controls.get("second")).getTooltip().getStyleConfig();
+        assertEquals(4, first.resolve(sketch).textPadding);
+        assertEquals(5, second.resolve(sketch).textPadding);
+        assertEquals(10, first.resolve(sketch).textSize);
+        int calls = sketch.getCreateFontCalls();
+        sketch.height = 1000;
+        assertEquals(20, first.resolve(sketch).textSize);
+        assertEquals(4, first.resolve(sketch).textPadding);
+        assertEquals(10, second.resolve(sketch).textPadding);
+        assertEquals(50, second.resolve(sketch).minHeight);
+        assertEquals(100, second.resolve(sketch).minWidth);
+        assertEquals(20, sketch.getLastCreateFontSize());
+        assertEquals(calls + 1, sketch.getCreateFontCalls());
+        sketch.height = 500;
+        first.resolve(sketch);
+        assertEquals(calls + 1, sketch.getCreateFontCalls());
+    }
+
+    @Test
+    void standaloneTooltipAcceptsMixedMeasuresAndRejectsMalformedOnes() {
+        JSONObject root = parse("""
+                {"text":"Server","style":{"textSize":{"mode":"absolute","value":18},
+                  "cornerRadius":{"mode":"relative","value":0.01},
+                  "strokeWeight":{"mode":"relative","value":0.002},
+                  "offset":{"mode":"relative","value":0.02},"minHeight":42}}
+                """);
+        JsonFontApplet sketch = new JsonFontApplet(ProcessingTestSupport.font("Dialog", 14), root);
+        sketch.height = 1000;
+        var style = TooltipFactory.loadFromJson(sketch, "tooltip.json").getStyleConfig().resolve(sketch);
+        assertEquals(18, style.textSize);
+        assertEquals(10, style.cornerRadius);
+        assertEquals(2, style.strokeWeight);
+        assertEquals(20, style.offset);
+        assertEquals(42, style.minHeight);
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> com.cpz.processing.controls.core.overlay.tooltip.config.TooltipJsonSupport.readTooltipDocument(
+                        sketch, parse("{\"text\":\"x\",\"style\":{\"offset\":{\"value\":0.02}}}"), "tooltip.json"));
+        assertTrue(error.getMessage().contains("offset"));
+        assertTrue(error.getMessage().contains("tooltip.json"));
+    }
+
+    @Test
     void tooltipIsOptional() {
         ButtonConfig config = new ButtonConfigLoader(new ProcessingTestSupport.FontApplet(ProcessingTestSupport.font("Dialog", 16)))
                 .loadFromJson(parse("{\"code\":\"b\",\"text\":\"Button\",\"x\":1,\"y\":1,\"width\":10,\"height\":10}"), "button.json");

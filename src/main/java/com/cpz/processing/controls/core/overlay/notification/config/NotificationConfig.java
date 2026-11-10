@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.core.overlay.notification.config;
 
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.core.overlay.notification.NotificationManager;
 import com.cpz.processing.controls.core.overlay.notification.NotificationPlacement;
 import com.cpz.processing.controls.core.overlay.notification.NotificationPosition;
@@ -122,21 +123,25 @@ public final class NotificationConfig {
         }
     }
 
+    /**
+     * Parsed style values. Legacy Float getters return the raw configured value
+     * (pixels or factor); measure getters also retain its explicit mode.
+     */
     public static final class StyleConfig {
         private final Integer backgroundColor;
         private final Integer textColor;
         private final Integer borderColor;
-        private final Float strokeWeight;
-        private final Float cornerRadius;
-        private final Float textSize;
-        private final Float textPadding;
-        private final Float gap;
-        private final Float margin;
-        private final Float width;
-        private final Float minHeight;
-        private final Float accentWidth;
-        private final Float iconSize;
-        private final Float iconTextGap;
+        private final ControlMeasure strokeWeight;
+        private final ControlMeasure cornerRadius;
+        private final ControlMeasure textSize;
+        private final ControlMeasure textPadding;
+        private final ControlMeasure gap;
+        private final ControlMeasure margin;
+        private final ControlMeasure width;
+        private final ControlMeasure minHeight;
+        private final ControlMeasure accentWidth;
+        private final ControlMeasure iconSize;
+        private final ControlMeasure iconTextGap;
         private final Integer infoAccentColor;
         private final Integer successAccentColor;
         private final Integer warningAccentColor;
@@ -151,17 +156,17 @@ public final class NotificationConfig {
                 Integer backgroundColor,
                 Integer textColor,
                 Integer borderColor,
-                Float strokeWeight,
-                Float cornerRadius,
-                Float textSize,
-                Float textPadding,
-                Float gap,
-                Float margin,
-                Float width,
-                Float minHeight,
-                Float accentWidth,
-                Float iconSize,
-                Float iconTextGap,
+                ControlMeasure strokeWeight,
+                ControlMeasure cornerRadius,
+                ControlMeasure textSize,
+                ControlMeasure textPadding,
+                ControlMeasure gap,
+                ControlMeasure margin,
+                ControlMeasure width,
+                ControlMeasure minHeight,
+                ControlMeasure accentWidth,
+                ControlMeasure iconSize,
+                ControlMeasure iconTextGap,
                 Integer infoAccentColor,
                 Integer successAccentColor,
                 Integer warningAccentColor,
@@ -215,48 +220,92 @@ public final class NotificationConfig {
             return this.borderColor;
         }
 
-        public Float getStrokeWeight() {
+        public ControlMeasure getStrokeWeightMeasure() {
             return this.strokeWeight;
         }
 
-        public Float getCornerRadius() {
+        public Float getStrokeWeight() {
+            return this.strokeWeight == null ? null : this.strokeWeight.value();
+        }
+
+        public ControlMeasure getCornerRadiusMeasure() {
             return this.cornerRadius;
         }
 
-        public Float getTextSize() {
+        public Float getCornerRadius() {
+            return this.cornerRadius == null ? null : this.cornerRadius.value();
+        }
+
+        public ControlMeasure getTextSizeMeasure() {
             return this.textSize;
         }
 
-        public Float getTextPadding() {
+        public Float getTextSize() {
+            return this.textSize == null ? null : this.textSize.value();
+        }
+
+        public ControlMeasure getTextPaddingMeasure() {
             return this.textPadding;
         }
 
-        public Float getGap() {
+        public Float getTextPadding() {
+            return this.textPadding == null ? null : this.textPadding.value();
+        }
+
+        public ControlMeasure getGapMeasure() {
             return this.gap;
         }
 
-        public Float getMargin() {
+        public Float getGap() {
+            return this.gap == null ? null : this.gap.value();
+        }
+
+        public ControlMeasure getMarginMeasure() {
             return this.margin;
         }
 
-        public Float getWidth() {
+        public Float getMargin() {
+            return this.margin == null ? null : this.margin.value();
+        }
+
+        public ControlMeasure getWidthMeasure() {
             return this.width;
         }
 
-        public Float getMinHeight() {
+        public Float getWidth() {
+            return this.width == null ? null : this.width.value();
+        }
+
+        public ControlMeasure getMinHeightMeasure() {
             return this.minHeight;
         }
 
-        public Float getAccentWidth() {
+        public Float getMinHeight() {
+            return this.minHeight == null ? null : this.minHeight.value();
+        }
+
+        public ControlMeasure getAccentWidthMeasure() {
             return this.accentWidth;
         }
 
-        public Float getIconSize() {
+        public Float getAccentWidth() {
+            return this.accentWidth == null ? null : this.accentWidth.value();
+        }
+
+        public ControlMeasure getIconSizeMeasure() {
             return this.iconSize;
         }
 
-        public Float getIconTextGap() {
+        public Float getIconSize() {
+            return this.iconSize == null ? null : this.iconSize.value();
+        }
+
+        public ControlMeasure getIconTextGapMeasure() {
             return this.iconTextGap;
+        }
+
+        public Float getIconTextGap() {
+            return this.iconTextGap == null ? null : this.iconTextGap.value();
         }
 
         public Integer getInfoAccentColor() {
@@ -357,6 +406,7 @@ public final class NotificationConfig {
                 if (resolvedFont != null) {
                     target.setFont(resolvedFont);
                 }
+                target.setFontResolver((surface, size) -> this.resolveFont(surface, size));
             }
         }
 

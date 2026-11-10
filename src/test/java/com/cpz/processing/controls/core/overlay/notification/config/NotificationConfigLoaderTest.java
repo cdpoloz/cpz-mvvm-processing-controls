@@ -23,6 +23,64 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NotificationConfigLoaderTest {
     @Test
+    void relativeFontUsesEffectiveSizeAndCacheWhileStyleCopiesStayIndependent() {
+        JsonFontApplet sketch = new JsonFontApplet(JSONObject.parse("{}"), ProcessingTestSupport.font("Dialog", 14));
+        sketch.height = 500;
+        NotificationManager manager = new NotificationManager(sketch, new OverlayManager());
+        config("{\"style\":{\"font\":\"font.ttf\",\"textSize\":{\"mode\":\"relative\",\"value\":0.02}}}")
+                .applyTo(manager);
+        NotificationStyle source = manager.getStyle();
+        assertEquals(10, source.resolve(sketch).getTextSize(), 0.001F);
+        assertEquals(10, sketch.getLastCreateFontSize());
+        int calls = sketch.getCreateFontCalls();
+        source.resolve(sketch);
+        assertEquals(calls, sketch.getCreateFontCalls());
+        NotificationStyle copy = new NotificationStyle(source);
+        sketch.height = 1000;
+        assertEquals(20, copy.resolve(sketch).getTextSize(), 0.001F);
+        assertEquals(20, sketch.getLastCreateFontSize());
+        sketch.height = 500;
+        source.resolve(sketch);
+        assertEquals(calls + 1, sketch.getCreateFontCalls());
+        copy.setTextSize(12);
+        assertEquals(MeasureMode.RELATIVE, source.getTextSizeMeasure().mode());
+        assertEquals(MeasureMode.ABSOLUTE, copy.getTextSizeMeasure().mode());
+    }
+
+    @Test
+    void allStyleDimensionsAcceptExplicitMeasuresAndKeepLegacyNumbers() {
+        String[] dimensions = {"strokeWeight", "cornerRadius", "textSize", "textPadding", "gap",
+                "margin", "width", "minHeight", "accentWidth", "iconSize", "iconTextGap"};
+        for (String dimension : dimensions) {
+            String json = "{\"style\":{\"" + dimension + "\":{\"mode\":\"relative\",\"value\":0.02}}}";
+            NotificationManager manager = manager();
+            config(json).applyTo(manager);
+            PApplet surface = new PApplet();
+            surface.height = 1000;
+            try {
+                var getter = NotificationStyle.class.getMethod("get" + Character.toUpperCase(dimension.charAt(0)) + dimension.substring(1));
+                assertEquals(20.0F, (float) getter.invoke(manager.getStyle().resolve(surface)), 0.001F, dimension);
+                surface.height = 500;
+                assertEquals(10.0F, (float) getter.invoke(manager.getStyle().resolve(surface)), 0.001F, dimension);
+                config("{\"style\":{\"" + dimension + "\":12}}").applyTo(manager);
+                assertEquals(12.0F, (float) getter.invoke(manager.getStyle().resolve(surface)), 0.001F, dimension);
+            } catch (ReflectiveOperationException exception) {
+                throw new AssertionError(exception);
+            }
+        }
+    }
+
+    @Test
+    void malformedStyleMeasuresReportTheDimensionAndSource() {
+        for (String raw : new String[]{"{\"value\":0.02}", "{\"mode\":\"fluid\",\"value\":0.02}", "\"small\""}) {
+            IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                    () -> config("{\"style\":{\"width\":" + raw + "}}"));
+            assertTrue(error.getMessage().contains("width"));
+            assertTrue(error.getMessage().contains("notification.json"));
+        }
+    }
+
+    @Test
     void loadReadsPlacementFromJson() {
         NotificationManager manager = manager();
 

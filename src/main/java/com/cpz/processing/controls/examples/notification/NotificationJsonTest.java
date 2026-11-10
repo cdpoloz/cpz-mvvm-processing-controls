@@ -37,6 +37,7 @@ public class NotificationJsonTest extends PApplet {
     }
 
     public void setup() {
+        surface.setResizable(true);
         this.inputManager = new InputManager();
         this.overlayManager = new OverlayManager();
         this.notifications = new NotificationManager(this, this.overlayManager);
@@ -76,6 +77,16 @@ public class NotificationJsonTest extends PApplet {
         this.errorButton.draw();
         this.placementButton.draw();
         this.drawActiveOverlays();
+    }
+
+    public void keyPressed() {
+        if (key == 'r' || key == 'R') {
+            NotificationConfigLoader.apply(this, "config/notification-relative.json", this.notifications);
+            this.notifications.info("Relative style: resize the window while this message is visible.");
+        } else if (key == 'a' || key == 'A') {
+            NotificationConfigLoader.apply(this, "config/notification.json", this.notifications);
+            this.notifications.info("Absolute pixel style restored.");
+        }
     }
 
     public void mouseMoved() {
@@ -118,7 +129,7 @@ public class NotificationJsonTest extends PApplet {
         fill(Colors.gray(160));
         textSize(14.0F);
         text("Standalone JSON config controls placement, position, durations, style, typography, and SVG icons.", 250.0F, 104.0F);
-        text("Messages remain runtime events from button callbacks.", 250.0F, 128.0F);
+        text("R: relative style / A: absolute style. Resize the window to compare.", 250.0F, 128.0F);
     }
 
     private void drawActiveOverlays() {
