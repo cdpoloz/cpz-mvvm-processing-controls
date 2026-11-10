@@ -1048,3 +1048,17 @@ It intentionally does not support:
 - [ProgressBar](progressbar.md)
 - [Tooltip](tooltip.md)
 - [Notification](notification.md)
+
+## Overlay style measures
+
+Notification and Tooltip style dimensions accept either legacy pixel numbers or
+explicit measures: `{ "mode": "absolute|relative", "value": ... }`. They reuse
+`ControlMeasure`, as Label does for text size. Relative overlay sizes always use
+current **sketch height**, including widths and horizontal spacing; they are not
+relative to a target control or Panel. Resolution happens each frame, so resizing
+does not require reloading JSON.
+
+See [Notification](notification.md#relative-style-dimensions) and
+[Tooltip](tooltip.md#relative-style-dimensions) for supported fields, Java APIs,
+copy/override behavior and runnable visual checks. Notification configuration
+remains standalone and does not become an entry in `controls[]`.

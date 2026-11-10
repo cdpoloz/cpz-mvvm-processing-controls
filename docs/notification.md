@@ -462,3 +462,53 @@ src/main/java/com/cpz/processing/controls/examples/notification/NotificationTest
 src/main/java/com/cpz/processing/controls/examples/notification/NotificationJsonTest.java
 data/config/notification.json
 ```
+
+## Relative style dimensions
+
+Notification style dimensions follow the explicit `ControlMeasure` pattern used
+by Label. Relative values use **sketch height**, including `width`, horizontal
+padding, margins, accent width and icon sizes. Custom position remains unchanged:
+X uses sketch width and Y uses sketch height.
+
+```java
+NotificationStyle style = new NotificationStyle()
+        .setWidth(ControlMeasure.relative(0.40F))
+        .setMinHeight(ControlMeasure.relative(0.06F))
+        .setTextSize(ControlMeasure.relative(0.018F))
+        .setTextPadding(ControlMeasure.relative(0.012F));
+notifications.setStyle(style);
+```
+
+Every dimension accepts a pixel number or an explicit measure in standalone JSON:
+
+```json
+{
+  "style": {
+    "width": {"mode": "relative", "value": 0.40},
+    "textSize": {"mode": "relative", "value": 0.018},
+    "strokeWeight": 1
+  }
+}
+```
+
+Supported dimensions: `width`, `minHeight`, `textSize`, `textPadding`, `gap`,
+`margin`, `strokeWeight`, `cornerRadius`, `accentWidth`, `iconSize`, `iconTextGap`.
+Numbers and existing float setters continue to mean absolute pixels. A float
+setter replaces a previous relative measure. Modes are explicit; a value below
+1 does not implicitly mean relative. Measures must be finite. The existing
+pixel minima are applied **after** resolution, never to the relative factor.
+
+The manager resolves one independent pixel style for layout and drawing each
+frame. Wrapping, stacking and icons therefore respond to resizing without
+reloading JSON or modifying the source style. Existing viewport width limiting
+still applies after resolving the requested width. `get...Measure()` exposes the
+retained measure. Existing float getters expose the configured pixel fallback;
+`style.resolve(sketch)` gives an independent style with current pixel values.
+Copies preserve measures and font resolvers. JSON fonts are cached by effective
+text size using the same bounded resolver as Label. Calling `setFont(PFont)`
+replaces the JSON resolver with the supplied font.
+
+Visual check: run `NotificationJsonTest`, press **R** to load
+`data/config/notification-relative.json`, then resize the window and create
+notifications. Press **A** to restore the original absolute example. Messages,
+expiration, severity behavior and custom positioning retain their existing rules.

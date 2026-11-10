@@ -1,8 +1,12 @@
 package com.cpz.processing.controls.core.overlay.notification;
 
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
+import com.cpz.processing.controls.controls.geometry.MeasureMode;
+import com.cpz.processing.controls.core.util.FontLoader;
 import java.util.EnumMap;
 import java.util.Objects;
 import processing.core.PFont;
+import processing.core.PApplet;
 
 /**
  * Mutable visual style for toast-style notifications.
@@ -39,6 +43,19 @@ public final class NotificationStyle {
     private final EnumMap<NotificationSeverity, String> severityIcons = new EnumMap<>(NotificationSeverity.class);
     private final EnumMap<NotificationSeverity, Integer> severityBackgroundColors = new EnumMap<>(NotificationSeverity.class);
     private PFont font;
+    private FontLoader.FontResolver fontResolver;
+    private ControlMeasure strokeWeightMeasure;
+    private ControlMeasure cornerRadiusMeasure;
+    private ControlMeasure textSizeMeasure;
+    private ControlMeasure textPaddingMeasure;
+    private ControlMeasure gapMeasure;
+    private ControlMeasure marginMeasure;
+    private ControlMeasure widthMeasure;
+    private ControlMeasure minHeightMeasure;
+    private ControlMeasure accentWidthMeasure;
+    private ControlMeasure iconSizeMeasure;
+    private ControlMeasure iconTextGapMeasure;
+
 
     public NotificationStyle() {
     }
@@ -66,6 +83,19 @@ public final class NotificationStyle {
             this.severityIcons.putAll(source.severityIcons);
             this.severityBackgroundColors.putAll(source.severityBackgroundColors);
             this.font = source.font;
+            this.fontResolver = source.fontResolver;
+            this.strokeWeightMeasure = source.strokeWeightMeasure;
+            this.cornerRadiusMeasure = source.cornerRadiusMeasure;
+            this.textSizeMeasure = source.textSizeMeasure;
+            this.textPaddingMeasure = source.textPaddingMeasure;
+            this.gapMeasure = source.gapMeasure;
+            this.marginMeasure = source.marginMeasure;
+            this.widthMeasure = source.widthMeasure;
+            this.minHeightMeasure = source.minHeightMeasure;
+            this.accentWidthMeasure = source.accentWidthMeasure;
+            this.iconSizeMeasure = source.iconSizeMeasure;
+            this.iconTextGapMeasure = source.iconTextGapMeasure;
+
         }
     }
 
@@ -96,13 +126,58 @@ public final class NotificationStyle {
         return this;
     }
 
+    /**
+     * Sets an explicit measure; relative values use the current sketch height.
+     * @param measure absolute pixels or relative factor
+     * @return this style
+     */
+    public NotificationStyle setStrokeWeight(ControlMeasure measure) {
+        Objects.requireNonNull(measure, "measure");
+        if (measure.mode() == MeasureMode.ABSOLUTE) {
+            return this.setStrokeWeight(measure.value());
+        }
+        this.strokeWeightMeasure = measure;
+        return this;
+    }
+
+    /**
+     * Returns the retained measure, without resolving it.
+     * @return explicit measure or the legacy absolute value
+     */
+    public ControlMeasure getStrokeWeightMeasure() {
+        return this.strokeWeightMeasure == null ? ControlMeasure.absolute(this.strokeWeight) : this.strokeWeightMeasure;
+    }
+
     public float getStrokeWeight() {
         return this.strokeWeight;
     }
 
     public NotificationStyle setStrokeWeight(float weight) {
+        this.strokeWeightMeasure = null;
         this.strokeWeight = Math.max(0.0F, weight);
         return this;
+    }
+
+    /**
+     * Sets an explicit measure; relative values use the current sketch height.
+     * @param measure absolute pixels or relative factor
+     * @return this style
+     */
+    public NotificationStyle setCornerRadius(ControlMeasure measure) {
+        Objects.requireNonNull(measure, "measure");
+        if (measure.mode() == MeasureMode.ABSOLUTE) {
+            return this.setCornerRadius(measure.value());
+        }
+        this.cornerRadiusMeasure = measure;
+        return this;
+    }
+
+    /**
+     * Returns the retained measure, without resolving it.
+     * @return explicit measure or the legacy absolute value
+     */
+    public ControlMeasure getCornerRadiusMeasure() {
+        return this.cornerRadiusMeasure == null ? ControlMeasure.absolute(this.cornerRadius) : this.cornerRadiusMeasure;
     }
 
     public float getCornerRadius() {
@@ -110,8 +185,31 @@ public final class NotificationStyle {
     }
 
     public NotificationStyle setCornerRadius(float cornerRadius) {
+        this.cornerRadiusMeasure = null;
         this.cornerRadius = Math.max(0.0F, cornerRadius);
         return this;
+    }
+
+    /**
+     * Sets an explicit measure; relative values use the current sketch height.
+     * @param measure absolute pixels or relative factor
+     * @return this style
+     */
+    public NotificationStyle setTextSize(ControlMeasure measure) {
+        Objects.requireNonNull(measure, "measure");
+        if (measure.mode() == MeasureMode.ABSOLUTE) {
+            return this.setTextSize(measure.value());
+        }
+        this.textSizeMeasure = measure;
+        return this;
+    }
+
+    /**
+     * Returns the retained measure, without resolving it.
+     * @return explicit measure or the legacy absolute value
+     */
+    public ControlMeasure getTextSizeMeasure() {
+        return this.textSizeMeasure == null ? ControlMeasure.absolute(this.textSize) : this.textSizeMeasure;
     }
 
     public float getTextSize() {
@@ -119,8 +217,31 @@ public final class NotificationStyle {
     }
 
     public NotificationStyle setTextSize(float textSize) {
+        this.textSizeMeasure = null;
         this.textSize = Math.max(1.0F, textSize);
         return this;
+    }
+
+    /**
+     * Sets an explicit measure; relative values use the current sketch height.
+     * @param measure absolute pixels or relative factor
+     * @return this style
+     */
+    public NotificationStyle setTextPadding(ControlMeasure measure) {
+        Objects.requireNonNull(measure, "measure");
+        if (measure.mode() == MeasureMode.ABSOLUTE) {
+            return this.setTextPadding(measure.value());
+        }
+        this.textPaddingMeasure = measure;
+        return this;
+    }
+
+    /**
+     * Returns the retained measure, without resolving it.
+     * @return explicit measure or the legacy absolute value
+     */
+    public ControlMeasure getTextPaddingMeasure() {
+        return this.textPaddingMeasure == null ? ControlMeasure.absolute(this.textPadding) : this.textPaddingMeasure;
     }
 
     public float getTextPadding() {
@@ -128,8 +249,31 @@ public final class NotificationStyle {
     }
 
     public NotificationStyle setTextPadding(float textPadding) {
+        this.textPaddingMeasure = null;
         this.textPadding = Math.max(0.0F, textPadding);
         return this;
+    }
+
+    /**
+     * Sets an explicit measure; relative values use the current sketch height.
+     * @param measure absolute pixels or relative factor
+     * @return this style
+     */
+    public NotificationStyle setGap(ControlMeasure measure) {
+        Objects.requireNonNull(measure, "measure");
+        if (measure.mode() == MeasureMode.ABSOLUTE) {
+            return this.setGap(measure.value());
+        }
+        this.gapMeasure = measure;
+        return this;
+    }
+
+    /**
+     * Returns the retained measure, without resolving it.
+     * @return explicit measure or the legacy absolute value
+     */
+    public ControlMeasure getGapMeasure() {
+        return this.gapMeasure == null ? ControlMeasure.absolute(this.gap) : this.gapMeasure;
     }
 
     public float getGap() {
@@ -137,8 +281,31 @@ public final class NotificationStyle {
     }
 
     public NotificationStyle setGap(float gap) {
+        this.gapMeasure = null;
         this.gap = Math.max(0.0F, gap);
         return this;
+    }
+
+    /**
+     * Sets an explicit measure; relative values use the current sketch height.
+     * @param measure absolute pixels or relative factor
+     * @return this style
+     */
+    public NotificationStyle setMargin(ControlMeasure measure) {
+        Objects.requireNonNull(measure, "measure");
+        if (measure.mode() == MeasureMode.ABSOLUTE) {
+            return this.setMargin(measure.value());
+        }
+        this.marginMeasure = measure;
+        return this;
+    }
+
+    /**
+     * Returns the retained measure, without resolving it.
+     * @return explicit measure or the legacy absolute value
+     */
+    public ControlMeasure getMarginMeasure() {
+        return this.marginMeasure == null ? ControlMeasure.absolute(this.margin) : this.marginMeasure;
     }
 
     public float getMargin() {
@@ -146,8 +313,31 @@ public final class NotificationStyle {
     }
 
     public NotificationStyle setMargin(float margin) {
+        this.marginMeasure = null;
         this.margin = Math.max(0.0F, margin);
         return this;
+    }
+
+    /**
+     * Sets an explicit measure; relative values use the current sketch height.
+     * @param measure absolute pixels or relative factor
+     * @return this style
+     */
+    public NotificationStyle setWidth(ControlMeasure measure) {
+        Objects.requireNonNull(measure, "measure");
+        if (measure.mode() == MeasureMode.ABSOLUTE) {
+            return this.setWidth(measure.value());
+        }
+        this.widthMeasure = measure;
+        return this;
+    }
+
+    /**
+     * Returns the retained measure, without resolving it.
+     * @return explicit measure or the legacy absolute value
+     */
+    public ControlMeasure getWidthMeasure() {
+        return this.widthMeasure == null ? ControlMeasure.absolute(this.width) : this.widthMeasure;
     }
 
     public float getWidth() {
@@ -155,8 +345,31 @@ public final class NotificationStyle {
     }
 
     public NotificationStyle setWidth(float width) {
+        this.widthMeasure = null;
         this.width = Math.max(1.0F, width);
         return this;
+    }
+
+    /**
+     * Sets an explicit measure; relative values use the current sketch height.
+     * @param measure absolute pixels or relative factor
+     * @return this style
+     */
+    public NotificationStyle setMinHeight(ControlMeasure measure) {
+        Objects.requireNonNull(measure, "measure");
+        if (measure.mode() == MeasureMode.ABSOLUTE) {
+            return this.setMinHeight(measure.value());
+        }
+        this.minHeightMeasure = measure;
+        return this;
+    }
+
+    /**
+     * Returns the retained measure, without resolving it.
+     * @return explicit measure or the legacy absolute value
+     */
+    public ControlMeasure getMinHeightMeasure() {
+        return this.minHeightMeasure == null ? ControlMeasure.absolute(this.minHeight) : this.minHeightMeasure;
     }
 
     public float getMinHeight() {
@@ -164,6 +377,7 @@ public final class NotificationStyle {
     }
 
     public NotificationStyle setMinHeight(float minHeight) {
+        this.minHeightMeasure = null;
         this.minHeight = Math.max(1.0F, minHeight);
         return this;
     }
@@ -204,13 +418,58 @@ public final class NotificationStyle {
         return this;
     }
 
+    /**
+     * Sets an explicit measure; relative values use the current sketch height.
+     * @param measure absolute pixels or relative factor
+     * @return this style
+     */
+    public NotificationStyle setAccentWidth(ControlMeasure measure) {
+        Objects.requireNonNull(measure, "measure");
+        if (measure.mode() == MeasureMode.ABSOLUTE) {
+            return this.setAccentWidth(measure.value());
+        }
+        this.accentWidthMeasure = measure;
+        return this;
+    }
+
+    /**
+     * Returns the retained measure, without resolving it.
+     * @return explicit measure or the legacy absolute value
+     */
+    public ControlMeasure getAccentWidthMeasure() {
+        return this.accentWidthMeasure == null ? ControlMeasure.absolute(this.accentWidth) : this.accentWidthMeasure;
+    }
+
     public float getAccentWidth() {
         return this.accentWidth;
     }
 
     public NotificationStyle setAccentWidth(float accentWidth) {
+        this.accentWidthMeasure = null;
         this.accentWidth = Math.max(0.0F, accentWidth);
         return this;
+    }
+
+    /**
+     * Sets an explicit measure; relative values use the current sketch height.
+     * @param measure absolute pixels or relative factor
+     * @return this style
+     */
+    public NotificationStyle setIconSize(ControlMeasure measure) {
+        Objects.requireNonNull(measure, "measure");
+        if (measure.mode() == MeasureMode.ABSOLUTE) {
+            return this.setIconSize(measure.value());
+        }
+        this.iconSizeMeasure = measure;
+        return this;
+    }
+
+    /**
+     * Returns the retained measure, without resolving it.
+     * @return explicit measure or the legacy absolute value
+     */
+    public ControlMeasure getIconSizeMeasure() {
+        return this.iconSizeMeasure == null ? ControlMeasure.absolute(this.iconSize) : this.iconSizeMeasure;
     }
 
     public float getIconSize() {
@@ -218,8 +477,31 @@ public final class NotificationStyle {
     }
 
     public NotificationStyle setIconSize(float iconSize) {
+        this.iconSizeMeasure = null;
         this.iconSize = Math.max(0.0F, iconSize);
         return this;
+    }
+
+    /**
+     * Sets an explicit measure; relative values use the current sketch height.
+     * @param measure absolute pixels or relative factor
+     * @return this style
+     */
+    public NotificationStyle setIconTextGap(ControlMeasure measure) {
+        Objects.requireNonNull(measure, "measure");
+        if (measure.mode() == MeasureMode.ABSOLUTE) {
+            return this.setIconTextGap(measure.value());
+        }
+        this.iconTextGapMeasure = measure;
+        return this;
+    }
+
+    /**
+     * Returns the retained measure, without resolving it.
+     * @return explicit measure or the legacy absolute value
+     */
+    public ControlMeasure getIconTextGapMeasure() {
+        return this.iconTextGapMeasure == null ? ControlMeasure.absolute(this.iconTextGap) : this.iconTextGapMeasure;
     }
 
     public float getIconTextGap() {
@@ -227,6 +509,7 @@ public final class NotificationStyle {
     }
 
     public NotificationStyle setIconTextGap(float iconTextGap) {
+        this.iconTextGapMeasure = null;
         this.iconTextGap = Math.max(0.0F, iconTextGap);
         return this;
     }
@@ -316,6 +599,7 @@ public final class NotificationStyle {
 
     public NotificationStyle setFont(PFont font) {
         this.font = font;
+        this.fontResolver = null;
         return this;
     }
 
@@ -332,5 +616,39 @@ public final class NotificationStyle {
             default:
                 return this.infoAccentColor;
         }
+    }
+    /**
+     * Installs a cached JSON font resolver for the effective render size.
+     * @param resolver resolver, or null to retain the configured font
+     * @return this style
+     */
+    public NotificationStyle setFontResolver(FontLoader.FontResolver resolver) {
+        this.fontResolver = resolver;
+        return this;
+    }
+
+    /**
+     * Resolves an independent pixel style for one frame, preserving this style's measures.
+     * Legacy float getters expose the configured pixel fallback; use measure getters
+     * to inspect relative configuration.
+     * @param sketch overlay surface
+     * @return resolved pixel style
+     */
+    public NotificationStyle resolve(PApplet sketch) {
+        NotificationStyle result = new NotificationStyle(this);
+        result.setStrokeWeight(this.getStrokeWeightMeasure().resolve(sketch.height));
+        result.setCornerRadius(this.getCornerRadiusMeasure().resolve(sketch.height));
+        result.setTextSize(this.getTextSizeMeasure().resolve(sketch.height));
+        result.setTextPadding(this.getTextPaddingMeasure().resolve(sketch.height));
+        result.setGap(this.getGapMeasure().resolve(sketch.height));
+        result.setMargin(this.getMarginMeasure().resolve(sketch.height));
+        result.setWidth(this.getWidthMeasure().resolve(sketch.height));
+        result.setMinHeight(this.getMinHeightMeasure().resolve(sketch.height));
+        result.setAccentWidth(this.getAccentWidthMeasure().resolve(sketch.height));
+        result.setIconSize(this.getIconSizeMeasure().resolve(sketch.height));
+        result.setIconTextGap(this.getIconTextGapMeasure().resolve(sketch.height));
+        result.font = FontLoader.resolve(this.fontResolver, sketch, result.textSize, this.font);
+        result.fontResolver = null;
+        return result;
     }
 }

@@ -27,7 +27,6 @@ import processing.core.PApplet;
  * @author CPZ
  */
 public final class TooltipView implements ControlView {
-   private static final float VERTICAL_OFFSET = 10.0F;
    private final PApplet sketch;
    private final TooltipViewModel viewModel;
    private float x;
@@ -36,6 +35,8 @@ public final class TooltipView implements ControlView {
    private float height;
    private DefaultTooltipStyle style;
    private TooltipBounds targetBounds;
+   private Float anchorX;
+   private float anchorY;
 
    /**
     * Creates a tooltip view.
@@ -61,10 +62,14 @@ public final class TooltipView implements ControlView {
    public void draw() {
       if (this.viewModel.isVisible()) {
          ThemeSnapshot snapshot = this.style.getThemeSnapshot();
-         TooltipRenderStyle renderStyle = this.style.resolveRenderStyle(snapshot);
+         TooltipRenderStyle renderStyle = this.style.resolveRenderStyle(snapshot, this.sketch);
          this.measureFromText(renderStyle);
-         this.positionAroundTarget(this.style.getOffset());
-         this.style.render(this.sketch, new TooltipViewState(this.x, this.y, this.width, this.height, this.viewModel.getText(), this.viewModel.isEnabled(), this.style.getTextPadding(), renderStyle.cornerRadius()), snapshot);
+         if (this.anchorX != null) {
+            this.x = this.anchorX;
+            this.y = this.anchorY - this.height * 0.5F - this.style.getOffset(this.sketch);
+         }
+         this.positionAroundTarget(this.style.getOffset(this.sketch));
+         this.style.renderResolved(this.sketch, new TooltipViewState(this.x, this.y, this.width, this.height, this.viewModel.getText(), this.viewModel.isEnabled(), renderStyle.textPadding(), renderStyle.cornerRadius()), renderStyle);
       }
    }
 
@@ -78,6 +83,7 @@ public final class TooltipView implements ControlView {
     * - Updates the public state or registration owned by this type.
     */
    public void setPosition(float x, float y) {
+      this.anchorX = null;
       this.x = x;
       this.y = y;
    }
@@ -93,9 +99,11 @@ public final class TooltipView implements ControlView {
     */
    public void setAnchorBounds(float x, float y) {
       ThemeSnapshot snapshot = this.style.getThemeSnapshot();
-      this.measureFromText(this.style.resolveRenderStyle(snapshot));
+      this.measureFromText(this.style.resolveRenderStyle(snapshot, this.sketch));
       this.x = x;
-      this.y = y - this.height * 0.5F - 10.0F;
+      this.anchorX = x;
+      this.anchorY = y;
+      this.y = y - this.height * 0.5F - this.style.getOffset(this.sketch);
    }
 
    public void setTargetBounds(TooltipBounds bounds) {
@@ -122,7 +130,7 @@ public final class TooltipView implements ControlView {
       this.sketch.pushStyle();
       try {
          TypographySupport.apply(this.sketch, renderStyle.font(), renderStyle.textSize());
-         this.width = Math.max(40.0F, this.sketch.textWidth(this.viewModel.getText()) + renderStyle.textPadding() * 2.0F);
+         this.width = Math.max(this.style.getMinWidth(this.sketch), this.sketch.textWidth(this.viewModel.getText()) + renderStyle.textPadding() * 2.0F);
          this.height = renderStyle.minHeight();
       } finally {
          this.sketch.popStyle();

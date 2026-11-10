@@ -222,43 +222,47 @@ public final class NotificationManager {
     }
 
     List<NotificationFrame> layoutFrames() {
+        return this.layoutFrames(this.style.resolve(this.sketch));
+    }
+
+    private List<NotificationFrame> layoutFrames(NotificationStyle style) {
         this.pruneExpired();
         if (this.notifications.isEmpty()) {
             return Collections.emptyList();
         }
 
-        this.prepareTypography();
+        this.prepareTypography(style);
         this.sketch.pushStyle();
         try {
-            this.applyTypography();
-            return this.layoutFramesWithoutStyleMutation();
+            this.applyTypography(style);
+            return this.layoutFramesWithoutStyleMutation(style);
         } finally {
             this.sketch.popStyle();
         }
     }
 
-    private List<NotificationFrame> layoutFramesWithoutStyleMutation() {
+    private List<NotificationFrame> layoutFramesWithoutStyleMutation(NotificationStyle style) {
         List<Notification> ordered = this.notificationsInEdgeOrder();
         List<NotificationFrame> frames = new ArrayList<>();
-        float width = this.resolvedWidth();
-        LayoutOrigin origin = this.resolvedLayoutOrigin(width);
+        float width = this.resolvedWidth(style);
+        LayoutOrigin origin = this.resolvedLayoutOrigin(width, style);
         float cursor = origin.y();
         for (Notification notification : ordered) {
             PShape icon = this.resolveSeverityIcon(notification.getSeverity());
-            float iconTextOffset = icon == null ? 0.0F : this.style.getIconSize() + this.style.getIconTextGap();
+            float iconTextOffset = icon == null ? 0.0F : style.getIconSize() + style.getIconTextGap();
             float textWidth = Math.max(
                     1.0F,
-                    width - this.style.getAccentWidth() - this.style.getTextPadding() * 2.0F - iconTextOffset
+                    width - style.getAccentWidth() - style.getTextPadding() * 2.0F - iconTextOffset
             );
             List<String> lines = this.wrapLines(notification.getMessage(), textWidth);
-            float height = this.heightFor(lines);
+            float height = this.heightFor(lines, style);
             float y;
             if (origin.stacksDown()) {
                 y = cursor;
-                cursor += height + this.style.getGap();
+                cursor += height + style.getGap();
             } else {
                 y = cursor - height;
-                cursor -= height + this.style.getGap();
+                cursor -= height + style.getGap();
             }
             frames.add(new NotificationFrame(notification, origin.x(), y, width, height, lines, icon));
         }
@@ -266,62 +270,63 @@ public final class NotificationManager {
     }
 
     private void render() {
-        List<NotificationFrame> frames = this.layoutFrames();
+        NotificationStyle style = this.style.resolve(this.sketch);
+        List<NotificationFrame> frames = this.layoutFrames(style);
         if (frames.isEmpty()) {
             this.unregisterOverlay();
             return;
         }
 
-        this.prepareTypography();
+        this.prepareTypography(style);
         this.sketch.pushStyle();
         try {
-            this.applyTypography();
+            this.applyTypography(style);
             for (NotificationFrame frame : frames) {
-                this.drawFrame(frame);
+                this.drawFrame(frame, style);
             }
         } finally {
             this.sketch.popStyle();
         }
     }
 
-    private void drawFrame(NotificationFrame frame) {
-        if (this.style.getStrokeWeight() > 0.0F) {
-            this.sketch.stroke(this.style.getBorderColor());
-            this.sketch.strokeWeight(this.style.getStrokeWeight());
+    private void drawFrame(NotificationFrame frame, NotificationStyle style) {
+        if (style.getStrokeWeight() > 0.0F) {
+            this.sketch.stroke(style.getBorderColor());
+            this.sketch.strokeWeight(style.getStrokeWeight());
         } else {
             this.sketch.noStroke();
         }
-        Integer severityBackgroundColor = this.style.getSeverityBackgroundColor(frame.notification().getSeverity());
-        this.sketch.fill(severityBackgroundColor != null ? severityBackgroundColor : this.style.getBackgroundColor());
-        this.sketch.rect(frame.x(), frame.y(), frame.width(), frame.height(), this.style.getCornerRadius());
+        Integer severityBackgroundColor = style.getSeverityBackgroundColor(frame.notification().getSeverity());
+        this.sketch.fill(severityBackgroundColor != null ? severityBackgroundColor : style.getBackgroundColor());
+        this.sketch.rect(frame.x(), frame.y(), frame.width(), frame.height(), style.getCornerRadius());
 
         this.sketch.noStroke();
-        if (this.style.getAccentWidth() > 0.0F) {
-            this.sketch.fill(this.style.accentColor(frame.notification().getSeverity()));
+        if (style.getAccentWidth() > 0.0F) {
+            this.sketch.fill(style.accentColor(frame.notification().getSeverity()));
             this.sketch.rect(
                     frame.x(),
                     frame.y(),
-                    this.style.getAccentWidth(),
+                    style.getAccentWidth(),
                     frame.height(),
-                    this.style.getCornerRadius(),
+                    style.getCornerRadius(),
                     0.0F,
                     0.0F,
-                    this.style.getCornerRadius()
+                    style.getCornerRadius()
             );
         }
 
         if (frame.icon() != null) {
-            this.drawIcon(frame);
+            this.drawIcon(frame, style);
         }
 
-        this.sketch.fill(this.style.getTextColor());
+        this.sketch.fill(style.getTextColor());
         this.sketch.textAlign(PApplet.LEFT, PApplet.TOP);
-        float textX = frame.x() + this.style.getAccentWidth() + this.style.getTextPadding();
+        float textX = frame.x() + style.getAccentWidth() + style.getTextPadding();
         if (frame.icon() != null) {
-            textX += this.style.getIconSize() + this.style.getIconTextGap();
+            textX += style.getIconSize() + style.getIconTextGap();
         }
-        float textY = frame.y() + this.style.getTextPadding();
-        float lineHeight = this.lineHeight();
+        float textY = frame.y() + style.getTextPadding();
+        float lineHeight = this.lineHeight(style);
         for (int i = 0; i < frame.lines().size(); i++) {
             this.sketch.text(frame.lines().get(i), textX, textY + i * lineHeight);
         }
@@ -411,8 +416,8 @@ public final class NotificationManager {
         return shape;
     }
 
-    private void drawIcon(NotificationFrame frame) {
-        float iconSize = this.style.getIconSize();
+    private void drawIcon(NotificationFrame frame, NotificationStyle style) {
+        float iconSize = style.getIconSize();
         if (iconSize <= 0.0F) {
             return;
         }
@@ -426,7 +431,7 @@ public final class NotificationManager {
             iconHeight = icon.getHeight() * scale;
         }
 
-        float areaX = frame.x() + this.style.getAccentWidth() + this.style.getTextPadding();
+        float areaX = frame.x() + style.getAccentWidth() + style.getTextPadding();
         float iconX = areaX + (iconSize - iconWidth) * 0.5F;
         float iconY = frame.y() + (frame.height() - iconHeight) * 0.5F;
         this.sketch.shapeMode(PApplet.CORNER);
@@ -447,20 +452,20 @@ public final class NotificationManager {
                 || this.placement == NotificationPlacement.TOP_CENTER;
     }
 
-    private float resolvedWidth() {
-        float requestedWidth = this.style.getWidth();
+    private float resolvedWidth(NotificationStyle style) {
+        float requestedWidth = style.getWidth();
         if (this.sketch.width <= 0) {
             return requestedWidth;
         }
-        float availableWidth = Math.max(1.0F, this.sketch.width - this.style.getMargin() * 2.0F);
+        float availableWidth = Math.max(1.0F, this.sketch.width - style.getMargin() * 2.0F);
         return Math.min(requestedWidth, availableWidth);
     }
 
-    private LayoutOrigin resolvedLayoutOrigin(float width) {
+    private LayoutOrigin resolvedLayoutOrigin(float width, NotificationStyle style) {
         if (this.position != null) {
             return this.resolvedCustomOrigin();
         }
-        return this.resolvedPlacementOrigin(width);
+        return this.resolvedPlacementOrigin(width, style);
     }
 
     private LayoutOrigin resolvedCustomOrigin() {
@@ -471,16 +476,16 @@ public final class NotificationManager {
         );
     }
 
-    private LayoutOrigin resolvedPlacementOrigin(float width) {
-        float y = this.startsAtTop() ? this.style.getMargin() : this.sketch.height - this.style.getMargin();
-        return new LayoutOrigin(this.resolvedPlacementX(width), y, this.startsAtTop());
+    private LayoutOrigin resolvedPlacementOrigin(float width, NotificationStyle style) {
+        float y = this.startsAtTop() ? style.getMargin() : this.sketch.height - style.getMargin();
+        return new LayoutOrigin(this.resolvedPlacementX(width, style), y, this.startsAtTop());
     }
 
-    private float resolvedPlacementX(float width) {
+    private float resolvedPlacementX(float width, NotificationStyle style) {
         switch (this.placement) {
             case TOP_LEFT:
             case BOTTOM_LEFT:
-                return this.style.getMargin();
+                return style.getMargin();
             case TOP_CENTER:
             case BOTTOM_CENTER:
                 return Math.max(0.0F, ((float) this.sketch.width - width) * 0.5F);
@@ -488,9 +493,9 @@ public final class NotificationManager {
             case BOTTOM_RIGHT:
             default:
                 if (this.sketch.width <= 0) {
-                    return this.style.getMargin();
+                    return style.getMargin();
                 }
-                return Math.max(0.0F, this.sketch.width - this.style.getMargin() - width);
+                return Math.max(0.0F, this.sketch.width - style.getMargin() - width);
         }
     }
 
@@ -533,23 +538,23 @@ public final class NotificationManager {
         }
     }
 
-    private float heightFor(List<String> lines) {
+    private float heightFor(List<String> lines, NotificationStyle style) {
         return Math.max(
-                this.style.getMinHeight(),
-                this.style.getTextPadding() * 2.0F + lines.size() * this.lineHeight()
+                style.getMinHeight(),
+                style.getTextPadding() * 2.0F + lines.size() * this.lineHeight(style)
         );
     }
 
-    private float lineHeight() {
-        return this.style.getTextSize() * 1.25F;
+    private float lineHeight(NotificationStyle style) {
+        return style.getTextSize() * 1.25F;
     }
 
-    private void prepareTypography() {
-        TypographySupport.prepareStyleScope(this.sketch, this.style.getFont());
+    private void prepareTypography(NotificationStyle style) {
+        TypographySupport.prepareStyleScope(this.sketch, style.getFont());
     }
 
-    private void applyTypography() {
-        TypographySupport.apply(this.sketch, this.style.getFont(), this.style.getTextSize());
+    private void applyTypography(NotificationStyle style) {
+        TypographySupport.apply(this.sketch, style.getFont(), style.getTextSize());
     }
 
     static final class NotificationFrame {

@@ -69,7 +69,7 @@ public final class DefaultTooltipStyle {
     * - Uses already available state and does not define business rules.
     */
    public void render(PApplet sketch, TooltipViewState state, ThemeSnapshot snapshot) {
-      this.renderer.render(sketch, state, this.resolveRenderStyle(snapshot));
+      this.renderer.render(sketch, state, this.resolveRenderStyle(snapshot, sketch));
    }
 
    /**
@@ -94,11 +94,29 @@ public final class DefaultTooltipStyle {
     * - Produces the public result required by the surrounding pipeline.
     */
    public TooltipRenderStyle resolveRenderStyle(ThemeSnapshot snapshot) {
+      return this.resolveRenderStyle(snapshot, this.config);
+   }
+
+   /**
+    * Resolves dimensions against the current overlay surface.
+    * @param snapshot theme snapshot
+    * @param sketch overlay surface
+    * @return pixel render style
+    */
+   public TooltipRenderStyle resolveRenderStyle(ThemeSnapshot snapshot, PApplet sketch) {
+      return this.resolveRenderStyle(snapshot, this.config.resolve(sketch));
+   }
+
+   public void renderResolved(PApplet sketch, TooltipViewState state, TooltipRenderStyle renderStyle) {
+      this.renderer.render(sketch, state, renderStyle);
+   }
+
+   private TooltipRenderStyle resolveRenderStyle(ThemeSnapshot snapshot, TooltipStyleConfig config) {
       ThemeTokens tokens = snapshot.tokens;
-      int backgroundColor = this.config.backgroundOverride != null ? this.config.backgroundOverride : InteractiveStyleHelper.applyOverlay(tokens.surfaceVariant, Colors.argb(220, 0, 0, 0));
-      int index = this.config.textOverride != null ? this.config.textOverride : tokens.onSurface;
-      int color = this.config.borderOverride != null ? this.config.borderOverride : tokens.border;
-      return new TooltipRenderStyle(backgroundColor, index, color, this.config.strokeWeight, this.config.textSize, this.config.textPadding, this.config.cornerRadius, this.config.minHeight, this.config.font);
+      int backgroundColor = config.backgroundOverride != null ? config.backgroundOverride : InteractiveStyleHelper.applyOverlay(tokens.surfaceVariant, Colors.argb(220, 0, 0, 0));
+      int index = config.textOverride != null ? config.textOverride : tokens.onSurface;
+      int color = config.borderOverride != null ? config.borderOverride : tokens.border;
+      return new TooltipRenderStyle(backgroundColor, index, color, config.strokeWeight, config.textSize, config.textPadding, config.cornerRadius, config.minHeight, config.font);
    }
 
    /**
@@ -127,5 +145,13 @@ public final class DefaultTooltipStyle {
     */
    public ThemeSnapshot getThemeSnapshot() {
       return this.themeProvider.getSnapshot();
+   }
+
+   public float getOffset(PApplet sketch) {
+      return Math.max(0.0F, this.config.getOffsetMeasure().resolve(sketch.height));
+   }
+
+   public float getMinWidth(PApplet sketch) {
+      return Math.max(0.0F, this.config.getMinWidthMeasure().resolve(sketch.height));
    }
 }

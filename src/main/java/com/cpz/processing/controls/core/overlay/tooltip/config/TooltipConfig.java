@@ -1,5 +1,7 @@
 package com.cpz.processing.controls.core.overlay.tooltip.config;
 
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
+
 /**
  * JSON-facing tooltip configuration.
  *
@@ -44,15 +46,21 @@ public final class TooltipConfig {
         return this.resolvedStyle == null ? null : new TooltipStyleConfig(this.resolvedStyle);
     }
 
+    /**
+     * Parsed style values. Legacy Float getters return the raw configured value
+     * (pixels or factor); measure getters also retain its explicit mode.
+     */
     public static final class StyleConfig {
         private final Integer backgroundColor;
         private final Integer textColor;
         private final Integer borderColor;
-        private final Float textPadding;
-        private final Float offset;
-        private final Float cornerRadius;
-        private final Float strokeWeight;
-        private final Float textSize;
+        private final ControlMeasure textPadding;
+        private final ControlMeasure offset;
+        private final ControlMeasure cornerRadius;
+        private final ControlMeasure strokeWeight;
+        private final ControlMeasure textSize;
+        private final ControlMeasure minHeight;
+        private final ControlMeasure minWidth;
         private final String fontPath;
         private final String sourcePath;
 
@@ -82,6 +90,29 @@ public final class TooltipConfig {
                 String fontPath,
                 String sourcePath
         ) {
+            this(backgroundColor, textColor, borderColor,
+                    textPadding == null ? null : ControlMeasure.absolute(textPadding),
+                    offset == null ? null : ControlMeasure.absolute(offset),
+                    cornerRadius == null ? null : ControlMeasure.absolute(cornerRadius),
+                    strokeWeight == null ? null : ControlMeasure.absolute(strokeWeight),
+                    textSize == null ? null : ControlMeasure.absolute(textSize),
+                    null, null, fontPath, sourcePath);
+        }
+
+        public StyleConfig(
+                Integer backgroundColor,
+                Integer textColor,
+                Integer borderColor,
+                ControlMeasure textPadding,
+                ControlMeasure offset,
+                ControlMeasure cornerRadius,
+                ControlMeasure strokeWeight,
+                ControlMeasure textSize,
+                ControlMeasure minHeight,
+                ControlMeasure minWidth,
+                String fontPath,
+                String sourcePath
+        ) {
             this.backgroundColor = backgroundColor;
             this.textColor = textColor;
             this.borderColor = borderColor;
@@ -90,6 +121,8 @@ public final class TooltipConfig {
             this.cornerRadius = cornerRadius;
             this.strokeWeight = strokeWeight;
             this.textSize = textSize;
+            this.minHeight = minHeight;
+            this.minWidth = minWidth;
             this.fontPath = fontPath;
             this.sourcePath = sourcePath;
         }
@@ -107,23 +140,51 @@ public final class TooltipConfig {
         }
 
         public Float getTextPadding() {
-            return this.textPadding;
+            return this.textPadding == null ? null : this.textPadding.value();
         }
 
         public Float getOffset() {
-            return this.offset;
+            return this.offset == null ? null : this.offset.value();
         }
 
         public Float getCornerRadius() {
-            return this.cornerRadius;
+            return this.cornerRadius == null ? null : this.cornerRadius.value();
         }
 
         public Float getStrokeWeight() {
-            return this.strokeWeight;
+            return this.strokeWeight == null ? null : this.strokeWeight.value();
         }
 
         public Float getTextSize() {
+            return this.textSize == null ? null : this.textSize.value();
+        }
+
+        public ControlMeasure getTextPaddingMeasure() {
+            return this.textPadding;
+        }
+
+        public ControlMeasure getOffsetMeasure() {
+            return this.offset;
+        }
+
+        public ControlMeasure getCornerRadiusMeasure() {
+            return this.cornerRadius;
+        }
+
+        public ControlMeasure getStrokeWeightMeasure() {
+            return this.strokeWeight;
+        }
+
+        public ControlMeasure getTextSizeMeasure() {
             return this.textSize;
+        }
+
+        public ControlMeasure getMinHeightMeasure() {
+            return this.minHeight;
+        }
+
+        public ControlMeasure getMinWidthMeasure() {
+            return this.minWidth;
         }
 
         public String getFontPath() {

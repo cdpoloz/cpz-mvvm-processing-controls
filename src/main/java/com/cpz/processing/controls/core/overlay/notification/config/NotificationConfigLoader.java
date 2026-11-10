@@ -183,17 +183,17 @@ public final class NotificationConfigLoader {
                 JsonConfigSupport.getOptionalColor(style, "backgroundColor", path),
                 JsonConfigSupport.getOptionalColor(style, "textColor", path),
                 JsonConfigSupport.getOptionalColor(style, "borderColor", path),
-                JsonConfigSupport.getOptionalFloat(style, "strokeWeight"),
-                JsonConfigSupport.getOptionalFloat(style, "cornerRadius"),
-                JsonConfigSupport.getOptionalFloat(style, "textSize"),
-                JsonConfigSupport.getOptionalFloat(style, "textPadding"),
-                JsonConfigSupport.getOptionalFloat(style, "gap"),
-                JsonConfigSupport.getOptionalFloat(style, "margin"),
-                JsonConfigSupport.getOptionalFloat(style, "width"),
-                JsonConfigSupport.getOptionalFloat(style, "minHeight"),
-                JsonConfigSupport.getOptionalFloat(style, "accentWidth"),
-                JsonConfigSupport.getOptionalFloat(style, "iconSize"),
-                JsonConfigSupport.getOptionalFloat(style, "iconTextGap"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "strokeWeight", path, "notification style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "cornerRadius", path, "notification style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "textSize", path, "notification style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "textPadding", path, "notification style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "gap", path, "notification style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "margin", path, "notification style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "width", path, "notification style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "minHeight", path, "notification style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "accentWidth", path, "notification style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "iconSize", path, "notification style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "iconTextGap", path, "notification style"),
                 JsonConfigSupport.getOptionalColor(style, "infoAccentColor", path),
                 JsonConfigSupport.getOptionalColor(style, "successAccentColor", path),
                 JsonConfigSupport.getOptionalColor(style, "warningAccentColor", path),
@@ -317,15 +317,14 @@ public final class NotificationConfigLoader {
         }
 
         public NotificationConfig.FontResolver create(String fontPath, String sourcePath) {
+            FontLoader.FontResolver resolver = FontLoader.resolver(fontPath, "notification", sourcePath);
             return new NotificationConfig.FontResolver() {
                 public processing.core.PFont load(float effectiveTextSize) {
-                    return FontLoader.load(
-                            BoundFontResolverFactory.this.sketch,
-                            fontPath,
-                            effectiveTextSize,
-                            "notification",
-                            sourcePath
-                    );
+                    return resolver.load(BoundFontResolverFactory.this.sketch, effectiveTextSize);
+                }
+
+                public processing.core.PFont load(PApplet sketch, float effectiveTextSize) {
+                    return resolver.load(sketch, effectiveTextSize);
                 }
             };
         }
@@ -335,19 +334,14 @@ public final class NotificationConfigLoader {
         INSTANCE;
 
         public NotificationConfig.FontResolver create(String fontPath, String sourcePath) {
+            FontLoader.FontResolver resolver = FontLoader.resolver(fontPath, "notification", sourcePath);
             return new NotificationConfig.FontResolver() {
                 public processing.core.PFont load(float effectiveTextSize) {
                     return null;
                 }
 
                 public processing.core.PFont load(PApplet sketch, float effectiveTextSize) {
-                    return FontLoader.load(
-                            sketch,
-                            fontPath,
-                            effectiveTextSize,
-                            "notification",
-                            sourcePath
-                    );
+                    return resolver.load(sketch, effectiveTextSize);
                 }
             };
         }

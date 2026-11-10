@@ -1,6 +1,6 @@
 package com.cpz.processing.controls.core.overlay.tooltip.config;
 
-import com.cpz.processing.controls.core.style.TypographySupport;
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.core.util.FontLoader;
 import com.cpz.processing.controls.core.util.JsonConfigSupport;
 import processing.core.PApplet;
@@ -115,30 +115,33 @@ public final class TooltipJsonSupport {
         if (style.getBorderColor() != null) {
             result.setBorderColor(style.getBorderColor());
         }
-        if (style.getTextPadding() != null) {
-            result.setTextPadding(style.getTextPadding());
+        if (style.getTextPaddingMeasure() != null) {
+            result.setTextPadding(style.getTextPaddingMeasure());
         }
-        if (style.getOffset() != null) {
-            result.setOffset(style.getOffset());
+        if (style.getOffsetMeasure() != null) {
+            result.setOffset(style.getOffsetMeasure());
         }
-        if (style.getCornerRadius() != null) {
-            result.setCornerRadius(style.getCornerRadius());
+        if (style.getCornerRadiusMeasure() != null) {
+            result.setCornerRadius(style.getCornerRadiusMeasure());
         }
-        if (style.getStrokeWeight() != null) {
-            result.setStrokeWeight(style.getStrokeWeight());
+        if (style.getStrokeWeightMeasure() != null) {
+            result.setStrokeWeight(style.getStrokeWeightMeasure());
         }
-        if (style.getTextSize() != null) {
-            result.setTextSize(style.getTextSize());
+        if (style.getTextSizeMeasure() != null) {
+            result.setTextSize(style.getTextSizeMeasure());
+        }
+        if (style.getMinHeightMeasure() != null) {
+            result.setMinHeight(style.getMinHeightMeasure());
+        }
+        if (style.getMinWidthMeasure() != null) {
+            result.setMinWidth(style.getMinWidthMeasure());
         }
         if (style.getFontPath() != null) {
             Objects.requireNonNull(sketch, "sketch");
-            result.setFont(FontLoader.load(
-                    sketch,
-                    style.getFontPath(),
-                    result.textSize > 0.0F ? result.textSize : TypographySupport.DEFAULT_CUSTOM_FONT_SIZE,
-                    "tooltip",
-                    style.getSourcePath()
-            ));
+            FontLoader.FontResolver resolver = FontLoader.resolver(style.getFontPath(), "tooltip", style.getSourcePath());
+            float size = Math.max(1.0F, result.getTextSizeMeasure().resolve(sketch.height));
+            result.setFont(resolver.load(sketch, size));
+            result.fontResolver = resolver;
         }
         return result;
     }
@@ -192,18 +195,20 @@ public final class TooltipJsonSupport {
                 JsonConfigSupport.getOptionalColor(style, "backgroundColor", path),
                 JsonConfigSupport.getOptionalColor(style, "textColor", path),
                 JsonConfigSupport.getOptionalColor(style, "borderColor", path),
-                readTextPadding(style),
-                JsonConfigSupport.getOptionalFloat(style, "offset"),
-                JsonConfigSupport.getOptionalFloat(style, "cornerRadius"),
-                JsonConfigSupport.getOptionalFloat(style, "strokeWeight"),
-                JsonConfigSupport.getOptionalFloat(style, "textSize"),
+                readTextPadding(style, path),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "offset", path, "tooltip style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "cornerRadius", path, "tooltip style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "strokeWeight", path, "tooltip style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "textSize", path, "tooltip style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "minHeight", path, "tooltip style"),
+                JsonConfigSupport.getOptionalStyleMeasure(style, "minWidth", path, "tooltip style"),
                 JsonConfigSupport.getOptionalNonBlankString(style, "font", path, "tooltip style"),
                 path
         );
     }
 
-    private static Float readTextPadding(JSONObject style) {
-        Float textPadding = JsonConfigSupport.getOptionalFloat(style, "textPadding");
-        return textPadding == null ? JsonConfigSupport.getOptionalFloat(style, "padding") : textPadding;
+    private static ControlMeasure readTextPadding(JSONObject style, String path) {
+        ControlMeasure textPadding = JsonConfigSupport.getOptionalStyleMeasure(style, "textPadding", path, "tooltip style");
+        return textPadding == null ? JsonConfigSupport.getOptionalStyleMeasure(style, "padding", path, "tooltip style") : textPadding;
     }
 }

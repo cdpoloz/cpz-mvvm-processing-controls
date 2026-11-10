@@ -1,0 +1,87 @@
+{
+  "placement": "bottom-center",
+  "position": {
+    "x": {
+      "mode": "relative",
+      "value": 0.5
+    },
+    "y": {
+      "mode": "relative",
+      "value": 0.05
+    }
+  },
+  "maxVisible": 4,
+  "defaultDurationMillis": 3000,
+  "severityDurations": {
+    "info": 3000,
+    "success": 3000,
+    "warning": 4500,
+    "error": 6000
+  },
+  "style": {
+    "backgroundColor": "#202020",
+    "textColor": "#FFFFFF",
+    "borderColor": "#404040",
+    "strokeWeight": {
+      "mode": "relative",
+      "value": 0.002381
+    },
+    "cornerRadius": {
+      "mode": "relative",
+      "value": 0.0190476
+    },
+    "font": "data/font/JetBrainsMono.ttf",
+    "textSize": {
+      "mode": "relative",
+      "value": 0.0285714
+    },
+    "textPadding": {
+      "mode": "relative",
+      "value": 0.0285714
+    },
+    "gap": {
+      "mode": "relative",
+      "value": 0.0190476
+    },
+    "margin": {
+      "mode": "relative",
+      "value": 0.0571429
+    },
+    "width": {
+      "mode": "relative",
+      "value": 0.7619048
+    },
+    "minHeight": {
+      "mode": "relative",
+      "value": 0.1142857
+    },
+    "accentWidth": {
+      "mode": "relative",
+      "value": 0.0119048
+    },
+    "iconSize": {
+      "mode": "relative",
+      "value": 0.0571429
+    },
+    "iconTextGap": {
+      "mode": "relative",
+      "value": 0.0238095
+    },
+    "severityBackgroundColors": {
+      "info": "#102A38",
+      "success": "#123023",
+      "warning": "#382A12",
+      "error": "#38151D"
+    },
+    "severityIcons": {
+      "info": "data/img/test.svg",
+      "success": "data/img/test.svg",
+      "warning": "data/img/test.svg",
+      "error": "data/img/test.svg"
+    },
+    "infoAccentColor": "#3B82F6",
+    "successAccentColor": "#22C55E",
+    "warningAccentColor": "#F59E0B",
+    "errorAccentColor": "#EF4444"
+  }
+}

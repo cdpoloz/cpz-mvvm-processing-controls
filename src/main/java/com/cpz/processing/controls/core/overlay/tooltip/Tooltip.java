@@ -1,5 +1,6 @@
 package com.cpz.processing.controls.core.overlay.tooltip;
 
+import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.core.overlay.tooltip.config.TooltipStyleConfig;
 import processing.core.PFont;
 
@@ -117,6 +118,55 @@ public final class Tooltip {
 
     public Tooltip setStrokeWeight(float strokeWeight) {
         this.styleConfig.setStrokeWeight(strokeWeight);
+        return this;
+    }
+    public Tooltip setTextSize(ControlMeasure measure) {
+        this.styleConfig.setTextSize(measure);
+        return this;
+    }
+
+    public Tooltip setTextPadding(ControlMeasure measure) {
+        this.styleConfig.setTextPadding(measure);
+        return this;
+    }
+
+    public Tooltip setOffset(ControlMeasure measure) {
+        this.styleConfig.setOffset(measure);
+        return this;
+    }
+
+    public Tooltip setCornerRadius(ControlMeasure measure) {
+        this.styleConfig.setCornerRadius(measure);
+        return this;
+    }
+
+    public Tooltip setMinHeight(ControlMeasure measure) {
+        this.styleConfig.setMinHeight(measure);
+        return this;
+    }
+
+    public Tooltip setStrokeWeight(ControlMeasure measure) {
+        this.styleConfig.setStrokeWeight(measure);
+        return this;
+    }
+
+    public Tooltip setMinWidth(ControlMeasure measure) {
+        this.styleConfig.setMinWidth(measure);
+        return this;
+    }
+
+    public Tooltip setPadding(ControlMeasure measure) {
+        this.styleConfig.setPadding(measure);
+        return this;
+    }
+
+    public Tooltip setMinHeight(float minHeight) {
+        this.styleConfig.setMinHeight(minHeight);
+        return this;
+    }
+
+    public Tooltip setMinWidth(float minWidth) {
+        this.styleConfig.setMinWidth(minWidth);
         return this;
     }
 }

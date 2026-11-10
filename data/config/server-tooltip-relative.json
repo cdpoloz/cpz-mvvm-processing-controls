@@ -1,0 +1,38 @@
+{
+  "text": "Tooltip con medidas relativas al alto del sketch",
+  "enabled": true,
+  "style": {
+    "backgroundColor": "#E61B1F26",
+    "textColor": "#FFFFFFFF",
+    "borderColor": "#668A94A6",
+    "font": "data/font/JetBrainsMono.ttf",
+    "textSize": {
+      "mode": "relative",
+      "value": 0.0325581
+    },
+    "textPadding": {
+      "mode": "relative",
+      "value": 0.0232558
+    },
+    "offset": {
+      "mode": "relative",
+      "value": 0.0232558
+    },
+    "cornerRadius": {
+      "mode": "relative",
+      "value": 0.0186047
+    },
+    "strokeWeight": {
+      "mode": "relative",
+      "value": 0.0023256
+    },
+    "minHeight": {
+      "mode": "relative",
+      "value": 0.0744186
+    },
+    "minWidth": {
+      "mode": "relative",
+      "value": 0.0930233
+    }
+  }
+}
