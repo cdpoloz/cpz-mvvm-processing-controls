@@ -27,6 +27,7 @@ public final class NotificationConfig {
     private final boolean positionSpecified;
     private final NotificationPosition position;
     private final Integer maxVisible;
+    private final Boolean prioritizeSeverity;
     private final Long defaultDurationMillis;
     private final EnumMap<NotificationSeverity, Long> severityDurations;
     private final StyleConfig style;
@@ -40,10 +41,24 @@ public final class NotificationConfig {
             Map<NotificationSeverity, Long> severityDurations,
             StyleConfig style
     ) {
+        this(placement, positionSpecified, position, maxVisible, defaultDurationMillis, severityDurations, style, null);
+    }
+
+    NotificationConfig(
+            NotificationPlacement placement,
+            boolean positionSpecified,
+            NotificationPosition position,
+            Integer maxVisible,
+            Long defaultDurationMillis,
+            Map<NotificationSeverity, Long> severityDurations,
+            StyleConfig style,
+            Boolean prioritizeSeverity
+    ) {
         this.placement = placement;
         this.positionSpecified = positionSpecified;
         this.position = position;
         this.maxVisible = maxVisible;
+        this.prioritizeSeverity = prioritizeSeverity;
         this.defaultDurationMillis = defaultDurationMillis;
         this.severityDurations = new EnumMap<>(NotificationSeverity.class);
         if (severityDurations != null) {
@@ -75,6 +90,10 @@ public final class NotificationConfig {
         return this.position;
     }
 
+    public Boolean getPrioritizeSeverity() {
+        return this.prioritizeSeverity;
+    }
+
     public Integer getMaxVisible() {
         return this.maxVisible;
     }
@@ -103,6 +122,9 @@ public final class NotificationConfig {
         }
         if (this.positionSpecified) {
             manager.setPosition(this.position);
+        }
+        if (this.prioritizeSeverity != null) {
+            manager.setPrioritizeSeverity(this.prioritizeSeverity);
         }
         if (this.maxVisible != null && this.maxVisible > 0) {
             manager.setMaxVisible(this.maxVisible);

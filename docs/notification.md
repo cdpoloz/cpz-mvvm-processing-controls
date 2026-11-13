@@ -153,6 +153,47 @@ placements stack upward.
 When the visible limit is exceeded, the oldest notification is dropped. There
 is no queue or backlog in `0.9.11`.
 
+### Optional severity priority (source change after 0.9.13)
+
+Chronological retention remains the default. To protect higher-severity messages
+from newer lower-severity messages, enable:
+
+```java
+notifications.setPrioritizeSeverity(true);
+boolean enabled = notifications.isPrioritizeSeverity();
+```
+
+The optional root-level standalone JSON field is equivalent:
+
+```json
+{
+  "maxVisible": 3,
+  "prioritizeSeverity": true
+}
+```
+
+This option requires a library build containing this change; the published
+0.9.13 artifact does not provide it. It is manager behavior, not a style field.
+
+Priority is explicitly `ERROR > WARNING > SUCCESS > INFO`. Both retention and
+display use that order. Equal-severity messages prefer the newest insertion,
+even when their timestamps are equal. With three unexpired errors visible, a
+new warning/success/info is discarded rather than displacing an error. A newer
+error replaces the oldest error when the limit is full. The highest-priority
+message appears nearest the configured origin/edge.
+
+Expired messages are removed before admitting a new notification. Messages
+keep their original duration and are not prolonged by reordering. Discarded
+messages are not queued and never reappear after another message expires.
+`show(...)` still returns the created event even if priority immediately drops
+it from the visible set.
+
+`prioritizeSeverity: false` restores chronology for the remaining messages;
+already discarded events cannot be recovered. Omitted or null configuration
+preserves the current manager setting; non-boolean values are rejected. When a
+config both enables priority and reduces maxVisible, priority is applied first
+so the reduction retains the highest-severity messages.
+
 Placement is defined by `NotificationPlacement`. A custom manager-level
 position can override the placement origin without changing the stored
 placement:
