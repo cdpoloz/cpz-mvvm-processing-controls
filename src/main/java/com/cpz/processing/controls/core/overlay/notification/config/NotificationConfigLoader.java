@@ -61,8 +61,17 @@ public final class NotificationConfigLoader {
                 readPositiveInt(root, "maxVisible"),
                 readPositiveLong(root, "defaultDurationMillis"),
                 readSeverityDurations(root),
-                readStyle(root, path, fontResolverFactory)
+                readStyle(root, path, fontResolverFactory),
+                readPrioritizeSeverity(root, path)
         );
+    }
+
+    private static Boolean readPrioritizeSeverity(JSONObject root, String path) {
+        if (!root.hasKey("prioritizeSeverity") || root.isNull("prioritizeSeverity")) return null;
+        Object value = root.get("prioritizeSeverity");
+        if (!(value instanceof Boolean))
+            throw new IllegalArgumentException("prioritizeSeverity must be a boolean in " + path);
+        return (Boolean) value;
     }
 
     private static PositionConfig readPosition(JSONObject root, String path) {

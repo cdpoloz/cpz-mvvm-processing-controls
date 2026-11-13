@@ -455,6 +455,12 @@ Notifications are runtime status messages owned by the sketch. Use them for
 non-blocking info, success, warning, and error feedback. Use a future
 dialog/modal feature, not `Notification`, for blocking user decisions.
 
+The current source also supports opt-in notification retention/display priority
+via `NotificationManager.setPrioritizeSeverity(true)` or standalone JSON
+`"prioritizeSeverity": true`: ERROR > WARNING > SUCCESS > INFO, newest first
+within a severity. Chronology remains the default. This addition is not part of
+the published 0.9.13 artifact; see [Notification](docs/notification.md).
+
 The JSON layer can also create one or more controls from a single document and returns them as `Map<String, Control>`. JSON can configure control layout and supported style blocks, including `Panel.style`; binding, behavior wiring, and `Panel` parent-child relationships stay in sketch code.
 
 The framework does not depend on Processing internally for input dispatch or interaction rules. It consumes framework-owned `PointerEvent` and `KeyboardEvent` instances that are expected to be produced by external adapters.

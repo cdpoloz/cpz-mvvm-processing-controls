@@ -45,6 +45,7 @@ public final class NotificationManager {
     private NotificationStyle style = new NotificationStyle();
     private int maxVisible = DEFAULT_MAX_VISIBLE;
     private boolean registered;
+    private boolean prioritizeSeverity;
 
     public NotificationManager(PApplet sketch, OverlayManager overlayManager) {
         this(sketch, overlayManager, new SystemTimeSource());
@@ -70,6 +71,7 @@ public final class NotificationManager {
     public Notification show(String message, NotificationSeverity severity, long durationMillis) {
         this.validateDurationMillis(durationMillis);
         Notification notification = new Notification(message, severity, this.nowMillis(), durationMillis);
+        this.pruneExpired();
         this.notifications.add(notification);
         this.trimToMaxVisible();
         this.registerOverlay();
@@ -197,6 +199,21 @@ public final class NotificationManager {
         this.severityDurations.put(severity, durationMillis);
     }
 
+    /** Whether visible notifications are retained and displayed by severity priority. */
+    public boolean isPrioritizeSeverity() {
+        return this.prioritizeSeverity;
+    }
+
+    /**
+     * Enables ERROR > WARNING > SUCCESS > INFO priority. Equal levels prefer newer
+     * messages. Disabled by default to preserve chronological behavior.
+     */
+    public void setPrioritizeSeverity(boolean prioritizeSeverity) {
+        this.pruneExpired();
+        this.prioritizeSeverity = prioritizeSeverity;
+        this.trimToMaxVisible();
+    }
+
     public int getMaxVisible() {
         return this.maxVisible;
     }
@@ -205,6 +222,7 @@ public final class NotificationManager {
         if (maxVisible <= 0) {
             throw new IllegalArgumentException("Notification maxVisible must be greater than 0.");
         }
+        this.pruneExpired();
         this.maxVisible = maxVisible;
         this.trimToMaxVisible();
         if (this.notifications.isEmpty()) {
@@ -373,7 +391,26 @@ public final class NotificationManager {
 
     private void trimToMaxVisible() {
         while (this.notifications.size() > this.maxVisible) {
-            this.notifications.remove(0);
+            int victim = 0;
+            if (this.prioritizeSeverity) {
+                for (int i = 1; i < this.notifications.size(); i++) {
+                    if (severityPriority(this.notifications.get(i).getSeverity())
+                            < severityPriority(this.notifications.get(victim).getSeverity())) {
+                        victim = i;
+                    }
+                }
+            }
+            this.notifications.remove(victim);
+        }
+    }
+
+    private static int severityPriority(NotificationSeverity severity) {
+        switch (severity) {
+            case ERROR: return 3;
+            case WARNING: return 2;
+            case SUCCESS: return 1;
+            case INFO: return 0;
+            default: throw new IllegalArgumentException("Unknown notification severity: " + severity);
         }
     }
 
@@ -442,6 +479,11 @@ public final class NotificationManager {
         List<Notification> ordered = new ArrayList<>(this.notifications.size());
         for (int i = this.notifications.size() - 1; i >= 0; i--) {
             ordered.add(this.notifications.get(i));
+        }
+        if (this.prioritizeSeverity) {
+            // Stable sort preserves reverse insertion order for equal severities.
+            ordered.sort((left, right) -> Integer.compare(
+                    severityPriority(right.getSeverity()), severityPriority(left.getSeverity())));
         }
         return ordered;
     }

@@ -896,6 +896,109 @@ class NotificationManagerTest {
         assertEquals(2, sketch.loadShapeCalls);
     }
 
+    @Test
+    void chronologicalRetentionRemainsTheDefault() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0));
+        manager.setMaxVisible(3);
+        assertFalse(manager.isPrioritizeSeverity());
+        manager.error("old error");
+        manager.warning("warning 1");
+        manager.warning("warning 2");
+        manager.info("latest info");
+        assertEquals(List.of("warning 1", "warning 2", "latest info"),
+                manager.getActiveNotifications().stream().map(Notification::getMessage).toList());
+    }
+
+    @Test
+    void lowerPriorityCannotDisplaceThreeUnexpiredErrorsAcrossCalls() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0));
+        manager.setPrioritizeSeverity(true);
+        manager.setMaxVisible(3);
+        manager.error("error 1");
+        manager.error("error 2");
+        manager.error("error 3");
+        manager.warning("new warning");
+        manager.success("new success");
+        manager.info("new info");
+        assertEquals(List.of("error 1", "error 2", "error 3"),
+                manager.getActiveNotifications().stream().map(Notification::getMessage).toList());
+        assertEquals(List.of("error 3", "error 2", "error 1"),
+                manager.layoutFrames().stream().map(frame -> frame.notification().getMessage()).toList());
+    }
+
+    @Test
+    void priorityDisplayAndEvictionPreferSeverityThenRecencyEvenAtEqualClockTime() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0));
+        manager.setMaxVisible(4);
+        manager.setPrioritizeSeverity(true);
+        manager.error("older error");
+        manager.info("info");
+        manager.warning("warning");
+        manager.success("success");
+        assertEquals(List.of("older error", "warning", "success", "info"),
+                manager.layoutFrames().stream().map(frame -> frame.notification().getMessage()).toList());
+        manager.error("newer error");
+        assertEquals(List.of("newer error", "older error", "warning", "success"),
+                manager.layoutFrames().stream().map(frame -> frame.notification().getMessage()).toList());
+        manager.setMaxVisible(1);
+        assertEquals("newer error", manager.getActiveNotifications().get(0).getMessage());
+    }
+
+    @Test
+    void expiredErrorsDoNotBlockNewMessagesAndDroppedMessagesDoNotReturn() {
+        FakeTimeSource clock = new FakeTimeSource(0);
+        OverlayManager overlays = new OverlayManager();
+        NotificationManager manager = manager(sketch(), overlays, clock);
+        manager.setMaxVisible(1);
+        manager.setPrioritizeSeverity(true);
+        manager.show("short error", NotificationSeverity.ERROR, 100);
+        manager.warning("discarded warning");
+        clock.setMillis(100);
+        manager.info("new info");
+        assertEquals(List.of("new info"),
+                manager.getActiveNotifications().stream().map(Notification::getMessage).toList());
+        assertEquals(1, overlays.getActiveOverlays().size());
+        manager.clear();
+        assertEquals(0, overlays.getActiveOverlays().size());
+    }
+
+    @Test
+    void jsonAppliesPriorityBeforeReducingVisibleLimitAndCanRestoreChronology() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0));
+        manager.error("error");
+        manager.info("info");
+        manager.success("success");
+        manager.warning("warning");
+        var config = com.cpz.processing.controls.core.overlay.notification.config.NotificationConfigLoader.loadFromJson(
+                processing.data.JSONObject.parse("{\"prioritizeSeverity\":true,\"maxVisible\":2}"), "test.json");
+        assertEquals(Boolean.TRUE, config.getPrioritizeSeverity());
+        config.applyTo(manager);
+        assertEquals(List.of("error", "warning"),
+                manager.layoutFrames().stream().map(frame -> frame.notification().getMessage()).toList());
+        com.cpz.processing.controls.core.overlay.notification.config.NotificationConfigLoader.loadFromJson(
+                processing.data.JSONObject.parse("{\"prioritizeSeverity\":false}"), "test.json").applyTo(manager);
+        assertFalse(manager.isPrioritizeSeverity());
+        manager.info("new info");
+        assertEquals(List.of("new info", "warning"),
+                manager.layoutFrames().stream().map(frame -> frame.notification().getMessage()).toList());
+    }
+
+    @Test
+    void partialJsonPreservesPriorityAndRejectsNonBooleanValues() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0));
+        manager.setPrioritizeSeverity(true);
+        for (String json : List.of("{}", "{\"prioritizeSeverity\":null}")) {
+            com.cpz.processing.controls.core.overlay.notification.config.NotificationConfigLoader.loadFromJson(
+                    processing.data.JSONObject.parse(json), "test.json").applyTo(manager);
+            assertTrue(manager.isPrioritizeSeverity());
+        }
+        for (String value : List.of("1", "\"true\"", "[]", "{}")) {
+            assertThrows(IllegalArgumentException.class, () ->
+                    com.cpz.processing.controls.core.overlay.notification.config.NotificationConfigLoader.loadFromJson(
+                            processing.data.JSONObject.parse("{\"prioritizeSeverity\":" + value + "}"), "test.json"));
+        }
+    }
+
     private static NotificationManager manager(PApplet sketch, OverlayManager overlayManager, TimeSource clock) {
         return new NotificationManager(sketch, overlayManager, clock);
     }
