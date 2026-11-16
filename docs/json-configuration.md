@@ -106,7 +106,12 @@ with `NotificationConfigLoader`. That file is separate from the controls JSON
 document and supports only notification-system settings such as placement,
 custom stack position, visible count, durations, severity durations, and visual
 style. That standalone style also supports `style.font` for the manager-wide
-notification typography.
+notification typography. Root-level `persistentDismissible` (boolean, default
+false) enables an X on persistent items only. Omitted or null preserves the
+current setting; other value types are rejected. The host must register
+`notifications.getInputLayer()` with its `InputManager` for X interaction.
+Persistent items are created by `showPersistent(...)` and closed by
+`dismiss(id)` even when X is disabled. See [Notification](notification.md#persistent-notifications).
 It does not define notification messages or trigger runtime notifications.
 
 Example:

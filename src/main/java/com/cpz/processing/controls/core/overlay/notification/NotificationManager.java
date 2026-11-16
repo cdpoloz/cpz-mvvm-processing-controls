@@ -1,6 +1,9 @@
 package com.cpz.processing.controls.core.overlay.notification;
 
 import com.cpz.processing.controls.controls.geometry.ControlMeasure;
+import com.cpz.processing.controls.core.input.DefaultInputLayer;
+import com.cpz.processing.controls.core.input.InputLayer;
+import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
 import com.cpz.processing.controls.core.style.TypographySupport;
@@ -17,9 +20,9 @@ import processing.core.PShape;
 /**
  * App-facing manager for toast-style runtime notifications.
  *
- * <p>The manager owns one render-only overlay entry and draws all active
- * notifications through it. It does not register input layers and does not
- * participate in focus management.</p>
+ * <p>The manager owns one overlay entry. Its optional pointer layer only handles
+ * close buttons on persistent items and never participates in focus management.
+ * Hosts register {@link #getInputLayer()} with their input manager once.</p>
  *
  * @author CPZ
  */
@@ -37,6 +40,7 @@ public final class NotificationManager {
     private final OverlayManager overlayManager;
     private final TimeSource timeSource;
     private final OverlayEntry overlayEntry;
+    private final CloseInputLayer inputLayer = new CloseInputLayer();
     private final List<Notification> notifications = new ArrayList<>();
     private final EnumMap<NotificationSeverity, Long> severityDurations = new EnumMap<>(NotificationSeverity.class);
     private final EnumMap<NotificationSeverity, CachedIcon> severityIconCache = new EnumMap<>(NotificationSeverity.class);
@@ -46,6 +50,7 @@ public final class NotificationManager {
     private int maxVisible = DEFAULT_MAX_VISIBLE;
     private boolean registered;
     private boolean prioritizeSeverity;
+    private boolean persistentDismissible;
 
     public NotificationManager(PApplet sketch, OverlayManager overlayManager) {
         this(sketch, overlayManager, new SystemTimeSource());
@@ -55,7 +60,7 @@ public final class NotificationManager {
         this.sketch = Objects.requireNonNull(sketch, "sketch");
         this.overlayManager = Objects.requireNonNull(overlayManager, "overlayManager");
         this.timeSource = Objects.requireNonNull(timeSource, "timeSource");
-        this.overlayEntry = new OverlayEntry(DEFAULT_Z_INDEX, this::render, null, this::clear, null);
+        this.overlayEntry = new OverlayEntry(DEFAULT_Z_INDEX, this::render, this.inputLayer, this::clear, null);
         this.resetSeverityDurations();
     }
 
@@ -71,11 +76,58 @@ public final class NotificationManager {
     public Notification show(String message, NotificationSeverity severity, long durationMillis) {
         this.validateDurationMillis(durationMillis);
         Notification notification = new Notification(message, severity, this.nowMillis(), durationMillis);
+        return this.add(notification);
+    }
+
+    /** Creates an INFO notification that remains until dismissed or cleared. */
+    public Notification showPersistent(String message) {
+        return this.showPersistent(message, NotificationSeverity.INFO);
+    }
+
+    /** Creates a persistent item; configured timed durations do not apply. */
+    public Notification showPersistent(String message, NotificationSeverity severity) {
+        return this.add(new Notification(message, severity, this.nowMillis(), 0L, true));
+    }
+
+    private Notification add(Notification notification) {
         this.pruneExpired();
         this.notifications.add(notification);
         this.trimToMaxVisible();
         this.registerOverlay();
         return notification;
+    }
+
+    /**
+     * Removes a visible or pending item by id, regardless of its close-button setting.
+     * @param id id returned by {@link Notification#getId()}
+     * @return whether an active item was removed; false for null or unknown ids
+     */
+    public boolean dismiss(String id) {
+        this.pruneExpired();
+        boolean removed = this.notifications.removeIf(notification -> notification.getId().equals(id));
+        if (this.notifications.isEmpty()) {
+            this.unregisterOverlay();
+        }
+        return removed;
+    }
+
+    /** Whether persistent items display a pointer-operated close button (default false). */
+    public boolean isPersistentDismissible() {
+        return this.persistentDismissible;
+    }
+
+    /** Enables or hides the close button on all current and future persistent items. */
+    public void setPersistentDismissible(boolean persistentDismissible) {
+        this.persistentDismissible = persistentDismissible;
+    }
+
+    /**
+     * Stable, non-modal pointer layer. Register once with the host InputManager.
+     * Only close-button gestures are consumed; keyboard input is never captured.
+     * @return the same input layer used by the notification overlay
+     */
+    public InputLayer getInputLayer() {
+        return this.inputLayer;
     }
 
     public Notification info(String message) {
@@ -103,6 +155,7 @@ public final class NotificationManager {
         this.clear();
     }
 
+    /** Returns all active items, including persistent items pending display. */
     public int size() {
         this.pruneExpired();
         return this.notifications.size();
@@ -265,15 +318,18 @@ public final class NotificationManager {
         float width = this.resolvedWidth(style);
         LayoutOrigin origin = this.resolvedLayoutOrigin(width, style);
         float cursor = origin.y();
-        for (Notification notification : ordered) {
+        for (Notification notification : ordered.subList(0, Math.min(this.maxVisible, ordered.size()))) {
             PShape icon = this.resolveSeverityIcon(notification.getSeverity());
             float iconTextOffset = icon == null ? 0.0F : style.getIconSize() + style.getIconTextGap();
+            float closeSize = notification.isPersistent() && this.persistentDismissible
+                    ? Math.min(width, this.lineHeight(style)) : 0.0F;
+            float closeOffset = closeSize > 0.0F ? closeSize + style.getTextSize() * 0.5F : 0.0F;
             float textWidth = Math.max(
                     1.0F,
-                    width - style.getAccentWidth() - style.getTextPadding() * 2.0F - iconTextOffset
+                    width - style.getAccentWidth() - style.getTextPadding() * 2.0F - iconTextOffset - closeOffset
             );
             List<String> lines = this.wrapLines(notification.getMessage(), textWidth);
-            float height = this.heightFor(lines, style);
+            float height = Math.max(this.heightFor(lines, style), closeSize + style.getTextPadding() * 2.0F);
             float y;
             if (origin.stacksDown()) {
                 y = cursor;
@@ -282,7 +338,10 @@ public final class NotificationManager {
                 y = cursor - height;
                 cursor -= height + style.getGap();
             }
-            frames.add(new NotificationFrame(notification, origin.x(), y, width, height, lines, icon));
+            CloseBounds closeBounds = closeSize > 0.0F ? new CloseBounds(
+                    origin.x() + Math.max(0.0F, width - style.getTextPadding() - closeSize),
+                    y + style.getTextPadding(), closeSize) : null;
+            frames.add(new NotificationFrame(notification, origin.x(), y, width, height, lines, icon, closeBounds));
         }
         return frames;
     }
@@ -348,6 +407,16 @@ public final class NotificationManager {
         for (int i = 0; i < frame.lines().size(); i++) {
             this.sketch.text(frame.lines().get(i), textX, textY + i * lineHeight);
         }
+        if (frame.closeBounds() != null) {
+            CloseBounds close = frame.closeBounds();
+            float inset = close.size() * 0.25F;
+            this.sketch.stroke(style.getTextColor());
+            this.sketch.strokeWeight(Math.max(1.0F, style.getTextSize() / 10.0F));
+            this.sketch.line(close.x() + inset, close.y() + inset,
+                    close.x() + close.size() - inset, close.y() + close.size() - inset);
+            this.sketch.line(close.x() + inset, close.y() + close.size() - inset,
+                    close.x() + close.size() - inset, close.y() + inset);
+        }
     }
 
     private void registerOverlay() {
@@ -390,17 +459,12 @@ public final class NotificationManager {
     }
 
     private void trimToMaxVisible() {
-        while (this.notifications.size() > this.maxVisible) {
-            int victim = 0;
-            if (this.prioritizeSeverity) {
-                for (int i = 1; i < this.notifications.size(); i++) {
-                    if (severityPriority(this.notifications.get(i).getSeverity())
-                            < severityPriority(this.notifications.get(victim).getSeverity())) {
-                        victim = i;
-                    }
-                }
+        List<Notification> ordered = this.notificationsInEdgeOrder();
+        for (int i = this.maxVisible; i < ordered.size(); i++) {
+            Notification overflow = ordered.get(i);
+            if (!overflow.isPersistent()) {
+                this.notifications.remove(overflow);
             }
-            this.notifications.remove(victim);
         }
     }
 
@@ -599,6 +663,60 @@ public final class NotificationManager {
         TypographySupport.apply(this.sketch, style.getFont(), style.getTextSize());
     }
 
+    private NotificationFrame closeTarget(float x, float y) {
+        if (!this.persistentDismissible) return null;
+        for (NotificationFrame frame : this.layoutFrames()) {
+            if (frame.closeBounds() != null && frame.closeBounds().contains(x, y)) return frame;
+        }
+        return null;
+    }
+
+    private final class CloseInputLayer extends DefaultInputLayer {
+        private String pressedId;
+
+        private CloseInputLayer() {
+            super(DEFAULT_Z_INDEX);
+        }
+
+        @Override
+        public boolean isActive() {
+            return this.pressedId != null || (registered && persistentDismissible);
+        }
+
+        @Override
+        public boolean isKeyboardCaptureEnabled() {
+            return false;
+        }
+
+        @Override
+        public boolean handlePointerEvent(PointerEvent event) {
+            if (event == null || !this.isActive()) return false;
+            if (event.getType() == PointerEvent.Type.PRESS) {
+                this.pressedId = null;
+                if (event.getButton() != 0 && event.getButton() != PApplet.LEFT) return false;
+                NotificationFrame target = closeTarget(event.getX(), event.getY());
+                if (target == null) return false;
+                this.pressedId = target.notification().getId();
+                return true;
+            }
+            if (event.getType() == PointerEvent.Type.RELEASE && this.pressedId != null) {
+                if (event.getButton() != 0 && event.getButton() != PApplet.LEFT) return false;
+                String id = this.pressedId;
+                this.pressedId = null;
+                NotificationFrame target = closeTarget(event.getX(), event.getY());
+                if (target != null && target.notification().getId().equals(id)) dismiss(id);
+                return true;
+            }
+            return event.getType() == PointerEvent.Type.DRAG && this.pressedId != null;
+        }
+    }
+
+    record CloseBounds(float x, float y, float size) {
+        boolean contains(float x, float y) {
+            return x >= this.x && x < this.x + this.size && y >= this.y && y < this.y + this.size;
+        }
+    }
+
     static final class NotificationFrame {
         private final Notification notification;
         private final float x;
@@ -607,6 +725,7 @@ public final class NotificationManager {
         private final float height;
         private final List<String> lines;
         private final PShape icon;
+        private final CloseBounds closeBounds;
 
         NotificationFrame(
                 Notification notification,
@@ -615,7 +734,8 @@ public final class NotificationManager {
                 float width,
                 float height,
                 List<String> lines,
-                PShape icon
+                PShape icon,
+                CloseBounds closeBounds
         ) {
             this.notification = notification;
             this.x = x;
@@ -624,6 +744,7 @@ public final class NotificationManager {
             this.height = height;
             this.lines = List.copyOf(lines);
             this.icon = icon;
+            this.closeBounds = closeBounds;
         }
 
         Notification notification() {
@@ -652,6 +773,10 @@ public final class NotificationManager {
 
         PShape icon() {
             return this.icon;
+        }
+
+        CloseBounds closeBounds() {
+            return this.closeBounds;
         }
     }
 

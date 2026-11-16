@@ -23,6 +23,32 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NotificationConfigLoaderTest {
     @Test
+    void persistentDismissibleIsOptInAndSupportsPartialConfiguration() {
+        NotificationManager manager = manager();
+        assertFalse(manager.isPersistentDismissible());
+        NotificationConfig enabled = config("{\"persistentDismissible\":true}");
+        assertEquals(Boolean.TRUE, enabled.getPersistentDismissible());
+        enabled.applyTo(manager);
+        assertTrue(manager.isPersistentDismissible());
+        for (String json : new String[]{"{}", "{\"persistentDismissible\":null}"}) {
+            config(json).applyTo(manager);
+            assertTrue(manager.isPersistentDismissible());
+        }
+        config("{\"persistentDismissible\":false}").applyTo(manager);
+        assertFalse(manager.isPersistentDismissible());
+    }
+
+    @Test
+    void invalidPersistentDismissibleReportsKeyAndSourceBeforeApplying() {
+        for (String value : new String[]{"1", "\"true\"", "[]", "{}"}) {
+            IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                    () -> config("{\"persistentDismissible\":" + value + "}"));
+            assertTrue(error.getMessage().contains("persistentDismissible"));
+            assertTrue(error.getMessage().contains("notification.json"));
+        }
+    }
+
+    @Test
     void relativeFontUsesEffectiveSizeAndCacheWhileStyleCopiesStayIndependent() {
         JsonFontApplet sketch = new JsonFontApplet(JSONObject.parse("{}"), ProcessingTestSupport.font("Dialog", 14));
         sketch.height = 500;

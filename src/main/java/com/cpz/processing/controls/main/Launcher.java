@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.main;
 
 import com.cpz.processing.controls.examples.button.ButtonTest;
+import com.cpz.processing.controls.examples.notification.NotificationPersistentTest;
 import processing.core.PApplet;
 
 import java.util.Locale;
@@ -110,6 +111,7 @@ public class Launcher {
         // Notification ***********************************
         //PApplet.main(NotificationTest.class);
         //PApplet.main(NotificationJsonTest.class);
+        //PApplet.main(NotificationPersistentTest.class);
 
         // Theme ****************************************
         //PApplet.main(ThemeFacadeSketch.class);
