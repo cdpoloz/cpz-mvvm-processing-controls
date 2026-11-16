@@ -2,6 +2,9 @@ package com.cpz.processing.controls.core.overlay.notification;
 
 import com.cpz.processing.controls.controls.geometry.ControlMeasure;
 import com.cpz.processing.controls.controls.geometry.MeasureMode;
+import com.cpz.processing.controls.core.input.DefaultInputLayer;
+import com.cpz.processing.controls.core.input.InputManager;
+import com.cpz.processing.controls.core.input.PointerEvent;
 import com.cpz.processing.controls.core.overlay.OverlayEntry;
 import com.cpz.processing.controls.core.overlay.OverlayManager;
 import com.cpz.processing.controls.testsupport.ProcessingTestSupport;
@@ -618,12 +621,14 @@ class NotificationManagerTest {
     }
 
     @Test
-    void overlayEntryHasNoFocusTargetAndNoInputLayer() {
+    void overlayEntryHasNoFocusTargetAndAnInactivePointerLayerByDefault() {
         NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0L));
         OverlayEntry entry = manager.getOverlayEntry();
 
         assertNull(entry.getFocusTarget());
-        assertNull(entry.getInputLayer());
+        assertSame(manager.getInputLayer(), entry.getInputLayer());
+        assertFalse(entry.getInputLayer().isActive());
+        assertFalse(entry.getInputLayer().isKeyboardCaptureEnabled());
     }
 
     @Test
@@ -999,6 +1004,217 @@ class NotificationManagerTest {
         }
     }
 
+    @Test
+    void persistentItemsNeverExpireAndTimedDurationValidationIsUnchanged() {
+        FakeTimeSource clock = new FakeTimeSource(0);
+        NotificationManager manager = manager(sketch(), new OverlayManager(), clock);
+        Notification persistent = manager.showPersistent("Keep", null);
+        Notification timed = manager.show("Timed", NotificationSeverity.ERROR, 100);
+        clock.setMillis(1_000_000);
+        assertTrue(persistent.isPersistent());
+        assertEquals(0, persistent.getDurationMillis());
+        assertEquals(NotificationSeverity.INFO, persistent.getSeverity());
+        assertFalse(persistent.isExpired(Long.MAX_VALUE));
+        assertFalse(timed.isPersistent());
+        assertEquals(List.of(persistent), manager.getActiveNotifications());
+        assertThrows(IllegalArgumentException.class, () -> manager.show("Zero", NotificationSeverity.INFO, 0));
+        assertThrows(IllegalArgumentException.class, () -> manager.setDefaultDurationMillis(0));
+        assertThrows(IllegalArgumentException.class, () -> manager.showPersistent("  "));
+        assertThrows(NullPointerException.class, () -> manager.showPersistent(null));
+    }
+
+    @Test
+    void chronologicalOverflowKeepsPendingPersistentItemsAndDropsTimedItems() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0));
+        manager.setMaxVisible(1);
+        Notification first = manager.showPersistent("First");
+        Notification second = manager.showPersistent("Second");
+        Notification timed = manager.info("Temporary");
+        assertEquals(3, manager.size());
+        assertSame(timed, manager.layoutFrames().get(0).notification());
+        assertTrue(manager.dismiss(timed.getId()));
+        assertSame(second, manager.layoutFrames().get(0).notification());
+        assertTrue(manager.dismiss(second.getId()));
+        assertSame(first, manager.layoutFrames().get(0).notification());
+        manager.info("Dropped on overflow");
+        manager.showPersistent("Newest");
+        assertEquals(List.of("First", "Newest"),
+                manager.getActiveNotifications().stream().map(Notification::getMessage).toList());
+    }
+
+    @Test
+    void priorityAndLimitChangesNeverDiscardPersistentItems() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0));
+        manager.setMaxVisible(1);
+        manager.setPrioritizeSeverity(true);
+        Notification info = manager.showPersistent("Info");
+        Notification error = manager.showPersistent("Error", NotificationSeverity.ERROR);
+        Notification warning = manager.showPersistent("Warning", NotificationSeverity.WARNING);
+        manager.success("Dropped");
+        assertEquals(3, manager.size());
+        assertSame(error, manager.layoutFrames().get(0).notification());
+        manager.setMaxVisible(2);
+        assertEquals(List.of(error, warning), manager.layoutFrames().stream().map(f -> f.notification()).toList());
+        manager.setMaxVisible(1);
+        manager.setPrioritizeSeverity(false);
+        assertSame(warning, manager.layoutFrames().get(0).notification());
+        assertEquals(3, manager.size());
+        manager.dismiss(info.getId()); // pending items are dismissible too
+        manager.dismiss(warning.getId());
+        assertSame(error, manager.layoutFrames().get(0).notification());
+    }
+
+    @Test
+    void expiryPromotesPendingPersistentItemAndDismissIsIdempotent() {
+        FakeTimeSource clock = new FakeTimeSource(0);
+        OverlayManager overlays = new OverlayManager();
+        NotificationManager manager = manager(sketch(), overlays, clock);
+        manager.setMaxVisible(1);
+        Notification persistent = manager.showPersistent("Pending");
+        manager.show("Timed", NotificationSeverity.INFO, 100);
+        clock.setMillis(100);
+        assertSame(persistent, manager.layoutFrames().get(0).notification());
+        assertFalse(manager.dismiss(null));
+        assertFalse(manager.dismiss("unknown"));
+        assertTrue(manager.dismiss(persistent.getId()));
+        assertFalse(manager.dismiss(persistent.getId()));
+        assertTrue(overlays.getActiveOverlays().isEmpty());
+    }
+
+    @Test
+    void globalClearAndDisposeRemovePendingItemsAndManagerCanBeReused() {
+        OverlayManager overlays = new OverlayManager();
+        NotificationManager manager = manager(sketch(), overlays, new FakeTimeSource(0));
+        manager.setMaxVisible(1);
+        manager.showPersistent("Pending");
+        manager.showPersistent("Visible");
+        overlays.clearAll();
+        assertTrue(manager.isEmpty());
+        manager.showPersistent("Again");
+        assertEquals(1, overlays.getActiveOverlays().size());
+        manager.dispose();
+        assertTrue(manager.isEmpty());
+        assertTrue(overlays.getActiveOverlays().isEmpty());
+    }
+
+    @Test
+    void closeButtonIsOnlyReservedAndDrawnForEnabledPersistentItems() {
+        RecordingApplet sketch = recordingSketch();
+        NotificationManager manager = manager(sketch, new OverlayManager(), new FakeTimeSource(0));
+        manager.setStyle(new NotificationStyle().setWidth(160).setTextSize(14).setTextPadding(10));
+        manager.showPersistent("one two three four");
+        var withoutClose = manager.layoutFrames().get(0);
+        assertNull(withoutClose.closeBounds());
+        manager.setPersistentDismissible(true);
+        var withClose = manager.layoutFrames().get(0);
+        assertTrue(withClose.lines().size() > withoutClose.lines().size());
+        manager.getOverlayEntry().getRender().run();
+        assertEquals(2, sketch.lineCalls);
+        manager.info("one two three four");
+        var timed = manager.layoutFrames().get(0);
+        assertNull(timed.closeBounds());
+        assertEquals(withoutClose.lines(), timed.lines());
+        manager.setPersistentDismissible(false);
+        assertTrue(manager.layoutFrames().stream().allMatch(f -> f.closeBounds() == null));
+        assertFalse(manager.getInputLayer().isActive());
+    }
+
+    @Test
+    void closeHitTestingFollowsRelativeStyleAndPositionAfterResize() {
+        RecordingApplet sketch = recordingSketch();
+        NotificationManager manager = manager(sketch, new OverlayManager(), new FakeTimeSource(0));
+        manager.setStyle(new NotificationStyle().setWidth(ControlMeasure.relative(0.4F))
+                .setTextSize(ControlMeasure.relative(0.02F)).setTextPadding(ControlMeasure.relative(0.01F)));
+        manager.setPosition(ControlMeasure.relative(0.1F), ControlMeasure.relative(0.1F));
+        manager.setPersistentDismissible(true);
+        manager.showPersistent("Resize");
+        var before = manager.layoutFrames().get(0).closeBounds();
+        sketch.width = 1000;
+        sketch.height = 800;
+        var after = manager.layoutFrames().get(0).closeBounds();
+        assertEquals(before.size() * 2, after.size(), 0.001F);
+        assertFalse(pointer(manager, PointerEvent.Type.PRESS, before));
+        assertFalse(pointer(manager, PointerEvent.Type.RELEASE, after)); // press must start on X
+        assertTrue(pointer(manager, PointerEvent.Type.PRESS, after));
+        assertTrue(pointer(manager, PointerEvent.Type.RELEASE, after));
+        assertTrue(manager.isEmpty());
+    }
+
+    @Test
+    void closeRequiresPrimaryPressAndReleaseOnTheSameNotification() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0));
+        manager.setPersistentDismissible(true);
+        Notification older = manager.showPersistent("Older");
+        Notification newer = manager.showPersistent("Newer");
+        var top = manager.layoutFrames().get(0).closeBounds();
+        var bottom = manager.layoutFrames().get(1).closeBounds();
+        assertFalse(manager.getInputLayer().handlePointerEvent(new PointerEvent(
+                PointerEvent.Type.PRESS, top.x() + 1, top.y() + 1, PApplet.RIGHT)));
+        assertFalse(pointer(manager, PointerEvent.Type.RELEASE, top));
+        assertTrue(pointer(manager, PointerEvent.Type.PRESS, top));
+        assertTrue(pointer(manager, PointerEvent.Type.DRAG, bottom));
+        assertTrue(pointer(manager, PointerEvent.Type.RELEASE, bottom));
+        assertEquals(2, manager.size());
+        assertTrue(pointer(manager, PointerEvent.Type.PRESS, top));
+        assertTrue(pointer(manager, PointerEvent.Type.RELEASE, top));
+        assertEquals(List.of(older), manager.getActiveNotifications());
+        assertFalse(manager.dismiss(newer.getId()));
+    }
+
+    @Test
+    void reorderingOrDisablingBetweenPressAndReleaseDoesNotCloseAnotherItem() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0));
+        manager.setPersistentDismissible(true);
+        Notification original = manager.showPersistent("Original");
+        var close = manager.layoutFrames().get(0).closeBounds();
+        pointer(manager, PointerEvent.Type.PRESS, close);
+        manager.showPersistent("New at same location");
+        assertTrue(pointer(manager, PointerEvent.Type.RELEASE, close));
+        assertEquals(2, manager.size());
+        pointer(manager, PointerEvent.Type.PRESS, close);
+        manager.setPersistentDismissible(false);
+        assertTrue(pointer(manager, PointerEvent.Type.RELEASE, close));
+        assertEquals(2, manager.size());
+        assertTrue(manager.dismiss(original.getId())); // still works when X is disabled
+    }
+
+    @Test
+    void onlyCloseGesturesAreConsumedAndHigherOverlaysKeepInputPriority() {
+        NotificationManager manager = manager(sketch(), new OverlayManager(), new FakeTimeSource(0));
+        manager.setPersistentDismissible(true);
+        manager.showPersistent("Keep");
+        InputManager input = new InputManager();
+        int[] underlying = {0};
+        input.registerLayer(new DefaultInputLayer(0) {
+            @Override public boolean handlePointerEvent(PointerEvent event) {
+                underlying[0]++;
+                return true;
+            }
+        });
+        input.registerLayer(manager.getInputLayer());
+        var frame = manager.layoutFrames().get(0);
+        input.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, frame.x() + 1, frame.y() + 1));
+        input.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, frame.x() + 1, frame.y() + 1));
+        assertEquals(2, underlying[0]);
+        var close = frame.closeBounds();
+        input.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, close.x() + 1, close.y() + 1));
+        input.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, close.x() + 1, close.y() + 1));
+        assertEquals(2, underlying[0]);
+        assertTrue(manager.isEmpty());
+        manager.showPersistent("Below dropdown");
+        DefaultInputLayer higher = new DefaultInputLayer(100) {
+            @Override public boolean handlePointerEvent(PointerEvent event) { return true; }
+        };
+        input.registerLayer(higher);
+        input.dispatchPointer(new PointerEvent(PointerEvent.Type.PRESS, close.x() + 1, close.y() + 1));
+        input.dispatchPointer(new PointerEvent(PointerEvent.Type.RELEASE, close.x() + 1, close.y() + 1));
+        assertEquals(1, manager.size());
+    }
+
+    private static boolean pointer(NotificationManager manager, PointerEvent.Type type, NotificationManager.CloseBounds close) {
+        return manager.getInputLayer().handlePointerEvent(new PointerEvent(type, close.x() + 1, close.y() + 1));
+    }
+
     private static NotificationManager manager(PApplet sketch, OverlayManager overlayManager, TimeSource clock) {
         return new NotificationManager(sketch, overlayManager, clock);
     }
@@ -1063,6 +1279,7 @@ class NotificationManagerTest {
 
     private static final class RecordingApplet extends PApplet {
         private int strokeCalls;
+        private int lineCalls;
         private int noStrokeCalls;
         private int shapeCalls;
         private int loadShapeCalls;
@@ -1102,6 +1319,11 @@ class NotificationManagerTest {
         @Override
         public void noStroke() {
             this.noStrokeCalls++;
+        }
+
+        @Override
+        public void line(float x1, float y1, float x2, float y2) {
+            this.lineCalls++;
         }
 
         @Override

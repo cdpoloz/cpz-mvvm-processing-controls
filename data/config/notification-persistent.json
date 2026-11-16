@@ -1,0 +1,18 @@
+{
+  "placement": "top-right",
+  "maxVisible": 3,
+  "prioritizeSeverity": true,
+  "persistentDismissible": true,
+  "style": {
+    "width": 380,
+    "textSize": 14,
+    "textPadding": 12,
+    "margin": 24,
+    "minHeight": 48,
+    "severityBackgroundColors": {
+      "info": "#102A38",
+      "warning": "#382A12",
+      "error": "#38151D"
+    }
+  }
+}

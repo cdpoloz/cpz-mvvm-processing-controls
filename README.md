@@ -407,9 +407,14 @@ This project is a UI framework intended for Processing sketches and for other ho
 The public control layer is exposed through closed ergonomic facades such as `Button`, `Checkbox`, `Toggle`, `Slider`, `Label`, `RadioGroup`, `TextField`, `NumericField`, `DropDown`, `Panel`, `Indicator`, and `ProgressBar`.
 
 `Notification` is a toast-style runtime overlay feature, not a `Control`. It is
-created programmatically through `NotificationManager`, does not consume
-pointer or keyboard input in `0.9.11`, and is not configured inside
-`controls[]`.
+created programmatically through `NotificationManager` and is not configured
+inside `controls[]`. Timed items expire normally; `showPersistent(...)` creates
+items retained until `dismiss(id)` or explicit clearing. Persistent items may
+show an X through standalone JSON `persistentDismissible: true` (default false).
+Register `notifications.getInputLayer()` with the host input manager to enable
+X interaction. Only close gestures consume pointer events; notifications never
+capture keyboard input or focus. Pending persistent items survive `maxVisible`
+overflow; see [Notification](docs/notification.md#persistent-notifications).
 
 Notification manager/style defaults can be loaded from standalone JSON through
 `NotificationConfigLoader`, for example `data/config/notification.json`. This

@@ -62,15 +62,16 @@ public final class NotificationConfigLoader {
                 readPositiveLong(root, "defaultDurationMillis"),
                 readSeverityDurations(root),
                 readStyle(root, path, fontResolverFactory),
-                readPrioritizeSeverity(root, path)
+                readOptionalBoolean(root, "prioritizeSeverity", path),
+                readOptionalBoolean(root, "persistentDismissible", path)
         );
     }
 
-    private static Boolean readPrioritizeSeverity(JSONObject root, String path) {
-        if (!root.hasKey("prioritizeSeverity") || root.isNull("prioritizeSeverity")) return null;
-        Object value = root.get("prioritizeSeverity");
+    private static Boolean readOptionalBoolean(JSONObject root, String key, String path) {
+        if (!root.hasKey(key) || root.isNull(key)) return null;
+        Object value = root.get(key);
         if (!(value instanceof Boolean))
-            throw new IllegalArgumentException("prioritizeSeverity must be a boolean in " + path);
+            throw new IllegalArgumentException(key + " must be a boolean in " + path);
         return (Boolean) value;
     }
 

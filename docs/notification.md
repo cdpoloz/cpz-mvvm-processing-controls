@@ -2,7 +2,8 @@
 
 `Notification` is a toast-style runtime overlay feature for short status
 messages. It is not a `Control`, is not part of the `controls[]` JSON format,
-and does not consume pointer or keyboard input in `0.9.11`.
+and never captures keyboard input or focus. Its optional close-button pointer
+layer is described below.
 
 Use notifications for transient application feedback such as saved state,
 success messages, warnings, or errors. Use a future dialog/modal feature, not
@@ -13,9 +14,9 @@ success messages, warnings, or errors. Use a future dialog/modal feature, not
 ## Components
 
 - `Notification`: read-only runtime item with id, message, severity, creation
-  time, duration, and expiry check
-- `NotificationManager`: app-facing manager that owns one render-only
-  `OverlayEntry`
+  time, duration, persistence flag, and expiry check
+- `NotificationManager`: app-facing manager that owns one `OverlayEntry`
+  and an optional close-button input layer
 - `NotificationSeverity`: `INFO`, `SUCCESS`, `WARNING`, `ERROR`
 - `NotificationPlacement`: top/bottom and left/right/center stack placement
 - `NotificationPosition`: immutable custom stack origin with independent
@@ -71,6 +72,13 @@ Notification show(String message);
 Notification show(String message, NotificationSeverity severity);
 Notification show(String message, NotificationSeverity severity, long durationMillis);
 
+Notification showPersistent(String message);
+Notification showPersistent(String message, NotificationSeverity severity);
+boolean dismiss(String id);
+boolean isPersistentDismissible();
+void setPersistentDismissible(boolean persistentDismissible);
+InputLayer getInputLayer();
+
 Notification info(String message);
 Notification success(String message);
 Notification warning(String message);
@@ -113,6 +121,7 @@ Default behavior:
 - warning duration: `4500L`
 - error duration: `6000L`
 - max visible notifications: `4`
+- persistent close buttons: disabled (`persistentDismissible: false`)
 - overlay z-index: `50`, below interactive dropdown overlays
 
 Messages must not be null or blank. Public duration values must be positive.
@@ -150,8 +159,9 @@ Notifications are stored in insertion order. The newest notification appears
 closest to the selected screen edge. Top placements stack downward; bottom
 placements stack upward.
 
-When the visible limit is exceeded, the oldest notification is dropped. There
-is no queue or backlog in `0.9.11`.
+When the visible limit is exceeded, overflowing **timed** notifications are
+dropped. Persistent items are retained as pending; at most `maxVisible` items
+are drawn. See persistent notification behavior below.
 
 ### Optional severity priority (source change after 0.9.13)
 
@@ -178,13 +188,17 @@ This option requires a library build containing this change; the published
 Priority is explicitly `ERROR > WARNING > SUCCESS > INFO`. Both retention and
 display use that order. Equal-severity messages prefer the newest insertion,
 even when their timestamps are equal. With three unexpired errors visible, a
-new warning/success/info is discarded rather than displacing an error. A newer
-error replaces the oldest error when the limit is full. The highest-priority
+new timed warning/success/info is discarded rather than displacing an error.
+A persistent lower-priority item is retained pending display instead. A newer
+error takes the oldest error's visible slot when the limit is full; an old
+persistent error is retained pending display. The highest-priority
 message appears nearest the configured origin/edge.
 
 Expired messages are removed before admitting a new notification. Messages
 keep their original duration and are not prolonged by reordering. Discarded
-messages are not queued and never reappear after another message expires.
+timed messages are not queued and never reappear after another message expires.
+Pending persistent items become visible when their order places them within
+the visible limit.
 `show(...)` still returns the created event even if priority immediately drops
 it from the visible set.
 
@@ -311,21 +325,92 @@ before. Text color is not adjusted automatically, so configure severity
 backgrounds with sufficient contrast against the existing `textColor`.
 
 There are no shadows, countdown bars, animations, fade, slide, easing, hover
-pause, close buttons, or actions.
+pause, or message actions. Optional close buttons are supported for persistent
+items only.
 
 ---
 
+## Persistent Notifications
+
+Create persistent items explicitly; zero or negative durations are still invalid
+in the existing timed APIs and JSON duration settings:
+
+```java
+Notification alert = notifications.showPersistent(
+        "Cooling unit unavailable", NotificationSeverity.ERROR);
+
+// When the condition resolves (also works for pending items):
+boolean removed = notifications.dismiss(alert.getId());
+```
+
+`showPersistent(message)` defaults to INFO. Persistent items expose
+`isPersistent() == true`, `getDurationMillis() == 0`, and never expire.
+`dismiss(id)` also works for timed items and returns false for null, unknown,
+expired, or already-dismissed ids. `clear()`, `dispose()`, and
+`OverlayManager.clearAll()` remove both visible and pending items.
+
+The manager-wide standalone JSON option enables an X close button:
+
+```json
+{
+  "persistentDismissible": true
+}
+```
+
+The default is false: persistent items have no X and are removed by code.
+An omitted or null field preserves the current setting on partial config apply;
+for a new manager it remains false. Non-boolean values are rejected with the
+field name and source path. `setPersistentDismissible(boolean)` is the equivalent
+runtime setter. Changes affect existing and future items immediately. Timed
+items never acquire an X.
+
+Close-button geometry scales with the resolved text size and padding. Only
+persistent items with X enabled reserve text space for it; they continue to
+support SVG icons, wrapping, relative style dimensions and custom origins.
+
+### Visible Limit And Pending Items
+
+Both timed and persistent items use the existing ordering: newest first, or
+severity then newest when `prioritizeSeverity` is enabled. The first
+`maxVisible` items are drawn. Persistent items outside that set remain pending;
+timed items outside it are discarded as before. Reducing `maxVisible` or
+changing priority never deletes persistent items. Once an item is dismissed or
+expires, pending items can enter the visible set. Enabling persistence does not
+promote a message above a higher-priority or newer item.
+
+`size()` counts all active items, including pending persistent items, so it may
+exceed `maxVisible`. Producers should keep the returned ids and dismiss alerts
+when resolved; there is no automatic bound on pending persistent items.
+
 ## Input And Focus
 
-Notifications are render-only overlays:
+To make close buttons interactive, register the manager's stable input layer
+once with the host's existing input manager:
 
-- no pointer input
-- no keyboard input
-- no focus target
-- no modal behavior
-- no input capture
+```java
+inputManager.registerLayer(notifications.getInputLayer());
+```
 
-Visible notifications do not block normal control input.
+Continue dispatching normalized pointer events through that `InputManager`,
+including PRESS and RELEASE. Registering the layer is harmless when the JSON
+option is false; it becomes active when close buttons are enabled and items
+are present. The same layer is exposed by the shared `OverlayEntry`.
+
+Only a primary-button press on X followed by a release on the **same item's**
+X dismisses it. Releasing elsewhere cancels closure. The close gesture consumes
+press, drag and release so controls below do not receive those events. Pointer
+events outside the X pass through normally; clicking the message body does not
+close it. Hit testing uses current layout, including resizing, reordering and
+custom positioning. Notifications never capture keyboard input or focus and
+remain non-modal. The layer priority is 50, below dropdown overlays (100).
+
+At host teardown, unregister the layer if the host input manager outlives the
+notification manager:
+
+```java
+notifications.dispose();
+inputManager.unregisterLayer(notifications.getInputLayer());
+```
 
 ---
 
@@ -337,7 +422,7 @@ created by `ControlConfigLoader`, and is not registered in
 
 `0.9.11` includes a standalone notification JSON loader for manager/style
 defaults only. It does not define messages, trigger notifications, register
-input, or create controls:
+input automatically, or create controls:
 
 ```java
 OverlayManager overlayManager = new OverlayManager();
@@ -371,6 +456,7 @@ Supported standalone JSON fields:
     }
   },
   "maxVisible": 4,
+  "persistentDismissible": false,
   "defaultDurationMillis": 3000,
   "severityDurations": {
     "info": 3000,
@@ -501,7 +587,9 @@ See:
 ```text
 src/main/java/com/cpz/processing/controls/examples/notification/NotificationTest.java
 src/main/java/com/cpz/processing/controls/examples/notification/NotificationJsonTest.java
+src/main/java/com/cpz/processing/controls/examples/notification/NotificationPersistentTest.java
 data/config/notification.json
+data/config/notification-persistent.json
 ```
 
 ## Relative style dimensions
@@ -553,3 +641,11 @@ Visual check: run `NotificationJsonTest`, press **R** to load
 `data/config/notification-relative.json`, then resize the window and create
 notifications. Press **A** to restore the original absolute example. Messages,
 expiration, severity behavior and custom positioning retain their existing rules.
+
+Visual persistence check: run `NotificationPersistentTest`. Create more than three
+persistent items and close visible ones to reveal pending items. Use **Dismiss
+oldest by ID** to remove visible or pending items through code. Edit
+`data/config/notification-persistent.json`, set `persistentDismissible` to false,
+and press **R**: existing X buttons disappear and code dismissal still works.
+Timed info has no X and continues to expire normally. Resize to check placement
+and X hit testing.
