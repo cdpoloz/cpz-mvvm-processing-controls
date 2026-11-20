@@ -1,0 +1,56 @@
+{
+  "title": "Items",
+  "measures": {
+    "width": { "mode": "relative", "value": 0.60 },
+    "maxHeight": { "mode": "relative", "value": 0.49 },
+    "rowHeight": { "mode": "relative", "value": 0.058 },
+    "headerHeight": { "mode": "relative", "value": 0.075 },
+    "scrollbarWidth": { "mode": "relative", "value": 0.027 },
+    "closeButtonWidth": { "mode": "relative", "value": 0.14 },
+    "closeButtonHeight": { "mode": "relative", "value": 0.057 },
+    "canvasMargin": { "mode": "relative", "value": 0.032 },
+    "anchorGap": { "mode": "relative", "value": 0.014 },
+    "padding": { "mode": "relative", "value": 0.012 },
+    "minThumbSize": { "mode": "relative", "value": 0.034 }
+  },
+  "style": {
+    "font": "data/font/JetBrainsMono.ttf",
+    "headerColor": "#263F40",
+    "frame": {
+      "backgroundColor": "#172C30",
+      "borderColor": "#568480",
+      "strokeWeight": { "mode": "relative", "value": 0.003 },
+      "cornerRadius": { "mode": "relative", "value": 0.012 }
+    },
+    "title": {
+      "color": "#D6FFF0",
+      "size": { "mode": "relative", "value": 0.024 },
+      "paddingLeft": { "mode": "relative", "value": 0.016 },
+      "paddingRight": { "mode": "relative", "value": 0.01 }
+    },
+    "empty": {
+      "color": "#B9DAD2",
+      "size": { "mode": "relative", "value": 0.022 },
+      "paddingLeft": { "mode": "relative", "value": 0.012 },
+      "paddingRight": { "mode": "relative", "value": 0.012 }
+    },
+    "scrollbar": {
+      "trackColor": "#152827",
+      "thumbColor": "#649B93",
+      "hoverColor": "#82BFB4",
+      "pressedColor": "#ADE3CA",
+      "cornerRadius": { "mode": "relative", "value": 0.007 }
+    },
+    "closeButton": {
+      "backgroundColor": "#355955",
+      "hoverColor": "#46746D",
+      "pressedColor": "#25413F",
+      "textColor": "#EDFFF8",
+      "borderColor": "#69998F",
+      "strokeWeight": { "mode": "relative", "value": 0.002 },
+      "hoverStrokeWeight": { "mode": "relative", "value": 0.004 },
+      "cornerRadius": { "mode": "relative", "value": 0.009 },
+      "textSize": { "mode": "relative", "value": 0.023 }
+    }
+  }
+}

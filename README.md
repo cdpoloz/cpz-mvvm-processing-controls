@@ -759,6 +759,7 @@ from `draw()`.
 - [Input System](docs/input-system.md)
 - [JSON Configuration](docs/json-configuration.md)
 - [Panel](docs/panel.md)
+- [Floating list panel](docs/floating-list-panel.md) with live titles, relative measures and standalone JSON styling
 - [Tooltip](docs/tooltip.md)
 - [Notification](docs/notification.md)
 - [Theme](docs/theme.md)

@@ -1,6 +1,7 @@
 package com.cpz.processing.controls.main;
 
 import com.cpz.processing.controls.examples.button.ButtonTest;
+import com.cpz.processing.controls.examples.floatinglist.FloatingListPanelDemo;
 import com.cpz.processing.controls.examples.notification.NotificationPersistentTest;
 import processing.core.PApplet;
 
@@ -115,5 +116,8 @@ public class Launcher {
 
         // Theme ****************************************
         //PApplet.main(ThemeFacadeSketch.class);
+
+        // FloatingPanel
+        //PApplet.main(FloatingListPanelDemo.class);
     }
 }

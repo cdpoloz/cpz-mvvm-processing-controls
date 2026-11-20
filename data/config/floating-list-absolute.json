@@ -1,0 +1,19 @@
+{
+  "title": "Items",
+  "measures": {
+    "width": 390,
+    "maxHeight": 286,
+    "rowHeight": 34,
+    "headerHeight": 42,
+    "scrollbarWidth": 16,
+    "closeButtonWidth": 82,
+    "closeButtonHeight": 34,
+    "canvasMargin": 12,
+    "anchorGap": 6,
+    "padding": 4,
+    "minThumbSize": 18
+  },
+  "style": {
+    "title": { "size": 16, "paddingLeft": 8, "paddingRight": 4 }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "title": "Items",
+  "measures": {
+    "width": 360,
+    "maxHeight": { "mode": "relative", "value": 0.50 },
+    "rowHeight": 32,
+    "headerHeight": { "mode": "relative", "value": 0.073 },
+    "canvasMargin": 20,
+    "anchorGap": { "mode": "relative", "value": 0.012 },
+    "padding": 6,
+    "minThumbSize": 20
+  },
+  "style": {
+    "headerColor": "#4A342B",
+    "frame": { "backgroundColor": "#302621", "borderColor": "#B48B75", "strokeWeight": 2, "cornerRadius": 8 },
+    "title": { "color": "#FFF0DE", "size": { "mode": "relative", "value": 0.026 } },
+    "scrollbar": { "trackColor": "#221B18", "thumbColor": "#BA937F", "pressedColor": "#FFF0DE" },
+    "closeButton": {
+      "backgroundColor": "#75513C",
+      "hoverColor": "#925F45",
+      "pressedColor": "#513322",
+      "textColor": "#FFF0DE",
+      "borderColor": "#BA937F",
+      "textSize": 14
+    }
+  }
+}
